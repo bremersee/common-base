@@ -44,13 +44,13 @@
     </licenses>
 
     <scm>
-        <url>https://github.com/bremersee/spring-support</url>
-        <connection>scm:git:git://github.com/bremersee/spring-support.git</connection>
-        <developerConnection>scm:git:git@github.com:bremersee/spring-support.git</developerConnection>
+        <url>https://github.com/bremersee/common</url>
+        <connection>scm:git:git://github.com/bremersee/common.git</connection>
+        <developerConnection>scm:git:git@github.com:bremersee/common.git</developerConnection>
     </scm>
 
     <issueManagement>
-        <url>https://github.com/bremersee/spring-support/issues</url>
+        <url>https://github.com/bremersee/common/issues</url>
         <system>GitHub Issues</system>
     </issueManagement>
 
@@ -84,6 +84,11 @@
                 <activeByDefault>true</activeByDefault>
             </activation>
             <modules>
+                <module>bremersee-common-dependencies</module>
+                <module>bremersee-common-parent</module>
+                <module>bremersee-common-api</module>
+                <module>bremersee-common-spring</module>
+                <module>bremersee-common-spring-autoconfigure</module>
             </modules>
         </profile>
     </profiles>
