@@ -20,6 +20,7 @@
         <java.version>1.8</java.version>
         <github.global.server>github</github.global.server>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <product.vendor>bremersee.org</product.vendor>
         <main.basedir>..</main.basedir>
     </properties>
@@ -69,10 +70,20 @@
     </distributionManagement>
 
     <dependencies>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+        </dependency>
+            
         <!-- Generally Useful Test Dependencies -->
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.assertj</groupId>
+            <artifactId>assertj-core</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -127,6 +138,8 @@
                     <exclude>**/application.properties</exclude>
                     <exclude>**/bootstrap.yml</exclude>
                     <exclude>**/bootstrap.properties</exclude>
+                    <exclude>**/bootstrap.properties</exclude>
+                    <exclude>**/log4j2.xml</exclude>
                 </excludes>
             </resource>
             <resource>
@@ -145,6 +158,7 @@
                     <include>**/application.properties</include>
                     <include>**/bootstrap.yml</include>
                     <include>**/bootstrap.properties</include>
+                    <include>**/log4j2.xml</include>
                 </includes>
             </resource>
         </resources>
@@ -351,7 +365,7 @@
                         <configuration>
                             <rules>
                                 <requireJavaVersion>
-                                    <version>(1.6,)</version>
+                                    <version>(1.8,)</version>
                                 </requireJavaVersion>
                                 <requireProperty>
                                     <property>main.basedir</property>
@@ -405,13 +419,11 @@
                     <excludes>
                         <exclude>**/Abstract*.java</exclude>
                     </excludes>
-                    <!--  
                     <systemPropertyVariables>
                         <java.security.egd>file:/dev/./urandom</java.security.egd>
                         <java.awt.headless>true</java.awt.headless>
                     </systemPropertyVariables>
-                    <argLine>-Xmx1024m -XX:MaxPermSize=256m</argLine>
-                    -->
+                    <argLine>-Xmx1024m</argLine>
                 </configuration>
             </plugin>
             <plugin>

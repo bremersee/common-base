@@ -7,7 +7,7 @@ package org.bremersee.common.exception;
  * @author Christian Bremer
  *
  */
-public class BadAccountNameException extends IllegalArgumentException
+public class BadUserNameException extends IllegalArgumentException
         implements StatusCodeAwareException {
 
     private static final long serialVersionUID = 1L;
@@ -17,8 +17,8 @@ public class BadAccountNameException extends IllegalArgumentException
      * message. The cause is not initialized, and may subsequently be
      * initialized by a call to {@link #initCause}.
      */
-    public BadAccountNameException() {
-        this(StatusCode.BAD_ACCOUNT_NAME.getDefaultMessage());
+    public BadUserNameException() {
+        this(StatusCode.BAD_USER_NAME.getDefaultMessage());
     }
 
     /**
@@ -30,7 +30,7 @@ public class BadAccountNameException extends IllegalArgumentException
      *            the detail message. The detail message is saved for later
      *            retrieval by the {@link #getMessage()} method.
      */
-    public BadAccountNameException(String message) {
+    public BadUserNameException(String message) {
         super(message);
     }
 
@@ -48,8 +48,8 @@ public class BadAccountNameException extends IllegalArgumentException
      *            unknown.)
      * @since 1.4
      */
-    public BadAccountNameException(Throwable cause) {
-        super(StatusCode.BAD_ACCOUNT_NAME.getDefaultMessage(), cause);
+    public BadUserNameException(Throwable cause) {
+        super(StatusCode.BAD_USER_NAME.getDefaultMessage(), cause);
     }
 
     /**
@@ -69,13 +69,13 @@ public class BadAccountNameException extends IllegalArgumentException
      *            unknown.)
      * @since 1.4
      */
-    public BadAccountNameException(String message, Throwable cause) {
+    public BadUserNameException(String message, Throwable cause) {
         super(message, cause);
     }
 
     @Override
     public int getStatusCode() {
-        return StatusCode.BAD_ACCOUNT_NAME.getStatusCode();
+        return StatusCode.BAD_USER_NAME.getStatusCode();
     }
 
 }

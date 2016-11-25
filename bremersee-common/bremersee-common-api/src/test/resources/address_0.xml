@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<address xmlns="http://bremersee.org/xmlschemas/common/v1" id="111" created="1468933888608">
+    <streetAddress>Reeperbahn</streetAddress>
+    <streetNumber>26a</streetNumber>
+    <city>Hamburg</city>
+    <country>Germany</country>
+</address>

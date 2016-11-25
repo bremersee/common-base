@@ -1,0 +1,31 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.bremersee</groupId>
+        <artifactId>bremersee-common-spring-boot-starter</artifactId>
+        <version>1.0.0-SNAPSHOT</version>
+    </parent>
+    <artifactId>bremersee-common-spring-boot-starter-base</artifactId>
+    <name>bremersee-common-spring-boot-starter-base</name>
+    <description>Common Base Spring Boot Starter</description>
+
+    <properties>
+        <main.basedir>${basedir}/../..</main.basedir>
+    </properties>
+    
+    <dependencies>
+        <dependency>
+            <groupId>org.bremersee</groupId>
+            <artifactId>bremersee-common-spring-autoconfigure</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-configuration-processor</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.bremersee</groupId>
+            <artifactId>bremersee-common-spring</artifactId>
+        </dependency>
+    </dependencies>
+</project>

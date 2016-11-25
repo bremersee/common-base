@@ -13,30 +13,77 @@
     
     <properties>
         <bcprov.version>1.54</bcprov.version>
-        <bremersee-common.version>${project.version}</bremersee-common.version>
-        <bremersee-comparator.version>1.2.0-SNAPSHOT</bremersee-comparator.version>
-        <bremersee-geojson.version>1.1.0</bremersee-geojson.version>
-        <bremersee-pagebuilder.version>1.2.0-SNAPSHOT</bremersee-pagebuilder.version>
-        <bremersee-utils.version>1.0.2</bremersee-utils.version>
+        <bremersee-common.version>1.0.0-SNAPSHOT</bremersee-common.version>
+        <bremersee-comparator.version>1.2.1</bremersee-comparator.version>
+        <bremersee-fac.version>1.1.0-SNAPSHOT</bremersee-fac.version>
+        <bremersee-geojson.version>1.1.2</bremersee-geojson.version>
+        <bremersee-pagebuilder.version>1.2.1</bremersee-pagebuilder.version>
+        <bremersee-sms.version>1.0.2-SNAPSHOT</bremersee-sms.version>
+        <bremersee-utils.version>1.0.3</bremersee-utils.version>
         <commons.codec.version>1.10</commons.codec.version>
         <commons-io.version>2.5</commons-io.version>
         <commons-lang3.version>3.4</commons-lang3.version>
         <hibernate-jpa-2.1-api.version>1.0.0.Final</hibernate-jpa-2.1-api.version>
-        <hibernate-spatial.version>4.3</hibernate-spatial.version>
+        <!-- <hibernate-spatial.version>4.3</hibernate-spatial.version> -->
         <javax.inject.version>1</javax.inject.version>
         <javax.ws.rs-api.version>2.0.1</javax.ws.rs-api.version>
-        <jersey.version>2.22.1</jersey.version>
+        <jersey.version>2.23.2</jersey.version>
+        <jmapper-core.version>1.6.0.1</jmapper-core.version>
         <jts.version>1.13</jts.version>
+        <ldaptive.version>1.2.0</ldaptive.version>
+        <lombok.version>1.16.10</lombok.version>
         <person-directory-api.version>1.7.0</person-directory-api.version>
-        <postgis-jdbc.version>1.5.2</postgis-jdbc.version>
-        <postgresql.version>9.4-1201-jdbc41</postgresql.version>
-        <spring-boot.version>1.3.5.RELEASE</spring-boot.version>
-        <!-- <spring-cloud.version>Brixton.SR1</spring-cloud.version> -->
-        <spring.version>4.2.6.RELEASE</spring.version>
+        <!-- <postgis-jdbc.version>1.5.2</postgis-jdbc.version> -->
+        <postgresql.version>9.4.1211.jre7</postgresql.version>
+        <spring-boot.version>1.4.1.RELEASE</spring-boot.version>
+        <spring-cloud.version>Camden.RELEASE</spring-cloud.version>
+        <spring.version>4.3.3.RELEASE</spring.version>
         <springfox-swagger.version>2.5.0</springfox-swagger.version>
         <swagger.version>1.5.9</swagger.version>
         <validation-api.version>1.1.0.Final</validation-api.version>
+        
+        <!-- Spring cloud versions from 'spring-cloud-dependencies' version 'Brixton.SR5' -->
+        <!--
+        <spring-cloud-aws.version>1.1.1.RELEASE</spring-cloud-aws.version>
+        <spring-cloud-bus.version>1.1.1.RELEASE</spring-cloud-bus.version>
+        <spring-cloud-cloudfoundry.version>1.0.0.RELEASE</spring-cloud-cloudfoundry.version>
+        <spring-cloud-commons.version>1.1.1.RELEASE</spring-cloud-commons.version>
+        <spring-cloud-config.version>1.1.3.RELEASE</spring-cloud-config.version>
+        <spring-cloud-netflix.version>1.1.5.RELEASE</spring-cloud-netflix.version>
+        <spring-cloud-security.version>1.1.2.RELEASE</spring-cloud-security.version>
+        <spring-cloud-cluster.version>1.0.1.RELEASE</spring-cloud-cluster.version>
+        <spring-cloud-consul.version>1.0.2.RELEASE</spring-cloud-consul.version>
+        <spring-cloud-sleuth.version>1.0.6.RELEASE</spring-cloud-sleuth.version>
+        <spring-cloud-stream.version>1.0.2.RELEASE</spring-cloud-stream.version>
+        <spring-cloud-task.version>1.0.2.RELEASE</spring-cloud-task.version>
+        <spring-cloud-zookeeper.version>1.0.2.RELEASE</spring-cloud-zookeeper.version>
+        -->
+
+        <!-- Spring cloud versions from 'spring-cloud-dependencies' version 'Camden.RELEASE' -->
+        <!--  
+        <spring-cloud-aws.version>1.1.3.RELEASE</spring-cloud-aws.version>
+        <spring-cloud-bus.version>1.2.0.RELEASE</spring-cloud-bus.version>
+        <spring-cloud-contract.version>1.0.0.RELEASE</spring-cloud-contract.version>
+        <spring-cloud-cloudfoundry.version>1.0.1.RELEASE</spring-cloud-cloudfoundry.version>
+        <spring-cloud-commons.version>1.1.3.RELEASE</spring-cloud-commons.version>
+        <spring-cloud-config.version>1.2.0.RELEASE</spring-cloud-config.version>
+        <spring-cloud-netflix.version>1.2.0.RELEASE</spring-cloud-netflix.version>
+        <spring-cloud-security.version>1.1.3.RELEASE</spring-cloud-security.version>
+        <spring-cloud-consul.version>1.1.0.RELEASE</spring-cloud-consul.version>
+        <spring-cloud-sleuth.version>1.0.9.RELEASE</spring-cloud-sleuth.version>
+        <spring-cloud-stream.version>Brooklyn.RELEASE</spring-cloud-stream.version>
+        <spring-cloud-task.version>1.0.3.RELEASE</spring-cloud-task.version>
+        <spring-cloud-zookeeper.version>1.0.3.RELEASE</spring-cloud-zookeeper.version>
+        -->
     </properties>
+
+    <repositories>
+        <repository> 
+            <id>repository.spring.milestone</id> 
+            <name>Spring Milestone Repository</name> 
+            <url>http://repo.spring.io/milestone</url> 
+        </repository>
+    </repositories>
 
     <developers>
         <developer>
@@ -96,11 +143,327 @@
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
-            <!--
             <dependency>
                 <groupId>org.springframework.cloud</groupId>
                 <artifactId>spring-cloud-starter-parent</artifactId>
                 <version>${spring-cloud.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <!--
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-commons</artifactId>
+                <version>${spring-cloud-commons.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-context</artifactId>
+                <version>${spring-cloud-commons.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-starter</artifactId>
+                <version>${spring-cloud-commons.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-security</artifactId>
+                <version>${spring-cloud-security.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-starter-bus-kafka</artifactId>
+                <version>${spring-cloud-bus.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-starter-cloudfoundry</artifactId>
+                <version>${spring-cloud-cloudfoundry.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-starter-config</artifactId>
+                <version>${spring-cloud-config.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-starter-eureka</artifactId>
+                <version>${spring-cloud-netflix.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>com.google.inject.extensions</groupId>
+                        <artifactId>guice-grapher</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>com.google.inject.extensions</groupId>
+                        <artifactId>guice-assistedinject</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.codehaus.jsr166-mirror</groupId>
+                        <artifactId>jsr166y</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.apache.xbean</groupId>
+                        <artifactId>xbean-finder</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>asm</groupId>
+                        <artifactId>asm-all</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>com.google.inject.extensions</groupId>
+                        <artifactId>guice-multibindings</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.apache.xbean</groupId>
+                        <artifactId>xbean-bundleutils</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.apache.commons</groupId>
+                        <artifactId>commons-math</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>com.netflix.netflix-commons</groupId>
+                        <artifactId>netflix-infix</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>joda-time</groupId>
+                        <artifactId>joda-time</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>commons-jxpath</groupId>
+                        <artifactId>commons-jxpath</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.antlr</groupId>
+                        <artifactId>antlr-runtime</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.antlr</groupId>
+                        <artifactId>stringtemplate</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>antlr</groupId>
+                        <artifactId>antlr</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>com.google.code.gson</groupId>
+                        <artifactId>gson</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>com.google.code.findbugs</groupId>
+                        <artifactId>annotations</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>com.squareup.dagger</groupId>
+                        <artifactId>dagger</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>com.netflix.blitz4j</groupId>
+                        <artifactId>blitz4j</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <artifactId>hibernate-validator</artifactId>
+                        <groupId>org.hibernate</groupId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-starter-eureka-server</artifactId>
+                <version>${spring-cloud-netflix.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>com.google.inject.extensions</groupId>
+                        <artifactId>guice-grapher</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>com.google.inject.extensions</groupId>
+                        <artifactId>guice-assistedinject</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.codehaus.jsr166-mirror</groupId>
+                        <artifactId>jsr166y</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.apache.xbean</groupId>
+                        <artifactId>xbean-finder</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>asm</groupId>
+                        <artifactId>asm-all</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>com.google.inject.extensions</groupId>
+                        <artifactId>guice-multibindings</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.apache.xbean</groupId>
+                        <artifactId>xbean-bundleutils</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.apache.commons</groupId>
+                        <artifactId>commons-math</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>com.netflix.netflix-commons</groupId>
+                        <artifactId>netflix-infix</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>joda-time</groupId>
+                        <artifactId>joda-time</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>commons-jxpath</groupId>
+                        <artifactId>commons-jxpath</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.antlr</groupId>
+                        <artifactId>antlr-runtime</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.antlr</groupId>
+                        <artifactId>stringtemplate</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>antlr</groupId>
+                        <artifactId>antlr</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>com.google.code.gson</groupId>
+                        <artifactId>gson</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>com.google.code.findbugs</groupId>
+                        <artifactId>annotations</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>com.squareup.dagger</groupId>
+                        <artifactId>dagger</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-starter-feign</artifactId>
+                <version>${spring-cloud-netflix.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-starter-hystrix</artifactId>
+                <version>${spring-cloud-netflix.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-starter-hystrix-dashboard</artifactId>
+                <version>${spring-cloud-netflix.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-starter-oauth2</artifactId>
+                <version>${spring-cloud-security.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-starter-ribbon</artifactId>
+                <version>${spring-cloud-netflix.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-starter-security</artifactId>
+                <version>${spring-cloud-security.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-starter-turbine</artifactId>
+                <version>${spring-cloud-netflix.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-starter-turbine-amqp</artifactId>
+                <version>${spring-cloud-netflix.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-starter-zuul</artifactId>
+                <version>${spring-cloud-netflix.version}</version>
+            </dependency>
+            
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-netflix-dependencies</artifactId>
+                <version>${spring-cloud-netflix.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-stream-dependencies</artifactId>
+                <version>${spring-cloud-stream.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-task-dependencies</artifactId>
+                <version>${spring-cloud-task.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-config-dependencies</artifactId>
+                <version>${spring-cloud-config.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-consul-dependencies</artifactId>
+                <version>${spring-cloud-consul.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-sleuth-dependencies</artifactId>
+                <version>${spring-cloud-sleuth.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-zookeeper-dependencies</artifactId>
+                <version>${spring-cloud-zookeeper.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-cloudfoundry-dependencies</artifactId>
+                <version>${spring-cloud-cloudfoundry.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-bus-dependencies</artifactId>
+                <version>${spring-cloud-bus.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-cluster-dependencies</artifactId>
+                <version>${spring-cloud-cluster.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-aws-dependencies</artifactId>
+                <version>${spring-cloud-aws.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -122,6 +485,46 @@
                 <artifactId>bremersee-common-spring</artifactId>
                 <version>${bremersee-common.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.bremersee</groupId>
+                <artifactId>bremersee-common-spring-acl</artifactId>
+                <version>${bremersee-common.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.bremersee</groupId>
+                <artifactId>bremersee-common-spring-autoconfigure</artifactId>
+                <version>${bremersee-common.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.bremersee</groupId>
+                <artifactId>bremersee-common-spring-boot-starter-base</artifactId>
+                <version>${bremersee-common.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.bremersee</groupId>
+                <artifactId>bremersee-common-spring-boot-starter-acl</artifactId>
+                <version>${bremersee-common.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.bremersee</groupId>
+                <artifactId>bremersee-common-spring-boot-starter-jms</artifactId>
+                <version>${bremersee-common.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.bremersee</groupId>
+                <artifactId>bremersee-common-spring-boot-starter-tomcat</artifactId>
+                <version>${bremersee-common.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.bremersee</groupId>
+                <artifactId>bremersee-common-spring-boot-starter-tomcat-rest</artifactId>
+                <version>${bremersee-common.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.bremersee</groupId>
+                <artifactId>bremersee-common-spring-boot-starter-tomcat-jersey</artifactId>
+                <version>${bremersee-common.version}</version>
+            </dependency>
             
             <dependency>
                 <groupId>org.bremersee</groupId>
@@ -135,8 +538,33 @@
             </dependency>
             <dependency>
                 <groupId>org.bremersee</groupId>
+                <artifactId>bremersee-fac-api</artifactId>
+                <version>${bremersee-fac.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.bremersee</groupId>
+                <artifactId>bremersee-fac-data-jpa</artifactId>
+                <version>${bremersee-fac.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.bremersee</groupId>
+                <artifactId>bremersee-fac-data-ldap</artifactId>
+                <version>${bremersee-fac.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.bremersee</groupId>
+                <artifactId>bremersee-fac-data-mongodb</artifactId>
+                <version>${bremersee-fac.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.bremersee</groupId>
                 <artifactId>bremersee-pagebuilder</artifactId>
                 <version>${bremersee-pagebuilder.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.bremersee</groupId>
+                <artifactId>bremersee-sms</artifactId>
+                <version>${bremersee-sms.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.bremersee</groupId>
@@ -189,10 +617,18 @@
             </dependency>
 
             <dependency>
+                <groupId>com.googlecode.jmapper-framework</groupId>
+                <artifactId>jmapper-core</artifactId>
+                <version>${jmapper-core.version}</version>
+            </dependency>
+            
+            <dependency>
                 <groupId>com.vividsolutions</groupId>
                 <artifactId>jts</artifactId>
                 <version>${jts.version}</version>
             </dependency>
+            <!-- Hibernate Spatial is now part of the Hibernate ORM project -->
+            <!--
             <dependency>
                 <groupId>org.hibernate</groupId>
                 <artifactId>hibernate-spatial</artifactId>
@@ -204,7 +640,36 @@
                     </exclusion>
                 </exclusions>
             </dependency>
+            -->
 
+            <dependency>
+                <groupId>org.ldaptive</groupId>
+                <artifactId>ldaptive</artifactId>
+                <version>${ldaptive.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.slf4j</groupId>
+                        <artifactId>slf4j-api</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>org.ldaptive</groupId>
+                <artifactId>ldaptive-beans</artifactId>
+                <version>${ldaptive.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.ldaptive</groupId>
+                <artifactId>ldaptive-unboundid</artifactId>
+                <version>${ldaptive.version}</version>
+            </dependency>
+            
+            <dependency>
+                <groupId>org.projectlombok</groupId>
+                <artifactId>lombok</artifactId>
+                <version>${lombok.version}</version>
+            </dependency>
+            
             <dependency>
                 <groupId>org.postgresql</groupId>
                 <artifactId>postgresql</artifactId>

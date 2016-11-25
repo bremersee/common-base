@@ -3,25 +3,27 @@
  */
 package org.bremersee.common.spring.autoconfigure;
 
+import org.bremersee.common.security.crypto.password.PasswordEncoderConfig;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**
  * @author Christian Bremer
  *
  */
-@ConfigurationProperties("b2c.security")
+@ConfigurationProperties("bremersee.security")
 public class SecurityProperties {
-    
-    // TODO
-    private int a = 0;
-    
+
     private String contextHolderStrategyName = "MODE_INHERITABLETHREADLOCAL";
-    
-    //private PasswordEncoderConfig password = new PasswordEncoderConfig();
+
+    private PasswordEncoderConfig encoder = new PasswordEncoderConfig();
 
     @Override
     public String toString() {
-        return "SecurityProperties [contextHolderStrategyName=" + contextHolderStrategyName + "]";
+        //@formatter:off
+        return "SecurityProperties [contextHolderStrategyName=" + contextHolderStrategyName 
+                + ", encoder=" + encoder
+                + "]";
+        //@formatter:on
     }
 
     public String getContextHolderStrategyName() {
@@ -32,8 +34,8 @@ public class SecurityProperties {
         this.contextHolderStrategyName = contextHolderStrategyName;
     }
 
-//    public PasswordEncoderConfig getPassword() {
-//        return password;
-//    }
+    public PasswordEncoderConfig getEncoder() {
+        return encoder;
+    }
 
 }

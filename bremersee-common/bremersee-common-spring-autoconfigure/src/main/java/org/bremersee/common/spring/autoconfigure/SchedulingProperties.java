@@ -9,7 +9,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
  * @author Christian Bremer
  *
  */
-@ConfigurationProperties("b2c.scheduling")
+@ConfigurationProperties("bremersee.scheduling")
 public class SchedulingProperties {
     
     private int scheduledThreadPool = 100;

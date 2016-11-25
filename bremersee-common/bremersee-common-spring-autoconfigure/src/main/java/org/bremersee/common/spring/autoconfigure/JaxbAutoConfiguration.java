@@ -68,9 +68,9 @@ public class JaxbAutoConfiguration {
         return paths.toArray(new String[paths.size()]);
     }
 
-    @Bean(name = { "payloadMarshaller", "payloadUnmarshaller" })
+    @Bean(name = { "jaxbMarshaller", "jaxbUnmarshaller" })
     @Primary
-    public Jaxb2Marshaller payloadMarshaller() {
+    public Jaxb2Marshaller jaxbMarshaller() {
         Jaxb2Marshaller m = new Jaxb2Marshaller();
         Map<String, Object> marshallerProperties = new HashMap<String, Object>();
         marshallerProperties.put(Marshaller.JAXB_FORMATTED_OUTPUT,

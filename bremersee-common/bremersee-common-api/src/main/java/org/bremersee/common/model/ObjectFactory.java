@@ -21,6 +21,18 @@ import javax.xml.bind.annotation.XmlRegistry;
 @XmlRegistry
 public class ObjectFactory {
     
+    public BooleanDto createBooleanDto() {
+        return new BooleanDto();
+    }
+    
+    public AddressDto createAddressDto() {
+        return new AddressDto();
+    }
+    
+    public StringListDto createStringListDto() {
+        return new StringListDto();
+    }
+    
     public ThrowableDto createThrowableDto() {
         return new ThrowableDto();
     }

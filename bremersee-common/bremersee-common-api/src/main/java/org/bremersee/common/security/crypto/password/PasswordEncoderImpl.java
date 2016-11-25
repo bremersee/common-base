@@ -71,6 +71,34 @@ public class PasswordEncoderImpl implements PasswordEncoder {
         return String.format("%s [algorithm = %s]", getClass().getName(), algorithm);
     }
     
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((algorithm == null) ? 0 : algorithm.hashCode());
+        result = prime * result + randomSaltLength;
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        PasswordEncoderImpl other = (PasswordEncoderImpl) obj;
+        if (algorithm == null) {
+            if (other.algorithm != null)
+                return false;
+        } else if (!algorithm.equals(other.algorithm))
+            return false;
+        if (randomSaltLength != other.randomSaltLength)
+            return false;
+        return true;
+    }
+
     @PostConstruct
     public void init() {
         log.info("Initializing " + getClass().getSimpleName() + " ...");
@@ -136,9 +164,10 @@ public class PasswordEncoderImpl implements PasswordEncoder {
 
     public boolean matches(CharSequence rawPassword, String encodedPassword) {
 
-        String clearPassword = rawPassword != null ? rawPassword.toString() : null;
-        byte[] userPassword = encodedPassword != null ? userPasswordToBytes(encodedPassword) : null;
-        return userPasswordMatches(userPassword, clearPassword);
+        final String clearPassword = rawPassword != null ? rawPassword.toString() : null;
+        final byte[] userPassword = encodedPassword != null ? userPasswordToBytes(encodedPassword) : null;
+        final boolean result = userPasswordMatches(userPassword, clearPassword);
+        return result;
     }
     
     private byte[] getRandomSalt() {
@@ -259,7 +288,9 @@ public class PasswordEncoderImpl implements PasswordEncoder {
                 log.debug("Salted Hash presented in hex: " + Hex.encodeHexString(pwhash));
             }
 
-            return MessageDigest.isEqual(hash, pwhash);
+            final boolean result = MessageDigest.isEqual(hash, pwhash);
+            log.debug("Password matches? " + result);
+            return result;
         }
         
         byte[] digest = md.digest(CodingUtils.toBytesSilently(clearPassword, StandardCharsets.UTF_8));

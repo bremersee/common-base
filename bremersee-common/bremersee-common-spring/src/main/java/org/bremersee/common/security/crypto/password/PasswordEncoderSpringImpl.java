@@ -24,12 +24,12 @@ public class PasswordEncoderSpringImpl extends PasswordEncoderImpl
         super(algorithm);
     }
 
-    public PasswordEncoderSpringImpl(PasswordEncoderConfig config) {
-        super(config);
-    }
-
     public PasswordEncoderSpringImpl(String algorithm, int randomSaltLength) {
         super(algorithm, randomSaltLength);
+    }
+
+    public PasswordEncoderSpringImpl(PasswordEncoderConfig config) {
+        super(config);
     }
 
 }

@@ -9,7 +9,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
  * @author Christian Bremer
  *
  */
-@ConfigurationProperties("b2c.tomcat.connector")
+@ConfigurationProperties("bremersee.tomcat.connector")
 public class TomcatProperties {
     
     private ConnectorProperties spring = new ConnectorProperties();
@@ -32,12 +32,24 @@ public class TomcatProperties {
         return spring;
     }
 
+    public void setSpring(ConnectorProperties spring) {
+        this.spring = spring;
+    }
+
     public ConnectorProperties getAjp() {
         return ajp;
     }
 
+    public void setAjp(ConnectorProperties ajp) {
+        this.ajp = ajp;
+    }
+
     public ConnectorProperties getHttp() {
         return http;
+    }
+
+    public void setHttp(ConnectorProperties http) {
+        this.http = http;
     }
 
     public static class ConnectorProperties {

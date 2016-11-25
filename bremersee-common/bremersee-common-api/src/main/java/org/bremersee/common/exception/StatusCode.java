@@ -144,7 +144,7 @@ public enum StatusCode {
     
     PASSWORDS_NOT_MATCH(497, PasswordsNotMatchException.class, "Passwords not match."),
     
-    BAD_ACCOUNT_NAME(498, BadAccountNameException.class, "Illegal account name."),
+    BAD_USER_NAME(498, BadUserNameException.class, "Illegal user name."),
     
     ALREADY_EXISTS(499, AlreadyExistsException.class, "Object already exists.")
     ;

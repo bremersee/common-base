@@ -29,6 +29,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  * @author Christian Bremer
  *
  */
+//@formatter:off
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlRootElement(name = "throwable")
 @XmlType(name = "throwableType", propOrder = {
@@ -38,12 +39,12 @@ import com.fasterxml.jackson.annotation.JsonProperty;
         "cause"
 })
 @JsonIgnoreProperties(ignoreUnknown = true)
-@JsonInclude(Include.ALWAYS)
+@JsonInclude(Include.NON_NULL)
 @JsonAutoDetect(
         fieldVisibility = Visibility.NONE, 
         getterVisibility = Visibility.PROTECTED_AND_PUBLIC, 
         creatorVisibility = Visibility.NONE, 
-        isGetterVisibility = Visibility.NONE, 
+        isGetterVisibility = Visibility.PROTECTED_AND_PUBLIC, 
         setterVisibility = Visibility.PROTECTED_AND_PUBLIC
 )
 @JsonPropertyOrder({
@@ -52,6 +53,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
         "stackTrace",
         "cause"
 })
+//@formatter:on
 public class ThrowableDto implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -62,7 +64,7 @@ public class ThrowableDto implements Serializable {
     @XmlElement(name = "message", required = false)
     private String message;
     
-    @XmlElementWrapper(name = "stackTrace")
+    @XmlElementWrapper(name = "stackTrace", required = false)
     @XmlElement(name = "stackTraceElement", required = false)
     private List<StackTraceElementDto> stackTrace = new ArrayList<>();
 
