@@ -16,12 +16,7 @@
 
 package org.bremersee.common.spring.autoconfigure;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import javax.annotation.PostConstruct;
 import javax.xml.bind.Marshaller;
@@ -42,10 +37,39 @@ import org.springframework.util.StringUtils;
 @Configuration
 public class JaxbAutoConfiguration {
 
-    protected final Logger log = LoggerFactory.getLogger(getClass());
+    private static final String[] DEFAULT_JAXB_CONTEXT_PATHS = {
+            org.bremersee.common.model.ObjectFactory.class.getPackage().getName(),
+            org.bremersee.comparator.model.ObjectFactory.class.getPackage().getName(),
+            org.bremersee.pagebuilder.model.ObjectFactory.class.getPackage().getName()
+    };
+
+    private static Jaxb2Marshaller jaxb2MarshallerInstance = null;
+
+    /**
+     * @return the default Jaxb2Marshaller
+     */
+    public static synchronized Jaxb2Marshaller getJaxbMarshaller() {
+        if (jaxb2MarshallerInstance == null) {
+            Jaxb2Marshaller m = new Jaxb2Marshaller();
+            Map<String, Object> marshallerProperties = new HashMap<String, Object>();
+            marshallerProperties.put(Marshaller.JAXB_FORMATTED_OUTPUT,
+                    Boolean.TRUE);
+            m.setMarshallerProperties(marshallerProperties);
+            m.setContextPaths(DEFAULT_JAXB_CONTEXT_PATHS);
+        }
+        return jaxb2MarshallerInstance;
+    }
+
+    private final Logger log = LoggerFactory.getLogger(getClass());
+
+    private List<JaxbContextPathsProvider> jaxbContextPathsProviders = new ArrayList<JaxbContextPathsProvider>();
 
     @Autowired(required = false)
-    protected List<JaxbContextPathsProvider> jaxbContextPathsProviders = new ArrayList<JaxbContextPathsProvider>();
+    public void setJaxbContextPathsProviders(List<JaxbContextPathsProvider> jaxbContextPathsProviders) {
+        if (jaxbContextPathsProviders != null) {
+            this.jaxbContextPathsProviders = jaxbContextPathsProviders;
+        }
+    }
 
     @PostConstruct
     public void init() {
@@ -59,15 +83,13 @@ public class JaxbAutoConfiguration {
         // @formatter:on
     }
 
-    protected String[] getJaxbContextPaths() {
+    private String[] getJaxbContextPaths() {
         
         Set<String> paths = new HashSet<String>();
         
         // defaults
-        paths.add(org.bremersee.common.model.ObjectFactory.class.getPackage().getName());
-        paths.add(org.bremersee.comparator.model.ObjectFactory.class.getPackage().getName());
-        paths.add(org.bremersee.pagebuilder.model.ObjectFactory.class.getPackage().getName());
-        
+        paths.addAll(Arrays.asList(DEFAULT_JAXB_CONTEXT_PATHS));
+
         if (jaxbContextPathsProviders != null) {
             for (JaxbContextPathsProvider provider : jaxbContextPathsProviders) {
                 String[] providerPaths = provider.getContextPaths();

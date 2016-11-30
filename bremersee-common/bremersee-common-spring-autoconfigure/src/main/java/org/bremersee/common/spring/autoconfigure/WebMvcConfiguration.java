@@ -16,13 +16,12 @@
 
 package org.bremersee.common.spring.autoconfigure;
 
-import java.util.List;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
-import org.springframework.boot.autoconfigure.jackson.Jackson2ObjectMapperBuilderCustomizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
@@ -30,6 +29,9 @@ import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.xml.MarshallingHttpMessageConverter;
 import org.springframework.oxm.jaxb.Jaxb2Marshaller;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
+
+import javax.annotation.PostConstruct;
+import java.util.List;
 
 /**
  * @author Christian Bremer
@@ -39,12 +41,38 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter
 @ConditionalOnClass(name = {"org.springframework.http.converter.xml.MarshallingHttpMessageConverter"})
 @ConditionalOnWebApplication
 public class WebMvcConfiguration extends WebMvcConfigurerAdapter {
-    
-    @Autowired
-    @Qualifier("jaxbMarshaller")
-    protected Jaxb2Marshaller jaxbMarshaller;
 
-    protected Jackson2ObjectMapperBuilderCustomizer c;
+    private final Logger log = LoggerFactory.getLogger(getClass());
+
+    private Jaxb2Marshaller jaxbMarshaller;
+
+    @Autowired(required = false)
+    @Qualifier("jaxbMarshaller")
+    public void setJaxbMarshaller(Jaxb2Marshaller jaxbMarshaller) {
+        this.jaxbMarshaller = jaxbMarshaller;
+    }
+
+    @PostConstruct
+    public void init() {
+        // @formatter:off
+        String msg;
+        if (jaxbMarshaller == null) {
+            jaxbMarshaller = JaxbAutoConfiguration.getJaxbMarshaller();
+            //    "**********************************************************************\n"
+            msg = "*   WARNING: A bean with name 'jaxbMarshaller' was not found!        *\n"
+                + "*            Using default 'Jaxb2Marshaller'.                        *\n";
+        } else {
+            msg = "";
+        }
+        log.info("\n"
+                + "**********************************************************************\n"
+                + "*  Common WebMVC Configuration                                       *\n"
+                + "**********************************************************************\n"
+                + "* - Provides common 'MarshallingHttpMessageConverter'.               *\n"
+                + msg
+                + "**********************************************************************");
+        // @formatter:on
+    }
 
     @Override
     public void extendMessageConverters(List<HttpMessageConverter<?>> converters) {
