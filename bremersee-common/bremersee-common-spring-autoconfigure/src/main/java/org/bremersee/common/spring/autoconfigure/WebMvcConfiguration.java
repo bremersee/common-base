@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
+import org.springframework.boot.autoconfigure.jackson.Jackson2ObjectMapperBuilderCustomizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
@@ -30,6 +31,8 @@ public class WebMvcConfiguration extends WebMvcConfigurerAdapter {
     @Qualifier("jaxbMarshaller")
     protected Jaxb2Marshaller jaxbMarshaller;
 
+    protected Jackson2ObjectMapperBuilderCustomizer c;
+
     @Override
     public void extendMessageConverters(List<HttpMessageConverter<?>> converters) {
         converters.add(marshallingHttpMessageConverter());
@@ -44,5 +47,5 @@ public class WebMvcConfiguration extends WebMvcConfigurerAdapter {
 //    public MappingJackson2HttpMessageConverter mappingJackson2HttpMessageConverter () {
 //        return null;
 //    }
-    
+
 }

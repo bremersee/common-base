@@ -389,9 +389,9 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
                 <configuration>
-                    <source>${java.version}</source>
-                    <target>${java.version}</target>
-                    <encoding>${project.build.sourceEncoding}</encoding>
+                    <!--<source>${java.version}</source>-->
+                    <!--<target>${java.version}</target>-->
+                    <!--<encoding>${project.build.sourceEncoding}</encoding>-->
                     <archive>
                         <addMavenDescriptor>true</addMavenDescriptor>
                         <index>true</index>
@@ -452,7 +452,7 @@
                 <configuration>
                     <show>protected</show>
                     <quiet>true</quiet>
-                    <test-aggregate>false</test-aggregate>
+                    <!--<test-aggregate>false</test-aggregate>-->
                     <failOnError>false</failOnError>
                 </configuration>
                 <executions>
@@ -530,7 +530,7 @@
                 <configuration>
                     <show>protected</show>
                     <quiet>true</quiet>
-                    <test-aggregate>false</test-aggregate>
+                    <!--<test-aggregate>false</test-aggregate>-->
                     <failOnError>false</failOnError>
                 </configuration>
             </plugin>
@@ -548,9 +548,9 @@
                 <artifactId>maven-pmd-plugin</artifactId>
                 <version>3.5</version>
                 <configuration>
-                    <targetjdk>${java.version}</targetjdk>
+                    <!--<targetjdk>${java.version}</targetjdk>-->
                     <format>xml</format>
-                    <linkXref>true</linkXref>
+                    <!--<linkXref>true</linkXref>-->
                     <sourceEncoding>${project.build.sourceEncoding}</sourceEncoding>
                     <minimumTokens>100</minimumTokens>
                 </configuration>
