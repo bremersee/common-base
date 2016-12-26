@@ -16,16 +16,15 @@
 
 package org.bremersee.common.spring.autoconfigure;
 
-import java.util.concurrent.atomic.AtomicInteger;
-
-import javax.jms.MessageListener;
-
 import org.apache.commons.lang3.Validate;
 import org.springframework.jms.listener.AbstractMessageListenerContainer;
 import org.springframework.jms.listener.MessageListenerContainer;
 import org.springframework.jms.listener.SessionAwareMessageListener;
 import org.springframework.jms.listener.endpoint.JmsActivationSpecConfig;
 import org.springframework.jms.listener.endpoint.JmsMessageEndpointManager;
+
+import javax.jms.MessageListener;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * @author Christian Bremer
@@ -47,6 +46,7 @@ public class JmsListenerEndpointImpl implements org.springframework.jms.config.J
      * Default constructor.
      */
     public JmsListenerEndpointImpl() {
+        super();
     }
 
     public JmsListenerEndpointImpl(AbstractJmsDestinationProperties destinationProperties, Object messageListener) {
@@ -82,9 +82,8 @@ public class JmsListenerEndpointImpl implements org.springframework.jms.config.J
 
     /**
      * Set the message listener implementation to register. This can be either a
-     * standard JMS {@link MessageListener} object, a Spring
-     * {@link SessionAwareMessageListener} object or a {@link BmsListener}
-     * object.
+     * standard JMS {@link MessageListener} object or a Spring
+     * {@link SessionAwareMessageListener} object.
      * 
      * @param messageListener
      *            the message listener
@@ -142,7 +141,6 @@ public class JmsListenerEndpointImpl implements org.springframework.jms.config.J
             listenerContainer.setPubSubDomain(getDestinationProperties().isPubSubDomain());
             listenerContainer.setPubSubNoLocal(getDestinationProperties().isPubSubNoLocal());
             listenerContainer.setSessionAcknowledgeMode(getDestinationProperties().getSessionAcknowledgeMode());
-            // listenerContainer.setSessionTransacted(destinationProperties.isSessionTransacted());
             listenerContainer.setSubscriptionDurable(destinationProperties.isSubscriptionDurable());
             if (getDestinationProperties().getSubscriptionName() != null) {
                 listenerContainer.setSubscriptionName(getDestinationProperties().getSubscriptionName());

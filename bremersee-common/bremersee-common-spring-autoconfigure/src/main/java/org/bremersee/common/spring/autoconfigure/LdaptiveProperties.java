@@ -45,18 +45,19 @@ public class LdaptiveProperties {
     // org.ldaptive.ssl.CredentialConfig
     /** Name of the trust certificates to use for the SSL connection. */
     private String trustCertificates;
+
     /** Name of the authentication certificate to use for the SSL connection. */
     private String authenticationCertificate;
+
     /** Name of the key to use for the SSL connection. */
     private String authenticationKey;
 
     // BindConnectionInitializer, sasl is not supported at the moment
     /** DN to bind as before performing operations. */
     private String bindDn;
+
     /** Credential for the bind DN. */
     private String bindCredential;
-    // /** Configuration for bind SASL authentication. */
-    // private SaslConfig bindSaslConfig;
 
     private boolean pooled = false;
 

@@ -20,6 +20,7 @@ package org.bremersee.common.spring.autoconfigure;
  * @author Christian Bremer
  *
  */
+@FunctionalInterface
 public interface JaxbContextPathsProvider {
     
     String[] getContextPaths();

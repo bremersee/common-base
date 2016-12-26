@@ -16,11 +16,6 @@
 
 package org.bremersee.common.spring.autoconfigure;
 
-import java.util.concurrent.Executor;
-
-import javax.annotation.PostConstruct;
-import javax.jms.ConnectionFactory;
-
 import org.bremersee.common.jms.DefaultJmsConverter;
 import org.bremersee.common.jms.DestinationByNameResolver;
 import org.bremersee.common.jms.SessionTransaction;
@@ -37,14 +32,16 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.jms.annotation.JmsListenerConfigurer;
 import org.springframework.jms.config.AbstractJmsListenerContainerFactory;
 import org.springframework.jms.config.DefaultJmsListenerContainerFactory;
-import org.springframework.jms.config.JmsListenerContainerFactory;
 import org.springframework.jms.config.JmsListenerEndpointRegistrar;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.jms.listener.AbstractMessageListenerContainer;
-import org.springframework.jms.listener.MessageListenerContainer;
 import org.springframework.jms.support.converter.MessageConverter;
 import org.springframework.oxm.jaxb.Jaxb2Marshaller;
 import org.springframework.transaction.PlatformTransactionManager;
+
+import javax.annotation.PostConstruct;
+import javax.jms.ConnectionFactory;
+import java.util.concurrent.Executor;
 
 /**
  * @author Christian Bremer
@@ -63,20 +60,20 @@ public class JmsAutoConfiguration implements JmsListenerConfigurer {
     protected final Logger log = LoggerFactory.getLogger(getClass());
 
     @Autowired
-    protected JmsProperties properties;
+    JmsProperties properties;
 
     @Autowired
-    protected ConnectionFactory connectionFactory;
+    ConnectionFactory connectionFactory;
 
     @Autowired
     @Qualifier("jaxbMarshaller")
-    protected Jaxb2Marshaller marshaller;
+    Jaxb2Marshaller marshaller;
     
     @Autowired
-    protected Executor taskExecutor;
+    Executor taskExecutor;
 
     @Autowired(required = false)
-    protected PlatformTransactionManager transactionManager;
+    PlatformTransactionManager transactionManager;
 
     @PostConstruct
     public void init() {
@@ -117,7 +114,7 @@ public class JmsAutoConfiguration implements JmsListenerConfigurer {
     
     @Bean(name = "defaultJmsListenerContainerFactory")
     @Primary
-    public JmsListenerContainerFactory<? extends MessageListenerContainer> defaultJmsListenerContainerFactory() {
+    public DefaultJmsListenerContainerFactory defaultJmsListenerContainerFactory() {
         
         DefaultJmsListenerContainerFactory factory = new DefaultJmsListenerContainerFactory();
         jmsListenerContainerFactoryConfigurator().configure(factory);
@@ -184,14 +181,14 @@ public class JmsAutoConfiguration implements JmsListenerConfigurer {
                 factory.setSubscriptionShared(props.getSubscriptionShared());
                 
                 if (factory instanceof DefaultJmsListenerContainerFactory) {
-                    DefaultJmsListenerContainerFactory _factory = (DefaultJmsListenerContainerFactory)factory;
-                    _factory.setCacheLevel(props.getCacheLevel());
-                    _factory.setConcurrency(props.getConcurrency());
-                    _factory.setMaxMessagesPerTask(props.getMaxMessagesPerTask());
-                    _factory.setReceiveTimeout(props.getReceiveTimeout());
-                    _factory.setTaskExecutor(taskExecutor);
+                    DefaultJmsListenerContainerFactory containerFactory = (DefaultJmsListenerContainerFactory)factory;
+                    containerFactory.setCacheLevel(props.getCacheLevel());
+                    containerFactory.setConcurrency(props.getConcurrency());
+                    containerFactory.setMaxMessagesPerTask(props.getMaxMessagesPerTask());
+                    containerFactory.setReceiveTimeout(props.getReceiveTimeout());
+                    containerFactory.setTaskExecutor(taskExecutor);
                     if (sessionTransaction.isXA()) {
-                        _factory.setTransactionManager(transactionManager);
+                        containerFactory.setTransactionManager(transactionManager);
                     }
                 }
             }

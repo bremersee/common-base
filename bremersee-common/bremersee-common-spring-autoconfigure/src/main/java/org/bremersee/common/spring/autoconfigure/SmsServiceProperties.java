@@ -62,8 +62,8 @@ public class SmsServiceProperties {
         //@formatter:off
         return "SmsServiceProperties ["
                 + "\n  url=" + url + ", "
-                + "\n  username=" + username + ", password=****, "
-                + "\n  proxyHost=" + proxyHost + ", proxyPort=" + proxyPort + ", proxyUsername=" + proxyUsername + ", proxyPassword=****, "
+                + "\n  username=" + username + ", password=****, " // NOSONAR
+                + "\n  proxyHost=" + proxyHost + ", proxyPort=" + proxyPort + ", proxyUsername=" + proxyUsername + ", proxyPassword=****, " // NOSONAR
                 + "\n  sendTimePattern=" + sendTimePattern + ", "
                 + "\n  defaultMessageType=" + defaultMessageType 
                 + "\n  defaultSender=" + defaultSender + ", "

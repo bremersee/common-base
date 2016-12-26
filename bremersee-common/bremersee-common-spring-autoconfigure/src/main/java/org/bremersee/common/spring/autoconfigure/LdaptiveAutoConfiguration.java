@@ -16,24 +16,9 @@
 
 package org.bremersee.common.spring.autoconfigure;
 
-import java.time.Duration;
-
-import javax.annotation.PostConstruct;
-
 import org.apache.commons.lang3.StringUtils;
-import org.ldaptive.BindConnectionInitializer;
-import org.ldaptive.ConnectionConfig;
-import org.ldaptive.ConnectionFactory;
-import org.ldaptive.ConnectionInitializer;
-import org.ldaptive.Credential;
-import org.ldaptive.DefaultConnectionFactory;
-import org.ldaptive.pool.BlockingConnectionPool;
-import org.ldaptive.pool.ConnectionPool;
-import org.ldaptive.pool.IdlePruneStrategy;
-import org.ldaptive.pool.PoolConfig;
-import org.ldaptive.pool.PooledConnectionFactory;
-import org.ldaptive.pool.PruneStrategy;
-import org.ldaptive.pool.SearchValidator;
+import org.ldaptive.*;
+import org.ldaptive.pool.*;
 import org.ldaptive.provider.Provider;
 import org.ldaptive.provider.unboundid.UnboundIDProvider;
 import org.ldaptive.ssl.CredentialConfig;
@@ -48,6 +33,9 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
+import javax.annotation.PostConstruct;
+import java.time.Duration;
 
 /**
  * @author Christian Bremer
@@ -89,7 +77,7 @@ public class LdaptiveAutoConfiguration {
         }
 
         if (properties.isPooled()) {
-            return pooledConnectionFactory(null);
+            return pooledConnectionFactory();
         }
         return defaultConnectionFactory(null);
     }
@@ -108,8 +96,6 @@ public class LdaptiveAutoConfiguration {
         ConnectionConfig cc = new ConnectionConfig();
         cc.setLdapUrl(properties.getLdapUrl());
         
-        //cc.setConnectTimeout(properties.getConnectTimeout());
-        //cc.setResponseTimeout(properties.getResponseTimeout());
         if (properties.getConnectTimeout() > 0L) {
             cc.setConnectTimeout(Duration.ofMillis(properties.getConnectTimeout()));
         }
@@ -117,10 +103,6 @@ public class LdaptiveAutoConfiguration {
             cc.setResponseTimeout(Duration.ofMillis(properties.getResponseTimeout()));
         }
         
-        // default one
-//        ConnectionStrategy strategy = new DefaultConnectionStrategy();
-//        cc.setConnectionStrategy(strategy);
-
         cc.setUseSSL(properties.isUseSsl());
         cc.setUseStartTLS(properties.isUseStartTls());
 
@@ -139,16 +121,10 @@ public class LdaptiveAutoConfiguration {
     private SslConfig sslConfig() {
         SslConfig sc = new SslConfig();
         sc.setCredentialConfig(sslCredentialConfig());
-        // there may be other ways
-        // sc.setEnabledCipherSuites(suites);
-        // sc.setEnabledProtocols(protocols);
-        // sc.setHandshakeCompletedListeners(listeners);
-        // sc.setTrustManagers(managers);
         return sc;
     }
 
     private CredentialConfig sslCredentialConfig() {
-        // there may be other ways
         X509CredentialConfig x509 = new X509CredentialConfig();
         x509.setAuthenticationCertificate(properties.getAuthenticationCertificate());
         x509.setAuthenticationKey(properties.getAuthenticationKey());
@@ -164,19 +140,18 @@ public class LdaptiveAutoConfiguration {
         return bci;
     }
 
-    private PooledConnectionFactory pooledConnectionFactory(Provider<?> provider) {
+    private PooledConnectionFactory pooledConnectionFactory() {
         PooledConnectionFactory factory = new PooledConnectionFactory();
-        factory.setConnectionPool(connectionPool(provider));
+        factory.setConnectionPool(connectionPool());
         return factory;
     }
 
-    private ConnectionPool connectionPool(Provider<?> provider) {
+    private ConnectionPool connectionPool() {
         BlockingConnectionPool pool = new BlockingConnectionPool();
-        pool.setConnectionFactory(defaultConnectionFactory(provider));
+        pool.setConnectionFactory(defaultConnectionFactory(null));
         pool.setPoolConfig(poolConfig());
         pool.setPruneStrategy(pruneStrategy());
         pool.setValidator(searchValidator());
-        //pool.setBlockWaitTime(properties.getBlockWaitTime());
         if (properties.getBlockWaitTime() > 0L) {
             pool.setBlockWaitTime(Duration.ofMillis(properties.getBlockWaitTime()));
         }
@@ -190,7 +165,6 @@ public class LdaptiveAutoConfiguration {
         pc.setMinPoolSize(properties.getMinPoolSize());
         pc.setValidateOnCheckIn(properties.isValidateOnCheckIn());
         pc.setValidateOnCheckOut(properties.isValidateOnCheckOut());
-        //pc.setValidatePeriod(properties.getValidatePeriod());
         if (properties.getValidatePeriod() > 0L) {
             pc.setValidatePeriod(Duration.ofSeconds(properties.getValidatePeriod()));
         }
@@ -201,8 +175,6 @@ public class LdaptiveAutoConfiguration {
     private PruneStrategy pruneStrategy() {
         // there may be other ways
         IdlePruneStrategy ips = new IdlePruneStrategy();
-        //ips.setIdleTime(properties.getIdleTime());
-        //ips.setPrunePeriod(properties.getPrunePeriod());
         if (properties.getIdleTime() > 0L) {
             ips.setIdleTime(Duration.ofSeconds(properties.getIdleTime()));
         }

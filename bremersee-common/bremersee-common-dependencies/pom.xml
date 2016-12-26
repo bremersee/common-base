@@ -30,7 +30,7 @@
         <jmapper-core.version>1.6.0.1</jmapper-core.version>
         <jts.version>1.13</jts.version>
         <ldaptive.version>1.2.0</ldaptive.version>
-        <lombok.version>1.16.10</lombok.version>
+        <lombok.version>1.16.12</lombok.version>
         <person-directory-api.version>1.7.0</person-directory-api.version>
         <postgresql.version>9.4.1211.jre7</postgresql.version>
         <spring-boot.version>1.4.1.RELEASE</spring-boot.version>

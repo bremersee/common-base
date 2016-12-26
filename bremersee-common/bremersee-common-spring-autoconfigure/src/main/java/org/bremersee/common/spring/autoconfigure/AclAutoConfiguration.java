@@ -45,12 +45,16 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
  *
  */
 @Configuration
-@ConditionalOnClass(name = { "org.springframework.security.acls.jdbc.JdbcMutableAclService", "org.bremersee.common.acl.domain.entity.AclClass" })
+@ConditionalOnClass(name = {
+        "org.springframework.security.acls.jdbc.JdbcMutableAclService",
+        "org.bremersee.common.acl.domain.entity.AclClass" })
 @EntityScan(basePackages = "org.bremersee.common.acl.domain.entity")
 public class AclAutoConfiguration {
+
+    private static final String ROLE_ACL_ADMIN = "ROLE_ACL_ADMIN";
     
     @Autowired
-    protected DataSource dataSource;
+    DataSource dataSource;
 
     @Bean
     public JdbcMutableAclService aclService() {
@@ -73,24 +77,22 @@ public class AclAutoConfiguration {
     }
 
     protected AclAuthorizationStrategy aclAuthorizationStrategy() {
-        return new AclAuthorizationStrategyImpl(new SimpleGrantedAuthority("ROLE_ACL_ADMIN"),
-                new SimpleGrantedAuthority("ROLE_ACL_ADMIN"), new SimpleGrantedAuthority("ROLE_ACL_ADMIN"));
+        return new AclAuthorizationStrategyImpl(new SimpleGrantedAuthority(ROLE_ACL_ADMIN),
+                new SimpleGrantedAuthority(ROLE_ACL_ADMIN), new SimpleGrantedAuthority(ROLE_ACL_ADMIN));
     }
     
     protected PermissionGrantingStrategy permissionGrantingStrategy() {
-        DefaultPermissionGrantingStrategy bean = new DefaultPermissionGrantingStrategy(auditLogger());
-        return bean;
+        return new DefaultPermissionGrantingStrategy(auditLogger());
     }
     
     protected AuditLogger auditLogger() {
-        ConsoleAuditLogger bean = new ConsoleAuditLogger();
-        return bean;
+        return new ConsoleAuditLogger();
     }
 
-//    @Bean
-//    AclMasterService masterService() {
-//        return new AclMasterService();
-//    }
+//    @Bean // NOSONAR
+//    AclMasterService masterService() { // NOSONAR
+//        return new AclMasterService(); // NOSONAR
+//    } // NOSONAR
 
     @Bean // TODO configure somewhere else?
     public MethodSecurityExpressionHandler createExpressionHandler() {

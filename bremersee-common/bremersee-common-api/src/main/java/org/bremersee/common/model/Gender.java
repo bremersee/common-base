@@ -27,16 +27,20 @@ import org.apache.commons.lang3.StringUtils;
 @XmlType(name = "genderType")
 public enum Gender {
     
-    MALE("M"), FEMALE("F");
+    MALE("M"), FEMALE("F"), UNKNOWN("U");
 
-    private final String gosaValue;
+    private final String stringValue;
     
-    private Gender(String gosaValue) {
-        this.gosaValue = gosaValue;
+    Gender(String stringValue) {
+        this.stringValue = stringValue;
     }
     
     public String getGosaValue() {
-        return gosaValue;
+        // gosa supports only M and F
+        if ("M".equals(stringValue) || "F".equals(stringValue)) {
+            return stringValue;
+        }
+        return null;
     }
     
     public static Gender fromGosaValue(String gosaValue) {
@@ -44,7 +48,7 @@ public enum Gender {
             return null;
         }
         for (Gender gender : Gender.values()) {
-            if (gosaValue.equalsIgnoreCase(gender.gosaValue)) {
+            if (gosaValue.equalsIgnoreCase(gender.stringValue)) {
                 return gender;
             }
         }

@@ -17,6 +17,7 @@
 package org.bremersee.common.spring.autoconfigure;
 
 import com.fasterxml.jackson.databind.AnnotationIntrospector;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.introspect.AnnotationIntrospectorPair;
 import com.fasterxml.jackson.databind.introspect.JacksonAnnotationIntrospector;
 import com.fasterxml.jackson.databind.type.TypeFactory;
@@ -24,9 +25,11 @@ import com.fasterxml.jackson.module.jaxb.JaxbAnnotationIntrospector;
 import org.bremersee.geojson.GeoJsonObjectMapperModule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.boot.autoconfigure.jackson.Jackson2ObjectMapperBuilderCustomizer;
+import org.springframework.boot.autoconfigure.jackson.JacksonProperties;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 
@@ -40,7 +43,16 @@ import javax.annotation.PostConstruct;
 @ConditionalOnWebApplication
 public class ObjectMapperAutoConfiguration implements Jackson2ObjectMapperBuilderCustomizer {
 
-    protected final Logger log = LoggerFactory.getLogger(getClass());
+    private final Logger log = LoggerFactory.getLogger(getClass());
+
+    private JacksonProperties properties = new JacksonProperties();
+
+    @Autowired(required = false)
+    public void setProperties(JacksonProperties properties) {
+        if (properties != null) {
+            this.properties = properties;
+        }
+    }
 
     @PostConstruct
     public void init() {
@@ -60,10 +72,23 @@ public class ObjectMapperAutoConfiguration implements Jackson2ObjectMapperBuilde
     @Override
     public void customize(Jackson2ObjectMapperBuilder jacksonObjectMapperBuilder) {
 
+        // see http://wiki.fasterxml.com/JacksonJAXBAnnotations
         AnnotationIntrospector primary = new JacksonAnnotationIntrospector();
         AnnotationIntrospector secondary = new JaxbAnnotationIntrospector(TypeFactory.defaultInstance());
         AnnotationIntrospectorPair pair = new AnnotationIntrospectorPair(primary, secondary);
         jacksonObjectMapperBuilder.annotationIntrospector(pair);
+
+        // http://wiki.fasterxml.com/JacksonFAQDateHandling
+        // http://docs.spring.io/spring-boot/docs/current/reference/html/howto-spring-mvc.html#howto-customize-the-jackson-objectmapper
+        if (properties.getSerialization().get(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS) == null) {
+            properties.getSerialization().put(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, Boolean.FALSE);
+            jacksonObjectMapperBuilder.featuresToDisable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+        }
+        if (Boolean.TRUE.equals(properties.getSerialization().get(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS))
+                && properties.getSerialization().get(SerializationFeature.WRITE_DATES_WITH_ZONE_ID) == null) {
+            properties.getSerialization().put(SerializationFeature.WRITE_DATES_WITH_ZONE_ID, Boolean.TRUE);
+            jacksonObjectMapperBuilder.featuresToEnable(SerializationFeature.WRITE_DATES_WITH_ZONE_ID);
+        }
 
         jacksonObjectMapperBuilder.modules(new GeoJsonObjectMapperModule());
     }

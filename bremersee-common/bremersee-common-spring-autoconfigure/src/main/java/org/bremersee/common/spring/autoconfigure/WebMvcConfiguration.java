@@ -57,7 +57,7 @@ public class WebMvcConfiguration extends WebMvcConfigurerAdapter {
         // @formatter:off
         String msg;
         if (jaxbMarshaller == null) {
-            jaxbMarshaller = JaxbAutoConfiguration.getJaxbMarshaller();
+            jaxbMarshaller = JaxbAutoConfiguration.createJaxbMarshaller();
             //    "**********************************************************************\n"
             msg = "*   WARNING: A bean with name 'jaxbMarshaller' was not found!        *\n"
                 + "*            Using default 'Jaxb2Marshaller'.                        *\n";
@@ -84,9 +84,5 @@ public class WebMvcConfiguration extends WebMvcConfigurerAdapter {
     public MarshallingHttpMessageConverter marshallingHttpMessageConverter() {
         return new MarshallingHttpMessageConverter(jaxbMarshaller, jaxbMarshaller);
     }
-
-//    public MappingJackson2HttpMessageConverter mappingJackson2HttpMessageConverter () {
-//        return null;
-//    }
 
 }

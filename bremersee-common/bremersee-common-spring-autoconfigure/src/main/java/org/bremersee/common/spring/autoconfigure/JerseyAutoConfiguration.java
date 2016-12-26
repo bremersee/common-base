@@ -16,26 +16,6 @@
 
 package org.bremersee.common.spring.autoconfigure;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import javax.ws.rs.Consumes;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
-import javax.ws.rs.ext.ContextResolver;
-import javax.ws.rs.ext.Provider;
-import javax.xml.bind.JAXBContext;
-
-import org.bremersee.common.exception.StatusCodeAwareException;
-import org.glassfish.jersey.server.ResourceConfig;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.AutoConfigureBefore;
@@ -46,7 +26,15 @@ import org.springframework.boot.autoconfigure.jersey.ResourceConfigCustomizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.oxm.jaxb.Jaxb2Marshaller;
-import org.springframework.util.StringUtils;
+
+import javax.ws.rs.Consumes;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.ext.ContextResolver;
+import javax.ws.rs.ext.Provider;
+import javax.xml.bind.JAXBContext;
+import java.util.ArrayList;
+import java.util.List;
 
 @Configuration
 @ConditionalOnClass(name = { "org.glassfish.jersey.server.spring.SpringComponentProvider",
@@ -56,67 +44,31 @@ import org.springframework.util.StringUtils;
 @AutoConfigureBefore(org.springframework.boot.autoconfigure.jersey.JerseyAutoConfiguration.class)
 public class JerseyAutoConfiguration {
     
-    @Autowired(required = false)
-    @Qualifier("jaxbMarshaller")
     protected Jaxb2Marshaller jaxb2Marshaller;
     
+    private List<JerseyComponentsProvider> componentProviders = new ArrayList<>();
+
+    @Autowired
+    @Qualifier("jaxbMarshaller")
+    public void setJaxb2Marshaller(Jaxb2Marshaller jaxb2Marshaller) {
+        this.jaxb2Marshaller = jaxb2Marshaller;
+    }
+
     @Autowired(required = false)
-    private List<JerseyComponentsProvider> componentProviders = new ArrayList<JerseyComponentsProvider>();
+    public void setComponentProviders(List<JerseyComponentsProvider> componentProviders) {
+        if (componentProviders != null) {
+            this.componentProviders = componentProviders;
+        }
+    }
 
     @Bean
     public ResourceConfigCustomizer jaxbContextResourceConfig() {
-        return new ResourceConfigCustomizer() {
-            
-            @Override
-            public void customize(ResourceConfig config) {
-                config.register(new JAXBContextProvider(jaxb2Marshaller));
-            }
-        };
+        return config -> config.register(new JAXBContextProvider(jaxb2Marshaller));
     }
 
     @Bean
     public ResourceConfigCustomizer componentsProviderResourceConfig() {
-        return new ResourceConfigCustomizer() {
-            
-            @Override
-            public void customize(ResourceConfig config) {
-                final Map<Class<? extends RuntimeException>, Integer> exceptionStatusCodeMap = new HashMap<>();
-                final Set<Object> componentsSet = new LinkedHashSet<Object>();
-                if (componentProviders != null) {
-                    for (JerseyComponentsProvider provider : componentProviders) {
-                        Object[] components = provider.getJerseyComponents();
-                        if (components != null) {
-                            for (Object component : components) {
-                                if (component != null) {
-                                    componentsSet.add(component);
-                                }
-                            }
-                        }
-                        Map<Class<? extends RuntimeException>, Integer> map = provider.getExceptionStatusCodeMap();
-                        if (map != null) {
-                            exceptionStatusCodeMap.putAll(map);
-                        }
-                    }
-                    for (Object component : componentsSet) {
-                        if (component != null) {
-                            if (component instanceof String) {
-                                try {
-                                    config.register(Class.forName(component.toString()));
-                                } catch (Exception e) {
-                                    // log?
-                                }
-                            } else if (component instanceof Class<?>) {
-                                config.register((Class<?>)component);
-                            } else {
-                                config.register(component);
-                            }
-                        }
-                    }
-                }
-                
-                config.register(new DefaultExceptionMapper(exceptionStatusCodeMap));
-            }
-        };
+        return new JerseyComponentsCustomizer(componentProviders);
     }
 
     @Provider
@@ -137,89 +89,6 @@ public class JerseyAutoConfiguration {
             }
             return null;
         }
-        
     }
     
-    @Provider
-    public static class DefaultExceptionMapper implements org.glassfish.jersey.spi.ExtendedExceptionMapper<RuntimeException> {
-        
-        protected final Logger log = LoggerFactory.getLogger(getClass());
-        
-        private final Map<Class<? extends RuntimeException>, Integer> exceptionStatusCodeMap;
-        
-        public DefaultExceptionMapper() {
-            this(null);
-        }
-        
-        public DefaultExceptionMapper(Map<Class<? extends RuntimeException>, Integer> exceptionStatusCodeMap) {
-            this.exceptionStatusCodeMap = exceptionStatusCodeMap == null ? new HashMap<Class<? extends RuntimeException>, Integer>() : exceptionStatusCodeMap;
-            initExceptionStatusCodeMap();
-        }
-        
-        protected void initExceptionStatusCodeMap() {
-            addRuntimeExceptionClassToMap(RuntimeException.class, Status.INTERNAL_SERVER_ERROR.getStatusCode());
-            addRuntimeExceptionClassToMap(IllegalArgumentException.class, Status.BAD_REQUEST.getStatusCode());
-            addRuntimeExceptionClassToMap("org.springframework.security.access.AccessDeniedException", Status.FORBIDDEN.getStatusCode());
-            addRuntimeExceptionClassToMap("javax.persistence.EntityNotFoundException", Status.NOT_FOUND.getStatusCode());
-        }
-        
-        protected void addRuntimeExceptionClassToMap(Class<? extends RuntimeException> cls, int statusCode) {
-            if (cls != null) {
-                if (exceptionStatusCodeMap.get(cls) == null) {
-                    exceptionStatusCodeMap.put(cls, statusCode);
-                }
-            }
-        }
-        
-        @SuppressWarnings("unchecked")
-        protected void addRuntimeExceptionClassToMap(String clsName, int statusCode) {
-            if (!StringUtils.isEmpty(clsName)) {
-                try {
-                    Class<? extends RuntimeException> cls = (Class<? extends RuntimeException>) Class.forName(clsName);
-                    addRuntimeExceptionClassToMap(cls, statusCode);
-                } catch (Throwable t) {
-                    log.info("RuntimeException [" + clsName + "] was not found. Status code mapping for this exception is not available.");
-                }
-            }
-        }
-        
-        @Override
-        public Response toResponse(RuntimeException exception) {
-            if (exception != null) {
-                Integer statusCode = exceptionStatusCodeMap.get(exception);
-                if (statusCode == null && exception instanceof StatusCodeAwareException) {
-                    statusCode = ((StatusCodeAwareException)exception).getStatusCode();
-                }
-                if (statusCode == null) {
-                    statusCode = Status.INTERNAL_SERVER_ERROR.getStatusCode();
-                }
-                final String msg;
-                if (StringUtils.isEmpty(exception.getMessage())) {
-                    Status status = Status.fromStatusCode(statusCode);
-                    msg = status != null ? status.getReasonPhrase() : "No reason";
-                } else {
-                    msg = exception.getMessage();
-                }
-                return Response
-                        .status(statusCode)
-                        .entity(msg)
-                        .type("text/plain").build();
-            } else {
-                return Response.serverError().build();
-            }
-        }
-
-        @Override
-        public boolean isMappable(RuntimeException exception) {
-            if (exception != null) {
-                if (exception instanceof StatusCodeAwareException) {
-                    return true;
-                }
-                return exceptionStatusCodeMap.get(exception) != null;
-            }
-            return false;
-        }
-        
-    }
-
 }

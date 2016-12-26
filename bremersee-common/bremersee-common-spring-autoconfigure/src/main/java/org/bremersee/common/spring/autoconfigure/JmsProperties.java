@@ -16,10 +16,12 @@
 
 package org.bremersee.common.spring.autoconfigure;
 
-import javax.jms.Session;
-
 import org.bremersee.common.jms.SessionTransaction;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+
+import javax.jms.Session;
 
 /**
  * @author Christian Bremer
@@ -27,13 +29,13 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
  */
 @ConfigurationProperties("bremersee.jms")
 public class JmsProperties {
+
+    protected final Logger log = LoggerFactory.getLogger(getClass());
     
     private SessionTransaction jmsSessionTransaction = SessionTransaction.AUTO;
     
     private JmsListenerContainerFactoryProperties jmsListenerContainerFactory = new JmsListenerContainerFactoryProperties(null, "1-5", null, false, null, Session.AUTO_ACKNOWLEDGE, null, null, null);
 
-    //private JmsDestinationProperties toClientQueue = new JmsDestinationProperties("to.client.queue", false);
-    
     @Override
     public String toString() {
         return "CommonProperties ["
@@ -44,28 +46,43 @@ public class JmsProperties {
 
     public SessionTransaction getJmsSessionTransaction() {
         if (jmsSessionTransaction == null || SessionTransaction.AUTO.equals(jmsSessionTransaction)) {
-            try {
-                Class.forName("org.springframework.transaction.jta.JtaTransactionManager");
-                
-                try {
-                    Class.forName("bitronix.tm.jndi.BitronixContext");
-                    jmsSessionTransaction = SessionTransaction.XA;
-                    
-                } catch (Exception e0) {
-                    try {
-                        Class.forName("com.atomikos.icatch.jta.UserTransactionManager");
-                        jmsSessionTransaction = SessionTransaction.XA;
-                        
-                    } catch (Exception e1) {
-                        jmsSessionTransaction = SessionTransaction.LOCAL;
-                    }
-                }
-                
-            } catch (Exception e) {
+            if (isJtaTransactionManagerAvailable() && (isAtomikosAvailable() || isBitronixAvailable())) {
+                jmsSessionTransaction = SessionTransaction.XA;
+            } else {
                 jmsSessionTransaction = SessionTransaction.LOCAL;
             }
         }
         return jmsSessionTransaction;
+    }
+
+    private boolean isJtaTransactionManagerAvailable() {
+        try {
+            Class.forName("org.springframework.transaction.jta.JtaTransactionManager");
+            return true;
+        } catch (ClassNotFoundException e) { // NOSONAR
+            log.debug("JtaTransactionManager is not available.");
+            return false;
+        }
+    }
+
+    private boolean isAtomikosAvailable() {
+        try {
+            Class.forName("com.atomikos.icatch.jta.UserTransactionManager");
+            return true;
+        } catch (ClassNotFoundException e) { // NOSONAR
+            log.debug("'om.atomikos.icatch.jta.UserTransactionManager' is not available.");
+            return false;
+        }
+    }
+
+    private boolean isBitronixAvailable() {
+        try {
+            Class.forName("bitronix.tm.jndi.BitronixContext");
+            return true;
+        } catch (ClassNotFoundException e) { // NOSONAR
+            log.debug("'bitronix.tm.jndi.BitronixContext' is not available.");
+            return false;
+        }
     }
 
     public JmsListenerContainerFactoryProperties getJmsListenerContainerFactory() {

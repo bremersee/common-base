@@ -16,11 +16,6 @@
 
 package org.bremersee.common.spring.autoconfigure;
 
-import java.util.*;
-
-import javax.annotation.PostConstruct;
-import javax.xml.bind.Marshaller;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,11 +23,13 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.oxm.jaxb.Jaxb2Marshaller;
-import org.springframework.util.StringUtils;
+
+import javax.annotation.PostConstruct;
+import javax.xml.bind.Marshaller;
+import java.util.*;
 
 /**
  * @author Christian Bremer
- *
  */
 @Configuration
 public class JaxbAutoConfiguration {
@@ -43,26 +40,48 @@ public class JaxbAutoConfiguration {
             org.bremersee.pagebuilder.model.ObjectFactory.class.getPackage().getName()
     };
 
-    private static Jaxb2Marshaller jaxb2MarshallerInstance = null;
-
-    /**
-     * @return the default Jaxb2Marshaller
-     */
-    public static synchronized Jaxb2Marshaller getJaxbMarshaller() {
-        if (jaxb2MarshallerInstance == null) {
-            Jaxb2Marshaller m = new Jaxb2Marshaller();
-            Map<String, Object> marshallerProperties = new HashMap<String, Object>();
-            marshallerProperties.put(Marshaller.JAXB_FORMATTED_OUTPUT,
-                    Boolean.TRUE);
-            m.setMarshallerProperties(marshallerProperties);
-            m.setContextPaths(DEFAULT_JAXB_CONTEXT_PATHS);
-        }
-        return jaxb2MarshallerInstance;
-    }
-
     private final Logger log = LoggerFactory.getLogger(getClass());
 
-    private List<JaxbContextPathsProvider> jaxbContextPathsProviders = new ArrayList<JaxbContextPathsProvider>();
+    private List<JaxbContextPathsProvider> jaxbContextPathsProviders = new ArrayList<>();
+
+    public static Jaxb2Marshaller createJaxbMarshaller() {
+        return createJaxbMarshaller(new ArrayList<>());
+    }
+
+    public static Jaxb2Marshaller createJaxbMarshaller(final Package...packages) {
+        final List<String> packageList = new ArrayList<>();
+        if (packages != null) {
+            for (Package p : packages) {
+                if (p != null) {
+                    packageList.add(p.getName());
+                }
+            }
+        }
+        return createJaxbMarshaller(packageList);
+    }
+
+    public static Jaxb2Marshaller createJaxbMarshaller(final String...packages) {
+        return createJaxbMarshaller(packages == null ? new ArrayList<>() : Arrays.asList(packages));
+    }
+
+    public static Jaxb2Marshaller createJaxbMarshaller(final Collection<String> packages) {
+        final Set<String> packageSet = createPackageSet(packages);
+        Jaxb2Marshaller m = new Jaxb2Marshaller();
+        Map<String, Object> marshallerProperties = new HashMap<>();
+        marshallerProperties.put(Marshaller.JAXB_FORMATTED_OUTPUT,
+                Boolean.TRUE);
+        m.setMarshallerProperties(marshallerProperties);
+        m.setContextPaths(packageSet.toArray(new String[packageSet.size()]));
+        return m;
+    }
+
+    private static Set<String> createPackageSet(Collection<String> packages) {
+        final Set<String> packageSet = new LinkedHashSet<>(Arrays.asList(DEFAULT_JAXB_CONTEXT_PATHS));
+        if (packages != null) {
+            packageSet.addAll(packages);
+        }
+        return packageSet;
+    }
 
     @Autowired(required = false)
     public void setJaxbContextPathsProviders(List<JaxbContextPathsProvider> jaxbContextPathsProviders) {
@@ -78,41 +97,34 @@ public class JaxbAutoConfiguration {
                + "**********************************************************************\n"
                + "*  JAXB Auto Configuration                                           *\n"
                + "**********************************************************************\n"
-               + "jaxbContextPaths = " + StringUtils.arrayToCommaDelimitedString(getJaxbContextPaths()) + "\n"
+               + "jaxbContextPaths = " + createPackageSet(getJaxbContextPaths()) + "\n"
                + "**********************************************************************");
         // @formatter:on
     }
 
-    private String[] getJaxbContextPaths() {
-        
-        Set<String> paths = new HashSet<String>();
-        
-        // defaults
-        paths.addAll(Arrays.asList(DEFAULT_JAXB_CONTEXT_PATHS));
+    private List<String> getJaxbContextPaths() {
 
-        if (jaxbContextPathsProviders != null) {
-            for (JaxbContextPathsProvider provider : jaxbContextPathsProviders) {
-                String[] providerPaths = provider.getContextPaths();
-                if (providerPaths != null) {
-                    for (String providerPath : providerPaths) {
-                        paths.add(providerPath);
-                    }
-                }
+        List<String> contextPaths = new ArrayList<>();
+        for (JaxbContextPathsProvider provider : jaxbContextPathsProviders) {
+            if (provider.getContextPaths() != null && provider.getContextPaths().length > 0) {
+                final String[] providerPaths = provider.getContextPaths();
+                contextPaths.addAll(Arrays.asList(providerPaths));
             }
         }
-        return paths.toArray(new String[paths.size()]);
+        return contextPaths;
     }
 
     @Bean(name = { "jaxbMarshaller", "jaxbUnmarshaller" })
     @Primary
     public Jaxb2Marshaller jaxbMarshaller() {
-        Jaxb2Marshaller m = new Jaxb2Marshaller();
-        Map<String, Object> marshallerProperties = new HashMap<String, Object>();
-        marshallerProperties.put(Marshaller.JAXB_FORMATTED_OUTPUT,
-                Boolean.TRUE);
-        m.setMarshallerProperties(marshallerProperties);
-        m.setContextPaths(getJaxbContextPaths());
-        return m;
+        List<String> contextPaths = new ArrayList<>();
+        for (JaxbContextPathsProvider provider : jaxbContextPathsProviders) {
+            if (provider.getContextPaths() != null && provider.getContextPaths().length > 0) {
+                final String[] providerPaths = provider.getContextPaths();
+                contextPaths.addAll(Arrays.asList(providerPaths));
+            }
+        }
+        return createJaxbMarshaller(contextPaths);
     }
     
 }

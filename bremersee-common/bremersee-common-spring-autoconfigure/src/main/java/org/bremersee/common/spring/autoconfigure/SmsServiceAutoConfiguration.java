@@ -64,8 +64,7 @@ public class SmsServiceAutoConfiguration {
     public SmsService smsService() {
         AbstractSmsService smsService;
         if (StringUtils.isAnyBlank(properties.getUrl(), properties.getUsername(), properties.getPassword())) {
-            DummySmsService dummy = new DummySmsService();
-            smsService = dummy;
+            smsService = new DummySmsService();
         } else {
             GoyyaSmsService goyya = new GoyyaSmsService(properties.getUsername(), properties.getPassword(), properties.getUrl());
             goyya.setProxyHost(properties.getProxyHost());

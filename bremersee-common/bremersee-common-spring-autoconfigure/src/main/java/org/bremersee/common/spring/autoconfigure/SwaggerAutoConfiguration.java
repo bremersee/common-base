@@ -16,11 +16,6 @@
 
 package org.bremersee.common.spring.autoconfigure;
 
-import java.util.Arrays;
-import java.util.List;
-
-import javax.annotation.PostConstruct;
-
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,21 +27,20 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
-
 import springfox.documentation.builders.ApiInfoBuilder;
 import springfox.documentation.builders.PathSelectors;
 import springfox.documentation.builders.RequestHandlerSelectors;
-import springfox.documentation.service.AuthorizationScope;
-import springfox.documentation.service.ImplicitGrant;
-import springfox.documentation.service.LoginEndpoint;
-import springfox.documentation.service.OAuth;
-import springfox.documentation.service.SecurityReference;
+import springfox.documentation.service.*;
 import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spi.service.contexts.SecurityContext;
 import springfox.documentation.spring.web.plugins.Docket;
 import springfox.documentation.swagger.web.ApiKeyVehicle;
 import springfox.documentation.swagger.web.SecurityConfiguration;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
+
+import javax.annotation.PostConstruct;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * @author Christian Bremer
@@ -55,8 +49,7 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 @Configuration
 @ConditionalOnProperty(
         prefix = "bremersee.swagger-ui", 
-        name = "base-package", 
-        matchIfMissing = false)
+        name = "base-package")
 @ConditionalOnClass(name = { 
         "springfox.documentation.spring.web.plugins.Docket",
         "springfox.documentation.swagger2.annotations.EnableSwagger2" 
@@ -81,10 +74,6 @@ public class SwaggerAutoConfiguration {
     private String getUserAuthorizationUri() {
         return env.getProperty("security.oauth2.client.user-authorization-uri", "");
     }
-    
-//    private String getAccessTokenUri() {
-//        return env.getProperty("security.oauth2.client.access-token-uri");
-//    }
     
     private String getClientId() {
         return env.getProperty("security.oauth2.client.client-id", "");
@@ -118,8 +107,8 @@ public class SwaggerAutoConfiguration {
                 .apis(StringUtils.isBlank(properties.getBasePackage()) ? RequestHandlerSelectors.any() : RequestHandlerSelectors.basePackage(properties.getBasePackage()))
                 .paths(StringUtils.isBlank(properties.getAntPath()) ? PathSelectors.any() : PathSelectors.ant(properties.getAntPath()))
                 .build()
-                .securitySchemes(Arrays.asList(implicitFlow()))
-                .securityContexts(Arrays.asList(securityContext()));
+                .securitySchemes(Collections.singletonList(implicitFlow()))
+                .securityContexts(Collections.singletonList(securityContext()));
         //@formatter:on
     }
     
@@ -131,8 +120,8 @@ public class SwaggerAutoConfiguration {
 
         return new OAuth(
                 RestConstants.SECURITY_SCHEMA_OAUTH2,
-                Arrays.asList(getAuthorizationScope()),
-                Arrays.asList(
+                Collections.singletonList(getAuthorizationScope()),
+                Collections.singletonList(
                         new ImplicitGrant(
                                 new LoginEndpoint(getUserAuthorizationUri()), 
                                 "access_token")
@@ -154,7 +143,7 @@ public class SwaggerAutoConfiguration {
                 = new AuthorizationScope(RestConstants.AUTHORIZATION_SCOPE, RestConstants.AUTHORIZATION_SCOPE_DESCR);
         AuthorizationScope[] authorizationScopes = new AuthorizationScope[1];
         authorizationScopes[0] = authorizationScope;
-        return Arrays.asList(
+        return Collections.singletonList(
                 new SecurityReference(RestConstants.SECURITY_SCHEMA_OAUTH2, authorizationScopes));
     }
 
@@ -168,13 +157,15 @@ public class SwaggerAutoConfiguration {
         ApiKeyVehicle apiKeyVehicle = ApiKeyVehicle.HEADER;
         String apiKeyName = "";
         String scopeSeparator = ",";
-        SecurityConfiguration sc = new SecurityConfiguration(clientId, clientSecret, realm, appName, apiKeyValue, apiKeyVehicle, apiKeyName, scopeSeparator);
-        return sc;
+        return new SecurityConfiguration(
+                clientId,
+                clientSecret,
+                realm,
+                appName,
+                apiKeyValue,
+                apiKeyVehicle,
+                apiKeyName,
+                scopeSeparator);
     }
-    
-//    public UiConfiguration uiConfiguation() {
-//        UiConfiguration ui = new UiConfiguration(null);
-//        return ui;
-//    }
     
 }

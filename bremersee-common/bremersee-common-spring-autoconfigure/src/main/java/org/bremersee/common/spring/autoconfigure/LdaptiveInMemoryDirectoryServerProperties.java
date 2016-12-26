@@ -33,7 +33,7 @@ public class LdaptiveInMemoryDirectoryServerProperties {
 
     private String managerDn = "cn=admin,dc=example,dc=org";
 
-    private String managerPassword = "changeit";
+    private String managerPassword = "changeit"; // NOSONAR
 
     private String trustStoreLocation;
     private String trustStorePassword;
