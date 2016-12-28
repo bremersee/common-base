@@ -1,43 +1,35 @@
-/**
- * 
+/*
+ * Copyright 2015 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
+
 package org.bremersee.common.security.crypto.password;
 
-import org.apache.commons.lang3.StringUtils;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
- * @author Christian Bremer
+ * Configuration object of {@link PasswordEncoder}.
  *
+ * @author Christian Bremer
  */
+@Data
+@NoArgsConstructor
 public class PasswordEncoderConfig {
 
     private int randomSaltLength = 4;
     
     private String algorithm = "SSHA";
 
-    @Override
-    public String toString() {
-        return "PasswordEncoderConfig [randomSaltLength=" + randomSaltLength + ", algorithm=" + algorithm + "]";
-    }
-
-    public int getRandomSaltLength() {
-        return randomSaltLength;
-    }
-
-    public void setRandomSaltLength(int randomSaltLength) {
-        if (randomSaltLength > 0) {
-            this.randomSaltLength = randomSaltLength;
-        }
-    }
-
-    public String getAlgorithm() {
-        return algorithm;
-    }
-
-    public void setAlgorithm(String algorithm) {
-        if (StringUtils.isNotBlank(algorithm)) {
-            this.algorithm = algorithm;
-        }
-    }
-    
 }

@@ -1,151 +1,149 @@
-/**
- * 
+/*
+ * Copyright 2015 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
+
 package org.bremersee.common.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import io.swagger.annotations.ApiModel;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.bremersee.common.exception.StatusCodeAwareException;
+
+import javax.xml.bind.annotation.*;
 import java.io.Serializable;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
+import java.lang.reflect.*;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlElementWrapper;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlType;
-
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 /**
- * @author Christian Bremer
+ * A DTO of a throwable object.
  *
+ * @author Christian Bremer
  */
 //@formatter:off
+@ApiModel("A DTO of a throwable object.")
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlRootElement(name = "throwable")
 @XmlType(name = "throwableType", propOrder = {
         "className",
         "message",
         "stackTrace",
-        "cause"
+        "cause",
+        "statusCode"
 })
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(Include.NON_NULL)
-@JsonAutoDetect(
-        fieldVisibility = Visibility.NONE, 
-        getterVisibility = Visibility.PROTECTED_AND_PUBLIC, 
-        creatorVisibility = Visibility.NONE, 
-        isGetterVisibility = Visibility.PROTECTED_AND_PUBLIC, 
-        setterVisibility = Visibility.PROTECTED_AND_PUBLIC
-)
 @JsonPropertyOrder({
         "className",
         "message",
         "stackTrace",
-        "cause"
+        "cause",
+        "statusCode"
 })
+@Data
+@NoArgsConstructor
 //@formatter:on
 public class ThrowableDto implements Serializable {
 
     private static final long serialVersionUID = 1L;
-    
-    @XmlElement(name = "className", required = false)
+
+    @XmlElement(name = "className")
+    @JsonProperty(value = "className")
     private String className;
-    
-    @XmlElement(name = "message", required = false)
+
+    @XmlElement(name = "message")
+    @JsonProperty(value = "message")
     private String message;
-    
-    @XmlElementWrapper(name = "stackTrace", required = false)
-    @XmlElement(name = "stackTraceElement", required = false)
+
+    @XmlElementWrapper(name = "stackTrace")
+    @XmlElement(name = "stackTraceElement")
+    @JsonProperty(value = "stackTrace")
     private List<StackTraceElementDto> stackTrace = new ArrayList<>();
 
-    @XmlElement(name = "cause", required = false)
+    @XmlElement(name = "cause")
+    @JsonProperty(value = "cause")
     private ThrowableDto cause;
-    
-    /**
-     * Default constructor. 
-     */
-    public ThrowableDto() {
-    }
 
-    public ThrowableDto(Throwable t) {
-        if (t != null) {
-            this.className = t.getClass().getName();
-            this.message = t.getMessage();
-            StackTraceElement[] stackTrace = t.getStackTrace();
-            if (stackTrace != null) {
-                for (StackTraceElement elem : stackTrace) {
-                    this.stackTrace.add(new StackTraceElementDto(elem.getClassName(), elem.getMethodName(), elem.getFileName(), elem.getLineNumber()));
+    @XmlElement(name = "statusCode")
+    @JsonProperty(value = "statusCode")
+    private Integer statusCode;
+
+    /**
+     * Creates the DTO of the specified throwable.
+     *
+     * @param throwable the source object
+     */
+    public ThrowableDto(Throwable throwable) {
+        if (throwable != null) {
+            this.className = throwable.getClass().getName();
+            this.message = throwable.getMessage();
+            StackTraceElement[] stackTraceElements = throwable.getStackTrace();
+            if (stackTraceElements != null) {
+                for (StackTraceElement elem : stackTraceElements) {
+                    this.stackTrace.add(new StackTraceElementDto(
+                            elem.getClassName(),
+                            elem.getMethodName(),
+                            elem.getFileName(),
+                            elem.getLineNumber()));
                 }
             }
-            if (t.getCause() != null) {
-                this.cause = new ThrowableDto(t.getCause());
+            if (throwable.getCause() != null) {
+                this.cause = new ThrowableDto(throwable.getCause());
+            }
+            if (throwable instanceof StatusCodeAwareException) {
+                this.statusCode = ((StatusCodeAwareException) throwable).getStatusCode();
             }
         }
     }
-    
-    @Override
-    public String toString() {
-        return "ThrowableDto [className=" + className + ", message=" + message
-                + ", stackTrace=" + stackTrace + ", cause=" + cause + "]";
-    }
 
-    @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + ((cause == null) ? 0 : cause.hashCode());
-        result = prime * result
-                + ((className == null) ? 0 : className.hashCode());
-        result = prime * result + ((message == null) ? 0 : message.hashCode());
-        result = prime * result
-                + ((stackTrace == null) ? 0 : stackTrace.hashCode());
-        return result;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj)
-            return true;
-        if (obj == null)
-            return false;
-        if (getClass() != obj.getClass())
-            return false;
-        ThrowableDto other = (ThrowableDto) obj;
-        if (cause == null) {
-            if (other.cause != null)
-                return false;
-        } else if (!cause.equals(other.cause))
-            return false;
-        if (className == null) {
-            if (other.className != null)
-                return false;
-        } else if (!className.equals(other.className))
-            return false;
-        if (message == null) {
-            if (other.message != null)
-                return false;
-        } else if (!message.equals(other.message))
-            return false;
-        if (stackTrace == null) {
-            if (other.stackTrace != null)
-                return false;
-        } else if (!stackTrace.equals(other.stackTrace))
-            return false;
-        return true;
+    /**
+     * Creates the throwable object of this DTO.
+     *
+     * @return the throwable object
+     */
+    public Throwable toThrowable() {
+        Class<? extends Throwable> cls = findClass();
+        Throwable throwable = findThrowable(cls);
+        StackTraceElement[] stackTraceElements = new StackTraceElement[stackTrace.size()];
+        int i = 0;
+        for (StackTraceElementDto dto : stackTrace) {
+            stackTraceElements[i] = dto.toStackTraceElement();
+            i++;
+        }
+        throwable.setStackTrace(stackTraceElements);
+        if (statusCode != null && throwable instanceof StatusCodeAwareException) {
+            try {
+                Method setter = throwable.getClass().getDeclaredMethod("setStatusCode", Integer.class);
+                if (!setter.isAccessible()) {
+                    setter.setAccessible(true);
+                }
+                setter.invoke(throwable, statusCode);
+            } catch (Exception e) { // NOSONAR
+                // ignored
+            }
+        }
+        return throwable;
     }
 
     @SuppressWarnings("unchecked")
-    private Class<? extends Throwable> findClass()  {
+    private Class<? extends Throwable> findClass() {
         try {
             Class<?> cls = Class.forName(className);
             if (Throwable.class.isAssignableFrom(cls)) {
@@ -153,17 +151,52 @@ public class ThrowableDto implements Serializable {
             } else {
                 return Throwable.class;
             }
-        } catch (ClassNotFoundException | RuntimeException e) {
+        } catch (ClassNotFoundException | RuntimeException e) { // NOSONAR
             return Throwable.class;
         }
     }
-    
+
     @SuppressWarnings("unchecked")
-    private Throwable findThrowable(Class<? extends Throwable> cls) {
+    private Throwable findThrowable(Class<? extends Throwable> clazz) {
+        Class<? extends Throwable> cls = clazz;
         while (Modifier.isAbstract(cls.getModifiers())) {
             cls = (Class<? extends Throwable>) cls.getSuperclass();
         }
+
+        Throwable t = findThrowableByStringAndThrowable(cls);
+        if (t != null) {
+            return t;
+        }
+
+        t = findThrowableByString(cls);
+        if (t != null) {
+            return t;
+        }
+
+        t = findThrowableByThrowable(cls);
+        if (t != null) {
+            return t;
+        }
+
+        t = findThrowableByNoArgs(cls);
+        if (t != null) {
+            return t;
+        }
+
         try {
+            Class<?> superCls = cls.getSuperclass();
+            if (Throwable.class.isAssignableFrom(superCls)) {
+                return findThrowable((Class<? extends Throwable>) superCls);
+            } else {
+                throw new RuntimeException("No suitable constructor for class [" + cls.getName() + "] was found."); // NOSONAR
+            }
+
+        } catch (Exception e) {
+            throw new RuntimeException("No suitable constructor for class [" + cls.getName() + "] was found.", e); // NOSONAR
+        }
+
+        /*
+        try {  // NOSONAR
             Constructor<? extends Throwable> constructor;
             try {
                 constructor = cls.getDeclaredConstructor(String.class, Throwable.class);
@@ -171,9 +204,9 @@ public class ThrowableDto implements Serializable {
                     constructor.setAccessible(true);
                 }
                 return constructor.newInstance(message, cause == null ? null : cause.toThrowable());
-                
+
             } catch (NoSuchMethodException ignored0) {
-                
+
                 try {
                     constructor = cls.getDeclaredConstructor(String.class);
                     if (!constructor.isAccessible()) {
@@ -184,9 +217,9 @@ public class ThrowableDto implements Serializable {
                         t.initCause(cause.toThrowable());
                     }
                     return t;
-                    
+
                 } catch (NoSuchMethodException ignored1) {
-                    
+
                     try {
                         constructor = cls.getDeclaredConstructor(Throwable.class);
                         if (!constructor.isAccessible()) {
@@ -195,9 +228,9 @@ public class ThrowableDto implements Serializable {
                         Throwable t = constructor.newInstance(cause == null ? null : cause.toThrowable());
                         putMessage(t, cls);
                         return t;
-                        
+
                     } catch (NoSuchMethodException ignored2) {
-                        
+
                         constructor = cls.getDeclaredConstructor();
                         if (!constructor.isAccessible()) {
                             constructor.setAccessible(true);
@@ -211,7 +244,7 @@ public class ThrowableDto implements Serializable {
                     }
                 }
             }
-            
+
         } catch (NoSuchMethodException e) {
             Class<?> superCls = cls.getSuperclass();
             if (Throwable.class.isAssignableFrom(superCls)) {
@@ -219,12 +252,72 @@ public class ThrowableDto implements Serializable {
             } else {
                 throw new RuntimeException("No suitable constructor for class [" + cls.getName() + "] was found.");
             }
-            
+
         } catch (Throwable t) {
             throw new RuntimeException("No suitable constructor for class [" + cls.getName() + "] was found.", t);
         }
+        */
     }
-    
+
+    private Throwable findThrowableByStringAndThrowable(Class<? extends Throwable> cls) {
+        try {
+            Constructor<? extends Throwable> constructor = cls.getDeclaredConstructor(String.class, Throwable.class);
+            if (!constructor.isAccessible()) {
+                constructor.setAccessible(true);
+            }
+            return constructor.newInstance(message, cause == null ? null : cause.toThrowable());
+        } catch (Exception e) { // NOSONAR
+            return null;
+        }
+    }
+
+    private Throwable findThrowableByString(Class<? extends Throwable> cls) {
+        try {
+            Constructor<? extends Throwable> constructor = cls.getDeclaredConstructor(String.class);
+            if (!constructor.isAccessible()) {
+                constructor.setAccessible(true);
+            }
+            Throwable t = constructor.newInstance(message);
+            if (cause != null) {
+                t.initCause(cause.toThrowable());
+            }
+            return t;
+        } catch (Exception e) { // NOSONAR
+            return null;
+        }
+    }
+
+    private Throwable findThrowableByThrowable(Class<? extends Throwable> cls) {
+        try {
+            Constructor<? extends Throwable> constructor = cls.getDeclaredConstructor(Throwable.class);
+            if (!constructor.isAccessible()) {
+                constructor.setAccessible(true);
+            }
+            Throwable t = constructor.newInstance(cause == null ? null : cause.toThrowable());
+            putMessage(t, cls);
+            return t;
+        } catch (Exception e) { // NOSONAR
+            return null;
+        }
+    }
+
+    private Throwable findThrowableByNoArgs(Class<? extends Throwable> cls) {
+        try {
+            Constructor<? extends Throwable> constructor = cls.getDeclaredConstructor();
+            if (!constructor.isAccessible()) {
+                constructor.setAccessible(true);
+            }
+            Throwable t = constructor.newInstance();
+            putMessage(t, cls);
+            if (cause != null) {
+                t.initCause(cause.toThrowable());
+            }
+            return t;
+        } catch (Exception e) { // NOSONAR
+            return null;
+        }
+    }
+
     @SuppressWarnings("unchecked")
     private void putMessage(Throwable t, Class<? extends Throwable> cls) {
         try {
@@ -233,75 +326,19 @@ public class ThrowableDto implements Serializable {
                 f.setAccessible(true);
             }
             f.set(t, message);
-            
-        } catch (NoSuchFieldException e) {
-            
+
+        } catch (NoSuchFieldException e) { // NOSONAR
+
             Class<?> superCls = cls.getSuperclass();
             if (Throwable.class.isAssignableFrom(superCls)) {
-                putMessage(t, (Class<? extends Throwable>)superCls);
+                putMessage(t, (Class<? extends Throwable>) superCls);
             } else {
-                throw new RuntimeException("Field [detailMessage] was not found on class [" + cls.getName() + "].");
+                throw new RuntimeException("Field [detailMessage] was not found on class [" + cls.getName() + "]."); // NOSONAR
             }
 
         } catch (SecurityException | IllegalAccessException e) {
-            throw new RuntimeException("Field [detailMessage] cannot be set on class [" + cls.getName() + "].", e);
+            throw new RuntimeException("Field [detailMessage] cannot be set on class [" + cls.getName() + "].", e); // NOSONAR
         }
     }
-    
-    public Throwable toThrowable() {
-        Class<? extends Throwable> cls = findClass();
-        Throwable t = findThrowable(cls);
-        StackTraceElement[] elems = new StackTraceElement[stackTrace.size()];
-        int i = 0;
-        for (StackTraceElementDto dto : stackTrace) {
-            elems[i] = dto.toStackTraceElement();
-            i++;
-        }
-        t.setStackTrace(elems);
-        return t;
-    }
-    
-    @JsonProperty(value = "className", required = false)
-    public String getClassName() {
-        return className;
-    }
 
-    @JsonProperty(value = "className", required = false)
-    public void setClassName(String className) {
-        this.className = className;
-    }
-
-    @JsonProperty(value = "message", required = false)
-    public String getMessage() {
-        return message;
-    }
-
-    @JsonProperty(value = "message", required = false)
-    public void setMessage(String message) {
-        this.message = message;
-    }
-
-    @JsonProperty(value = "stackTrace", required = false)
-    public List<StackTraceElementDto> getStackTrace() {
-        return stackTrace;
-    }
-
-    @JsonProperty(value = "stackTrace", required = false)
-    public void setStackTrace(List<StackTraceElementDto> stackTrace) {
-        if (stackTrace == null) {
-            stackTrace = new ArrayList<>();
-        }
-        this.stackTrace = stackTrace;
-    }
-
-    @JsonProperty(value = "cause", required = false)
-    public ThrowableDto getCause() {
-        return cause;
-    }
-
-    @JsonProperty(value = "cause", required = false)
-    public void setCause(ThrowableDto cause) {
-        this.cause = cause;
-    }
-    
 }

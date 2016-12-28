@@ -21,20 +21,26 @@ import javax.xml.bind.annotation.XmlType;
 import org.apache.commons.lang3.StringUtils;
 
 /**
- * @author Christian Bremer
+ * Gender enumeration.
  *
+ * @author Christian Bremer
  */
 @XmlType(name = "genderType")
 public enum Gender {
-    
+
     MALE("M"), FEMALE("F"), UNKNOWN("U");
 
     private final String stringValue;
-    
+
     Gender(String stringValue) {
         this.stringValue = stringValue;
     }
-    
+
+    /**
+     * Returns {@code M}, {@code F} or {@code null}. {@code U} (that means unknown) is not supported by GOSA.
+     *
+     * @return {@code M}, {@code F} or {@code null}
+     */
     public String getGosaValue() {
         // gosa supports only M and F
         if ("M".equals(stringValue) || "F".equals(stringValue)) {
@@ -42,7 +48,13 @@ public enum Gender {
         }
         return null;
     }
-    
+
+    /**
+     * Creates a gender enumeration from the GOSA representation ({@code M} or {@code F}).
+     *
+     * @param gosaValue {@code M} or {@code F}
+     * @return the gender enumeration or {@code null}
+     */
     public static Gender fromGosaValue(String gosaValue) {
         if (StringUtils.isBlank(gosaValue)) {
             return null;
@@ -54,5 +66,5 @@ public enum Gender {
         }
         return null;
     }
-    
+
 }

@@ -92,6 +92,11 @@
                 </exclusion>
             </exclusions>
         </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-test</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>
@@ -162,13 +167,11 @@
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-jar-plugin</artifactId>
                     <configuration>
-                        <source>${java.version}</source>
-                        <target>${java.version}</target>
-                        <encoding>${project.build.sourceEncoding}</encoding>
                         <archive>
                             <addMavenDescriptor>true</addMavenDescriptor>
                             <index>true</index>
                             <manifest>
+                                <!--suppress MavenModelInspection -->
                                 <mainClass>${start-class}</mainClass>
                                 <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
                                 <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
@@ -202,6 +205,7 @@
                         <failOnMissingWebXml>false</failOnMissingWebXml>
                         <archive>
                             <manifest>
+                                <!--suppress MavenModelInspection -->
                                 <mainClass>${start-class}</mainClass>
                                 <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
                             </manifest>
@@ -212,6 +216,7 @@
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>exec-maven-plugin</artifactId>
                     <configuration>
+                        <!--suppress MavenModelInspection -->
                         <mainClass>${start-class}</mainClass>
                     </configuration>
                 </plugin>
@@ -237,6 +242,7 @@
                         </execution>
                     </executions>
                     <configuration>
+                        <!--suppress MavenModelInspection -->
                         <mainClass>${start-class}</mainClass>
                     </configuration>
                 </plugin>
@@ -288,6 +294,7 @@
                                         implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer" />
                                     <transformer
                                         implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                        <!--suppress MavenModelInspection -->
                                         <mainClass>${start-class}</mainClass>
                                     </transformer>
                                 </transformers>
@@ -329,7 +336,6 @@
                 <configuration>
                     <show>protected</show>
                     <quiet>true</quiet>
-                    <test-aggregate>false</test-aggregate>
                     <failOnError>false</failOnError>
                 </configuration>
                 <executions>
@@ -374,6 +380,7 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-release-plugin</artifactId>
                 <configuration>
+                    <!--suppress MavenModelInspection -->
                     <tagBase>${releaseTagBase}</tagBase>
                 </configuration>
             </plugin>
@@ -407,7 +414,6 @@
                 <configuration>
                     <show>protected</show>
                     <quiet>true</quiet>
-                    <test-aggregate>false</test-aggregate>
                     <failOnError>false</failOnError>
                 </configuration>
             </plugin>
@@ -425,9 +431,9 @@
                 <artifactId>maven-pmd-plugin</artifactId>
                 <version>3.5</version>
                 <configuration>
-                    <targetjdk>${java.version}</targetjdk>
+                    <targetJdk>${java.version}</targetJdk>
                     <format>xml</format>
-                    <linkXref>true</linkXref>
+                    <linkXRef>true</linkXRef>
                     <sourceEncoding>${project.build.sourceEncoding}</sourceEncoding>
                     <minimumTokens>100</minimumTokens>
                 </configuration>

@@ -1,5 +1,10 @@
 package org.bremersee.common.jms;
 
+import org.apache.commons.lang3.Validate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.jms.*;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.text.MessageFormat;
@@ -7,29 +12,14 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Map;
 
-import javax.jms.Connection;
-import javax.jms.ConnectionFactory;
-import javax.jms.Destination;
-import javax.jms.JMSException;
-import javax.jms.Message;
-import javax.jms.MessageConsumer;
-import javax.jms.MessageProducer;
-import javax.jms.Queue;
-import javax.jms.Session;
-import javax.jms.Topic;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 /**
+ * JMS utility methods.
+ *
  * @author Christian Bremer
  */
 public abstract class JmsUtils {
 
     private static final Logger log = LoggerFactory.getLogger(JmsUtils.class);
-
-    private JmsUtils() {
-    }
 
     /**
      * Timeout value indicating that a receive operation should check if a
@@ -46,6 +36,9 @@ public abstract class JmsUtils {
      * Character used to replace illegal characters in a message header.
      */
     public static final char REPLACEMENT_CHAR = '_';
+
+    private JmsUtils() {
+    }
 
     /**
      * Encodes a {@link String} so that is is a valid JMS header name.
@@ -66,7 +59,8 @@ public abstract class JmsUtils {
                     "Header name to encode must not be null or empty");
         }
 
-        int i = 0, length = name.length();
+        int i = 0;
+        int length = name.length();
         while (i < length && Character.isJavaIdentifierPart(name.charAt(i))) {
             // zip through
             i++;
@@ -78,7 +72,7 @@ public abstract class JmsUtils {
 
         } else {
             // make a copy, fix up remaining characters
-            StringBuffer sb = new StringBuffer(name);
+            StringBuilder sb = new StringBuilder(name);
             for (int j = i; j < length; j++) {
                 if (!Character.isJavaIdentifierPart(sb.charAt(j))) {
                     sb.setCharAt(j, REPLACEMENT_CHAR);
@@ -114,15 +108,15 @@ public abstract class JmsUtils {
     public static Object getProperty(Message message, String key,
             Object defaultValue) {
 
-        key = JmsUtils.encodeHeader(key);
+        String encodedKey = JmsUtils.encodeHeader(key);
         try {
-            Object value = message.getObjectProperty(key);
+            Object value = message.getObjectProperty(encodedKey);
             if (value != null)
                 return value;
             else
                 return defaultValue;
         } catch (Exception e) {
-            log.error("get property with key = " + key
+            log.error("get property with key = " + encodedKey
                     + "throws an exception; return default value = "
                     + defaultValue, e);
             return defaultValue;
@@ -315,7 +309,7 @@ public abstract class JmsUtils {
         if (obj != null) {
             return Boolean.parseBoolean(obj.toString());
         }
-        return null;
+        return defaultValue;
     }
 
     /**
@@ -325,7 +319,7 @@ public abstract class JmsUtils {
      *            the message
      * @param headerMap
      *            a map of properties
-     * @throws JMSException
+     * @throws JMSException when the property can't be set
      */
     public static void setProperties(Message message,
             Map<String, Object> headerMap) throws JMSException {
@@ -346,48 +340,30 @@ public abstract class JmsUtils {
      *            the name of property
      * @param value
      *            the value of the property
-     * @throws JMSException
+     * @throws JMSException when property can't be set
      */
-    public static void setProperty(Message message, String key, Object value)
+    public static void setProperty(Message message, String key, Object value) // NOSONAR
             throws JMSException {
 
         if (key != null && key.trim().length() > 0 && value != null) {
-            // Ensures that all keys are conform with JMS spec.
-            key = JmsUtils.encodeHeader(key);
 
-            if (value instanceof Boolean) {
-                // message.setBooleanProperty(key, (Boolean)value);
-                message.setObjectProperty(key, value);
-            } else if (value instanceof Byte) {
-                // message.setByteProperty(key, (Byte)value);
-                message.setObjectProperty(key, value);
-            } else if (value instanceof Double) {
-                // message.setDoubleProperty(key, (Double)value);
-                message.setObjectProperty(key, value);
-            } else if (value instanceof Float) {
-                // message.setFloatProperty(key, (Float)value);
-                message.setObjectProperty(key, value);
-            } else if (value instanceof Integer) {
-                // message.setIntProperty(key, (Integer)value);
-                message.setObjectProperty(key, value);
-            } else if (value instanceof Long) {
-                // message.setLongProperty(key, (Long)value);
-                message.setObjectProperty(key, value);
-            } else if (value instanceof Short) {
-                // message.setShortProperty(key, (Short)value);
-                message.setObjectProperty(key, value);
-            } else if (value instanceof String) {
-                // message.setStringProperty(key, (String)value);
-                message.setObjectProperty(key, value);
+            // Ensures that all keys are conform with JMS spec.
+            String encodedKey = JmsUtils.encodeHeader(key);
+
+            if (value.getClass().isPrimitive()
+                    || value instanceof Boolean
+                    || value instanceof Number
+                    || value instanceof String) {
+                message.setObjectProperty(encodedKey, value);
             } else if (value.getClass().isEnum()) {
-                setProperty(message, key, ((Enum<?>) value).name());
+                setProperty(message, encodedKey, ((Enum<?>) value).name());
             } else if (value instanceof Date) {
-                setProperty(message, key, ((Date) value).getTime());
+                setProperty(message, encodedKey, ((Date) value).getTime());
             } else if (value instanceof Calendar) {
-                setProperty(message, key, ((Calendar) value).getTime());
+                setProperty(message, encodedKey, ((Calendar) value).getTime());
             } else {
                 log.warn(
-                        "Key = " + key + " and value = " + value + " of type = "
+                        "Key = " + encodedKey + " and value = " + value + " of type = "
                                 + value.getClass().getName() + " are ignored.");
             }
         }
@@ -446,10 +422,8 @@ public abstract class JmsUtils {
         return null;
     }
 
-    public static Boolean isPubSubDomain(Destination destination) {
-        if (destination == null) {
-            return null;
-        }
+    public static boolean isPubSubDomain(Destination destination) {
+        Validate.notNull(destination, "Destination must not be null.");
         return destination instanceof Topic;
     }
 
@@ -480,9 +454,11 @@ public abstract class JmsUtils {
      * @throws JMSException
      *             if creation of the connection fails
      */
+    @SuppressWarnings("SameParameterValue")
     public static Connection createConnection(
             ConnectionFactory connectionFactory, String userName,
             String password) throws JMSException {
+
         if (userName == null || userName.trim().length() == 0) {
             return connectionFactory.createConnection();
         } else {
@@ -534,8 +510,10 @@ public abstract class JmsUtils {
      * @throws JMSException
      *             if creation of the JMS session fails
      */
+    @SuppressWarnings("SameParameterValue")
     public static Session createSession(Connection connection,
-            int acknowledgeMode, boolean startConnection) throws JMSException {
+                                        int acknowledgeMode, boolean startConnection) throws JMSException {
+
         return createSession(connection, false, acknowledgeMode,
                 startConnection);
     }
@@ -557,8 +535,9 @@ public abstract class JmsUtils {
      * @throws JMSException
      *             if creation of the JMS session fails
      */
+    @SuppressWarnings("SameParameterValue")
     public static Session createSession(Connection connection,
-            boolean transacted, int acknowledgeMode, boolean startConnection)
+                                        boolean transacted, int acknowledgeMode, boolean startConnection)
                     throws JMSException {
         if (connection == null) {
             throw new JMSException("Connection must not be null.");
@@ -573,13 +552,13 @@ public abstract class JmsUtils {
             if (session != null) {
                 try {
                     session.close();
-                } catch (Throwable ignored) {
+                } catch (Throwable ignored) { // NOSONAR
                     // ignored
                 }
             }
             try {
                 connection.close();
-            } catch (Throwable ignored) {
+            } catch (Throwable ignored) { // NOSONAR
                 // ignored
             }
             throw e;
@@ -637,9 +616,10 @@ public abstract class JmsUtils {
      * @throws JMSException
      *             if creation of the message consumer fails
      */
+    @SuppressWarnings("SameParameterValue")
     public static MessageConsumer createConsumer(Session session,
-            Destination destination, String messageSelector,
-            boolean isPubSubNoLocal) throws JMSException {
+                                                 Destination destination, String messageSelector,
+                                                 boolean isPubSubNoLocal) throws JMSException {
 
         // Only pass in the NoLocal flag in case of a Topic:
         // Some JMS providers, such as WebSphere MQ 6.0, throw
@@ -666,7 +646,7 @@ public abstract class JmsUtils {
                 session.close();
             } catch (JMSException ex) {
                 log.debug("Could not close JMS Session", ex);
-            } catch (Throwable ex) {
+            } catch (Throwable ex) { // NOSONAR
                 // We don't trust the JMS provider: It might throw
                 // RuntimeException or Error.
                 log.debug("Unexpected exception on closing JMS Session", ex);
@@ -687,7 +667,7 @@ public abstract class JmsUtils {
                 producer.close();
             } catch (JMSException ex) {
                 log.debug("Could not close JMS MessageProducer", ex);
-            } catch (Throwable ex) {
+            } catch (Throwable ex) { // NOSONAR
                 // We don't trust the JMS provider: It might throw
                 // RuntimeException or Error.
                 log.debug("Unexpected exception on closing JMS MessageProducer",
@@ -713,7 +693,7 @@ public abstract class JmsUtils {
                 consumer.close();
             } catch (JMSException ex) {
                 log.debug("Could not close JMS MessageConsumer", ex);
-            } catch (Throwable ex) {
+            } catch (Throwable ex) { // NOSONAR
                 // We don't trust the JMS provider: It might throw
                 // RuntimeException or Error.
                 log.debug("Unexpected exception on closing JMS MessageConsumer",
@@ -730,11 +710,7 @@ public abstract class JmsUtils {
     /**
      * Release the given Connection, stopping it (if necessary) and eventually
      * closing it.
-     * <p>
-     * Checks {@link SmartConnectionFactory#shouldStop}, if available. This is
-     * essentially a more sophisticated version of
-     * {@link org.springframework.jms.support.JmsUtils#closeConnection}.
-     * 
+     *
      * @param con
      *            the Connection to release (if this is {@code null}, the call
      *            will be ignored)
@@ -749,14 +725,14 @@ public abstract class JmsUtils {
         if (started) {
             try {
                 con.stop();
-            } catch (Throwable ex) {
+            } catch (Throwable ex) { // NOSONAR
                 log.debug("Could not stop JMS Connection before closing it",
                         ex);
             }
         }
         try {
             con.close();
-        } catch (Throwable ex) {
+        } catch (Throwable ex) { // NOSONAR
             log.debug("Could not close JMS Connection", ex);
         }
     }

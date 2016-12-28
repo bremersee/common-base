@@ -33,6 +33,11 @@ import javax.jms.TextMessage;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
+import com.fasterxml.jackson.databind.AnnotationIntrospector;
+import com.fasterxml.jackson.databind.introspect.AnnotationIntrospectorPair;
+import com.fasterxml.jackson.databind.introspect.JacksonAnnotationIntrospector;
+import com.fasterxml.jackson.databind.type.TypeFactory;
+import com.fasterxml.jackson.module.jaxb.JaxbAnnotationIntrospector;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -59,19 +64,26 @@ public class DefaultJmsConverter implements MessageConverter {
 
     protected Jaxb2Marshaller marshaller;
 
-    protected ObjectMapper objectMapper = new ObjectMapper();
+    protected ObjectMapper objectMapper;
 
     /**
      * Default constructor.
      */
     public DefaultJmsConverter() {
+        objectMapper = new ObjectMapper();
+        AnnotationIntrospector primary = new JacksonAnnotationIntrospector();
+        AnnotationIntrospector secondary = new JaxbAnnotationIntrospector(TypeFactory.defaultInstance());
+        AnnotationIntrospectorPair pair = new AnnotationIntrospectorPair(primary, secondary);
+        objectMapper.setAnnotationIntrospector(pair);
     }
 
     public DefaultJmsConverter(Jaxb2Marshaller marshaller) {
+        this();
         setMarshaller(marshaller);
     }
 
     public DefaultJmsConverter(Jaxb2Marshaller marshaller, ObjectMapper objectMapper) {
+        this();
         setMarshaller(marshaller);
         setObjectMapper(objectMapper);
     }
@@ -90,113 +102,127 @@ public class DefaultJmsConverter implements MessageConverter {
      * @see org.springframework.jms.support.converter.MessageConverter#fromMessage(javax.jms.Message)
      */
     @Override
-    public Object fromMessage(Message message) throws JMSException, MessageConversionException {
+    public Object fromMessage(Message message) throws JMSException {
 
         if (message == null) {
             return null;
         }
-        
+
         Class<?> payloadClass;
         try {
             payloadClass = Class.forName(message.getJMSType());
-        } catch (Throwable t) {
+        } catch (Throwable t) { // NOSONAR
             payloadClass = null;
         }
-        
-        Object payload = null;
-        
+
+        Object payload;
+
         if (message instanceof TextMessage) {
-            
+
             TextMessage msg = (TextMessage)message;
-            String text = msg.getText();
-            if (StringUtils.isNotBlank(text)) {
-                
-                String trimmedText = text.trim();
-                if (payloadClass != null && trimmedText.startsWith("{") && trimmedText.endsWith("}")) {
-                    try {
-                        payload = objectMapper.readValue(trimmedText, payloadClass);
-                        
-                    } catch (Throwable t0) {
-                        log.info("Reading JSON from message with JMSType [" + message.getJMSType() + "] failed.");
-                    }
-                }
-                
-                if (payload == null) {
-                    try {
-                        payload = marshaller.unmarshal(new StreamSource(new StringReader(text)));
-                        
-                    } catch (Throwable t0) {
-                        log.info("Reading XML from message with JMSType [" + message.getJMSType() + "] failed.");
-                    }
-                }
-                
-                if (payload == null) {
-                    MessageConversionException e = new MessageConversionException("Converting TextMessage failed.");
-                    log.error("Could not convert text:\n" + text + "\n", e);
-                    throw e;
-                }
-            }
-            
+            payload = tryToGetPayload(msg, payloadClass);
+
         } else if (message instanceof BytesMessage) {
-            
+
             BytesMessage msg = (BytesMessage)message;
-            int len = 0;
-            byte[] buf = new byte[1024];
-            ByteArrayOutputStream out = new ByteArrayOutputStream();
-            while ((len = msg.readBytes(buf)) != -1) {
-                out.write(buf, 0, len);
-            }
-            byte[] payloadBytes = out.toByteArray();
-            
-            if (payloadBytes != null && payloadBytes.length > 0) {
-                
-                if (payloadClass != null && isJson(payloadBytes)) {
-                    try {
-                        payload = objectMapper.readValue(payloadBytes, payloadClass);
-                        
-                    } catch (Throwable t0) {
-                        log.info("Reading JSON from message with JMSType [" + message.getJMSType() + "] failed.");
-                    }
-                }
-                
-                if (payload == null && (payloadClass == null ? true : marshaller.supports(payloadClass))) {
-                    try {
-                        payload = marshaller.unmarshal(new StreamSource(new ByteArrayInputStream(payloadBytes)));
-                        
-                    } catch (Throwable t0) {
-                        log.info("Reading XML from message with JMSType [" + message.getJMSType() + "] failed.");
-                    }
-                }
-                
-                if (payload == null && (payloadClass == null ? true : Serializable.class.isAssignableFrom(payloadClass))) {
-                    try {
-                        ObjectInputStream objectInputStream = new ObjectInputStream(new ByteArrayInputStream(payloadBytes));
-                        payload = objectInputStream.readObject();
-                        
-                    } catch (Throwable t0) {
-                        log.info("Reading serialized object of JMSType [" + message.getJMSType() + "] failed.");
-                    }
-                }
-                
-                if (payload == null) {
-                    MessageConversionException e = new MessageConversionException("Converting BytesMessage failed.");
-                    log.error("Could not convert bytes:\n" + Base64.encodeBase64String(payloadBytes) + "\n", e);
-                    throw e;
-                }
-            }
-            
+            payload = tryToGetPayload(msg, payloadClass);
+
         } else {
-            
+
             MessageConversionException e = new MessageConversionException("Unsupported message type [" + message.getClass().getName() + "].");
             log.error("Could not convert message:", e);
             throw e;
         }
-        
+
         return payload;
     }
-    
-    private boolean isJson(byte[] payloadBytes) throws JMSException, MessageConversionException {
-        
+
+    private Object tryToGetPayload(TextMessage msg, Class<?> payloadClass) throws JMSException {
+        String text = msg.getText();
+        if (StringUtils.isBlank(text)) {
+            return null;
+        }
+        String trimmedText = text.trim();
+        Object payload = null;
+        if (payloadClass != null && trimmedText.startsWith("{") && trimmedText.endsWith("}")) {
+            try {
+                payload = objectMapper.readValue(trimmedText, payloadClass);
+
+            } catch (Throwable t0) { // NOSONAR
+                log.info("Reading JSON from message with JMSType [" + msg.getJMSType() + "] failed."); // NOSONAR
+            }
+        }
+
+        if (payload == null) {
+            try {
+                payload = marshaller.unmarshal(new StreamSource(new StringReader(text)));
+
+            } catch (Throwable t0) { // NOSONAR
+                log.info("Reading XML from message with JMSType [" + msg.getJMSType() + "] failed.");
+            }
+        }
+
+        if (payload == null) {
+            MessageConversionException e = new MessageConversionException("Converting TextMessage failed.");
+            log.error("Could not convert text:\n" + text + "\n", e);
+            throw e;
+        }
+
+        return payload;
+    }
+
+    private Object tryToGetPayload(BytesMessage msg, Class<?> payloadClass) throws JMSException {
+        int len;
+        byte[] buf = new byte[1024];
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        while ((len = msg.readBytes(buf)) != -1) {
+            out.write(buf, 0, len);
+        }
+        byte[] payloadBytes = out.toByteArray();
+        if (payloadBytes == null || payloadBytes.length == 0) {
+            return null;
+        }
+
+        Object payload = null;
+        if (shouldTryJson(payloadClass, payloadBytes)) {
+            try {
+                payload = objectMapper.readValue(payloadBytes, payloadClass);
+
+            } catch (Throwable t0) { // NOSONAR
+                log.info("Reading JSON from message with JMSType [" + msg.getJMSType() + "] failed.");
+            }
+        }
+
+        if (shouldTryUnmarshal(payload, payloadClass)) {
+            try {
+                payload = marshaller.unmarshal(new StreamSource(new ByteArrayInputStream(payloadBytes)));
+
+            } catch (Throwable t0) { // NOSONAR
+                log.info("Reading XML from message with JMSType [" + msg.getJMSType() + "] failed.");
+            }
+        }
+
+        if (shouldTryDeserialize(payload, payloadClass)) {
+            try {
+                ObjectInputStream objectInputStream = new ObjectInputStream(new ByteArrayInputStream(payloadBytes));
+                payload = objectInputStream.readObject();
+
+            } catch (Throwable t0) { // NOSONAR
+                log.info("Reading serialized object of JMSType [" + msg.getJMSType() + "] failed.");
+            }
+        }
+
+        if (payload == null) {
+            MessageConversionException e = new MessageConversionException("Converting BytesMessage failed.");
+            log.error("Could not convert bytes:\n" + Base64.encodeBase64String(payloadBytes) + "\n", e);
+            throw e;
+        }
+
+        return payload;
+    }
+
+    private boolean isJson(byte[] payloadBytes) {
+
         if (payloadBytes == null || payloadBytes.length < (JSON_START.length + JSON_END.length)) {
             return false;
         }
@@ -205,12 +231,24 @@ public class DefaultJmsConverter implements MessageConverter {
         byte[] end = ArrayUtils.subarray(payloadBytes, len - JSON_END.length, len);
         return Objects.deepEquals(JSON_START, start) && Objects.deepEquals(JSON_END, end);
     }
-    
+
+    private boolean shouldTryJson(Class<?> payloadClass, byte[] payloadBytes) {
+        return payloadClass != null && isJson(payloadBytes);
+    }
+
+    private boolean shouldTryUnmarshal(Object payload, Class<?> payloadClass) {
+        return payload == null && (payloadClass == null || marshaller.supports(payloadClass));
+    }
+
+    private boolean shouldTryDeserialize(Object payload, Class<?> payloadClass) {
+        return payload == null && (payloadClass == null || Serializable.class.isAssignableFrom(payloadClass));
+    }
+
     /* (non-Javadoc)
      * @see org.springframework.jms.support.converter.MessageConverter#toMessage(java.lang.Object, javax.jms.Session)
      */
     @Override
-    public Message toMessage(Object object, Session session) throws JMSException, MessageConversionException {
+    public Message toMessage(Object object, Session session) throws JMSException {
         
         Message message = null;
         
@@ -236,7 +274,7 @@ public class DefaultJmsConverter implements MessageConverter {
         return message;
     }
     
-    private Message createJsonMessage(Object object, Session session) throws JMSException, MessageConversionException {
+    private Message createJsonMessage(Object object, Session session) throws JMSException {
         try {
             TextMessage msg = session.createTextMessage();
             String payload = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(object);
@@ -244,13 +282,13 @@ public class DefaultJmsConverter implements MessageConverter {
             msg.setJMSType(object.getClass().getName());
             return msg;
             
-        } catch (Throwable t) {
+        } catch (Throwable t) { // NOSONAR
             log.info("Creating JSON JMS from object of type [" + (object == null ? "null" : object.getClass().getName()) + "] failed.");
             return null;
         }
     }
     
-    private Message createXmlMessage(Object object, Session session) throws JMSException, MessageConversionException {
+    private Message createXmlMessage(Object object, Session session) throws JMSException {
         try {
             TextMessage msg = session.createTextMessage();
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
@@ -261,13 +299,13 @@ public class DefaultJmsConverter implements MessageConverter {
             msg.setJMSType(object.getClass().getName());
             return msg;
             
-        } catch (Throwable t) {
+        } catch (Throwable t) { // NOSONAR
             log.info("Creating XML JMS from object of type [" + (object == null ? "null" : object.getClass().getName()) + "] failed.");
             return null;
         }
     }
     
-    private Message createSerializedMessage(Serializable object, Session session) throws JMSException, MessageConversionException {
+    private Message createSerializedMessage(Serializable object, Session session) throws JMSException {
         try {
             BytesMessage msg = session.createBytesMessage();
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
@@ -278,7 +316,7 @@ public class DefaultJmsConverter implements MessageConverter {
             msg.setJMSType(object.getClass().getName());
             return msg;
             
-        } catch (Throwable t) {
+        } catch (Throwable t) { // NOSONAR
             log.info("Creating Serialized JMS from object of type [" + (object == null ? "null" : object.getClass().getName()) + "] failed.");
             return null;
         }

@@ -16,13 +16,6 @@
 
 package org.bremersee.common.model;
 
-import java.io.Serializable;
-
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlType;
-
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
@@ -30,69 +23,55 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.googlecode.jmapper.annotations.JMap;
 import com.googlecode.jmapper.annotations.JMapConversion;
-
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlType;
+import java.io.Serializable;
 
 /**
- * @author Christian Bremer
+ * A common base model object.
  *
+ * @author Christian Bremer
  */
+@ApiModel(description = "Common base model object.")
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "baseType")
 @JsonInclude(Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonPropertyOrder(alphabetic = true)
-@ApiModel(value = "AbstractBase", description = "Common base modell object.")
 @Data
-public class AbstractBaseDto implements Serializable {
+@NoArgsConstructor
+public abstract class AbstractBaseDto implements Serializable {
 
     private static final long serialVersionUID = 1L;
-    
+
+    @XmlAttribute(name = "id")
+    @JsonProperty(value = "id")
+    @ApiModelProperty(name = "id", value = "The database ID.")
+    @JMap(value = "dbId", attributes = {"id", "dbId"})
+    private String dbId;
+
+    @XmlAttribute(name = "created")
+    @JsonProperty(value = "created")
+    @ApiModelProperty("The created timestamp (in millis).")
+    @JMap
+    private Long created;
+
+    @XmlAttribute(name = "modified")
+    @JsonProperty(value = "modified")
+    @ApiModelProperty("The last modified timestamp (in millis).")
+    @JMap
+    private Long modified;
+
     @JMapConversion(from = "id", to = "dbId")
     public static String toDbId(Serializable destination, Serializable source) {
         return source == null ? null : source.toString();
     }
-    
-    @XmlAttribute(name = "id", required = false)
-    @JsonProperty(value = "id", required = false)
-    @ApiModelProperty(name = "id", value = "The database ID.", required = false)
-    @JMap(value = "dbId", attributes = {"id", "dbId"})
-    private String dbId;
-    
-    @XmlAttribute(name = "created", required = false)
-    @JMap
-    private Long created;
-    
-    @XmlAttribute(name = "modified", required = false)
-    @JMap
-    private Long modified;
-    
-//    @JsonIgnore
-//    @JMap
-//    protected Map<String, Object> extensions = new LinkedHashMap<>();
-
-//    @JsonAnyGetter
-//    public final Map<String, Object> getExtensions() {
-//        if (extensions == null) {
-//            extensions = new LinkedHashMap<>();
-//        }
-//        return extensions;
-//    }
-//    
-//    @JsonIgnore
-//    public void setExtensions(Map<String, Object> extensions) {
-//        if (extensions == null) {
-//            this.extensions = new LinkedHashMap<>();
-//        } else {
-//            this.extensions = extensions;
-//        }
-//    }
-//
-//    @JsonAnySetter
-//    public void addExtension(String key, Object value) {
-//        getExtensions().put(key, value);
-//    }
 
 }

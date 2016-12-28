@@ -16,28 +16,15 @@
 
 package org.bremersee.common.domain.jpa.entity;
 
+import javax.persistence.*;
 import java.io.Serializable;
-import java.util.LinkedHashMap;
-import java.util.Map;
-
-import javax.persistence.Column;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.MappedSuperclass;
-import javax.persistence.PrePersist;
-import javax.persistence.PreUpdate;
-import javax.persistence.Transient;
-
-import org.bremersee.common.domain.entity.BaseEntity;
-import org.bremersee.common.model.Base;
 
 /**
  * @author Christian Bremer
  *
  */
 @MappedSuperclass
-public abstract class AbstractBaseJpa<PK extends Serializable> implements BaseEntity {
+public abstract class AbstractBaseJpa<PK extends Serializable> implements Serializable { // NOSONAR
     
     private static final long serialVersionUID = 1L;
     
@@ -46,15 +33,19 @@ public abstract class AbstractBaseJpa<PK extends Serializable> implements BaseEn
     @Column(name = "id", nullable = false)
     protected PK id;
     
-    @Column(name = "created", nullable = true)
+    @Column(name = "created")
     protected Long created;
     
-    @Column(name = "modified", nullable = true)
+    @Column(name = "modified")
     protected Long modified;
-    
-    @Transient
-    private final Map<String, Object> tmpExtensions = new LinkedHashMap<>();
-    
+
+    /**
+     * Default constructor.
+     */
+    public AbstractBaseJpa() {
+        super();
+    }
+
     @PrePersist @PreUpdate
     protected void preSave() {
         long ct = System.currentTimeMillis();
@@ -64,22 +55,6 @@ public abstract class AbstractBaseJpa<PK extends Serializable> implements BaseEn
         modified = ct;
     }
     
-    /**
-     * Default constructor.
-     */
-    public AbstractBaseJpa() {
-    }
-
-    public AbstractBaseJpa(Base obj) {
-        if (obj != null) {
-            setCreated(obj.getCreated());
-            setModified(obj.getModified());
-            if (obj.getExtensions() != null) {
-                getExtensions().putAll(obj.getExtensions());
-            }
-        }
-    }
-
     @Override
     public int hashCode() {
         final int prime = 31;
@@ -111,7 +86,6 @@ public abstract class AbstractBaseJpa<PK extends Serializable> implements BaseEn
         return getId() == null;
     }
 
-    @Override
     public PK getId() {
         return id;
     }
@@ -120,29 +94,20 @@ public abstract class AbstractBaseJpa<PK extends Serializable> implements BaseEn
         this.id = id;
     }
 
-    @Override
     public Long getCreated() {
         return created;
     }
 
-    @Override
     public void setCreated(Long created) {
         this.created = created;
     }
 
-    @Override
     public Long getModified() {
         return modified;
     }
 
-    @Override
     public void setModified(Long modified) {
         this.modified = modified;
-    }
-
-    @Override
-    public Map<String, Object> getExtensions() {
-        return tmpExtensions;
     }
 
 }

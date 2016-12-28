@@ -87,6 +87,7 @@
                 <module>bremersee-common-dependencies</module>
                 <module>bremersee-common-parent</module>
                 <module>bremersee-common-api</module>
+                <module>bremersee-common-data-jpa</module>
                 <module>bremersee-common-spring</module>
                 <module>bremersee-common-spring-acl</module>
                 <module>bremersee-common-spring-autoconfigure</module>

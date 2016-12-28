@@ -16,35 +16,43 @@
 
 package org.bremersee.common.model;
 
-import java.util.TimeZone;
-
-import javax.xml.bind.annotation.adapters.XmlAdapter;
-
 import org.apache.commons.lang3.StringUtils;
 
+import javax.xml.bind.annotation.adapters.XmlAdapter;
+import java.util.TimeZone;
+
 /**
- * @author Christian Bremer
+ * XML adapter of a {@link TimeZone}.
  *
+ * @author Christian Bremer
  */
 public class TimeZoneXmlAdapter extends XmlAdapter<String, TimeZone> {
 
-    /* (non-Javadoc)
-     * @see javax.xml.bind.annotation.adapters.XmlAdapter#unmarshal(java.lang.Object)
+    /**
+     * Returns the time zone.
+     *
+     * @param xmlValue the xml element value
+     * @return the time zone
+     * @throws Exception when parsing failed
      */
     @Override
-    public TimeZone unmarshal(String v) throws Exception {
-        if (StringUtils.isNotBlank(v)) {
-            return TimeZone.getTimeZone(v);
+    public TimeZone unmarshal(String xmlValue) throws Exception {
+        if (StringUtils.isNotBlank(xmlValue)) {
+            return TimeZone.getTimeZone(xmlValue);
         }
         return null;
     }
 
-    /* (non-Javadoc)
-     * @see javax.xml.bind.annotation.adapters.XmlAdapter#marshal(java.lang.Object)
+    /**
+     * Returns the ID of the time zone.
+     *
+     * @param timeZone the time zone to marshal
+     * @return the XML representation of the time zone
+     * @throws Exception when parsing failed
      */
     @Override
-    public String marshal(TimeZone v) throws Exception {
-        String s = v != null ? v.getID() : null;
+    public String marshal(TimeZone timeZone) throws Exception {
+        String s = timeZone != null ? timeZone.getID() : null;
         return StringUtils.isBlank(s) ? null : s;
     }
 

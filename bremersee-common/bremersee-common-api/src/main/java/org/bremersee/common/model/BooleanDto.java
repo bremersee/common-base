@@ -16,21 +16,18 @@
 
 package org.bremersee.common.model;
 
-import java.io.Serializable;
-
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlType;
-
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import javax.xml.bind.annotation.*;
+import java.io.Serializable;
 
 /**
  * <p>
@@ -39,6 +36,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
  * 
  * @author Christian Bremer
  */
+@ApiModel(description = "A boolean wrapper object.")
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlRootElement(name = "boolean")
 @XmlType(name = "booleanType", propOrder = {
@@ -46,107 +44,16 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 })
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(Include.ALWAYS)
-@JsonAutoDetect(fieldVisibility = Visibility.ANY, 
-    getterVisibility = Visibility.NONE, 
-    creatorVisibility = Visibility.NONE, 
-    isGetterVisibility = Visibility.NONE, 
-    setterVisibility = Visibility.NONE)
-@JsonPropertyOrder(value = {
-        "value" 
-})
-public class BooleanDto implements Serializable, Cloneable {
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class BooleanDto implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
     @XmlAttribute(name = "value", required = true)
     @JsonProperty(value = "value", required = true)
+    @ApiModelProperty(value = "The boolean value.", required = true)
     private boolean value;
-
-    /**
-     * Default constructor.
-     */
-    public BooleanDto() {
-    }
-
-    /**
-     * Constructs an instance with the specified parameter.
-     * 
-     * @param value
-     *            the boolean value
-     */
-    public BooleanDto(boolean value) {
-        this.value = value;
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see java.lang.Object#toString()
-     */
-    @Override
-    public String toString() {
-        return "BooleanDto [value=" + value + "]";
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see java.lang.Object#hashCode()
-     */
-    @Override
-    public int hashCode() {
-        return Boolean.valueOf(value).hashCode();
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see java.lang.Object#equals(java.lang.Object)
-     */
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj)
-            return true;
-        if (obj == null)
-            return false;
-        if (obj instanceof Boolean) {
-            return obj.equals(value);
-        }
-        if (getClass() != obj.getClass())
-            return false;
-        BooleanDto other = (BooleanDto) obj;
-        if (value != other.value)
-            return false;
-        return true;
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see java.lang.Object#clone()
-     */
-    @Override
-    public BooleanDto clone() {
-        return new BooleanDto(isValue());
-    }
-
-    /**
-     * Return the boolean value.
-     * 
-     * @return the boolean value
-     */
-    public boolean isValue() {
-        return value;
-    }
-
-    /**
-     * Sets the boolean value.
-     * 
-     * @param value
-     *            the boolean value
-     */
-    public void setValue(boolean value) {
-        this.value = value;
-    }
 
 }

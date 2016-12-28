@@ -31,7 +31,7 @@ import javax.xml.transform.stream.StreamResult;
  */
 public class BufferSchemaOutputResolver extends SchemaOutputResolver {
 
-    protected Map<String, StreamResult> buffers = new HashMap<String, StreamResult>();
+    protected Map<String, StreamResult> buffers = new HashMap<>();
 
     /*
      * (non-Javadoc)

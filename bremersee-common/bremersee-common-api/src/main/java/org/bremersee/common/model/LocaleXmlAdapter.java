@@ -24,29 +24,38 @@ import org.apache.commons.lang3.LocaleUtils;
 import org.apache.commons.lang3.StringUtils;
 
 /**
- * @author Christian Bremer
+ * XMl adapter of a {@link Locale}.
  *
+ * @author Christian Bremer
  */
 
 public class LocaleXmlAdapter extends XmlAdapter<String, Locale> {
 
-    /* (non-Javadoc)
-     * @see javax.xml.bind.annotation.adapters.XmlAdapter#unmarshal(java.lang.Object)
+    /**
+     * Returns the locale.
+     *
+     * @param xmlValue the XMl value of the locale
+     * @return the locale
+     * @throws Exception when parsing failed.
      */
     @Override
-    public Locale unmarshal(String v) throws Exception {
-        if (StringUtils.isNotBlank(v)) {
-            return LocaleUtils.toLocale(v);
+    public Locale unmarshal(String xmlValue) throws Exception {
+        if (StringUtils.isNotBlank(xmlValue)) {
+            return LocaleUtils.toLocale(xmlValue);
         }
         return null;
     }
 
-    /* (non-Javadoc)
-     * @see javax.xml.bind.annotation.adapters.XmlAdapter#marshal(java.lang.Object)
+    /**
+     * Returns the string representation of the locale.
+     *
+     * @param locale the locale
+     * @return the string representation
+     * @throws Exception when parsing failed
      */
     @Override
-    public String marshal(Locale v) throws Exception {
-        String s = v != null ? v.toString() : null;
+    public String marshal(Locale locale) throws Exception {
+        String s = locale != null ? locale.toString() : null;
         return StringUtils.isBlank(s) ? null : s;
     }
 

@@ -14,17 +14,13 @@
  * limitations under the License.
  */
 
-package org.bremersee.common.acl.domain.entity;
+package org.bremersee.common.acl.domain.jpa.entity;
 
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import javax.persistence.*;
 import java.io.Serializable;
-
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Table;
-import javax.persistence.UniqueConstraint;
 
 /**
  * @author Christian Bremer
@@ -32,8 +28,10 @@ import javax.persistence.UniqueConstraint;
  */
 @Entity
 @Table(name = "acl_class", uniqueConstraints = {
-        @UniqueConstraint(name = "unique_uk_2", columnNames = { "class" })
+        @UniqueConstraint(name = "acl_class_uc_class", columnNames = { "class" })
 })
+@Data
+@NoArgsConstructor
 public class AclClass implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -43,23 +41,7 @@ public class AclClass implements Serializable {
     @Column(name = "id", nullable = false)
     private Long id;
     
-    @Column(name = "class", nullable = false, length = 255)
+    @Column(name = "class", nullable = false)
     private String clazz;
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getClazz() {
-        return clazz;
-    }
-
-    public void setClazz(String clazz) {
-        this.clazz = clazz;
-    }
 
 }

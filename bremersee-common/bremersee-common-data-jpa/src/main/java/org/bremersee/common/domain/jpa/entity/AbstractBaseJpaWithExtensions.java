@@ -16,37 +16,35 @@
 
 package org.bremersee.common.domain.jpa.entity;
 
+import com.fasterxml.jackson.databind.AnnotationIntrospector;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.introspect.AnnotationIntrospectorPair;
+import com.fasterxml.jackson.databind.introspect.JacksonAnnotationIntrospector;
+import com.fasterxml.jackson.databind.type.TypeFactory;
+import com.fasterxml.jackson.module.jaxb.JaxbAnnotationIntrospector;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
+
+import javax.persistence.*;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlType;
 import java.io.Serializable;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import javax.persistence.Basic;
-import javax.persistence.Column;
-import javax.persistence.Lob;
-import javax.persistence.MappedSuperclass;
-import javax.persistence.PostLoad;
-import javax.persistence.PrePersist;
-import javax.persistence.PreUpdate;
-import javax.persistence.Transient;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlType;
-
-import org.apache.commons.lang3.StringUtils;
-import org.bremersee.common.model.Base;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 /**
  * @author Christian Bremer
  *
  */
 @MappedSuperclass
-public abstract class AbstractBaseJpaWithExtensions<PK extends Serializable> extends AbstractBaseJpa<PK> {
+public abstract class AbstractBaseJpaWithExtensions<PK extends Serializable> extends AbstractBaseJpa<PK> { // NOSONAR
     
     private static final long serialVersionUID = 1L;
     
@@ -54,41 +52,49 @@ public abstract class AbstractBaseJpaWithExtensions<PK extends Serializable> ext
     
     private static final ObjectMapper om;
     
-    @XmlAccessorType(XmlAccessType.PUBLIC_MEMBER)
+    @SuppressWarnings("ValidExternallyBoundObject")
+    @XmlAccessorType(XmlAccessType.FIELD)
     @XmlRootElement(name = "extensionsWrapper")
     @XmlType(name = "extensionsWrapperType")
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
     protected static class ExtensionsWrapper {
         
-        public Map<String, Object> extensions = new LinkedHashMap<>();
+        private Map<String, Object> extensions = new LinkedHashMap<>();
         
-        public ExtensionsWrapper() {
-        }
-        
-        public ExtensionsWrapper(Map<String, Object> extensions) {
-            if (extensions != null) {
-                this.extensions = extensions;
-            }
-        }
     }
     
     static {
         om = new ObjectMapper();
+        AnnotationIntrospector primary = new JacksonAnnotationIntrospector();
+        AnnotationIntrospector secondary = new JaxbAnnotationIntrospector(TypeFactory.defaultInstance());
+        AnnotationIntrospectorPair pair = new AnnotationIntrospectorPair(primary, secondary);
+        om.setAnnotationIntrospector(pair);
         try {
             jaxbContext = JAXBContext.newInstance(ExtensionsWrapper.class);
         } catch (Exception e) {
-            throw new RuntimeException("Creating JAXBContext failed.", e);
+            throw new RuntimeException("Creating JAXBContext failed.", e); // NOSONAR
         }
     }
     
-    @Basic(optional = true)
+    @Basic
     @Lob
-    @Column(name = "ext_str", length = 8000000, nullable = true)
+    @Column(name = "ext_str", length = 8000000)
     private String extensionsStr;
     
     @Transient
-    private Map<String, Object> extensions = new LinkedHashMap<String, Object>();
-    
+    private Map<String, Object> extensions = new LinkedHashMap<>(); // NOSONAR
+
+    /**
+     * Default constructor.
+     */
+    public AbstractBaseJpaWithExtensions() {
+        super();
+    }
+
     @PrePersist @PreUpdate
+    @Override
     protected void preSave() {
         super.preSave();
         if (extensions == null || extensions.isEmpty()) {
@@ -104,8 +110,8 @@ public abstract class AbstractBaseJpaWithExtensions<PK extends Serializable> ext
                     jaxbContext.createMarshaller().marshal(new ExtensionsWrapper(extensions), sw);
                     extensionsStr = sw.toString();
                     
-                } catch (Exception e0) {
-                    throw new RuntimeException("Creating extension string failed.", e);
+                } catch (Exception e0) { // NOSONAR
+                    throw new RuntimeException("Creating extension string failed.", e); // NOSONAR
                 }
             }
         }
@@ -119,35 +125,20 @@ public abstract class AbstractBaseJpaWithExtensions<PK extends Serializable> ext
                 try {
                     extensions = om.readValue(extensionsStr, Map.class);
                 } catch (Exception e) {
-                    throw new RuntimeException("Reading extension string as JSON failed.", e);
+                    throw new RuntimeException("Reading extension string as JSON failed.", e); // NOSONAR
                 }
             } else {
                 try {
-                    extensions = ((ExtensionsWrapper) jaxbContext.createUnmarshaller().unmarshal(new StringReader(extensionsStr))).extensions;
+                    extensions = ((ExtensionsWrapper) jaxbContext.createUnmarshaller()
+                            .unmarshal(new StringReader(extensionsStr))).getExtensions();
                 } catch (Exception e) {
-                    throw new RuntimeException("Reading extension string as XML failed.", e);
+                    throw new RuntimeException("Reading extension string as XML failed.", e); // NOSONAR
                 }
             }
+            extensionsStr = null;
         }
     }
 
-    /**
-     * Default constructor.
-     */
-    public AbstractBaseJpaWithExtensions() {
-    }
-
-    public AbstractBaseJpaWithExtensions(Base obj) {
-        if (obj != null) {
-            setCreated(obj.getCreated());
-            setModified(obj.getModified());
-            if (obj.getExtensions() != null) {
-                getExtensions().putAll(obj.getExtensions());
-            }
-        }
-    }
-
-    @Override
     public Map<String, Object> getExtensions() {
         if (extensions == null) {
             extensions = new LinkedHashMap<>();
@@ -155,12 +146,12 @@ public abstract class AbstractBaseJpaWithExtensions<PK extends Serializable> ext
         return extensions;
     }
 
-    @Override
     public void setExtensions(Map<String, Object> extensions) {
         if (extensions == null) {
-            extensions = new LinkedHashMap<>();
+            this.extensions = new LinkedHashMap<>();
+        } else {
+            this.extensions = extensions;
         }
-        this.extensions = extensions;
     }
 
 }

@@ -18,17 +18,22 @@ package org.bremersee.common.model;
 
 import javax.xml.bind.annotation.XmlRegistry;
 
+/**
+ * XML registry.
+ *
+ * @author Christian Bremer
+ */
 @XmlRegistry
 public class ObjectFactory {
-    
-    public BooleanDto createBooleanDto() {
-        return new BooleanDto();
-    }
     
     public AddressDto createAddressDto() {
         return new AddressDto();
     }
-    
+
+    public BooleanDto createBooleanDto() {
+        return new BooleanDto();
+    }
+
     public StringListDto createStringListDto() {
         return new StringListDto();
     }

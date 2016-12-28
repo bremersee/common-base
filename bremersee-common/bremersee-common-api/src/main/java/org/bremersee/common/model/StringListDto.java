@@ -16,62 +16,69 @@
 
 package org.bremersee.common.model;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlElementWrapper;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlType;
-
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
+
+import javax.xml.bind.annotation.*;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 /**
- * @author Christian Bremer
+ * A list of strings.
  *
+ * @author Christian Bremer
  */
 //@formatter:off
+@ApiModel(description = "A list of strings.")
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlRootElement(name = "stringList")
 @XmlType(name = "stringList")
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(Include.NON_NULL)
-@JsonAutoDetect(fieldVisibility = Visibility.ANY, 
-    getterVisibility = Visibility.NONE, 
-    creatorVisibility = Visibility.NONE, 
-    isGetterVisibility = Visibility.NONE, 
-    setterVisibility = Visibility.NONE)
+@JsonAutoDetect(fieldVisibility = Visibility.ANY,
+        getterVisibility = Visibility.NONE,
+        creatorVisibility = Visibility.NONE,
+        isGetterVisibility = Visibility.NONE,
+        setterVisibility = Visibility.NONE)
+@NoArgsConstructor
+@ToString
+@EqualsAndHashCode
 //@formatter:on
 public class StringListDto implements Serializable {
-    
+
     private static final long serialVersionUID = 1L;
-    
-    @XmlElementWrapper(name = "entries", required = false)
-    @XmlElement(name = "entry", required = false)
-    @JsonProperty(value = "entries", required = false)
+
+    @XmlElementWrapper(name = "entries")
+    @XmlElement(name = "entry")
+    @JsonProperty(value = "entries")
+    @ApiModelProperty("The entries of the string list.")
     private List<String> entries = new ArrayList<>();
 
     /**
-     * Default constructor.
+     * Creates a list of string DTO from the specified collection.
+     *
+     * @param entries the source
      */
-    public StringListDto() {
-    }
-
     public StringListDto(Collection<String> entries) {
         if (entries != null) {
             this.entries.addAll(entries);
         }
     }
 
+    /**
+     * @return the entries of this list
+     */
     public List<String> getEntries() {
         if (entries == null) {
             entries = new ArrayList<>();
@@ -79,11 +86,17 @@ public class StringListDto implements Serializable {
         return entries;
     }
 
+    /**
+     * Sets the strings of this list.
+     *
+     * @param entries the source
+     */
     public void setEntries(List<String> entries) {
         if (entries == null) {
-            entries = new ArrayList<>();
+            this.entries = new ArrayList<>();
+        } else {
+            this.entries = entries;
         }
-        this.entries = entries;
     }
 
 }

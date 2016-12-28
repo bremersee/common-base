@@ -1,5 +1,9 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
 org.bremersee.common.spring.autoconfigure.JaxbAutoConfiguration,\
+org.bremersee.common.spring.autoconfigure.AclCacheAutoConfiguration,\
+org.bremersee.common.spring.autoconfigure.AclCommonAutoConfiguration,\
+org.bremersee.common.spring.autoconfigure.AclPermissionEvaluatorAutoConfiguration,\
+org.bremersee.common.spring.autoconfigure.AclServiceAutoConfiguration,\
 org.bremersee.common.spring.autoconfigure.JerseyAutoConfiguration,\
 org.bremersee.common.spring.autoconfigure.JmsAutoConfiguration,\
 org.bremersee.common.spring.autoconfigure.LdaptiveAutoConfiguration,\

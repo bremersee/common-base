@@ -1,6 +1,19 @@
-/**
- * 
+/*
+ * Copyright 2016 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
+
 package org.bremersee.common.exception;
 
 import java.lang.reflect.Constructor;
@@ -8,16 +21,15 @@ import java.lang.reflect.InvocationTargetException;
 
 /**
  * @author Christian Bremer
- *
  */
 public enum StatusCode {
-    
+
     /**
      * The server successfully processed the request, but is not returning any
      * content.
      */
     NO_CONTENT(204, NoContentException.class, "No Content"),
-    
+
     /**
      * The server cannot or will not process the request due to something that
      * is perceived to be a client error (e.g., malformed request syntax,
@@ -25,7 +37,7 @@ public enum StatusCode {
      * on code 400].
      */
     BAD_REQUEST(400, BadRequestException.class, "Bad Request"),
-    
+
     /**
      * Similar to 403 Forbidden, but specifically for use when authentication is
      * required and has failed or has not yet been provided. The response must
@@ -34,7 +46,7 @@ public enum StatusCode {
      * "you don't have necessary credentials".
      */
     UNAUTHORIZED(401, UnauthorizedException.class, "Unauthorized"),
-    
+
     /**
      * Reserved for future use. The original intention was that this code might
      * be used as part of some form of digital cash or micropayment scheme, but
@@ -43,7 +55,7 @@ public enum StatusCode {
      * the daily limit on requests.
      */
     PAYMENT_REQUIRED(402, PaymentRequiredException.class, "Payment Required"),
-    
+
     /**
      * The request was a valid request, but the server is refusing to respond to
      * it. Unlike a 401 Unauthorized response, authenticating will make no
@@ -51,31 +63,31 @@ public enum StatusCode {
      * "you don't have necessary permissions for the resource".
      */
     FORBIDDEN(403, ForbiddenException.class, "Forbidden"),
-    
+
     /**
      * The requested resource could not be found but may be available again in
      * the future. Subsequent requests by the client are permissible.
      */
     NOT_FOUND(404, NotFoundException.class, "Not Found."),
-    
+
     /**
      * A request was made of a resource using a request method not supported by
      * that resource; for example, using GET on a form which requires data to be
      * presented via POST, or using PUT on a read-only resource.
      */
     METHOD_NOT_ALLOWED(405, MethodNotAllowedException.class, "Method Not Allowed"),
-    
+
     /**
      * The requested resource is only capable of generating content not
      * acceptable according to the Accept headers sent in the request.
      */
     NOT_ACCEPTABLE(406, NotAcceptableException.class, "Not Acceptable"),
-    
+
     /**
      * The client must first authenticate itself with the proxy.
      */
     PROXY_AUTHENTICATION_REQUIRED(407, ProxyAuthenticationRequiredException.class, "Proxy Authentication Required"),
-    
+
     /**
      * The server timed out waiting for the request. According to HTTP
      * specifications: The client did not produce a request within the time that
@@ -83,13 +95,13 @@ public enum StatusCode {
      * without modifications at any later time.
      */
     REQUEST_TIMED_OUT(408, RequestTimeoutException.class, "Request Timeout"),
-    
+
     /**
      * Indicates that the request could not be processed because of conflict in
      * the request, such as an edit conflict in the case of multiple updates.
      */
     CONFLICT(409, ConflictException.class, "Conflict"),
-    
+
     /**
      * Indicates that the resource requested is no longer available and will not
      * be available again. This should be used when a resource has been
@@ -100,25 +112,25 @@ public enum StatusCode {
      * to purge the resource, and a "404 Not Found" may be used instead.
      */
     GONE(410, GoneException.class, "Gone"),
-    
+
     /**
      * The request did not specify the length of its content, which is required
      * by the requested resource.
      */
     LENGTH_REQUIRED(411, LengthRequiredException.class, "Length Required"),
-    
+
     /**
      * The server does not meet one of the preconditions that the requester put
      * on the request.
      */
     PRECONDITION_FAILED(412, PreconditionFailedException.class, "Precondition Failed"),
-    
+
     /**
      * The request is larger than the server is willing or able to process.
      * Previously called "Request Entity Too Large".
      */
     REQUEST_ENTITY_TOO_LARGE(413, RequestEntityTooLargeException.class, "Request Entity Too Large"),
-    
+
     /**
      * The URI provided was too long for the server to process. Often the result
      * of too much data being encoded as a query-string of a GET request, in
@@ -126,70 +138,48 @@ public enum StatusCode {
      * "Request-URI Too Long" previously
      */
     REQUEST_URL_TOO_LONG(414, RequestUriTooLongException.class, "Request-URI Too Long"),
-    
+
     /**
      * The request entity has a media type which the server or resource does not
      * support. For example, the client uploads an image as image/svg+xml, but
      * the server requires that images use a different format.
      */
     UNSUPPORTED_MEDIA_TYPE(415, UnsupportedMediaTypeException.class, "Unsupported Media Type"),
-    
-    REQUESTED_RANGE_NOT_SATISFIABLE(416, UnsupportedMediaTypeException.class, "Requested Range Not Satisfiable"),
-    
-    EXPECTATION_FAILED(417, UnsupportedMediaTypeException.class, "Expectation Failed"),
-    
-    PASSWORD_ALREADY_USED(495, PasswordAlreadyUsedException.class, "Password was already used."),
-    
-    PASSWORD_TOO_WEAK(496, PasswordTooWeakException.class, "Password is too weak."),
-    
-    PASSWORDS_NOT_MATCH(497, PasswordsNotMatchException.class, "Passwords not match."),
-    
-    BAD_USER_NAME(498, BadUserNameException.class, "Illegal user name."),
-    
-    ALREADY_EXISTS(499, AlreadyExistsException.class, "Object already exists.")
-    ;
-    
-    public static StatusCode findByStatusCode(int statusCode) {
-        for (StatusCode entry : StatusCode.values()) {
-            if (statusCode == entry.getStatusCode()) {
-                return entry;
-            }
-        }
-        throw new IllegalArgumentException("Unknown status code [" + statusCode + "]");
-    }
-    
-    public static RuntimeException createRuntimeException(int statusCode, String message) {
-        try {
-            StatusCode en = findByStatusCode(statusCode);
-            return en.getRuntimeException(message);
-            
-        } catch (IllegalArgumentException e) {
-            return new RuntimeException(message);
-        }
-    }
-    
-    public static void throwRuntimeException(int statusCode, String message) throws RuntimeException {
-        throw createRuntimeException(statusCode, message);
-    }
 
-    private int statusCode;
-    
+    REQUESTED_RANGE_NOT_SATISFIABLE(416, UnsupportedMediaTypeException.class, "Requested Range Not Satisfiable"),
+
+    EXPECTATION_FAILED(417, UnsupportedMediaTypeException.class, "Expectation Failed"),
+
+    PASSWORD_ALREADY_USED(495, PasswordAlreadyUsedException.class, "Password was already used."),
+
+    PASSWORD_TOO_WEAK(496, PasswordTooWeakException.class, "Password is too weak."),
+
+    PASSWORDS_NOT_MATCH(497, PasswordsNotMatchException.class, "Passwords not match."),
+
+    BAD_USER_NAME(498, BadUserNameException.class, "Illegal user name."),
+
+    ALREADY_EXISTS(499, AlreadyExistsException.class, "Object already exists.");
+
+    private int statusCodeValue;
+
     private Class<? extends RuntimeException> runtimeExceptionClass;
 
     private String defaultMessage;
-    
-    private StatusCode(int statusCode, Class<? extends RuntimeException> runtimeExceptionClass, String defaultMessage) {
-            this.statusCode = statusCode;
+
+    StatusCode(int statusCodeValue, Class<? extends RuntimeException> runtimeExceptionClass, String defaultMessage) {
+        this.statusCodeValue = statusCodeValue;
+        this.runtimeExceptionClass = runtimeExceptionClass;
+        this.defaultMessage = defaultMessage;
     }
 
-    public int getStatusCode() {
-        return statusCode;
+    public int getStatusCodeValue() {
+        return statusCodeValue;
     }
 
     public String getDefaultMessage() {
         return defaultMessage;
     }
-    
+
     public Class<? extends RuntimeException> getRuntimeExceptionClass() {
         return runtimeExceptionClass;
     }
@@ -197,18 +187,65 @@ public enum StatusCode {
     public RuntimeException getRuntimeException() {
         return getRuntimeException(null);
     }
-    
+
     public RuntimeException getRuntimeException(String message) {
-        if (message == null) {
-            message = defaultMessage;
+        String exceptionMessage = message;
+        if (exceptionMessage == null) {
+            exceptionMessage = defaultMessage;
         }
         try {
             Constructor<? extends RuntimeException> c = runtimeExceptionClass.getConstructor(String.class);
-            return c.newInstance(message);
-            
-        } catch (NoSuchMethodException | InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-            throw new RuntimeException(message);
+            return c.newInstance(exceptionMessage);
+
+        } catch (NoSuchMethodException // NOSONAR
+                | InstantiationException
+                | IllegalAccessException
+                | IllegalArgumentException
+                | InvocationTargetException e) {
+            throw new RuntimeException(exceptionMessage); // NOSONAR
         }
     }
-    
+
+    /**
+     * Finds a status code enumeration by the status code value.
+     *
+     * @param statusCode the status code value
+     * @return the status code enumeration
+     */
+    public static StatusCode findByStatusCode(int statusCode) {
+        for (StatusCode entry : StatusCode.values()) {
+            if (statusCode == entry.getStatusCodeValue()) {
+                return entry;
+            }
+        }
+        throw new IllegalArgumentException("Unknown status code [" + statusCode + "]");
+    }
+
+    /**
+     * Creates a {@link RuntimeException} or a sub-class of it with the specified status code and message.
+     *
+     * @param statusCode the status code
+     * @param message    the exception message
+     * @return the runtime exception
+     */
+    public static RuntimeException createRuntimeException(int statusCode, String message) {
+        try {
+            StatusCode en = findByStatusCode(statusCode);
+            return en.getRuntimeException(message);
+
+        } catch (IllegalArgumentException e) { // NOSONAR
+            return new RuntimeException(message);
+        }
+    }
+
+    /**
+     * Throws a {@link RuntimeException} or a sub-class of it with the specified status code and message.
+     *
+     * @param statusCode the status code
+     * @param message    the exception message
+     */
+    public static void throwRuntimeException(int statusCode, String message) {
+        throw createRuntimeException(statusCode, message);
+    }
+
 }

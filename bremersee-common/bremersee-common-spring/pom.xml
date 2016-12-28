@@ -20,7 +20,12 @@
             <groupId>org.bremersee</groupId>
             <artifactId>bremersee-common-api</artifactId>
         </dependency>
-    
+
+        <dependency>
+            <groupId>com.fasterxml.jackson.module</groupId>
+            <artifactId>jackson-module-jaxb-annotations</artifactId>
+        </dependency>
+
         <dependency>
             <groupId>javax.jms</groupId>
             <artifactId>jms-api</artifactId>

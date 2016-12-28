@@ -1,6 +1,19 @@
-/**
- * 
+/*
+ * Copyright 2016 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
+
 package org.bremersee.common.exception;
 
 /**
@@ -11,34 +24,6 @@ public class BadRequestException extends IllegalArgumentException
         implements StatusCodeAwareException {
 
     private static final long serialVersionUID = 1L;
-    
-    public static void validateNotNull(Object object, String message)
-            throws BadRequestException {
-        if (object == null) {
-            throwException(message);
-        }
-    }
-
-    public static void validateNotBlank(CharSequence chars, String message)
-            throws BadRequestException {
-        if (chars == null || chars.length() == 0) {
-            throwException(message);
-        }
-    }
-
-    public static void validateTrue(boolean expression, String message) {
-        if (!expression) {
-            throwException(message);
-        }
-    }
-    
-    private static void throwException(String message) {
-        if (message == null) {
-            throw new BadRequestException();
-        } else {
-            throw new BadRequestException(message);
-        }
-    }
     
     /**
      * Constructs a new runtime exception with {@code null} as its detail
@@ -103,7 +88,36 @@ public class BadRequestException extends IllegalArgumentException
 
     @Override
     public int getStatusCode() {
-        return StatusCode.BAD_REQUEST.getStatusCode();
+        return StatusCode.BAD_REQUEST.getStatusCodeValue();
+    }
+
+    @SuppressWarnings("ConstantConditions")
+    public static void validateNotNull(Object object, String message) {
+        if (object == null) {
+            throwException(message);
+        }
+    }
+
+    @SuppressWarnings("ConstantConditions")
+    public static void validateNotBlank(CharSequence chars, String message) {
+        if (chars == null || chars.length() == 0) {
+            throwException(message);
+        }
+    }
+
+    @SuppressWarnings("ConstantConditions")
+    public static void validateTrue(boolean expression, String message) {
+        if (!expression) {
+            throwException(message);
+        }
+    }
+
+    private static void throwException(String message) {
+        if (message == null) {
+            throw new BadRequestException();
+        } else {
+            throw new BadRequestException(message);
+        }
     }
 
 }

@@ -14,17 +14,13 @@
  * limitations under the License.
  */
 
-package org.bremersee.common.acl.domain.entity;
+package org.bremersee.common.acl.domain.jpa.entity;
 
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import javax.persistence.*;
 import java.io.Serializable;
-
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Table;
-import javax.persistence.UniqueConstraint;
 
 /**
  * @author Christian Bremer
@@ -32,8 +28,10 @@ import javax.persistence.UniqueConstraint;
  */
 @Entity
 @Table(name = "acl_sid", uniqueConstraints = {
-        @UniqueConstraint(name = "unique_uk_1", columnNames = {"sid", "principal"})
+        @UniqueConstraint(name = "acl_sid_uc_sid_principal", columnNames = {"sid", "principal"})
 })
+@Data
+@NoArgsConstructor
 public class AclSid implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -46,15 +44,7 @@ public class AclSid implements Serializable {
     @Column(name = "principal", nullable = false)
     private boolean principal;
     
-    @Column(name = "sid", nullable = false, length = 255)
+    @Column(name = "sid", nullable = false)
     private String sid;
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
 
 }
