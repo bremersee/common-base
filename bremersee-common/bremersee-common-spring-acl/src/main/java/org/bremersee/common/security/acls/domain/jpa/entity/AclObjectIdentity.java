@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.bremersee.common.acl.domain.jpa.entity;
+package org.bremersee.common.security.acls.domain.jpa.entity;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -27,24 +27,38 @@ import java.io.Serializable;
  *
  */
 @Entity
-@Table(name = "acl_sid", uniqueConstraints = {
-        @UniqueConstraint(name = "acl_sid_uc_sid_principal", columnNames = {"sid", "principal"})
+@Table(name = "acl_object_identity", uniqueConstraints = {
+        @UniqueConstraint(name = "acl_object_identity_uc_class_identity",
+                columnNames = { "object_id_class", "object_id_identity" })
 })
 @Data
 @NoArgsConstructor
-public class AclSid implements Serializable {
+public class AclObjectIdentity implements Serializable {
 
     private static final long serialVersionUID = 1L;
-    
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id", nullable = false)
     private Long id;
-    
-    @Column(name = "principal", nullable = false)
-    private boolean principal;
-    
-    @Column(name = "sid", nullable = false)
-    private String sid;
+
+    @ManyToOne
+    @JoinColumn(name = "object_id_class", nullable = false)
+    private AclClass objectIdClass;
+
+    @Column(name = "object_id_identity", nullable = false, length = 32)
+    private String objectIdIdentity;
+//    private Long objectIdIdentity; // NOSONAR
+
+    @ManyToOne
+    @JoinColumn(name = "parent_object")
+    private AclObjectIdentity parentObject;
+
+    @ManyToOne
+    @JoinColumn(name = "owner_sid")
+    private AclSid ownerSid;
+
+    @Column(name = "entries_inheriting", nullable = false)
+    private boolean entriesInheriting;
 
 }

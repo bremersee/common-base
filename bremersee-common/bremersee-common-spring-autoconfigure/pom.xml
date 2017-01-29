@@ -74,11 +74,6 @@
         </dependency>
 
         <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-        </dependency>
-
-        <dependency>
             <groupId>javax.jms</groupId>
             <artifactId>jms-api</artifactId>
             <optional>true</optional>
@@ -133,12 +128,6 @@
             <artifactId>spring-security-crypto</artifactId>
             <optional>true</optional>
         </dependency>
-
-        <!-- <dependency> <groupId>org.springframework.cloud</groupId> <artifactId>spring-cloud-starter-oauth2</artifactId> 
-            <optional>true</optional> </dependency> <dependency> <groupId>org.springframework.cloud</groupId> 
-            <artifactId>spring-cloud-starter-feign</artifactId> <optional>true</optional> 
-            </dependency> -->
-
         <dependency>
             <groupId>org.apache.tomcat.embed</groupId>
             <artifactId>tomcat-embed-core</artifactId>
@@ -216,7 +205,7 @@
         <dependency>
             <groupId>com.fasterxml.jackson.module</groupId>
             <artifactId>jackson-module-jaxb-annotations</artifactId>
-            <!--<optional>true</optional>-->
+            <optional>true</optional>
         </dependency>
 
         <dependency>

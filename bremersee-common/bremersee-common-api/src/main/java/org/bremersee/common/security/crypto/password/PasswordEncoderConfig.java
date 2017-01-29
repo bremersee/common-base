@@ -29,7 +29,7 @@ import lombok.NoArgsConstructor;
 public class PasswordEncoderConfig {
 
     private int randomSaltLength = 4;
-    
+
     private String algorithm = "SSHA";
 
 }

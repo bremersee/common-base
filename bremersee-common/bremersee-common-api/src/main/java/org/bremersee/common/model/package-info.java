@@ -18,7 +18,7 @@
  * <p>
  * This package contains the model of the bremersee common project.
  * </p>
- * 
+ *
  * @author Christian Bremer
  */
 @javax.xml.bind.annotation.XmlSchema(

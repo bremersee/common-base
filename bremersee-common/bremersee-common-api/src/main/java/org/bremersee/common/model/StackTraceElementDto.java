@@ -19,7 +19,6 @@ package org.bremersee.common.model;
 import com.fasterxml.jackson.annotation.*;
 import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
-import com.googlecode.jmapper.annotations.JMap;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
@@ -34,7 +33,6 @@ import java.io.Serializable;
 
 /**
  * @author Christian Bremer
- *
  */
 //@formatter:off
 @ApiModel(description = "A stack trace element of a throwable DTO.")
@@ -48,10 +46,10 @@ import java.io.Serializable;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(Include.NON_NULL)
 @JsonAutoDetect(
-        fieldVisibility = Visibility.ANY, 
-        getterVisibility = Visibility.NONE, 
-        creatorVisibility = Visibility.NONE, 
-        isGetterVisibility = Visibility.NONE, 
+        fieldVisibility = Visibility.ANY,
+        getterVisibility = Visibility.NONE,
+        creatorVisibility = Visibility.NONE,
+        isGetterVisibility = Visibility.NONE,
         setterVisibility = Visibility.NONE
 )
 @JsonPropertyOrder({
@@ -71,26 +69,22 @@ public class StackTraceElementDto implements Serializable {
     @XmlElement(name = "declaringClass")
     @JsonProperty(value = "declaringClass")
     @ApiModelProperty("The declaring class.")
-    @JMap
     private String declaringClass;
-    
+
     @XmlElement(name = "methodName")
     @JsonProperty(value = "methodName")
     @ApiModelProperty("The method name.")
-    @JMap
     private String methodName;
-    
+
     @XmlElement(name = "fileName")
     @JsonProperty(value = "fileName")
     @ApiModelProperty("The file name.")
-    @JMap
     private String fileName;
-    
+
     @XmlElement(name = "lineNumber", defaultValue = "0")
     @JsonProperty(value = "lineNumber", defaultValue = "0")
     @ApiModelProperty("The line number.")
-    @JMap
-    private int    lineNumber;
+    private int lineNumber;
 
     public StackTraceElement toStackTraceElement() {
         return new StackTraceElement(declaringClass, methodName, fileName, lineNumber);

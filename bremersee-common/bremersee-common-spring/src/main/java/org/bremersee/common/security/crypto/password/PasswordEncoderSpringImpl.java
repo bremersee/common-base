@@ -19,8 +19,11 @@ package org.bremersee.common.security.crypto.password;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 /**
- * @author Christian Bremer
+ * <p>
+ * Extends the {@link PasswordEncoderImpl} around Spring's {@link PasswordEncoder}.
+ * </p>
  *
+ * @author Christian Bremer
  */
 public class PasswordEncoderSpringImpl extends PasswordEncoderImpl
         implements PasswordEncoder {

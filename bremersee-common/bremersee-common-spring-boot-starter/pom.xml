@@ -59,8 +59,10 @@
         <module>bremersee-common-spring-boot-starter-base</module>
         <module>bremersee-common-spring-boot-starter-acl</module>
         <module>bremersee-common-spring-boot-starter-jms</module>
+        <module>bremersee-common-spring-boot-starter-data-jpa</module>
+        <module>bremersee-common-spring-boot-starter-data-mongodb</module>
         <module>bremersee-common-spring-boot-starter-tomcat</module>
-        <module>bremersee-common-spring-boot-starter-tomcat-rest</module>
         <module>bremersee-common-spring-boot-starter-tomcat-jersey</module>
+        <module>bremersee-common-spring-boot-starter-swagger</module>
     </modules>
 </project>

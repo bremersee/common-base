@@ -1,8 +1,8 @@
 {
-  "streetAddress" : "Reeperbahn",
-  "streetNumber" : "26a",
   "city" : "Hamburg",
   "country" : "Germany",
-  "id" : "111",
-  "created" : 1468933888608
+  "streetAddress" : "Reeperbahn",
+  "streetNumber" : "26a",
+  "created" : "2016-07-19T13:11:28.608+0000",
+  "id" : "111"
 }

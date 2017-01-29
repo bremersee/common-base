@@ -132,7 +132,7 @@ public class JerseyComponentsCustomizer implements ResourceConfigCustomizer {
             if (exception != null) {
                 Integer statusCode = exceptionStatusCodeMap.get(exception.getClass());
                 if (statusCode == null && exception instanceof StatusCodeAwareException) {
-                    statusCode = ((StatusCodeAwareException)exception).getStatusCode();
+                    statusCode = ((StatusCodeAwareException)exception).getHttpStatusCode();
                 }
                 if (statusCode == null) {
                     statusCode = Response.Status.INTERNAL_SERVER_ERROR.getStatusCode();

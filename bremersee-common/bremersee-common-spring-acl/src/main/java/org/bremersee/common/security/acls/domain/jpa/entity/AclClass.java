@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.bremersee.common.acl.domain.jpa.entity;
+package org.bremersee.common.security.acls.domain.jpa.entity;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -27,10 +27,12 @@ import java.io.Serializable;
  *
  */
 @Entity
-@Table(name = "acl_entry")
+@Table(name = "acl_class", uniqueConstraints = {
+        @UniqueConstraint(name = "acl_class_uc_class", columnNames = { "class" })
+})
 @Data
 @NoArgsConstructor
-public class AclEntry implements Serializable {
+public class AclClass implements Serializable {
 
     private static final long serialVersionUID = 1L;
     
@@ -39,27 +41,7 @@ public class AclEntry implements Serializable {
     @Column(name = "id", nullable = false)
     private Long id;
     
-    @ManyToOne
-    @JoinColumn(name = "acl_object_identity", nullable = false)
-    private AclObjectIdentity aclObjectIdentity;
-    
-    @Column(name = "ace_order", nullable = false)
-    private int aceOrder;
-    
-    @ManyToOne
-    @JoinColumn(name = "sid", nullable = false)
-    private AclSid sid;
-    
-    @Column(name = "mask", nullable = false)
-    private int mask;
-    
-    @Column(name = "granting", nullable = false)
-    private boolean granting;
-    
-    @Column(name = "audit_success", nullable = false)
-    private boolean auditSuccess;
-    
-    @Column(name = "audit_failure", nullable = false)
-    private boolean auditFailure;
+    @Column(name = "class", nullable = false)
+    private String clazz;
 
 }

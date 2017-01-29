@@ -37,17 +37,18 @@ public abstract class JmsUtils {
      */
     public static final char REPLACEMENT_CHAR = '_';
 
+    /**
+     * Never construct.
+     */
     private JmsUtils() {
     }
 
     /**
      * Encodes a {@link String} so that is is a valid JMS header name.
      *
-     * @param name
-     *            the String to encode
+     * @param name the String to encode
      * @return a valid JMS header name
-     * @throws IllegalArgumentException
-     *             if name is null or blank
+     * @throws IllegalArgumentException if name is null or blank
      */
     public static String encodeHeader(String name) {
 
@@ -56,7 +57,7 @@ public abstract class JmsUtils {
 
         if (name == null || name.trim().length() == 0) {
             throw new IllegalArgumentException(
-                    "Header name to encode must not be null or empty");
+                    "Header name to encode must not be null or blank.");
         }
 
         int i = 0;
@@ -83,9 +84,9 @@ public abstract class JmsUtils {
             if (nonCompliant) {
                 log.warn(
                         MessageFormat.format(
-                                "Header: {0} is not compliant with JMS specification (sec. 3.5.1, 3.8.1.1). It will cause "
-                                        + "problems in your and other applications. Please update your application code to correct this. "
-                                        + "I renamed it to {1}",
+                                "Header: {0} is not compliant with JMS specification (sec. 3.5.1, 3.8.1.1). " +
+                                        "It will cause problems in your and other applications. Please update " +
+                                        "your application code to correct this. I renamed it to {1}",
                                 name, sb.toString()));
             }
 
@@ -94,19 +95,16 @@ public abstract class JmsUtils {
     }
 
     /**
-     * Returns the value of a message header or <code>null</code> if there's no
+     * Returns the value of a message header or {@code null} if there's no
      * such message header.
-     * 
-     * @param message
-     *            the message
-     * @param key
-     *            the name of the message header property
-     * @param defaultValue
-     *            a default value, can be <code>null</code>
+     *
+     * @param message      the message
+     * @param key          the name of the message header property
+     * @param defaultValue a default value, can be {@code null}
      * @return the value of a message header
      */
     public static Object getProperty(Message message, String key,
-            Object defaultValue) {
+                                     Object defaultValue) {
 
         String encodedKey = JmsUtils.encodeHeader(key);
         try {
@@ -124,19 +122,16 @@ public abstract class JmsUtils {
     }
 
     /**
-     * Returns the value of a message header or <code>null</code> if there's no
+     * Returns the value of a message header or {@code null} if there's no
      * such message header.
-     * 
-     * @param message
-     *            the message
-     * @param key
-     *            the name of the message header property
-     * @param defaultValue
-     *            a default value, can be <code>null</code>
+     *
+     * @param message      the message
+     * @param key          the name of the message header property
+     * @param defaultValue a default value, can be {@code null}
      * @return the value of a message header
      */
     public static String getPropertyAsString(Message message, String key,
-            String defaultValue) {
+                                             String defaultValue) {
         Object obj = getProperty(message, key, defaultValue);
         if (obj != null) {
             return obj.toString();
@@ -145,19 +140,16 @@ public abstract class JmsUtils {
     }
 
     /**
-     * Returns the value of a message header or <code>null</code> if there's no
+     * Returns the value of a message header or {@code null} if there's no
      * such message header.
-     * 
-     * @param message
-     *            the message
-     * @param key
-     *            the name of the message header property
-     * @param defaultValue
-     *            a default value, can be <code>null</code>
+     *
+     * @param message      the message
+     * @param key          the name of the message header property
+     * @param defaultValue a default value, can be {@code null}
      * @return the value of a message header
      */
     public static BigInteger getPropertyAsBigDecimal(Message message,
-            String key, BigInteger defaultValue) {
+                                                     String key, BigInteger defaultValue) {
         Object obj = getProperty(message, key, defaultValue);
         if (obj != null) {
             return new BigInteger(obj.toString());
@@ -166,19 +158,16 @@ public abstract class JmsUtils {
     }
 
     /**
-     * Returns the value of a message header or <code>null</code> if there's no
+     * Returns the value of a message header or {@code null} if there's no
      * such message header.
-     * 
-     * @param message
-     *            the message
-     * @param key
-     *            the name of the message header property
-     * @param defaultValue
-     *            a default value, can be <code>null</code>
+     *
+     * @param message      the message
+     * @param key          the name of the message header property
+     * @param defaultValue a default value, can be {@code null}
      * @return the value of a message header
      */
     public static Long getPropertyAsLong(Message message, String key,
-            Long defaultValue) {
+                                         Long defaultValue) {
         Object obj = getProperty(message, key, defaultValue);
         if (obj != null) {
             return Long.parseLong(obj.toString());
@@ -187,19 +176,16 @@ public abstract class JmsUtils {
     }
 
     /**
-     * Returns the value of a message header or <code>null</code> if there's no
+     * Returns the value of a message header or {@code null} if there's no
      * such message header.
-     * 
-     * @param message
-     *            the message
-     * @param key
-     *            the name of the message header property
-     * @param defaultValue
-     *            a default value, can be <code>null</code>
+     *
+     * @param message      the message
+     * @param key          the name of the message header property
+     * @param defaultValue a default value, can be {@code null}
      * @return the value of a message header
      */
     public static Integer getPropertyAsInteger(Message message, String key,
-            Integer defaultValue) {
+                                               Integer defaultValue) {
         Object obj = getProperty(message, key, defaultValue);
         if (obj != null) {
             return Integer.parseInt(obj.toString());
@@ -208,19 +194,16 @@ public abstract class JmsUtils {
     }
 
     /**
-     * Returns the value of a message header or <code>null</code> if there's no
+     * Returns the value of a message header or {@code null} if there's no
      * such message header.
-     * 
-     * @param message
-     *            the message
-     * @param key
-     *            the name of the message header property
-     * @param defaultValue
-     *            a default value, can be <code>null</code>
+     *
+     * @param message      the message
+     * @param key          the name of the message header property
+     * @param defaultValue a default value, can be {@code null}
      * @return the value of a message header
      */
     public static Byte getPropertyAsByte(Message message, String key,
-            Byte defaultValue) {
+                                         Byte defaultValue) {
         Object obj = getProperty(message, key, defaultValue);
         if (obj != null) {
             return Byte.parseByte(obj.toString());
@@ -229,19 +212,16 @@ public abstract class JmsUtils {
     }
 
     /**
-     * Returns the value of a message header or <code>null</code> if there's no
+     * Returns the value of a message header or {@code null} if there's no
      * such message header.
-     * 
-     * @param message
-     *            the message
-     * @param key
-     *            the name of the message header property
-     * @param defaultValue
-     *            a default value, can be <code>null</code>
+     *
+     * @param message      the message
+     * @param key          the name of the message header property
+     * @param defaultValue a default value, can be {@code null}
      * @return the value of a message header
      */
     public static BigDecimal getPropertyAsBigDecimal(Message message,
-            String key, BigDecimal defaultValue) {
+                                                     String key, BigDecimal defaultValue) {
         Object obj = getProperty(message, key, defaultValue);
         if (obj != null) {
             return new BigDecimal(obj.toString());
@@ -250,19 +230,16 @@ public abstract class JmsUtils {
     }
 
     /**
-     * Returns the value of a message header or <code>null</code> if there's no
+     * Returns the value of a message header or {@code null} if there's no
      * such message header.
-     * 
-     * @param message
-     *            the message
-     * @param key
-     *            the name of the message header property
-     * @param defaultValue
-     *            a default value, can be <code>null</code>
+     *
+     * @param message      the message
+     * @param key          the name of the message header property
+     * @param defaultValue a default value, can be {@code null}
      * @return the value of a message header
      */
     public static Double getPropertyAsDouble(Message message, String key,
-            Double defaultValue) {
+                                             Double defaultValue) {
         Object obj = getProperty(message, key, defaultValue);
         if (obj != null) {
             return Double.parseDouble(obj.toString());
@@ -271,19 +248,16 @@ public abstract class JmsUtils {
     }
 
     /**
-     * Returns the value of a message header or <code>null</code> if there's no
+     * Returns the value of a message header or {@code null} if there's no
      * such message header.
-     * 
-     * @param message
-     *            the message
-     * @param key
-     *            the name of the message header property
-     * @param defaultValue
-     *            a default value, can be <code>null</code>
+     *
+     * @param message      the message
+     * @param key          the name of the message header property
+     * @param defaultValue a default value, can be {@code null}
      * @return the value of a message header
      */
     public static Float getPropertyAsFloat(Message message, String key,
-            Float defaultValue) {
+                                           Float defaultValue) {
         Object obj = getProperty(message, key, defaultValue);
         if (obj != null) {
             return Float.parseFloat(obj.toString());
@@ -292,19 +266,16 @@ public abstract class JmsUtils {
     }
 
     /**
-     * Returns the value of a message header or <code>null</code> if there's no
+     * Returns the value of a message header or {@code null} if there's no
      * such message header.
-     * 
-     * @param message
-     *            the message
-     * @param key
-     *            the name of the message header property
-     * @param defaultValue
-     *            a default value, can be <code>null</code>
+     *
+     * @param message      the message
+     * @param key          the name of the message header property
+     * @param defaultValue a default value, can be {@code null}
      * @return the value of a message header
      */
     public static Boolean getPropertyAsBoolean(Message message, String key,
-            Boolean defaultValue) {
+                                               Boolean defaultValue) {
         Object obj = getProperty(message, key, defaultValue);
         if (obj != null) {
             return Boolean.parseBoolean(obj.toString());
@@ -314,15 +285,13 @@ public abstract class JmsUtils {
 
     /**
      * Sets a set of properties on the message.
-     * 
-     * @param message
-     *            the message
-     * @param headerMap
-     *            a map of properties
+     *
+     * @param message   the message
+     * @param headerMap a map of properties
      * @throws JMSException when the property can't be set
      */
     public static void setProperties(Message message,
-            Map<String, Object> headerMap) throws JMSException {
+                                     Map<String, Object> headerMap) throws JMSException {
 
         for (Map.Entry<String, Object> entry : headerMap.entrySet()) {
             if (entry.getValue() != null) {
@@ -333,13 +302,10 @@ public abstract class JmsUtils {
 
     /**
      * Sets the specified property onto the message.
-     * 
-     * @param message
-     *            the message
-     * @param key
-     *            the name of property
-     * @param value
-     *            the value of the property
+     *
+     * @param message the message
+     * @param key     the name of property
+     * @param value   the value of the property
      * @throws JMSException when property can't be set
      */
     public static void setProperty(Message message, String key, Object value) // NOSONAR
@@ -371,22 +337,18 @@ public abstract class JmsUtils {
 
     /**
      * Creates a {@link Destination} from it's name.
-     * 
-     * @param destinationName
-     *            the name of the destination
-     * @param destinationIsTopic
-     *            specifies whether the destination is a {@link Topic} or a
-     *            {@link Queue}, the argument can be {@code null} only if the
-     *            destination name ends with 'topic' or 'queue' (case
-     *            insensitive)
-     * @param session
-     *            the JMS session
+     *
+     * @param destinationName    the name of the destination
+     * @param destinationIsTopic specifies whether the destination is a {@link Topic} or a
+     *                           {@link Queue}, the argument can be {@code null} only if the
+     *                           destination name ends with 'topic' or 'queue' (case
+     *                           insensitive)
+     * @param session            the JMS session
      * @return the JMS destination
-     * @throws JMSException
-     *             if resolving fails
+     * @throws JMSException if resolving fails
      */
     public static Destination resolveDestination(String destinationName,
-            Boolean destinationIsTopic, Session session) throws JMSException {
+                                                 Boolean destinationIsTopic, Session session) throws JMSException {
 
         if (destinationName == null || destinationName.trim().length() == 0) {
             throw new JMSException(
@@ -411,13 +373,13 @@ public abstract class JmsUtils {
         throw new JMSException(
                 "Could not resolve destination because destination name does not end with 'queue' or 'topic' and 'destinationIsTopic' is NULL.");
     }
-    
+
     public static String getDestinationName(Destination destination) throws JMSException {
         if (destination instanceof Queue) {
-            return ((Queue)destination).getQueueName();
+            return ((Queue) destination).getQueueName();
         }
         if (destination instanceof Topic) {
-            return ((Topic)destination).getTopicName();
+            return ((Topic) destination).getTopicName();
         }
         return null;
     }
@@ -429,12 +391,10 @@ public abstract class JmsUtils {
 
     /**
      * Creates a {@link Connection}.
-     * 
-     * @param connectionFactory
-     *            the connection factory
+     *
+     * @param connectionFactory the connection factory
      * @return the connection
-     * @throws JMSException
-     *             if creation of the connection fails
+     * @throws JMSException if creation of the connection fails
      */
     public static Connection createConnection(
             ConnectionFactory connectionFactory) throws JMSException {
@@ -443,16 +403,12 @@ public abstract class JmsUtils {
 
     /**
      * Creates a {@link Connection} with the specified user anem and password.
-     * 
-     * @param connectionFactory
-     *            the connection factory
-     * @param userName
-     *            the user name
-     * @param password
-     *            the password
+     *
+     * @param connectionFactory the connection factory
+     * @param userName          the user name
+     * @param password          the password
      * @return the connection
-     * @throws JMSException
-     *             if creation of the connection fails
+     * @throws JMSException if creation of the connection fails
      */
     @SuppressWarnings("SameParameterValue")
     public static Connection createConnection(
@@ -468,12 +424,10 @@ public abstract class JmsUtils {
 
     /**
      * Creates a JMS session.
-     * 
-     * @param connection
-     *            the connection
+     *
+     * @param connection the connection
      * @return the JMS session
-     * @throws JMSException
-     *             if creation of the JMS session fails
+     * @throws JMSException if creation of the JMS session fails
      */
     public static Session createSession(Connection connection)
             throws JMSException {
@@ -482,33 +436,26 @@ public abstract class JmsUtils {
 
     /**
      * Creates a JMS session.
-     * 
-     * @param connection
-     *            the connection
-     * @param acknowledgeMode
-     *            the acknowledge mode
+     *
+     * @param connection      the connection
+     * @param acknowledgeMode the acknowledge mode
      * @return the JMS session
-     * @throws JMSException
-     *             if creation of the JMS session fails
+     * @throws JMSException if creation of the JMS session fails
      */
     public static Session createSession(Connection connection,
-            int acknowledgeMode) throws JMSException {
+                                        int acknowledgeMode) throws JMSException {
         return createSession(connection, acknowledgeMode, false);
     }
 
     /**
      * Creates a JMS session.
-     * 
-     * @param connection
-     *            the connection
-     * @param acknowledgeMode
-     *            the acknowledge mode
-     * @param startConnection
-     *            {@code true} if the connection should be started otherwise
-     *            {@code false}
+     *
+     * @param connection      the connection
+     * @param acknowledgeMode the acknowledge mode
+     * @param startConnection {@code true} if the connection should be started otherwise
+     *                        {@code false}
      * @return the JMS session
-     * @throws JMSException
-     *             if creation of the JMS session fails
+     * @throws JMSException if creation of the JMS session fails
      */
     @SuppressWarnings("SameParameterValue")
     public static Session createSession(Connection connection,
@@ -520,25 +467,20 @@ public abstract class JmsUtils {
 
     /**
      * Creates a JMS session.
-     * 
-     * @param connection
-     *            the connection
-     * @param transacted
-     *            {@code true} if the session should be transacted otherwise
-     *            {@code false}
-     * @param acknowledgeMode
-     *            the acknowledge mode
-     * @param startConnection
-     *            {@code true} if the connection should be started otherwise
-     *            {@code false}
+     *
+     * @param connection      the connection
+     * @param transacted      {@code true} if the session should be transacted otherwise
+     *                        {@code false}
+     * @param acknowledgeMode the acknowledge mode
+     * @param startConnection {@code true} if the connection should be started otherwise
+     *                        {@code false}
      * @return the JMS session
-     * @throws JMSException
-     *             if creation of the JMS session fails
+     * @throws JMSException if creation of the JMS session fails
      */
     @SuppressWarnings("SameParameterValue")
     public static Session createSession(Connection connection,
                                         boolean transacted, int acknowledgeMode, boolean startConnection)
-                    throws JMSException {
+            throws JMSException {
         if (connection == null) {
             throw new JMSException("Connection must not be null.");
         }
@@ -568,53 +510,41 @@ public abstract class JmsUtils {
 
     /**
      * Create a message producer.
-     * 
-     * @param session
-     *            the JMS session
-     * @param destination
-     *            the JMS destination
+     *
+     * @param session     the JMS session
+     * @param destination the JMS destination
      * @return the message producer
-     * @throws JMSException
-     *             if creation of the message producer fails
+     * @throws JMSException if creation of the message producer fails
      */
     public static MessageProducer createProducer(Session session,
-            Destination destination) throws JMSException {
+                                                 Destination destination) throws JMSException {
         return session.createProducer(destination);
     }
 
     /**
      * Creates a message consumer.
-     * 
-     * @param session
-     *            the JMS session
-     * @param destination
-     *            the JMS destination
-     * @param messageSelector
-     *            the JMS message selector (may be {@code null})
+     *
+     * @param session         the JMS session
+     * @param destination     the JMS destination
+     * @param messageSelector the JMS message selector (may be {@code null})
      * @return the message consumer
-     * @throws JMSException
-     *             if creation of the message consumer fails
+     * @throws JMSException if creation of the message consumer fails
      */
     public static MessageConsumer createConsumer(Session session,
-            Destination destination, String messageSelector)
-                    throws JMSException {
+                                                 Destination destination, String messageSelector)
+            throws JMSException {
         return createConsumer(session, destination, messageSelector, false);
     }
 
     /**
      * Creates a message consumer.
-     * 
-     * @param session
-     *            the JMS session
-     * @param destination
-     *            the JMS destination
-     * @param messageSelector
-     *            the JMS message selector (may be {@code null})
-     * @param isPubSubNoLocal
-     *            no local flag
+     *
+     * @param session         the JMS session
+     * @param destination     the JMS destination
+     * @param messageSelector the JMS message selector (may be {@code null})
+     * @param isPubSubNoLocal no local flag
      * @return the message consumer
-     * @throws JMSException
-     *             if creation of the message consumer fails
+     * @throws JMSException if creation of the message consumer fails
      */
     @SuppressWarnings("SameParameterValue")
     public static MessageConsumer createConsumer(Session session,
@@ -636,9 +566,8 @@ public abstract class JmsUtils {
     /**
      * Close the given JMS Session and ignore any thrown exception. This is
      * useful for typical {@code finally} blocks in manual JMS code.
-     * 
-     * @param session
-     *            the JMS Session to close (may be {@code null})
+     *
+     * @param session the JMS Session to close (may be {@code null})
      */
     public static void closeSession(Session session) {
         if (session != null) {
@@ -657,9 +586,8 @@ public abstract class JmsUtils {
     /**
      * Close the given JMS MessageProducer and ignore any thrown exception. This
      * is useful for typical {@code finally} blocks in manual JMS code.
-     * 
-     * @param producer
-     *            the JMS MessageProducer to close (may be {@code null})
+     *
+     * @param producer the JMS MessageProducer to close (may be {@code null})
      */
     public static void closeMessageProducer(MessageProducer producer) {
         if (producer != null) {
@@ -679,9 +607,8 @@ public abstract class JmsUtils {
     /**
      * Close the given JMS MessageConsumer and ignore any thrown exception. This
      * is useful for typical {@code finally} blocks in manual JMS code.
-     * 
-     * @param consumer
-     *            the JMS MessageConsumer to close (may be {@code null})
+     *
+     * @param consumer the JMS MessageConsumer to close (may be {@code null})
      */
     public static void closeMessageConsumer(MessageConsumer consumer) {
         if (consumer != null) {
@@ -711,12 +638,10 @@ public abstract class JmsUtils {
      * Release the given Connection, stopping it (if necessary) and eventually
      * closing it.
      *
-     * @param con
-     *            the Connection to release (if this is {@code null}, the call
-     *            will be ignored)
-     * @param started
-     *            whether the Connection might have been started by the
-     *            application
+     * @param con     the Connection to release (if this is {@code null}, the call
+     *                will be ignored)
+     * @param started whether the Connection might have been started by the
+     *                application
      */
     public static void releaseConnection(Connection con, boolean started) {
         if (con == null) {

@@ -25,7 +25,7 @@ import javax.xml.bind.annotation.XmlRegistry;
  */
 @XmlRegistry
 public class ObjectFactory {
-    
+
     public AddressDto createAddressDto() {
         return new AddressDto();
     }
@@ -37,9 +37,13 @@ public class ObjectFactory {
     public StringListDto createStringListDto() {
         return new StringListDto();
     }
-    
+
     public ThrowableDto createThrowableDto() {
         return new ThrowableDto();
+    }
+
+    public ThrowableMessageDto createThrowableMessageDto() {
+        return new ThrowableMessageDto();
     }
 
 }

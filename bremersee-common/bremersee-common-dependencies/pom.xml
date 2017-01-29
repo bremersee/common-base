@@ -14,12 +14,12 @@
     <properties>
         <bcprov.version>1.47</bcprov.version>
         <bremersee-common.version>1.0.0-SNAPSHOT</bremersee-common.version>
-        <bremersee-comparator.version>1.2.1</bremersee-comparator.version>
-        <bremersee-fac.version>1.1.0</bremersee-fac.version>
+        <bremersee-comparator.version>1.2.2</bremersee-comparator.version>
+        <bremersee-fac.version>1.1.2</bremersee-fac.version>
         <bremersee-geojson.version>1.1.3</bremersee-geojson.version>
-        <bremersee-pagebuilder.version>1.2.2</bremersee-pagebuilder.version>
-        <bremersee-sms.version>1.0.2</bremersee-sms.version>
-        <bremersee-utils.version>1.0.3</bremersee-utils.version>
+        <bremersee-pagebuilder.version>1.2.3</bremersee-pagebuilder.version>
+        <bremersee-sms.version>1.0.3</bremersee-sms.version>
+        <bremersee-utils.version>1.0.5</bremersee-utils.version>
         <commons.codec.version>1.10</commons.codec.version>
         <commons-io.version>2.5</commons-io.version>
         <commons-lang3.version>3.4</commons-lang3.version>
@@ -27,20 +27,21 @@
         <javax.inject.version>1</javax.inject.version>
         <javax.ws.rs-api.version>2.0.1</javax.ws.rs-api.version>
         <jersey.version>2.23.2</jersey.version>
-        <jmapper-core.version>1.6.0.1</jmapper-core.version>
+        <!--<jmapper-core.version>1.6.0.1</jmapper-core.version>-->
         <jts.version>1.13</jts.version>
         <ldaptive.version>1.2.0</ldaptive.version>
         <lombok.version>1.16.12</lombok.version>
         <person-directory-api.version>1.7.0</person-directory-api.version>
-        <postgresql.version>9.4.1211.jre7</postgresql.version>
-        <spring-boot.version>1.4.1.RELEASE</spring-boot.version>
-        <spring-cloud.version>Camden.SR2</spring-cloud.version>
-        <spring.version>4.3.3.RELEASE</spring.version>
+        <!--<postgresql.version>9.4.1211.jre7</postgresql.version>-->
+        <spring-boot.version>1.4.2.RELEASE</spring-boot.version>
+        <spring-cloud.version>Camden.SR4</spring-cloud.version>
+        <spring.version>4.3.4.RELEASE</spring.version>
         <springfox-swagger.version>2.5.0</springfox-swagger.version>
         <swagger.version>1.5.9</swagger.version>
         <validation-api.version>1.1.0.Final</validation-api.version>
     </properties>
 
+    <!--
     <repositories>
         <repository> 
             <id>repository.spring.milestone</id> 
@@ -48,6 +49,7 @@
             <url>http://repo.spring.io/milestone</url> 
         </repository>
     </repositories>
+    -->
 
     <developers>
         <developer>
@@ -134,6 +136,16 @@
             </dependency>
             <dependency>
                 <groupId>org.bremersee</groupId>
+                <artifactId>bremersee-common-spring-data-jpa</artifactId>
+                <version>${bremersee-common.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.bremersee</groupId>
+                <artifactId>bremersee-common-spring-data-mongodb</artifactId>
+                <version>${bremersee-common.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.bremersee</groupId>
                 <artifactId>bremersee-common-spring-acl</artifactId>
                 <version>${bremersee-common.version}</version>
             </dependency>
@@ -145,6 +157,16 @@
             <dependency>
                 <groupId>org.bremersee</groupId>
                 <artifactId>bremersee-common-spring-boot-starter-base</artifactId>
+                <version>${bremersee-common.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.bremersee</groupId>
+                <artifactId>bremersee-common-spring-boot-starter-data-jpa</artifactId>
+                <version>${bremersee-common.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.bremersee</groupId>
+                <artifactId>bremersee-common-spring-boot-starter-data-mongodb</artifactId>
                 <version>${bremersee-common.version}</version>
             </dependency>
             <dependency>
@@ -164,15 +186,15 @@
             </dependency>
             <dependency>
                 <groupId>org.bremersee</groupId>
-                <artifactId>bremersee-common-spring-boot-starter-tomcat-rest</artifactId>
+                <artifactId>bremersee-common-spring-boot-starter-tomcat-jersey</artifactId>
                 <version>${bremersee-common.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.bremersee</groupId>
-                <artifactId>bremersee-common-spring-boot-starter-tomcat-jersey</artifactId>
+                <artifactId>bremersee-common-spring-boot-starter-swagger</artifactId>
                 <version>${bremersee-common.version}</version>
             </dependency>
-            
+
             <dependency>
                 <groupId>org.bremersee</groupId>
                 <artifactId>bremersee-comparator</artifactId>
@@ -263,11 +285,13 @@
                 <version>${hibernate-jpa-2.1-api.version}</version>
             </dependency>
 
+            <!-- @Jmap
             <dependency>
                 <groupId>com.googlecode.jmapper-framework</groupId>
                 <artifactId>jmapper-core</artifactId>
                 <version>${jmapper-core.version}</version>
             </dependency>
+            -->
             
             <dependency>
                 <groupId>com.vividsolutions</groupId>
@@ -302,12 +326,14 @@
                 <artifactId>lombok</artifactId>
                 <version>${lombok.version}</version>
             </dependency>
-            
+
+            <!--
             <dependency>
                 <groupId>org.postgresql</groupId>
                 <artifactId>postgresql</artifactId>
                 <version>${postgresql.version}</version>
             </dependency>
+            -->
             
             <dependency>
                 <groupId>org.jasig.service.persondir</groupId>

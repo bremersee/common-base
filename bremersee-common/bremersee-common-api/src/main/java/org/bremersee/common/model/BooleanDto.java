@@ -33,7 +33,7 @@ import java.io.Serializable;
  * <p>
  * A {@link Boolean} wrapper.
  * </p>
- * 
+ *
  * @author Christian Bremer
  */
 @ApiModel(description = "A boolean wrapper object.")

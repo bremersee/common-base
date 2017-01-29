@@ -17,16 +17,20 @@
 package org.bremersee.common.exception;
 
 /**
- * An exception that knows a status code.
+ * An exception that knows a custom and a HTTP status code.
  *
  * @author Christian Bremer
  */
-@FunctionalInterface
 public interface StatusCodeAwareException {
 
     /**
-     * @return the status code
+     * @return a custom status code, which can be more detailled as a HTTP status code
      */
-    int getStatusCode();
+    int getCustomStatusCode();
+
+    /**
+     * @return the HTTP status code
+     */
+    int getHttpStatusCode();
 
 }

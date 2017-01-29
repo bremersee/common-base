@@ -18,6 +18,7 @@ package org.bremersee.common.exception;
 
 /**
  * Maps a {@link Throwable} into a DTO.
+ *
  * @author Christian Bremer
  */
 @FunctionalInterface
@@ -25,6 +26,7 @@ public interface ThrowableToDtoMapper {
 
     /**
      * Maps a {@link Throwable} into a DTO.
+     *
      * @param t the throwable
      * @return the DTO
      */

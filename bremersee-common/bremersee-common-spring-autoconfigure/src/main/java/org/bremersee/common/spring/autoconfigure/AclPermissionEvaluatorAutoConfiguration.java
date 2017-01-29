@@ -45,7 +45,7 @@ import javax.annotation.PostConstruct;
 @Configuration
 @ConditionalOnClass(name = {
         "org.springframework.security.acls.jdbc.JdbcMutableAclService",
-        "org.bremersee.common.acl.domain.jpa.entity.AclClass"})
+        "org.bremersee.common.security.acls.domain.jpa.entity.AclClass"})
 @EnableConfigurationProperties(AclProperties.class)
 public class AclPermissionEvaluatorAutoConfiguration {
 

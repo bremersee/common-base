@@ -9,6 +9,10 @@
     <description>Bremersee Common</description>
     <url>http://bremersee.github.io/common/</url>
 
+    <prerequisites>
+        <maven>3.0.2</maven>
+    </prerequisites>
+
     <properties>
         <github.global.server>github</github.global.server>
         <java.version>1.8</java.version>
@@ -61,10 +65,6 @@
         </snapshotRepository>
     </distributionManagement>
 
-    <prerequisites>
-        <maven>3.2.1</maven>
-    </prerequisites>
-
     <build>
         <pluginManagement>
             <plugins>
@@ -87,8 +87,9 @@
                 <module>bremersee-common-dependencies</module>
                 <module>bremersee-common-parent</module>
                 <module>bremersee-common-api</module>
-                <module>bremersee-common-data-jpa</module>
                 <module>bremersee-common-spring</module>
+                <module>bremersee-common-spring-data-jpa</module>
+                <module>bremersee-common-spring-data-mongodb</module>
                 <module>bremersee-common-spring-acl</module>
                 <module>bremersee-common-spring-autoconfigure</module>
                 <module>bremersee-common-spring-boot-starter</module>

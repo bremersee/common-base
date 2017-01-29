@@ -18,20 +18,20 @@ package org.bremersee.common.exception;
 
 /**
  * @author Christian Bremer
- *
  */
+@SuppressWarnings("SameParameterValue")
 public class BadRequestException extends IllegalArgumentException
         implements StatusCodeAwareException {
 
     private static final long serialVersionUID = 1L;
-    
+
     /**
      * Constructs a new runtime exception with {@code null} as its detail
      * message. The cause is not initialized, and may subsequently be
      * initialized by a call to {@link #initCause}.
      */
     public BadRequestException() {
-        this(StatusCode.BAD_REQUEST.getDefaultMessage());
+        this(Exceptions.BAD_REQUEST.getDefaultMessage());
     }
 
     /**
@@ -39,9 +39,8 @@ public class BadRequestException extends IllegalArgumentException
      * cause is not initialized, and may subsequently be initialized by a call
      * to {@link #initCause}.
      *
-     * @param message
-     *            the detail message. The detail message is saved for later
-     *            retrieval by the {@link #getMessage()} method.
+     * @param message the detail message. The detail message is saved for later
+     *                retrieval by the {@link #getMessage()} method.
      */
     public BadRequestException(String message) {
         super(message);
@@ -54,15 +53,14 @@ public class BadRequestException extends IllegalArgumentException
      * constructor is useful for runtime exceptions that are little more than
      * wrappers for other throwables.
      *
-     * @param cause
-     *            the cause (which is saved for later retrieval by the
-     *            {@link #getCause()} method). (A <tt>null</tt> value is
-     *            permitted, and indicates that the cause is nonexistent or
-     *            unknown.)
+     * @param cause the cause (which is saved for later retrieval by the
+     *              {@link #getCause()} method). (A <tt>null</tt> value is
+     *              permitted, and indicates that the cause is nonexistent or
+     *              unknown.)
      * @since 1.4
      */
     public BadRequestException(Throwable cause) {
-        super(StatusCode.BAD_REQUEST.getDefaultMessage(), cause);
+        super(Exceptions.BAD_REQUEST.getDefaultMessage(), cause);
     }
 
     /**
@@ -72,14 +70,12 @@ public class BadRequestException extends IllegalArgumentException
      * Note that the detail message associated with {@code cause} is <i>not</i>
      * automatically incorporated in this runtime exception's detail message.
      *
-     * @param message
-     *            the detail message (which is saved for later retrieval by the
-     *            {@link #getMessage()} method).
-     * @param cause
-     *            the cause (which is saved for later retrieval by the
-     *            {@link #getCause()} method). (A <tt>null</tt> value is
-     *            permitted, and indicates that the cause is nonexistent or
-     *            unknown.)
+     * @param message the detail message (which is saved for later retrieval by the
+     *                {@link #getMessage()} method).
+     * @param cause   the cause (which is saved for later retrieval by the
+     *                {@link #getCause()} method). (A <tt>null</tt> value is
+     *                permitted, and indicates that the cause is nonexistent or
+     *                unknown.)
      * @since 1.4
      */
     public BadRequestException(String message, Throwable cause) {
@@ -87,8 +83,13 @@ public class BadRequestException extends IllegalArgumentException
     }
 
     @Override
-    public int getStatusCode() {
-        return StatusCode.BAD_REQUEST.getStatusCodeValue();
+    public int getHttpStatusCode() {
+        return Exceptions.BAD_REQUEST.getHttpStatusCode();
+    }
+
+    @Override
+    public int getCustomStatusCode() {
+        return Exceptions.BAD_REQUEST.getCustomStatusCode();
     }
 
     @SuppressWarnings("ConstantConditions")

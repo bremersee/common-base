@@ -21,7 +21,6 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import com.googlecode.jmapper.annotations.JMap;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.*;
@@ -66,61 +65,51 @@ public class AddressDto extends AbstractBaseDto {
     @XmlElement(name = "streetAddress")
     @JsonProperty(value = "streetAddress")
     @ApiModelProperty(value = "The name of the street.")
-    @JMap
     private String streetAddress; // google: route, street_number (long_name / short_name)
 
     @XmlElement(name = "streetNumber")
     @JsonProperty(value = "streetNumber")
     @ApiModelProperty(value = "The number of the building.")
-    @JMap
     private String streetNumber;
 
     @XmlElement(name = "postalCode")
     @JsonProperty(value = "postalCode")
     @ApiModelProperty(value = "The postal code of the city.")
-    @JMap
     private String postalCode; // google: postal_code (long_name / short_name)
 
     @XmlElement(name = "city")
     @JsonProperty(value = "city")
     @ApiModelProperty(value = "The name of the city.")
-    @JMap
     private String city; // google: locality (long_name / short_name)
 
     @XmlElement(name = "cityCode")
     @JsonProperty(value = "cityCode")
     @ApiModelProperty(value = "The short name of the city.")
-    @JMap
     private String cityCode; // google: locality (long_name / short_name)
 
     @XmlElement(name = "sublocality")
     @JsonProperty(value = "sublocality")
     @ApiModelProperty(value = "The name of the sublocality.")
-    @JMap
     private String sublocality; // (eg Eixe) (long_name / short_name)
 
     @XmlElement(name = "state")
     @JsonProperty(value = "state")
     @ApiModelProperty(value = "The name of the state.")
-    @JMap
     private String state; // google: administrative_area_level_1 (long_name / short_name)
 
     @XmlElement(name = "stateCode")
     @JsonProperty(value = "stateCode")
     @ApiModelProperty(value = "The short name of the state.")
-    @JMap
     private String stateCode; // google: administrative_area_level_1 (long_name / short_name)
 
     @XmlElement(name = "country")
     @JsonProperty(value = "country")
     @ApiModelProperty(value = "The name of the country.")
-    @JMap
     private String country; // google: country (long_name / short_name)
 
     @XmlElement(name = "countryCode")
     @JsonProperty(value = "countryCode")
     @ApiModelProperty(value = "The short name of the country.")
-    @JMap
     private String countryCode; // google: country (long_name / short_name)
 
     // google: "formatted_address" : "Hauptstraße 26, 31228 Peine, Deutschland"

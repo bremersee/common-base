@@ -16,8 +16,12 @@
 
 package org.bremersee.common.spring.autoconfigure;
 
+import java.util.Arrays;
+import java.util.function.IntFunction;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
+import org.springframework.beans.PropertyAccessorUtils;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.util.StringUtils;
 
@@ -238,7 +242,8 @@ public class LdaptiveInMemoryDirectoryServerProperties {
 
     public String[] getSchemaLocationsAsArray() {
         if (StringUtils.hasText(schemaLocations)) {
-            return schemaLocations.split(Pattern.quote(","));
+            String[] values = schemaLocations.split(Pattern.quote(","));
+            return Arrays.stream(values).map(String::trim).toArray(size -> new String[size]);
         }
         return new String[0];
     }
@@ -253,7 +258,8 @@ public class LdaptiveInMemoryDirectoryServerProperties {
 
     public String[] getLdifLocationsAsArray() {
         if (StringUtils.hasText(ldifLocations)) {
-            return ldifLocations.split(Pattern.quote(","));
+            String[] values = ldifLocations.split(Pattern.quote(","));
+            return Arrays.stream(values).map(String::trim).toArray(size -> new String[size]);
         }
         return new String[0];
     }

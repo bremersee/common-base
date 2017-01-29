@@ -21,8 +21,6 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import com.googlecode.jmapper.annotations.JMap;
-import com.googlecode.jmapper.annotations.JMapConversion;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -33,6 +31,7 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlType;
 import java.io.Serializable;
+import java.util.Date;
 
 /**
  * A common base model object.
@@ -54,24 +53,16 @@ public abstract class AbstractBaseDto implements Serializable {
     @XmlAttribute(name = "id")
     @JsonProperty(value = "id")
     @ApiModelProperty(name = "id", value = "The database ID.")
-    @JMap(value = "dbId", attributes = {"id", "dbId"})
-    private String dbId;
+    private String id;
 
     @XmlAttribute(name = "created")
     @JsonProperty(value = "created")
     @ApiModelProperty("The created timestamp (in millis).")
-    @JMap
-    private Long created;
+    private Date created;
 
     @XmlAttribute(name = "modified")
     @JsonProperty(value = "modified")
     @ApiModelProperty("The last modified timestamp (in millis).")
-    @JMap
-    private Long modified;
-
-    @JMapConversion(from = "id", to = "dbId")
-    public static String toDbId(Serializable destination, Serializable source) {
-        return source == null ? null : source.toString();
-    }
+    private Date modified;
 
 }
