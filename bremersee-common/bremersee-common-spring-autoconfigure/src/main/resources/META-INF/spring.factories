@@ -13,6 +13,5 @@ org.bremersee.common.spring.autoconfigure.PageBuilderAutoConfiguration,\
 org.bremersee.common.spring.autoconfigure.SchedulingAutoConfiguration,\
 org.bremersee.common.spring.autoconfigure.SecurityAutoConfiguration,\
 org.bremersee.common.spring.autoconfigure.SmsServiceAutoConfiguration,\
-org.bremersee.common.spring.autoconfigure.SwaggerAutoConfiguration,\
 org.bremersee.common.spring.autoconfigure.TomcatAutoConfiguration,\
 org.bremersee.common.spring.autoconfigure.WebMvcConfiguration

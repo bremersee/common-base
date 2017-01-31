@@ -46,7 +46,7 @@ public class AclObjectIdentity implements Serializable {
     @JoinColumn(name = "object_id_class", nullable = false)
     private AclClass objectIdClass;
 
-    @Column(name = "object_id_identity", nullable = false, length = 32)
+    @Column(name = "object_id_identity", nullable = false)
     private String objectIdIdentity;
 //    private Long objectIdIdentity; // NOSONAR
 

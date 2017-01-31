@@ -14,18 +14,28 @@
  * limitations under the License.
  */
 
-package org.bremersee.common.swagger.test;
+package org.bremersee.common.spring.autoconfigure;
 
-import org.junit.Test;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author Christian Bremer
  */
-public class SwaggerApplicationTests {
+@ConfigurationProperties("bremersee.web-mvc")
+@Data
+@NoArgsConstructor
+public class WebMvcProperties {
 
-    @Test
-    public void testSomething() {
-
-    }
-
+	private ErrorMessageDetails errorMessageType = ErrorMessageDetails.FULL;
+	
+	private Map<String, ErrorMessageDetails> errorMessageDetailsHandlerMap = new HashMap<>();
+	
+	public enum ErrorMessageDetails {
+		LIGHTWEIGHT, FULL;
+	}
 }

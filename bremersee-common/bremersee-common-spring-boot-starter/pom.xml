@@ -63,6 +63,5 @@
         <module>bremersee-common-spring-boot-starter-data-mongodb</module>
         <module>bremersee-common-spring-boot-starter-tomcat</module>
         <module>bremersee-common-spring-boot-starter-tomcat-jersey</module>
-        <module>bremersee-common-spring-boot-starter-swagger</module>
     </modules>
 </project>

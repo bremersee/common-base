@@ -40,7 +40,6 @@ import javax.annotation.PostConstruct;
 
 /**
  * @author Christian Bremer
- *
  */
 @Configuration
 @ConditionalOnClass(name = {
@@ -78,10 +77,13 @@ public class AclPermissionEvaluatorAutoConfiguration {
     @Autowired(required = false)
     PermissionCacheOptimizer permissionCacheOptimizer;
 
+    @Autowired(required = false)
+    MethodSecurityExpressionHandler methodSecurityExpressionHandler;
+
     @PostConstruct
     public void init() {
         // @formatter:off
-        LOG.info("\n"
+        LOG.info("\n" // NOSONAR
                 + "**********************************************************************\n"
                 + "*  ACL Permission Evaluator Auto Configuration                       *\n"
                 + "**********************************************************************\n"
@@ -93,8 +95,61 @@ public class AclPermissionEvaluatorAutoConfiguration {
                 + "* - trustResolver = " + trustResolver + "\n"
                 + "* - parameterNameDiscoverer = " + parameterNameDiscoverer + "\n"
                 + "* - permissionCacheOptimizer = " + permissionCacheOptimizer + "\n"
+                + "* - methodSecurityExpressionHandler = " + methodSecurityExpressionHandler + "\n"
                 + "**********************************************************************");
         // @formatter:on
+        if (methodSecurityExpressionHandler instanceof DefaultMethodSecurityExpressionHandler) {
+            DefaultMethodSecurityExpressionHandler expressionHandler = (DefaultMethodSecurityExpressionHandler)
+                    methodSecurityExpressionHandler;
+            expressionHandler.setPermissionEvaluator(permissionEvaluator());
+            expressionHandler.setDefaultRolePrefix(aclProperties.getDefaultRolePrefix());
+            expressionHandler.setParameterNameDiscoverer(parameterNameDiscoverer);
+            expressionHandler.setTrustResolver(trustResolver);
+            expressionHandler.setPermissionCacheOptimizer(permissionCacheOptimizer);
+        } else {
+            StringBuilder logMsgBuilder = new StringBuilder();
+            logMsgBuilder.append("######################################################################\n");
+            if (methodSecurityExpressionHandler == null) {
+                logMsgBuilder.append("# The Method Security Expression Handler is NULL.                    #\n");
+            } else {
+                logMsgBuilder.append("# The Method Security Expression Handler is NOT an instance of       #\n");
+                logMsgBuilder.append("# DefaultMethodSecurityExpressionHandler.                            #\n");
+            }
+            logMsgBuilder.append("#                                                                    #\n"); // NOSONAR
+            logMsgBuilder.append("# The beans of the ACL configuration cannot be applied to it.        #\n");
+            logMsgBuilder.append("# Security method expressions like                                   #\n");
+            logMsgBuilder.append("# hasPermission(#name, 'Role', 'write') won't work.                  #\n");
+            logMsgBuilder.append("#                                                                    #\n");
+            logMsgBuilder.append("# Please provide a configuration like this:                          #\n");
+            logMsgBuilder.append("#                                                                    #\n");
+            logMsgBuilder.append("# @Configuration                                                     #\n");
+            logMsgBuilder.append("# @EnableGlobalMethodSecurity(prePostEnabled = true, ...)            #\n");
+            logMsgBuilder.append("# public class MethodSecurityConfig                                  #\n");
+            logMsgBuilder.append("#              extends GlobalMethodSecurityConfiguration {           #\n");
+            logMsgBuilder.append("#                                                                    #\n");
+            logMsgBuilder.append("#     final DefaultMethodSecurityExpressionHandler handler =         #\n");
+            logMsgBuilder.append("#         new DefaultMethodSecurityExpressionHandler();              #\n");
+            logMsgBuilder.append("#         // or new OAuth2MethodSecurityExpressionHandler()          #\n");
+            logMsgBuilder.append("#         // if you want to use security annotation like this:       #\n");
+            logMsgBuilder.append("#         // @PreAuthorize(\"#oauth2.hasScope('requiredScope')\")      #\n");
+            logMsgBuilder.append("#                                                                    #\n");
+            logMsgBuilder.append("#     @Override                                                      #\n");
+            logMsgBuilder.append("#     MethodSecurityExpressionHandler createExpressionHandler() {    #\n");
+            logMsgBuilder.append("#         return handler();                                          #\n");
+            logMsgBuilder.append("#     }                                                              #\n");
+            logMsgBuilder.append("#                                                                    #\n");
+            logMsgBuilder.append("#     @Bean(\"methodSecurityExpressionHandler\")                     #\n");
+            logMsgBuilder.append("#     MethodSecurityExpressionHandler handler() {                    #\n");
+            logMsgBuilder.append("#         return handler;                                            #\n");
+            logMsgBuilder.append("#     }                                                              #\n");
+            logMsgBuilder.append("# }                                                                  #\n");
+            logMsgBuilder.append("#                                                                    #\n");
+            logMsgBuilder.append("######################################################################");
+
+            if (LOG.isWarnEnabled()) {
+                LOG.warn(logMsgBuilder.toString());
+            }
+        }
     }
 
     @Bean
@@ -107,15 +162,16 @@ public class AclPermissionEvaluatorAutoConfiguration {
         return evaluator;
     }
 
-    @Bean
-    public MethodSecurityExpressionHandler createExpressionHandler() {
-        final DefaultMethodSecurityExpressionHandler expressionHandler = new DefaultMethodSecurityExpressionHandler();
-        expressionHandler.setPermissionEvaluator(permissionEvaluator());
-        expressionHandler.setDefaultRolePrefix(aclProperties.getDefaultRolePrefix());
-        expressionHandler.setParameterNameDiscoverer(parameterNameDiscoverer);
-        expressionHandler.setTrustResolver(trustResolver);
-        expressionHandler.setPermissionCacheOptimizer(permissionCacheOptimizer);
-        return expressionHandler;
-    }
+//    @Bean                                                                                  // NOSONAR
+//    public MethodSecurityExpressionHandler createExpressionHandler() {                     // NOSONAR
+//        final DefaultMethodSecurityExpressionHandler expressionHandler =                   // NOSONAR
+//                new DefaultMethodSecurityExpressionHandler();                              // NOSONAR
+//        expressionHandler.setPermissionEvaluator(permissionEvaluator());                   // NOSONAR
+//        expressionHandler.setDefaultRolePrefix(aclProperties.getDefaultRolePrefix());      // NOSONAR
+//        expressionHandler.setParameterNameDiscoverer(parameterNameDiscoverer);             // NOSONAR
+//        expressionHandler.setTrustResolver(trustResolver);                                 // NOSONAR
+//        expressionHandler.setPermissionCacheOptimizer(permissionCacheOptimizer);           // NOSONAR
+//        return expressionHandler;                                                          // NOSONAR
+//    }                                                                                      // NOSONAR
 
 }
