@@ -23,6 +23,18 @@ import java.io.Serializable;
  */
 public interface RoleNameService {
 
+    @SuppressWarnings("PointlessBitwiseExpression")
+    int NORMAL_ROLE_MASK_VALUE = 1 << 0;
+
+    int FRIENDS_ROLE_MASK_VALUE = 1 << 1;
+
+    int CUSTOM_ROLE_MASK_VALUE = 1 << 2;
+
+    int OWNER_ROLE_MASK_VALUE = 1 << 3;
+
+    int MANAGER_ROLE_MASK_VALUE = 1 << 4;
+
+
     String USER_PLACE_HOLDER = "{user}";
 
     String CUSTOM_ROLE_PREFIX = "ROLE_CUSTOM_OF_";
