@@ -24,7 +24,6 @@ import java.io.Serializable;
 
 /**
  * @author Christian Bremer
- *
  */
 @Entity
 @Table(name = "acl_entry")
@@ -33,32 +32,32 @@ import java.io.Serializable;
 public class AclEntry implements Serializable {
 
     private static final long serialVersionUID = 1L;
-    
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id", nullable = false)
     private Long id;
-    
+
     @ManyToOne
     @JoinColumn(name = "acl_object_identity", nullable = false)
     private AclObjectIdentity aclObjectIdentity;
-    
+
     @Column(name = "ace_order", nullable = false)
     private int aceOrder;
-    
+
     @ManyToOne
     @JoinColumn(name = "sid", nullable = false)
     private AclSid sid;
-    
+
     @Column(name = "mask", nullable = false)
     private int mask;
-    
+
     @Column(name = "granting", nullable = false)
     private boolean granting;
-    
+
     @Column(name = "audit_success", nullable = false)
     private boolean auditSuccess;
-    
+
     @Column(name = "audit_failure", nullable = false)
     private boolean auditFailure;
 

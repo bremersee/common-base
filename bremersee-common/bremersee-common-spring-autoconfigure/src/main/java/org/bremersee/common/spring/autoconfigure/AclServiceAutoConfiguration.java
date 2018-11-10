@@ -67,7 +67,7 @@ public class AclServiceAutoConfiguration {
     @PostConstruct
     public void init() {
         // @formatter:off
-        LOG.info("\n"
+        LOG.info("\n"                                                                               // NOSONAR
                 + "**********************************************************************\n"
                 + "*  ACL Service Auto Configuration                                    *\n"
                 + "**********************************************************************\n"

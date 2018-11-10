@@ -16,8 +16,7 @@
 
 package org.bremersee.common.domain.jpa.entity;
 
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedBy;
@@ -26,16 +25,17 @@ import org.springframework.data.domain.Persistable;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
-import java.time.ZonedDateTime;
 import java.util.Date;
 
 /**
  * @author Christian Bremer
- *
  */
 @MappedSuperclass
 @EntityListeners(AuditingEntityListener.class)
-@Data
+@Getter
+@Setter
+@EqualsAndHashCode(of = {"id"})
+@ToString
 @NoArgsConstructor
 public abstract class AbstractBaseJpa implements Persistable<Long> {
 
@@ -45,6 +45,9 @@ public abstract class AbstractBaseJpa implements Persistable<Long> {
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id", nullable = false)
     private Long id;
+
+    @org.springframework.data.annotation.Version
+    private Long version;
 
     @Column(name = "created_date")
     @CreatedDate

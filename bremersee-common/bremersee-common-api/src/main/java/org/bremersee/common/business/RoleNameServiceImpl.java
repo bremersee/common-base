@@ -16,6 +16,10 @@
 
 package org.bremersee.common.business;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
 import org.bremersee.common.exception.BadRequestException;
 import org.bremersee.utils.PasswordUtils;
@@ -25,7 +29,38 @@ import java.io.Serializable;
 /**
  * @author Christian Bremer
  */
+@NoArgsConstructor
+@AllArgsConstructor
 public class RoleNameServiceImpl implements RoleNameService {
+
+    private static final String USER_PLACE_HOLDER = "{user}";
+
+    private static final String CUSTOM_ROLE_PREFIX_TEMPLATE = CUSTOM_ROLE_PREFIX + USER_PLACE_HOLDER + "_";
+
+    private static final String ENTITY_TYPE_PLACE_HOLDER = "{entityType}";
+
+    private static final String OWNER_ROLE_PREFIX_TEMPLATE = OWNER_ROLE_PREFIX + ENTITY_TYPE_PLACE_HOLDER + "_";
+
+    private static final String MANAGER_ROLE_PREFIX_TEMPLATE = MANAGER_ROLE_PREFIX + ENTITY_TYPE_PLACE_HOLDER + "_";
+
+    @Getter
+    @Setter
+    private int minLength = 3;
+
+    @Getter
+    @Setter
+    private String rolePrefix = "ROLE_";
+
+    @Override
+    public boolean isValidNormalRoleName(final String roleName) {
+        return StringUtils.isNotBlank(roleName)
+                && roleName.startsWith(rolePrefix)
+                && roleName.length() - rolePrefix.length() >= minLength
+                && !isCustomRoleName(roleName, null)
+                && !isFriendsRoleName(roleName)
+                && !isManagerRoleName(roleName, null)
+                && !isOwnerRoleName(roleName, null);
+    }
 
     @Override
     public boolean isCustomRoleName(final String roleName, final String userName) {

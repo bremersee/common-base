@@ -16,19 +16,22 @@
 
 package org.bremersee.common.domain.mongodb.entity;
 
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.springframework.data.annotation.*;
+import org.springframework.data.domain.Auditable;
 import org.springframework.data.domain.Persistable;
+import org.springframework.data.mongodb.core.index.Indexed;
 
 import java.math.BigInteger;
 import java.util.Date;
 
 /**
  * @author Christian Bremer
- *
  */
-@Data
+@Getter
+@Setter
+@EqualsAndHashCode(of = {"id", "version"})
+@ToString
 @NoArgsConstructor
 public abstract class AbstractBaseMongo implements Persistable<BigInteger> {
 
@@ -37,10 +40,14 @@ public abstract class AbstractBaseMongo implements Persistable<BigInteger> {
     @Id
     private BigInteger id;
 
+    @Version
+    private Long version;
+
     @CreatedDate
     private Date created;
 
     @CreatedBy
+    @Indexed(sparse = true)
     private String createdBy;
 
     @LastModifiedDate

@@ -16,22 +16,23 @@
 
 package org.bremersee.common.security.acls.domain.jpa.entity;
 
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.*;
 import java.io.Serializable;
 
 /**
  * @author Christian Bremer
- *
  */
 @Entity
 @Table(name = "acl_object_identity", uniqueConstraints = {
         @UniqueConstraint(name = "acl_object_identity_uc_class_identity",
-                columnNames = { "object_id_class", "object_id_identity" })
+                columnNames = {"object_id_class", "object_id_identity"})
 })
-@Data
+@Getter
+@Setter
+@EqualsAndHashCode(of = {"objectIdClass", "objectIdIdentity"})
+@ToString
 @NoArgsConstructor
 public class AclObjectIdentity implements Serializable {
 

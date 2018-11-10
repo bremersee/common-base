@@ -63,7 +63,7 @@ public class AclCacheAutoConfiguration {
     @PostConstruct
     public void init() {
         // @formatter:off
-        LOG.info("\n"
+        LOG.info("\n" // NOSONAR
                 + "**********************************************************************\n"
                 + "*  ACL Cache Auto Configuration                                      *\n"
                 + "**********************************************************************\n"
@@ -79,6 +79,7 @@ public class AclCacheAutoConfiguration {
         final EhCacheFactoryBean factoryBean = new EhCacheFactoryBean();
         factoryBean.setName(StringUtils.isEmpty(
                 aclProperties.getAclCacheName()) ? "aclCache" : aclProperties.getAclCacheName());
+        //noinspection ConstantConditions
         if (cacheManager != null) {
             factoryBean.setCacheManager(cacheManager);
         }

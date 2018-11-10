@@ -23,36 +23,55 @@ import java.io.Serializable;
  */
 public interface RoleNameService {
 
+    /**
+     * The bit mask value of a normal role.
+     */
     @SuppressWarnings("PointlessBitwiseExpression")
     int NORMAL_ROLE_MASK_VALUE = 1 << 0;
 
+    /**
+     * The bit mask value of a friends role.
+     */
     int FRIENDS_ROLE_MASK_VALUE = 1 << 1;
 
+    /**
+     * The bit mask value of a custom role.
+     */
     int CUSTOM_ROLE_MASK_VALUE = 1 << 2;
 
+    /**
+     * The bit mask value of an owner role.
+     */
     int OWNER_ROLE_MASK_VALUE = 1 << 3;
 
+    /**
+     * The bit mask value of a manager role.
+     */
     int MANAGER_ROLE_MASK_VALUE = 1 << 4;
 
 
-    String USER_PLACE_HOLDER = "{user}";
-
+    /**
+     * The role name prefix of a custom role.
+     */
     String CUSTOM_ROLE_PREFIX = "ROLE_CUSTOM_OF_";
 
-    String CUSTOM_ROLE_PREFIX_TEMPLATE = CUSTOM_ROLE_PREFIX + USER_PLACE_HOLDER + "_";
-
+    /**
+     * The role name prefix of a friends role.
+     */
     String FRIENDS_ROLE_PREFIX = "ROLE_FRIENDS_OF_";
 
-    String ENTITY_TYPE_PLACE_HOLDER = "{entityType}";
-
+    /**
+     * The role name prefix of an owner role.
+     */
     String OWNER_ROLE_PREFIX = "ROLE_OWNER_OF_";
 
-    String OWNER_ROLE_PREFIX_TEMPLATE = OWNER_ROLE_PREFIX + ENTITY_TYPE_PLACE_HOLDER + "_";
-
+    /**
+     * The role name prefix of a manager role.
+     */
     String MANAGER_ROLE_PREFIX = "ROLE_MANAGER_OF_";
 
-    String MANAGER_ROLE_PREFIX_TEMPLATE = MANAGER_ROLE_PREFIX + ENTITY_TYPE_PLACE_HOLDER + "_";
 
+    boolean isValidNormalRoleName(String roleName);
 
     boolean isCustomRoleName(String roleName, String userName);
 

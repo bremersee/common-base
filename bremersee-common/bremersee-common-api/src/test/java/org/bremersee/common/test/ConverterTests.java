@@ -16,15 +16,9 @@
 
 package org.bremersee.common.test;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import junit.framework.TestCase;
-import org.bremersee.common.converter.ConverterUtils;
 import org.bremersee.common.converter.ObjectMapperUtils;
+import org.junit.Assert;
 import org.junit.Test;
-
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
-import java.util.Date;
 
 /**
  * @author Christian Bremer
@@ -32,22 +26,8 @@ import java.util.Date;
 public class ConverterTests {
 
     @Test
-    public void testCreateDefaultObjectMapper() {
-        System.out.println("Testing creation of default JSON object mapper ...");
-        ObjectMapper om = ObjectMapperUtils.createDefaultObjectMapper();
-        TestCase.assertNotNull(om);
-        System.out.println("Testing creation of default JSON object mapper ... DONE");
-    }
-
-    @Test
-    public void testDateTomeConverting() {
-        System.out.println("Testing date time converting ...");
-        final long ct = System.currentTimeMillis();
-        final Date date = new Date(ct);
-        final ZonedDateTime zonedDateTime = ZonedDateTime.ofInstant(date.toInstant(), ZoneId.systemDefault());
-        TestCase.assertEquals(zonedDateTime, ConverterUtils.mapToZonedDateTime(date));
-        TestCase.assertEquals(date, ConverterUtils.mapToDate(zonedDateTime));
-        System.out.println("Testing date time converting ... DONE!");
+    public void testCreateDefaultObjectMapperNonNull() {
+        Assert.assertNotNull(ObjectMapperUtils.createDefaultObjectMapper());
     }
 
 }

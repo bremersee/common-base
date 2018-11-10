@@ -225,7 +225,7 @@ public abstract class ExceptionRegistry {
     }
 
     /**
-     * Get a registered runtime exception by the specified class name.<br/>
+     * Get a registered runtime exception by the specified class name.
      * If there's no registered exception with the specified class name, a plain runtime exception will be returned.
      *
      * @param exceptionClassName the class name of the runtime exception
@@ -236,7 +236,7 @@ public abstract class ExceptionRegistry {
     }
 
     /**
-     * Get a registered runtime exception by the specified class name.<br/>
+     * Get a registered runtime exception by the specified class name.
      * If there's no registered exception with the specified class name, a plain runtime exception will be returned.
      *
      * @param exceptionClassName the class name of the runtime exception
@@ -262,7 +262,7 @@ public abstract class ExceptionRegistry {
     }
 
     /**
-     * Get a registered runtime exception by the specified class.<br/>
+     * Get a registered runtime exception by the specified class.
      * If there's no registered exception with the specified class, a plain runtime exception will be returned.
      *
      * @param exceptionClass the class of the runtime exception
@@ -273,7 +273,7 @@ public abstract class ExceptionRegistry {
     }
 
     /**
-     * Get a registered runtime exception by the specified class.<br/>
+     * Get a registered runtime exception by the specified class.
      * If there's no registered exception with the specified class, a plain runtime exception will be returned.
      *
      * @param exceptionClass the class of the runtime exception
@@ -295,7 +295,7 @@ public abstract class ExceptionRegistry {
     }
 
     /**
-     * Get a registered runtime exception by it's custom status code.<br/>
+     * Get a registered runtime exception by it's custom status code.
      * If there's no registered exception with the specified status code, a plain {@link HttpErrorException} will be
      * returned.
      *
@@ -307,7 +307,7 @@ public abstract class ExceptionRegistry {
     }
 
     /**
-     * Get a registered runtime exception by it's custom status code.<br/>
+     * Get a registered runtime exception by it's custom status code.
      * If there's no registered exception with the specified status code, a plain {@link HttpErrorException} will be
      * returned.
      *
@@ -337,9 +337,9 @@ public abstract class ExceptionRegistry {
     }
 
     /**
-     * Get a registered runtime exception by it's HTTP status code.<br/>
+     * Get a registered runtime exception by it's HTTP status code.
      * If there's more than one exception with the specified status code, the one with the lowest custom status code
-     * will be returned.<br/>
+     * will be returned.
      * If there's no registered exception with the specified status code, a plain {@link HttpErrorException} will be
      * returned.
      *
@@ -351,9 +351,9 @@ public abstract class ExceptionRegistry {
     }
 
     /**
-     * Get a registered runtime exception by it's HTTP status code.<br/>
+     * Get a registered runtime exception by it's HTTP status code.
      * If there's more than one exception with the specified status code, the one with the lowest custom status code
-     * will be returned.<br/>
+     * will be returned.
      * If there's no registered exception with the specified status code, a plain {@link HttpErrorException} will be
      * returned.
      *
@@ -383,7 +383,7 @@ public abstract class ExceptionRegistry {
     }
 
     /**
-     * Get a runtime exception from the specified {@link ThrowableMessageDto} or {@link ThrowableDto}.<br/>
+     * Get a runtime exception from the specified {@link ThrowableMessageDto} or {@link ThrowableDto}.
      * The {@link ThrowableMessageDto} or {@link ThrowableDto} can be returned by a (rest) server.
      * Use this method to obtain the original runtime exception.
      *
@@ -401,7 +401,7 @@ public abstract class ExceptionRegistry {
     }
 
     /**
-     * Get a throwable from the specified {@link ThrowableMessageDto} or {@link ThrowableDto}.<br/>
+     * Get a throwable from the specified {@link ThrowableMessageDto} or {@link ThrowableDto}.
      * The {@link ThrowableMessageDto} or {@link ThrowableDto} can be returned by a (rest) server.
      * Use this method to obtain the original throwable.
      *

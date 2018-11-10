@@ -39,20 +39,19 @@ import java.util.Map;
 
 /**
  * @author Christian Bremer
- *
  */
-@EqualsAndHashCode(callSuper = true)
+@EqualsAndHashCode(callSuper = true, exclude = {"extensions", "extensionsStr"})
 @ToString(callSuper = true)
 @NoArgsConstructor
 @MappedSuperclass
 public abstract class AbstractBaseJpaWithExtensions extends AbstractBaseJpa {
-    
+
     private static final long serialVersionUID = 1L;
-    
+
     private static final JAXBContext jaxbContext;
-    
+
     private static final ObjectMapper om;
-    
+
     @SuppressWarnings("ValidExternallyBoundObject")
     @XmlAccessorType(XmlAccessType.FIELD)
     @XmlRootElement(name = "extensionsWrapper")
@@ -63,7 +62,7 @@ public abstract class AbstractBaseJpaWithExtensions extends AbstractBaseJpa {
     protected static class ExtensionsWrapper {
         private Map<String, Object> extensions = new LinkedHashMap<>();
     }
-    
+
     static {
         om = new ObjectMapper();
         AnnotationIntrospector primary = new JacksonAnnotationIntrospector();
@@ -76,37 +75,38 @@ public abstract class AbstractBaseJpaWithExtensions extends AbstractBaseJpa {
             throw new InternalServerError("Creating JAXBContext failed.", e);
         }
     }
-    
+
     @Basic
     @Lob
     @Column(name = "ext_str", length = 8000000)
     private String extensionsStr;
-    
+
     @Transient
     private Map<String, Object> extensions = new LinkedHashMap<>(); // NOSONAR
 
-    @PrePersist @PreUpdate
+    @PrePersist
+    @PreUpdate
     protected void prePersistOrUpdateExtensions() {
         if (extensions == null || extensions.isEmpty()) {
             this.extensionsStr = null;
         } else {
             try {
                 om.writeValueAsString(extensions);
-                
+
             } catch (Exception e) {
-                
+
                 try {
                     StringWriter sw = new StringWriter();
                     jaxbContext.createMarshaller().marshal(new ExtensionsWrapper(extensions), sw);
                     extensionsStr = sw.toString();
-                    
+
                 } catch (Exception e0) { // NOSONAR
                     throw new InternalServerError("Creating extension string failed.", e);
                 }
             }
         }
     }
-    
+
     @SuppressWarnings("unchecked")
     @PostLoad
     protected void postLoadExtensions() {

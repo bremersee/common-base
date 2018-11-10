@@ -21,8 +21,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.xml.bind.annotation.*;
 import java.util.ArrayList;
@@ -43,7 +42,10 @@ import java.util.List;
         description = "A full described error message.",
         discriminator = "@class",
         parent = ThrowableMessageDto.class)
-@Data
+@Getter
+@Setter
+@EqualsAndHashCode(callSuper = true)
+@ToString(callSuper = true)
 @NoArgsConstructor
 //@formatter:on
 public class ThrowableDto extends ThrowableMessageDto {

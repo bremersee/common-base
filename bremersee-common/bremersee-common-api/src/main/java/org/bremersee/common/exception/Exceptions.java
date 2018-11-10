@@ -173,6 +173,10 @@ enum Exceptions {
 
     ALREADY_EXISTS(AlreadyExistsException.class, 40630, 400, "Object already exists."),
 
+    USER_ALREADY_EXISTS(UserAlreadyExistsException.class, 40631, 400, "User already exists."),
+
+    EMAIL_ALREADY_EXISTS(EmailAlreadyExistsException.class, 40632, 400, "Email already exists."),
+
 
     INTERNAL_SERVER_ERROR(InternalServerError.class, 50500, 500, "Internal Server Error"),
 

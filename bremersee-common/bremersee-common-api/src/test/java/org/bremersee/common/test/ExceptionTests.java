@@ -16,20 +16,22 @@
 
 package org.bremersee.common.test;
 
-import junit.framework.TestCase;
+import lombok.extern.slf4j.Slf4j;
 import org.bremersee.common.exception.ExceptionRegistry;
+import org.junit.Assert;
 import org.junit.Test;
 
 /**
  * @author Christian Bremer
  */
+@Slf4j
 public class ExceptionTests {
 
     @Test
     public void testExceptionRegistry() {
-        System.out.println("Testing exception registry ...");
+        log.info("Testing exception registry ...");
         boolean exists = ExceptionRegistry.existsByHttpStatusCode(404);
-        TestCase.assertEquals(true, exists);
-        System.out.println("Testing exception registry ... DONE!");
+        Assert.assertEquals(true, exists);
+        log.info("Testing exception registry ... DONE!");
     }
 }

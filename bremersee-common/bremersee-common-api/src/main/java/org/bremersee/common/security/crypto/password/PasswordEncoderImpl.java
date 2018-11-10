@@ -40,7 +40,7 @@ public class PasswordEncoderImpl implements PasswordEncoder {
 
     private static final String NO_ENCRYPTION = "clear";
 
-    private static final String BOUNCY_CASTLER_PROVIDER = "org.bouncycastle.jce.provider.BouncyCastleProvider";
+    private static final String BOUNCY_CASTLE_PROVIDER = "org.bouncycastle.jce.provider.BouncyCastleProvider";
 
     protected final Logger log = LoggerFactory.getLogger(getClass());
 
@@ -54,6 +54,8 @@ public class PasswordEncoderImpl implements PasswordEncoder {
     private int randomSaltLength = 4;
 
     private String algorithm = "SSHA";
+
+    private boolean storeNoEncryptionFlag = false;
 
     private Provider bouncyCastleProvider;
 
@@ -132,7 +134,7 @@ public class PasswordEncoderImpl implements PasswordEncoder {
         log.info("Initializing " + getClass().getSimpleName() + " ...");
         if (bouncyCastleProvider == null) {
             try {
-                bouncyCastleProvider = (Provider) Class.forName(BOUNCY_CASTLER_PROVIDER).newInstance();
+                bouncyCastleProvider = (Provider) Class.forName(BOUNCY_CASTLE_PROVIDER).newInstance();
             } catch (Exception e) { // NOSONAR
                 log.warn("BouncyCastleProvider is not available - some methods won't work!");
             }
@@ -147,7 +149,7 @@ public class PasswordEncoderImpl implements PasswordEncoder {
                 throw new IllegalArgumentException("Algorithm [" + algorithm + "] is not supported.");
             }
 
-            log.info("algorithm = " + algorithm);
+            log.info("algorithm = {}", algorithm);
         } else {
             log.warn("No encryption algorithm is specified. Passwords won't be encrypted! " +
                     "It is better to set algorithm to 'SSHA'.");
@@ -174,7 +176,7 @@ public class PasswordEncoderImpl implements PasswordEncoder {
     protected Provider getBouncyCastleProvider() {
         if (bouncyCastleProvider == null) {
             try {
-                bouncyCastleProvider = (Provider) Class.forName(BOUNCY_CASTLER_PROVIDER).newInstance();
+                bouncyCastleProvider = (Provider) Class.forName(BOUNCY_CASTLE_PROVIDER).newInstance();
             } catch (Exception e) {
                 throw new UnsupportedOperationException(e);
             }
@@ -184,6 +186,14 @@ public class PasswordEncoderImpl implements PasswordEncoder {
 
     public void setBouncyCastleProvider(final Provider bouncyCastleProvider) {
         this.bouncyCastleProvider = bouncyCastleProvider;
+    }
+
+    protected boolean isStoreNoEncryptionFlag() {
+        return storeNoEncryptionFlag;
+    }
+
+    public void setStoreNoEncryptionFlag(boolean storeNoEncryptionFlag) {
+        this.storeNoEncryptionFlag = storeNoEncryptionFlag;
     }
 
     @Override
@@ -318,7 +328,7 @@ public class PasswordEncoderImpl implements PasswordEncoder {
             }
 
             final boolean result = MessageDigest.isEqual(hash, pwhash);
-            log.debug("Password matches? " + result);
+            log.debug("Password matches? {}", result);
             return result;
         }
 
@@ -334,7 +344,8 @@ public class PasswordEncoderImpl implements PasswordEncoder {
         }
 
         if (NO_ENCRYPTION.equalsIgnoreCase(algorithm)) {
-            return CodingUtils.toBytesSilently(clearPassword, StandardCharsets.UTF_8);
+            final String flag = isStoreNoEncryptionFlag() ? "{" + NO_ENCRYPTION + "}" : "";
+            return CodingUtils.toBytesSilently(flag + clearPassword, StandardCharsets.UTF_8);
         }
 
         final MessageDigest md = getMessageDigest(algorithm);
@@ -506,7 +517,7 @@ public class PasswordEncoderImpl implements PasswordEncoder {
      * </p>
      * <p>
      * Notice that Java bytes are always signed, but the cryptographic
-     * algorithms rely on unsigned ones, that can be simulated in this way.<br>
+     * algorithms rely on unsigned ones, that can be simulated in this way.
      * A bit mask is employed to prevent that the signum bit is extended to
      * MSBs.
      * </p>

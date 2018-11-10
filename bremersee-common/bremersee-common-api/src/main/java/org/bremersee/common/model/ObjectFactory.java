@@ -34,6 +34,10 @@ public class ObjectFactory {
         return new BooleanDto();
     }
 
+    public SelectOptionDto createSelectOptionDto() {
+        return new SelectOptionDto();
+    }
+
     public StringListDto createStringListDto() {
         return new StringListDto();
     }

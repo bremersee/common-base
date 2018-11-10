@@ -23,8 +23,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -44,7 +43,10 @@ import java.util.Date;
 @JsonInclude(Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonPropertyOrder(alphabetic = true)
-@Data
+@Getter
+@Setter
+@EqualsAndHashCode(of = { "id" })
+@ToString
 @NoArgsConstructor
 public abstract class AbstractBaseDto implements Serializable {
 
@@ -57,12 +59,22 @@ public abstract class AbstractBaseDto implements Serializable {
 
     @XmlAttribute(name = "created")
     @JsonProperty(value = "created")
-    @ApiModelProperty("The created timestamp (in millis).")
+    @ApiModelProperty("The created timestamp.")
     private Date created;
+
+    @XmlAttribute(name = "createdBy")
+    @JsonProperty(value = "createdBy")
+    @ApiModelProperty("The creator's name.")
+    private String createdBy;
 
     @XmlAttribute(name = "modified")
     @JsonProperty(value = "modified")
     @ApiModelProperty("The last modified timestamp (in millis).")
     private Date modified;
+
+    @XmlAttribute(name = "modifiedBy")
+    @JsonProperty(value = "modifiedBy")
+    @ApiModelProperty("The modifier's name.")
+    private String modifiedBy;
 
 }

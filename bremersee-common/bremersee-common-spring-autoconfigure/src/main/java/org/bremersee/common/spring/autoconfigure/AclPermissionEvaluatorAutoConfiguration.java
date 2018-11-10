@@ -109,6 +109,7 @@ public class AclPermissionEvaluatorAutoConfiguration {
         } else {
             StringBuilder logMsgBuilder = new StringBuilder();
             logMsgBuilder.append("######################################################################\n");
+            //noinspection ConstantConditions
             if (methodSecurityExpressionHandler == null) {
                 logMsgBuilder.append("# The Method Security Expression Handler is NULL.                    #\n");
             } else {

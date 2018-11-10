@@ -7,7 +7,6 @@ import org.slf4j.LoggerFactory;
 import javax.jms.*;
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.text.MessageFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Map;
@@ -80,17 +79,16 @@ public abstract class JmsUtils {
                     nonCompliant = true;
                 }
             }
+            final String result = sb.toString();
 
             if (nonCompliant) {
-                log.warn(
-                        MessageFormat.format(
-                                "Header: {0} is not compliant with JMS specification (sec. 3.5.1, 3.8.1.1). " +
-                                        "It will cause problems in your and other applications. Please update " +
-                                        "your application code to correct this. I renamed it to {1}",
-                                name, sb.toString()));
+                log.warn("Header: {} is not compliant with JMS specification (sec. 3.5.1, 3.8.1.1). " +
+                                "It will cause problems in your and other applications. Please update " +
+                                "your application code to correct this. I renamed it to {}",
+                        name, result);
             }
 
-            return sb.toString();
+            return result;
         }
     }
 
@@ -328,9 +326,8 @@ public abstract class JmsUtils {
             } else if (value instanceof Calendar) {
                 setProperty(message, encodedKey, ((Calendar) value).getTime());
             } else {
-                log.warn(
-                        "Key = " + encodedKey + " and value = " + value + " of type = "
-                                + value.getClass().getName() + " are ignored.");
+                log.warn("Key = {} and value = {} of type = {} are ignored.",
+                        encodedKey, value, value.getClass().getName());
             }
         }
     }

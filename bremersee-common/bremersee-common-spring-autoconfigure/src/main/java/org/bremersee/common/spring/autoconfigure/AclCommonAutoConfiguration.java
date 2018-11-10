@@ -27,7 +27,10 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.ParameterNameDiscoverer;
-import org.springframework.security.acls.domain.*;
+import org.springframework.security.acls.domain.AuditLogger;
+import org.springframework.security.acls.domain.DefaultPermissionFactory;
+import org.springframework.security.acls.domain.PermissionFactory;
+import org.springframework.security.acls.domain.SidRetrievalStrategyImpl;
 import org.springframework.security.acls.model.*;
 import org.springframework.security.authentication.AuthenticationTrustResolver;
 import org.springframework.security.authentication.AuthenticationTrustResolverImpl;
@@ -62,7 +65,7 @@ public class AclCommonAutoConfiguration {
     @PostConstruct
     public void init() {
         // @formatter:off
-        LOG.info("\n"
+        LOG.info("\n" // NOSONAR
                 + "**********************************************************************\n"
                 + "*  ACL Common Auto Configuration                                     *\n"
                 + "**********************************************************************\n"
@@ -77,21 +80,21 @@ public class AclCommonAutoConfiguration {
     }
 
     @Bean
-    @ConditionalOnMissingBean({ ObjectIdentityRetrievalStrategy.class })
+    @ConditionalOnMissingBean({ObjectIdentityRetrievalStrategy.class})
     public ObjectIdentityRetrievalStrategy objectIdentityRetrievalStrategy() {
         LOG.info("Creating new 'ObjectIdentityRetrievalStrategy' ...");
         return objectIdentityRetrievalStrategy;
     }
 
     @Bean
-    @ConditionalOnMissingBean({ ObjectIdentityGenerator.class })
+    @ConditionalOnMissingBean({ObjectIdentityGenerator.class})
     public ObjectIdentityGenerator objectIdentityGenerator() {
         LOG.info("Creating new 'ObjectIdentityGenerator' ...");
         return objectIdentityRetrievalStrategy;
     }
 
     @Bean
-    @ConditionalOnMissingBean({ SidRetrievalStrategy.class })
+    @ConditionalOnMissingBean({SidRetrievalStrategy.class})
     public SidRetrievalStrategy sidRetrievalStrategy() {
         SidRetrievalStrategyImpl impl = new SidRetrievalStrategyImpl();
         LOG.info("Creating new 'SidRetrievalStrategy' ...");
@@ -99,7 +102,7 @@ public class AclCommonAutoConfiguration {
     }
 
     @Bean
-    @ConditionalOnMissingBean({ PermissionFactory.class })
+    @ConditionalOnMissingBean({PermissionFactory.class})
     public PermissionFactory permissionFactory() {
         DefaultPermissionFactory impl = new DefaultPermissionFactory();
         LOG.info("Creating new 'PermissionFactory' ...");
@@ -107,7 +110,7 @@ public class AclCommonAutoConfiguration {
     }
 
     @Bean
-    @ConditionalOnMissingBean({ AuthenticationTrustResolver.class })
+    @ConditionalOnMissingBean({AuthenticationTrustResolver.class})
     public AuthenticationTrustResolver trustResolver() {
         AuthenticationTrustResolverImpl impl = new AuthenticationTrustResolverImpl();
         LOG.info("Creating new 'AuthenticationTrustResolver' ...");
@@ -115,7 +118,7 @@ public class AclCommonAutoConfiguration {
     }
 
     @Bean
-    @ConditionalOnMissingBean({ ParameterNameDiscoverer.class })
+    @ConditionalOnMissingBean({ParameterNameDiscoverer.class})
     public ParameterNameDiscoverer parameterNameDiscoverer() {
         DefaultSecurityParameterNameDiscoverer impl = new DefaultSecurityParameterNameDiscoverer();
         LOG.info("Creating new 'ParameterNameDiscoverer' ...");
@@ -123,7 +126,7 @@ public class AclCommonAutoConfiguration {
     }
 
     @Bean
-    @ConditionalOnMissingBean({ AuditLogger.class })
+    @ConditionalOnMissingBean({AuditLogger.class})
     public AuditLogger auditLogger() {
         return new Sl4jAuditLogger(aclProperties.getAuditLoggerName());
     }
@@ -149,10 +152,9 @@ public class AclCommonAutoConfiguration {
                 AuditableAccessControlEntry auditableAce = (AuditableAccessControlEntry) ace;
 
                 if (granted && auditableAce.isAuditSuccess()) {
-                    log.info("GRANTED due to ACE: " + ace);
-                }
-                else if (!granted && auditableAce.isAuditFailure()) {
-                    log.info("DENIED due to ACE: " + ace);
+                    log.info("GRANTED due to ACE: {}", ace);
+                } else if (!granted && auditableAce.isAuditFailure()) {
+                    log.info("DENIED due to ACE: {}", ace);
                 }
             }
 

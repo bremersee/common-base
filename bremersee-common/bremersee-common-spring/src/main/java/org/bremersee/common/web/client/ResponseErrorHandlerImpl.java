@@ -22,6 +22,7 @@ import com.fasterxml.jackson.databind.introspect.AnnotationIntrospectorPair;
 import com.fasterxml.jackson.databind.introspect.JacksonAnnotationIntrospector;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.fasterxml.jackson.module.jaxb.JaxbAnnotationIntrospector;
+import lombok.Getter;
 import org.bremersee.common.exception.ExceptionRegistry;
 import org.bremersee.common.exception.HttpErrorException;
 import org.bremersee.common.model.ThrowableMessageDto;
@@ -40,7 +41,7 @@ import java.io.IOException;
 /**
  * <p>
  * A response error handler that tries to parse the response to a {@link ThrowableMessageDto}
- * or a {@link org.bremersee.common.model.ThrowableDto} and throws an appropriate exception.<br/>
+ * or a {@link org.bremersee.common.model.ThrowableDto} and throws an appropriate exception.
  * If the response don't contains such a DTO, an exception appropriate to the status code will be thrown.
  * </p>
  *
@@ -56,12 +57,14 @@ public class ResponseErrorHandlerImpl implements ResponseErrorHandler {
     /**
      * The XML unmarshaller.
      */
-    protected Unmarshaller unmarshaller;
+    @Getter
+    private Unmarshaller unmarshaller;
 
     /**
      * The JSON object mapper.
      */
-    protected ObjectMapper objectMapper;
+    @Getter
+    private ObjectMapper objectMapper;
 
     /**
      * Default constructor.
