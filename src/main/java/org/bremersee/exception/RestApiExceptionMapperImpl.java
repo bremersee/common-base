@@ -23,7 +23,6 @@ import javax.validation.constraints.NotNull;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import org.bremersee.ErrorCodeAware;
 import org.bremersee.exception.RestApiExceptionMapperProperties.ExceptionMappingConfig;
 import org.bremersee.exception.annotation.ErrorCode;
 import org.bremersee.exception.model.Handler;

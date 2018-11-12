@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.bremersee;
+package org.bremersee.exception;
 
 /**
  * @author Christian Bremer

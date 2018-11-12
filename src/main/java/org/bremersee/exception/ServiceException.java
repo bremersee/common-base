@@ -17,7 +17,6 @@
 package org.bremersee.exception;
 
 import lombok.Getter;
-import org.bremersee.ErrorCodeAware;
 import org.springframework.http.HttpStatus;
 import org.springframework.util.StringUtils;
 
