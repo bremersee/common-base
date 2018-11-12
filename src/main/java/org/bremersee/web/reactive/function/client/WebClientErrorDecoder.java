@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 the original author or authors.
+ * Copyright 2016 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,32 +17,14 @@
 package org.bremersee.web.reactive.function.client;
 
 import java.util.function.Function;
-import org.springframework.http.HttpStatus;
 import org.springframework.web.reactive.function.client.ClientResponse;
 import reactor.core.publisher.Mono;
 
 /**
  * @author Christian Bremer
  */
-public abstract class ExceptionCreator<E extends Throwable>
-    implements Function<ClientResponse, Mono<? extends Throwable>> {
+public interface WebClientErrorDecoder<E extends AbstractWebClientException>
+    extends Function<ClientResponse, Mono<? extends Throwable>> {
 
-  @Override
-  public Mono<? extends Throwable> apply(ClientResponse clientResponse) {
-
-    return clientResponse
-        .bodyToMono(String.class)
-        .map(body -> createException(clientResponse.statusCode(), body));
-  }
-
-  protected abstract E createException(HttpStatus httpStatus, String body);
-
-  public static class Default extends ExceptionCreator<ClientResponseException> {
-
-    @Override
-    protected ClientResponseException createException(HttpStatus httpStatus, String body) {
-      return new ClientResponseException(httpStatus, body);
-    }
-  }
-
+  E buildException(ClientResponse clientResponse, String response);
 }

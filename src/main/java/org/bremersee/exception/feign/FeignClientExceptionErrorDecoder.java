@@ -21,8 +21,6 @@ import static java.lang.String.format;
 import static java.util.Locale.US;
 import static java.util.concurrent.TimeUnit.SECONDS;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import feign.Response;
 import feign.RetryableException;
 import feign.Util;
@@ -31,15 +29,15 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
+import org.bremersee.exception.RestApiExceptionParser;
+import org.bremersee.exception.RestApiExceptionParserImpl;
 import org.bremersee.exception.model.RestApiException;
-import org.bremersee.web.MediaTypeHelper;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
-import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
-import org.springframework.util.StringUtils;
 
 /**
  * @author Christian Bremer
@@ -50,32 +48,17 @@ public class FeignClientExceptionErrorDecoder implements ErrorDecoder {
   private final DateFormat rfc822Format = new SimpleDateFormat(
       "EEE, dd MMM yyyy HH:mm:ss 'GMT'", US);
 
-  private final Jackson2ObjectMapperBuilder objectMapperBuilder;
+  private final RestApiExceptionParser parser;
 
   public FeignClientExceptionErrorDecoder() {
-    this.objectMapperBuilder = null;
+    this.parser = new RestApiExceptionParserImpl();
   }
 
   public FeignClientExceptionErrorDecoder(
-      Jackson2ObjectMapperBuilder objectMapperBuilder) {
-    this.objectMapperBuilder = objectMapperBuilder;
+      final RestApiExceptionParser parser) {
+    this.parser = parser != null ? parser : new RestApiExceptionParserImpl();
   }
 
-  private ObjectMapper getJsonMapper() {
-    if (objectMapperBuilder != null) {
-      return objectMapperBuilder.build();
-    } else {
-      return Jackson2ObjectMapperBuilder.json().build();
-    }
-  }
-
-  private XmlMapper getXmlMapper() {
-    if (objectMapperBuilder != null) {
-      return objectMapperBuilder.createXmlMapper(true).build();
-    } else {
-      return Jackson2ObjectMapperBuilder.xml().build();
-    }
-  }
 
   @Override
   public Exception decode(final String methodKey, final Response response) {
@@ -87,15 +70,14 @@ public class FeignClientExceptionErrorDecoder implements ErrorDecoder {
     final String message = format("status %s reading %s", response.status(), methodKey);
     final String contentType = firstOrDefault(response.headers(), HttpHeaders.CONTENT_TYPE,
         MediaType.TEXT_PLAIN_VALUE);
-    final RestApiException restApiException = parseRestApiException(body, contentType);
+    final RestApiException restApiException = parser.parseRestApiException(body, contentType);
     if (log.isDebugEnabled() && body != null) {
       log.debug("msg=[Is error formatted as rest api exception? {}]",
           restApiException != null && !body.equals(restApiException.getMessage()));
-      // too much: log.debug("restApiException=[{}]", restApiException);
     }
     final FeignClientException feignClientException = new FeignClientException(
         response.request(),
-        response.headers(),
+        response.headers() != null ? Collections.unmodifiableMap(response.headers()) : null,
         response.status(),
         message,
         restApiException);
@@ -108,47 +90,12 @@ public class FeignClientExceptionErrorDecoder implements ErrorDecoder {
     return feignClientException;
   }
 
-  private RestApiException parseRestApiException(String body, String contentType) {
-    RestApiException restApiException = null;
-    if (MediaTypeHelper.isJson(contentType)) {
-      restApiException = parseJson(body);
-    } else if (MediaTypeHelper.isXml(contentType)) {
-      restApiException = parseXml(body);
-    }
-    if (restApiException == null && StringUtils.hasText(body)) {
-      restApiException = new RestApiException().message(body);
-    }
-    return restApiException;
-  }
-
   private String readBody(Response response) {
     if (response.body() == null) {
       return null;
     }
     try {
       return Util.toString(response.body().asReader());
-    } catch (Exception ignored) {
-      return null;
-    }
-  }
-
-  private RestApiException parseJson(String body) {
-    if (!StringUtils.hasText(body)) {
-      return null;
-    }
-    try {
-      return getJsonMapper().readValue(body, RestApiException.class);
-    } catch (Exception ignored) {
-      return null;
-    }
-  }
-
-  private RestApiException parseXml(String body) {
-    if (!StringUtils.hasText(body)) {
-      return null;
-    }
-    try {
-      return getXmlMapper().readValue(body, RestApiException.class);
     } catch (Exception ignored) {
       return null;
     }

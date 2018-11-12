@@ -14,30 +14,26 @@
  * limitations under the License.
  */
 
-package org.bremersee.exception.feign;
+package org.bremersee.web.reactive.function.client;
 
-import feign.FeignException;
-import feign.Request;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
 import lombok.Getter;
 import org.bremersee.exception.ErrorCodeAware;
 import org.bremersee.exception.HttpResponseHeadersAware;
-import org.bremersee.exception.HttpStatusAware;
 import org.bremersee.exception.RestApiExceptionAware;
 import org.bremersee.exception.model.RestApiException;
 import org.springframework.http.HttpStatus;
 import org.springframework.lang.Nullable;
+import org.springframework.web.server.ResponseStatusException;
 
 /**
  * @author Christian Bremer
  */
-public class FeignClientException extends FeignException implements HttpStatusAware,
-    HttpResponseHeadersAware, RestApiExceptionAware, ErrorCodeAware {
-
-  @Getter
-  private final Request request;
+public abstract class AbstractWebClientException
+    extends ResponseStatusException
+    implements RestApiExceptionAware, ErrorCodeAware, HttpResponseHeadersAware {
 
   @Getter
   private final Map<String, Collection<String>> headers;
@@ -46,27 +42,18 @@ public class FeignClientException extends FeignException implements HttpStatusAw
   @Nullable
   private final RestApiException restApiException;
 
-  public FeignClientException(
-      final Request request,
+  public AbstractWebClientException(
+      final HttpStatus status,
       final Map<String, Collection<String>> headers,
-      final int status,
-      final String message,
       final RestApiException restApiException) {
-
-    super(resolveHttpStatusCode(status), message);
-    this.request = request;
+    super(status);
     this.headers = headers != null ? headers : Collections.emptyMap();
     this.restApiException = restApiException;
   }
 
   @Override
   public String getErrorCode() {
-    return restApiException != null ? restApiException.getErrorCode() : null;
-  }
-
-  private static int resolveHttpStatusCode(final int httpStatusCode) {
-    final HttpStatus httpStatus = HttpStatus.resolve(httpStatusCode);
-    return httpStatus != null ? httpStatus.value() : HttpStatus.INTERNAL_SERVER_ERROR.value();
+    return getRestApiException() != null ? getRestApiException().getErrorCode() : null;
   }
 
 }

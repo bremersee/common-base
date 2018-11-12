@@ -16,33 +16,24 @@
 
 package org.bremersee.web.reactive.function.client;
 
-import java.util.function.Function;
-import org.springframework.http.HttpStatus;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.Setter;
+import org.bremersee.exception.model.RestApiException;
 import org.springframework.web.reactive.function.client.ClientResponse;
 import reactor.core.publisher.Mono;
 
 /**
  * @author Christian Bremer
  */
-public abstract class ExceptionCreator<E extends Throwable>
-    implements Function<ClientResponse, Mono<? extends Throwable>> {
+public abstract class AbstractWebClientErrorDecoder<E extends AbstractWebClientException>
+    implements WebClientErrorDecoder<E> {
 
   @Override
   public Mono<? extends Throwable> apply(ClientResponse clientResponse) {
-
     return clientResponse
         .bodyToMono(String.class)
-        .map(body -> createException(clientResponse.statusCode(), body));
-  }
-
-  protected abstract E createException(HttpStatus httpStatus, String body);
-
-  public static class Default extends ExceptionCreator<ClientResponseException> {
-
-    @Override
-    protected ClientResponseException createException(HttpStatus httpStatus, String body) {
-      return new ClientResponseException(httpStatus, body);
-    }
+        .map(response -> buildException(clientResponse, response));
   }
 
 }
