@@ -103,7 +103,9 @@ public class ApiExceptionResolver implements HandlerExceptionResolver {
         modelAndView = new ModelAndView(new EmptyView(payload));
     }
 
-    response.setContentType(chooser.getContentType());
+    if (StringUtils.hasText(chooser.getContentType())) {
+      response.setContentType(chooser.getContentType());
+    }
     final int statusCode = exceptionMapper.detectHttpStatus(ex, handler).value();
     applyStatusCodeIfPossible(request, response, statusCode);
     return modelAndView;
