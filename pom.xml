@@ -1,0 +1,309 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>org.bremersee</groupId>
+  <artifactId>common</artifactId>
+  <version>0.0.1-SNAPSHOT</version>
+  <packaging>jar</packaging>
+
+  <name>common</name>
+  <description>Common stuff</description>
+
+  <parent>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-parent</artifactId>
+    <version>2.1.0.RELEASE</version>
+    <relativePath/> <!-- lookup parent from repository -->
+  </parent>
+
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+    <java.version>1.8</java.version>
+    <spring-cloud.version>Greenwich.M1</spring-cloud.version>
+
+    <swagger-annotations.version>1.5.18</swagger-annotations.version>
+    <swagger-base-package>org.bremersee.exception</swagger-base-package>
+    <swagger-codegen-maven-plugin.version>2.3.1</swagger-codegen-maven-plugin.version>
+  </properties>
+
+  <repositories>
+    <repository>
+      <id>spring-milestones</id>
+      <name>Spring Milestones</name>
+      <url>https://repo.spring.io/milestone</url>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+    </repository>
+  </repositories>
+
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>org.springframework.cloud</groupId>
+        <artifactId>spring-cloud-dependencies</artifactId>
+        <version>${spring-cloud.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-webflux</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.security</groupId>
+      <artifactId>spring-security-config</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.security</groupId>
+      <artifactId>spring-security-oauth2-client</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.security</groupId>
+      <artifactId>spring-security-oauth2-jose</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.security</groupId>
+      <artifactId>spring-security-oauth2-resource-server</artifactId>
+    </dependency>
+    <!--
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-data-mongodb-reactive</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-actuator</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.micrometer</groupId>
+      <artifactId>micrometer-registry-prometheus</artifactId>
+    </dependency>
+    -->
+    <!--
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-cache</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-data-ldap</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.cloud</groupId>
+      <artifactId>spring-cloud-starter-config</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.cloud</groupId>
+      <artifactId>spring-cloud-starter-zipkin</artifactId>
+    </dependency>
+    -->
+
+    <dependency>
+      <groupId>io.swagger</groupId>
+      <artifactId>swagger-annotations</artifactId>
+      <version>${swagger-annotations.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-annotations</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-databind</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.fasterxml.jackson.dataformat</groupId>
+      <artifactId>jackson-dataformat-xml</artifactId>
+    </dependency>
+    <!-- It is faster than the default StAX implementation provided by the JDK -->
+    <dependency>
+      <groupId>org.codehaus.woodstox</groupId>
+      <artifactId>woodstox-core-asl</artifactId>
+      <version>4.4.1</version>
+      <!-- <optional>true</optional> -->
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>javax.servlet</groupId>
+      <artifactId>javax.servlet-api</artifactId>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>javax.validation</groupId>
+      <artifactId>validation-api</artifactId>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-web</artifactId>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-webmvc</artifactId>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>io.github.openfeign</groupId>
+      <artifactId>feign-core</artifactId>
+      <optional>true</optional>
+    </dependency>
+
+    <dependency>
+      <groupId>com.jayway.jsonpath</groupId>
+      <artifactId>json-path</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-devtools</artifactId>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-configuration-processor</artifactId>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>org.projectlombok</groupId>
+      <artifactId>lombok</artifactId>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-test</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <!--
+    <dependency>
+      <groupId>de.flapdoodle.embed</groupId>
+      <artifactId>de.flapdoodle.embed.mongo</artifactId>
+      <scope>test</scope>
+    </dependency>
+    -->
+    <dependency>
+      <groupId>io.projectreactor</groupId>
+      <artifactId>reactor-test</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.security</groupId>
+      <artifactId>spring-security-test</artifactId>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>io.swagger</groupId>
+          <artifactId>swagger-codegen-maven-plugin</artifactId>
+          <version>${swagger-codegen-maven-plugin.version}</version>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+    <plugins>
+      <plugin>
+        <groupId>io.swagger</groupId>
+        <artifactId>swagger-codegen-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>api</id>
+            <goals>
+              <goal>generate</goal>
+            </goals>
+            <configuration>
+              <!--
+              <configurationFile>
+                ${project.basedir}/src/main/swagger/exception-model-config.json
+              </configurationFile>
+              -->
+              <!-- OpenAPI Spec file path (required) -->
+              <inputSpec>
+                ${project.basedir}/src/main/swagger/exception-model.yml
+              </inputSpec>
+              <!-- target generation language (required) -->
+              <language>spring</language>
+              <!-- target output path  -->
+              <output>${project.build.directory}/generated-sources</output>
+              <!-- directory with mustache templates  -->
+              <templateDirectory>
+                ${project.basedir}/src/main/swagger/templates
+              </templateDirectory>
+              <!-- the package to use for generated model objects/classes -->
+              <modelPackage>${swagger-base-package}.model</modelPackage>
+              <!-- the package to use for generated api objects/classes -->
+              <apiPackage>${swagger-base-package}.api</apiPackage>
+              <!-- the package to use for the generated invoker objects -->
+              <invokerPackage>${swagger-base-package}.invoker</invokerPackage>
+              <!-- enable XML annotations inside the generated models and API (only works with
+                   Java language and libraries that provide support for JSON and XML) -->
+              <withXml>true</withXml>
+              <!-- generate the apis (true by default) -->
+              <generateApis>false</generateApis>
+              <!-- generate the api tests (true by default.
+                   Only available if generateApis is true) -->
+              <generateApiTests>false</generateApiTests>
+              <!-- generate the api documentation (true by default.
+                   Only available if generateApis is true) -->
+              <generateApiDocumentation>false</generateApiDocumentation>
+              <!-- generate the models (true by default) -->
+              <generateModels>true</generateModels>
+              <!-- generate the model tests (true by default.
+                   Only available if generateModels is true) -->
+              <generateModelTests>false</generateModelTests>
+              <!-- generate the model documentation (true by default.
+                   Only available if generateModels is true) -->
+              <generateModelDocumentation>true</generateModelDocumentation>
+              <!-- generate the supporting files (true by default) -->
+              <generateSupportingFiles>false</generateSupportingFiles>
+              <!-- a map of language-specific parameters -->
+              <configOptions>
+                <!-- boolean - toggle "implements Serializable" for generated models
+                     (Default: false) -->
+                <serializableModel>true</serializableModel>
+                <!-- hides the timestamp when files were generated -->
+                <hideGenerationTimestamp>true</hideGenerationTimestamp>
+                <!-- whether to include support for application/xml content type and include XML
+                     annotations in the model (works with libraries that provide support for JSON
+                     and XML) (Default: false) -->
+                <withXml>true</withXml>
+                <!-- Date library to use -->
+                <dateLibrary>java8</dateLibrary>
+                <!-- Use Java8 classes instead of third party equivalents -->
+                <java8>true</java8>
+
+                <!-- api generation: generate class names by tags -->
+                <useTags>true</useTags>
+                <!-- api generation: generate only interfaces, no stubs -->
+                <interfaceOnly>true</interfaceOnly>
+              </configOptions>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <!--
+      <plugin>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-maven-plugin</artifactId>
+      </plugin>
+      -->
+    </plugins>
+  </build>
+
+
+</project>

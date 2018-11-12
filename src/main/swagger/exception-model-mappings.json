@@ -1,0 +1,6 @@
+{
+  "importMappings": {
+    "StackTraceItem": "org.bremersee.common.exhandling.model.StackTraceItem",
+    "RestApiException": "org.bremersee.common.exhandling.model.RestApiException"
+  }
+}

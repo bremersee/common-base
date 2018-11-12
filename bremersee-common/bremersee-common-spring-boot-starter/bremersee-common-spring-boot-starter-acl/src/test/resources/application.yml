@@ -1,9 +1,0 @@
-spring:
-  cache:
-    ehcache:
-      config: classpath:ehcache.xml
-
-bremersee:
-  acl:
-    class-identity-query: call identity()
-    sid-identity-query: call identity()

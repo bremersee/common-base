@@ -1,9 +1,0 @@
-dn: dc=example,dc=org
-objectclass: domain
-objectclass: top
-dc: example
-
-dn: ou=Access Failed Entries,dc=example,dc=org
-objectclass: top
-objectclass: organizationalUnit
-ou: Access Failed Entries
