@@ -20,6 +20,7 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.constraints.NotNull;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -148,10 +149,10 @@ public class ApiExceptionResolver implements HandlerExceptionResolver {
 
   static class ResponseFormatAndContentType {
 
-    @Getter
+    @Getter(AccessLevel.PROTECTED)
     private ResponseFormat responseFormat;
 
-    @Getter
+    @Getter(AccessLevel.PROTECTED)
     private String contentType;
 
     ResponseFormatAndContentType(final @NotNull HttpServletRequest request) {
@@ -190,18 +191,13 @@ public class ApiExceptionResolver implements HandlerExceptionResolver {
       this.errorMessage = StringUtils.hasText(payload.getMessage())
           ? payload.getMessage()
           : "No message available";
-      this.errorCode = StringUtils.hasText(payload.getErrorCode())
-          ? payload.getErrorCode()
-          : "UNSPECIFIED";
-      this.errorClassName = StringUtils.hasText(payload.getClassName())
-          ? payload.getClassName()
-          : Exception.class.getName();
+      this.errorCode = payload.getErrorCode();
+      this.errorClassName = payload.getClassName();
     }
 
-    @SuppressWarnings("NullableProblems")
     @Override
     protected void renderMergedOutputModel(
-        final Map<String, Object> map,
+        @Nullable final Map<String, Object> map,
         final HttpServletRequest httpServletRequest,
         final HttpServletResponse httpServletResponse) {
 
