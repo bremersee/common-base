@@ -18,12 +18,21 @@ package org.bremersee.exception;
 
 import java.util.Collection;
 import java.util.Map;
+import javax.validation.constraints.NotNull;
 
 /**
+ * Marker interface to get the response headers.
+ *
  * @author Christian Bremer
  */
 public interface HttpResponseHeadersAware {
 
+  /**
+   * Gets the response headers.
+   *
+   * @return the response headers
+   */
+  @NotNull
   Map<String, Collection<String>> getHeaders();
 
 }

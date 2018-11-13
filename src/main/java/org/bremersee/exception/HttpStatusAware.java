@@ -17,10 +17,17 @@
 package org.bremersee.exception;
 
 /**
+ * Marker interface to get the HTTP status code.
+ *
  * @author Christian Bremer
  */
 public interface HttpStatusAware {
 
+  /**
+   * Gets the HTTP status code.
+   *
+   * @return the HTTP status code
+   */
   int status();
 
 }

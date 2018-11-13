@@ -17,6 +17,7 @@
 package org.bremersee.exception;
 
 import java.lang.reflect.Method;
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.UUID;
 import javax.validation.constraints.NotNull;
@@ -159,7 +160,7 @@ public class RestApiExceptionMapperImpl implements RestApiExceptionMapper {
     if (httpStatus.series() == HttpStatus.Series.SERVER_ERROR) {
       restApiException.setId(UUID.randomUUID().toString());
     }
-    restApiException.setTimestamp(System.currentTimeMillis());
+    restApiException.setTimestamp(OffsetDateTime.now());
     restApiException.setMessage(detectMessage(exception, handler, config));
     if (config.isIncludeExceptionClassName()) {
       restApiException.setClassName(exception.getClass().getName());

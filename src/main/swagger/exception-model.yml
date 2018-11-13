@@ -50,9 +50,9 @@ definitions:
         type: "string"
         description: "The id of the exception."
       timestamp:
-        type: "integer"
-        format: int64
-        description: "The timestamp in millis."
+        type: "string"
+        format: "date-time"
+        description: "The timestamp."
       message:
         type: "string"
         description: "A human readable exception message."

@@ -32,6 +32,8 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import org.springframework.lang.Nullable;
+import org.springframework.util.AntPathMatcher;
+import org.springframework.util.PathMatcher;
 import org.springframework.util.StringUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RestController;
@@ -51,6 +53,10 @@ import org.springframework.web.util.WebUtils;
 public class ApiExceptionResolver implements HandlerExceptionResolver {
 
   private static final String MODEL_KEY = "error";
+
+  @Getter(AccessLevel.PROTECTED)
+  @Setter
+  private PathMatcher pathMatcher = new AntPathMatcher();
 
   private final RestApiExceptionMapper exceptionMapper;
 

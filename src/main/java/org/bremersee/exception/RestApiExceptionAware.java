@@ -17,12 +17,21 @@
 package org.bremersee.exception;
 
 import org.bremersee.exception.model.RestApiException;
+import org.springframework.lang.Nullable;
 
 /**
+ * Marker interface to get the {@link RestApiException} model.
+ *
  * @author Christian Bremer
  */
 public interface RestApiExceptionAware {
 
+  /**
+   * Gets rest api exception.
+   *
+   * @return the rest api exception
+   */
+  @Nullable
   RestApiException getRestApiException();
 
 }

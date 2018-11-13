@@ -23,7 +23,7 @@ import reactor.core.publisher.Mono;
 /**
  * @author Christian Bremer
  */
-public interface WebClientErrorDecoder<E extends AbstractWebClientException>
+public interface WebClientErrorDecoder<E extends Throwable>
     extends Function<ClientResponse, Mono<? extends Throwable>> {
 
   E buildException(ClientResponse clientResponse, String response);

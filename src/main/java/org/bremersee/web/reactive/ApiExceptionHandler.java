@@ -17,6 +17,9 @@
 package org.bremersee.web.reactive;
 
 import javax.validation.constraints.NotNull;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.bremersee.exception.RestApiExceptionMapper;
 import org.bremersee.exception.model.RestApiException;
@@ -29,6 +32,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.codec.ServerCodecConfigurer;
 import org.springframework.lang.Nullable;
 import org.springframework.util.AntPathMatcher;
+import org.springframework.util.PathMatcher;
 import org.springframework.util.StringUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.reactive.function.BodyInserters;
@@ -45,7 +49,12 @@ import reactor.core.publisher.Mono;
 @Slf4j
 public class ApiExceptionHandler extends AbstractErrorWebExceptionHandler {
 
-  private RestApiExceptionMapper restApiExceptionMapper;
+  @Getter(AccessLevel.PROTECTED)
+  @Setter
+  private PathMatcher pathMatcher = new AntPathMatcher();
+
+  @Getter(AccessLevel.PROTECTED)
+  private final RestApiExceptionMapper restApiExceptionMapper;
 
   public ApiExceptionHandler(
       @NotNull ErrorAttributes errorAttributes,
@@ -67,36 +76,37 @@ public class ApiExceptionHandler extends AbstractErrorWebExceptionHandler {
     return RouterFunctions.route(this::isResponsibleExceptionHandler, this::renderErrorResponse);
   }
 
-  private boolean isResponsibleExceptionHandler(ServerRequest request) {
-    final AntPathMatcher matcher = new AntPathMatcher();
+  @SuppressWarnings("WeakerAccess")
+  protected boolean isResponsibleExceptionHandler(ServerRequest request) {
     return restApiExceptionMapper.getApiAntPaths().stream().anyMatch(
-        s -> matcher.match(s, request.path()));
+        s -> pathMatcher.match(s, request.path()));
   }
 
-  private Mono<ServerResponse> renderErrorResponse(ServerRequest request) {
+  @SuppressWarnings("WeakerAccess")
+  protected Mono<ServerResponse> renderErrorResponse(ServerRequest request) {
 
-    final RestApiException model = restApiExceptionMapper
+    final RestApiException response = restApiExceptionMapper
         .build(getError(request), request.path(), null);
     final String accepts = MediaTypeHelper.toString(request.headers().accept());
     if (MediaTypeHelper.canContentTypeBeJson(accepts)) {
       return ServerResponse
           .status(restApiExceptionMapper.detectHttpStatus(getError(request), null))
           .contentType(MediaType.APPLICATION_JSON)
-          .body(BodyInserters.fromObject(model));
+          .body(BodyInserters.fromObject(response));
     } else if (MediaTypeHelper.canContentTypeBeXml(accepts)) {
       return ServerResponse
           .status(restApiExceptionMapper.detectHttpStatus(getError(request), null))
           .contentType(MediaType.APPLICATION_XML)
-          .body(BodyInserters.fromObject(model));
+          .body(BodyInserters.fromObject(response));
     } else {
-      final String msg = StringUtils.hasText(model.getMessage())
-          ? model.getMessage()
+      final String msg = StringUtils.hasText(response.getMessage())
+          ? response.getMessage()
           : "No message available";
-      final String code = StringUtils.hasText(model.getErrorCode())
-          ? model.getErrorCode()
+      final String code = StringUtils.hasText(response.getErrorCode())
+          ? response.getErrorCode()
           : "UNSPECIFIED";
-      final String cls = StringUtils.hasText(model.getClassName())
-          ? model.getClassName()
+      final String cls = StringUtils.hasText(response.getClassName())
+          ? response.getClassName()
           : Exception.class.getName();
       return ServerResponse
           .status(restApiExceptionMapper.detectHttpStatus(getError(request), null))

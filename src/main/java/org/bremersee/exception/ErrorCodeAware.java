@@ -16,11 +16,21 @@
 
 package org.bremersee.exception;
 
+import org.springframework.lang.Nullable;
+
 /**
+ * Marker interface to get an error code.
+ *
  * @author Christian Bremer
  */
 public interface ErrorCodeAware {
 
+  /**
+   * Gets the error code.
+   *
+   * @return the error code
+   */
+  @Nullable
   String getErrorCode();
 
 }

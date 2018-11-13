@@ -16,17 +16,13 @@
 
 package org.bremersee.web.reactive.function.client;
 
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.Setter;
-import org.bremersee.exception.model.RestApiException;
 import org.springframework.web.reactive.function.client.ClientResponse;
 import reactor.core.publisher.Mono;
 
 /**
  * @author Christian Bremer
  */
-public abstract class AbstractWebClientErrorDecoder<E extends AbstractWebClientException>
+public abstract class AbstractWebClientErrorDecoder<E extends Throwable>
     implements WebClientErrorDecoder<E> {
 
   @Override
