@@ -16,6 +16,8 @@
 
 package org.bremersee.exception;
 
+import java.util.Collection;
+import java.util.Map;
 import org.bremersee.exception.model.RestApiException;
 import org.springframework.lang.Nullable;
 import org.springframework.validation.annotation.Validated;
@@ -30,6 +32,6 @@ public interface RestApiExceptionParser {
   @Nullable
   RestApiException parseRestApiException(
       @Nullable String response,
-      @Nullable String contentType);
+      @Nullable Map<String, ? extends Collection<String>> headers);
 
 }

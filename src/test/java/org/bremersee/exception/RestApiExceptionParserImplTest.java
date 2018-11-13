@@ -24,6 +24,7 @@ import org.bremersee.TestHelper;
 import org.bremersee.exception.model.RestApiException;
 import org.junit.Assert;
 import org.junit.Test;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 
 /**
@@ -44,7 +45,7 @@ public class RestApiExceptionParserImplTest {
     final RestApiException actual = new RestApiExceptionParserImpl()
         .parseRestApiException(
             getJsonMapper().writeValueAsString(expected),
-            MediaType.APPLICATION_JSON_UTF8_VALUE);
+            buildHttpHeaders(MediaType.APPLICATION_JSON_UTF8));
     log.info("Actual:   {}", actual);
     Assert.assertNotNull(actual);
     Assert.assertEquals(expected, actual);
@@ -57,7 +58,7 @@ public class RestApiExceptionParserImplTest {
     final RestApiException actual = new RestApiExceptionParserImpl()
         .parseRestApiException(
             getXmlMapper().writeValueAsString(expected),
-            MediaType.APPLICATION_XML_VALUE);
+            buildHttpHeaders(MediaType.APPLICATION_XML));
     log.info("Actual:   {}", actual);
     Assert.assertNotNull(actual);
     Assert.assertEquals(expected, actual);
@@ -73,10 +74,18 @@ public class RestApiExceptionParserImplTest {
     final RestApiException actual = new RestApiExceptionParserImpl()
         .parseRestApiException(
             response,
-            MediaType.APPLICATION_JSON_VALUE);
+            buildHttpHeaders(MediaType.APPLICATION_JSON));
     log.info("Actual:   {}", actual);
     Assert.assertNotNull(actual);
     Assert.assertEquals(expected, actual);
+  }
+
+  // TODO add test for empty + headers and totally empty
+
+  private HttpHeaders buildHttpHeaders(MediaType contentType) {
+    final HttpHeaders httpHeaders = new HttpHeaders();
+    httpHeaders.setContentType(contentType);
+    return httpHeaders;
   }
 
 }

@@ -50,7 +50,7 @@ public class DefaultWebClientErrorDecoder
         .unmodifiableMap(clientResponse.headers().asHttpHeaders());
     final RestApiException restApiException = parser.parseRestApiException(
         response,
-        String.valueOf(clientResponse.headers().asHttpHeaders().getContentType()));
+        clientResponse.headers().asHttpHeaders());
     if (log.isDebugEnabled() && response != null) {
       log.debug("msg=[Is error formatted as rest api exception? {}]",
           restApiException != null && !response.equals(restApiException.getMessage()));
