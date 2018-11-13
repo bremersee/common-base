@@ -50,7 +50,7 @@ public class RestApiExceptionMapperProperties {
     apiAntPaths.add("/api/**");
 
     defaultExceptionMapping = new ExceptionMapping();
-    defaultExceptionMapping.setCode("UNSPECIFIED");
+    defaultExceptionMapping.setCode(ExceptionConstants.NO_ERROR_CODE_PRESENT);
     defaultExceptionMapping.setMessage(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase());
     defaultExceptionMapping.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
     defaultExceptionMapping.setExceptionClassName("*");

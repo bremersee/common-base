@@ -21,6 +21,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.bremersee.exception.ExceptionConstants;
 import org.bremersee.exception.RestApiExceptionMapper;
 import org.bremersee.exception.model.RestApiException;
 import org.bremersee.web.MediaTypeHelper;
@@ -51,9 +52,11 @@ public class ApiExceptionHandler extends AbstractErrorWebExceptionHandler {
 
   @Getter(AccessLevel.PROTECTED)
   @Setter
+  @NotNull
   private PathMatcher pathMatcher = new AntPathMatcher();
 
   @Getter(AccessLevel.PROTECTED)
+  @NotNull
   private final RestApiExceptionMapper restApiExceptionMapper;
 
   public ApiExceptionHandler(
@@ -101,10 +104,10 @@ public class ApiExceptionHandler extends AbstractErrorWebExceptionHandler {
     } else {
       final String msg = StringUtils.hasText(response.getMessage())
           ? response.getMessage()
-          : "No message available";
+          : ExceptionConstants.NO_MESSAGE_PRESENT;
       final String code = StringUtils.hasText(response.getErrorCode())
           ? response.getErrorCode()
-          : "UNSPECIFIED";
+          : ExceptionConstants.NO_ERROR_CODE_PRESENT;
       final String cls = StringUtils.hasText(response.getClassName())
           ? response.getClassName()
           : Exception.class.getName();

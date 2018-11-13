@@ -14,22 +14,17 @@
  * limitations under the License.
  */
 
-package org.bremersee.web.reactive.function.client;
-
-import org.springframework.web.reactive.function.client.ClientResponse;
-import reactor.core.publisher.Mono;
+package org.bremersee.exception;
 
 /**
  * @author Christian Bremer
  */
-public abstract class AbstractWebClientErrorDecoder<E extends Throwable>
-    implements WebClientErrorDecoder<E> {
+public abstract class ExceptionConstants {
 
-  @Override
-  public Mono<? extends Throwable> apply(ClientResponse clientResponse) {
-    return clientResponse
-        .bodyToMono(String.class) // TODO test if null or empty
-        .map(response -> buildException(clientResponse, response));
+  public static final String NO_MESSAGE_PRESENT = "No message present.";
+
+  public static final String NO_ERROR_CODE_PRESENT = "UNSPECIFIED";
+
+  private ExceptionConstants() {
   }
-
 }
