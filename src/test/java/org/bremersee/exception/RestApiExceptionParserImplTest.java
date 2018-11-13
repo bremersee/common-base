@@ -35,7 +35,10 @@ public class RestApiExceptionParserImplTest {
 
   @Test
   public void testResponseIsNull() {
-    Assert.assertNull(new RestApiExceptionParserImpl().parseRestApiException(null, null));
+    final RestApiException actual = new RestApiExceptionParserImpl()
+        .parseRestApiException(null, null);
+    Assert.assertNotNull(actual);
+    Assert.assertEquals(new RestApiException().getMessage(), actual.getMessage());
   }
 
   @Test

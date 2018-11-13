@@ -70,20 +70,18 @@ public class RestApiExceptionParserImpl implements RestApiExceptionParser {
     final HttpHeaders httpHeaders = HttpHeadersHelper.buildHttpHeaders(headers);
     final String contentType = String.valueOf(httpHeaders.getContentType());
 
-    if (!StringUtils.hasText(response)) {
-      return null;
-    }
-
     RestApiException restApiException = null;
     try {
-      if (MediaTypeHelper.canContentTypeBeJson(contentType)) {
+      if (StringUtils.hasText(response) && MediaTypeHelper.canContentTypeBeJson(contentType)) {
         restApiException = getJsonMapper().readValue(response, RestApiException.class);
       }
     } catch (Exception ignored) {
       log.debug("msg=[Response is not a 'RestApiException' as JSON.]");
     }
     try {
-      if (restApiException == null && MediaTypeHelper.canContentTypeBeXml(contentType)) {
+      if (restApiException == null
+          && StringUtils.hasText(response)
+          && MediaTypeHelper.canContentTypeBeXml(contentType)) {
         restApiException = getXmlMapper().readValue(response, RestApiException.class);
       }
     } catch (Exception ignored) {
@@ -91,7 +89,10 @@ public class RestApiExceptionParserImpl implements RestApiExceptionParser {
     }
     if (restApiException == null) {
       restApiException = new RestApiException();
-      restApiException.setMessage(response);
+      // TODO parse headers
+      if (StringUtils.hasText(response)) {
+        restApiException.setMessage(response);
+      }
     }
     return restApiException;
   }

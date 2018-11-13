@@ -22,7 +22,6 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.function.BiConsumer;
 import org.springframework.http.HttpHeaders;
-import org.springframework.lang.Nullable;
 import org.springframework.util.MultiValueMap;
 
 /**
@@ -33,8 +32,7 @@ public abstract class HttpHeadersHelper {
   private HttpHeadersHelper() {
   }
 
-  public static HttpHeaders buildHttpHeaders(
-      @Nullable Map<String, ? extends Collection<String>> headers) {
+  public static HttpHeaders buildHttpHeaders(Map<String, ? extends Collection<String>> headers) {
 
     if (headers instanceof HttpHeaders) {
       return (HttpHeaders) headers;

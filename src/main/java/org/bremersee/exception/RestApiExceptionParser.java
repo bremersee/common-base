@@ -28,7 +28,6 @@ import org.springframework.validation.annotation.Validated;
 @Validated
 public interface RestApiExceptionParser {
 
-  @Nullable
   RestApiException parseRestApiException(
       @Nullable String response,
       @Nullable Map<String, ? extends Collection<String>> headers);
