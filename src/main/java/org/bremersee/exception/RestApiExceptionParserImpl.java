@@ -18,12 +18,11 @@ package org.bremersee.exception;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
-import java.util.function.BiConsumer;
 import lombok.extern.slf4j.Slf4j;
 import org.bremersee.exception.model.RestApiException;
+import org.bremersee.http.HttpHeadersHelper;
 import org.bremersee.http.MediaTypeHelper;
 import org.bremersee.http.converter.ObjectMapperHelper;
 import org.springframework.http.HttpHeaders;
@@ -68,12 +67,7 @@ public class RestApiExceptionParserImpl implements RestApiExceptionParser {
       final String response,
       final Map<String, ? extends Collection<String>> headers) {
 
-    final HttpHeaders httpHeaders = new HttpHeaders();
-    if (headers != null) {
-      headers.forEach(
-          (BiConsumer<String, Collection<String>>) (key, values)
-              -> httpHeaders.addAll(key, new ArrayList<>(values)));
-    }
+    final HttpHeaders httpHeaders = HttpHeadersHelper.buildHttpHeaders(headers);
     final String contentType = String.valueOf(httpHeaders.getContentType());
 
     if (!StringUtils.hasText(response)) {
