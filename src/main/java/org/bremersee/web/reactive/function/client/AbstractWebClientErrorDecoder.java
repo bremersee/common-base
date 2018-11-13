@@ -28,7 +28,8 @@ public abstract class AbstractWebClientErrorDecoder<E extends Throwable>
   @Override
   public Mono<? extends Throwable> apply(ClientResponse clientResponse) {
     return clientResponse
-        .bodyToMono(String.class) // TODO test if null or empty
+        .bodyToMono(String.class)
+        .switchIfEmpty(Mono.just(""))
         .map(response -> buildException(clientResponse, response));
   }
 

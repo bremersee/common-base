@@ -16,6 +16,7 @@
 
 package org.bremersee.security.authentication;
 
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.bremersee.security.OAuth2Properties;
 import org.springframework.core.convert.converter.Converter;
@@ -31,7 +32,6 @@ import org.springframework.security.oauth2.jwt.ReactiveJwtDecoder;
 import org.springframework.security.oauth2.server.resource.BearerTokenError;
 import org.springframework.security.oauth2.server.resource.BearerTokenErrorCodes;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
-import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.security.oauth2.server.resource.authentication.ReactiveJwtAuthenticationConverterAdapter;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -45,8 +45,10 @@ public class PasswordFlowReactiveAuthenticationManager
     extends AbstractPasswordFlowAuthenticationManager
     implements ReactiveAuthenticationManager {
 
+  @Setter
   private AccessTokenRetriever<MultiValueMap<String, String>, Mono<String>> accessTokenRetriever;
 
+  @Setter
   private Converter<Jwt, ? extends Mono<? extends AbstractAuthenticationToken>> jwtAuthenticationConverter
       = new ReactiveJwtAuthenticationConverterAdapter(new JwtAuthenticationConverter());
 
@@ -85,22 +87,6 @@ public class PasswordFlowReactiveAuthenticationManager
         HttpStatus.UNAUTHORIZED,
         message,
         "https://tools.ietf.org/html/rfc6750#section-3.1");
-  }
-
-  public PasswordFlowReactiveAuthenticationManager accessTokenRetriever(
-      final AccessTokenRetriever<MultiValueMap<String, String>, Mono<String>> accessTokenRetriever) {
-    if (accessTokenRetriever != null) {
-      this.accessTokenRetriever = accessTokenRetriever;
-    }
-    return this;
-  }
-
-  public PasswordFlowReactiveAuthenticationManager jwtAuthenticationConverter(
-      final Converter<Jwt, Mono<JwtAuthenticationToken>> jwtAuthenticationConverter) {
-    if (jwtAuthenticationConverter != null) {
-      this.jwtAuthenticationConverter = jwtAuthenticationConverter;
-    }
-    return this;
   }
 
 }

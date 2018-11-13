@@ -26,7 +26,10 @@ import org.springframework.validation.annotation.Validated;
 @Validated
 public interface RestApiExceptionParser {
 
+  // TODO we have to add response headers here : replace contentType with headers
   @Nullable
-  RestApiException parseRestApiException(@Nullable String response, @Nullable String contentType);
+  RestApiException parseRestApiException(
+      @Nullable String response,
+      @Nullable String contentType);
 
 }

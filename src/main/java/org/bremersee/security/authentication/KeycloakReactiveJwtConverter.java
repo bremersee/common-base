@@ -24,6 +24,7 @@ import reactor.core.publisher.Mono;
 /**
  * @author Christian Bremer
  */
+@SuppressWarnings("unused")
 public class KeycloakReactiveJwtConverter implements Converter<Jwt, Mono<JwtAuthenticationToken>> {
 
   private final KeycloakJwtConverter converter;

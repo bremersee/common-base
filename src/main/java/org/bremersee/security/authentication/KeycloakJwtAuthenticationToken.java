@@ -24,6 +24,7 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtAut
 /**
  * @author Christian Bremer
  */
+@SuppressWarnings({"WeakerAccess", "unused"})
 public class KeycloakJwtAuthenticationToken extends JwtAuthenticationToken {
 
   public static final String KEYCLOAK_PREFERRED_USERNAME = "preferred_username";

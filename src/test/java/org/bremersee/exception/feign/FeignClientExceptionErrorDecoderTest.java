@@ -101,4 +101,26 @@ public class FeignClientExceptionErrorDecoderTest {
     Assert.assertEquals(body, ((FeignClientException) actual).getRestApiException().getMessage());
   }
 
+  @Test
+  public void testDecodeEmptyResponse() {
+    final MultiValueMap<String, String> headers = new LinkedMultiValueMap<>();
+    headers.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_XML_VALUE);
+    final String body = "";
+    //noinspection unchecked
+    final Response response = Response
+        .builder()
+        .body(body.getBytes(StandardCharsets.UTF_8))
+        .headers((Map) headers)
+        .reason("Something bad")
+        .status(500)
+        .build();
+    final Exception actual = decoder.decode("getNothing", response);
+    Assert.assertNotNull(actual);
+    Assert.assertTrue(actual instanceof FeignClientException);
+    Assert.assertEquals(500, ((FeignClientException) actual).status());
+
+    // TODO wollen wir hier trotzdem ein cause haben?
+    Assert.assertNull(((FeignClientException) actual).getRestApiException());
+  }
+
 }

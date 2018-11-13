@@ -18,7 +18,6 @@ package org.bremersee.security.authentication;
 
 import lombok.AccessLevel;
 import lombok.Getter;
-import lombok.extern.slf4j.Slf4j;
 import org.bremersee.security.OAuth2Properties;
 import org.springframework.security.core.Authentication;
 import org.springframework.util.LinkedMultiValueMap;
@@ -27,8 +26,8 @@ import org.springframework.util.MultiValueMap;
 /**
  * @author Christian Bremer
  */
-@Slf4j
-public class AbstractPasswordFlowAuthenticationManager {
+@SuppressWarnings("WeakerAccess")
+public abstract class AbstractPasswordFlowAuthenticationManager {
 
   @Getter(AccessLevel.PROTECTED)
   private final OAuth2Properties oauth2Properties;

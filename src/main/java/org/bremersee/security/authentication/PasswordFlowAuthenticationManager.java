@@ -78,7 +78,7 @@ public class PasswordFlowAuthenticationManager
     try {
       jwt = this.jwtDecoder.decode(tokenStr);
     } catch (JwtException failed) {
-      OAuth2Error invalidToken = invalidToken(failed.getMessage());
+      final OAuth2Error invalidToken = invalidToken(failed.getMessage());
       throw new OAuth2AuthenticationException(invalidToken, invalidToken.getDescription(), failed);
     }
 
@@ -89,22 +89,6 @@ public class PasswordFlowAuthenticationManager
   public boolean supports(Class<?> authentication) {
     return (UsernamePasswordAuthenticationToken.class
         .isAssignableFrom(authentication));
-  }
-
-  public PasswordFlowAuthenticationManager accessTokenRetriever(
-      final AccessTokenRetriever<MultiValueMap<String, String>, String> accessTokenRetriever) {
-    if (accessTokenRetriever != null) {
-      this.accessTokenRetriever = accessTokenRetriever;
-    }
-    return this;
-  }
-
-  public PasswordFlowAuthenticationManager jwtAuthenticationConverter(
-      final Converter<Jwt, ? extends AbstractAuthenticationToken> jwtAuthenticationConverter) {
-    if (jwtAuthenticationConverter != null) {
-      this.jwtAuthenticationConverter = jwtAuthenticationConverter;
-    }
-    return this;
   }
 
   private static OAuth2Error invalidToken(String message) {

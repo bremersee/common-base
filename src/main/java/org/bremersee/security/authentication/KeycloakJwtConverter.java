@@ -41,6 +41,7 @@ public class KeycloakJwtConverter implements Converter<Jwt, JwtAuthenticationTok
   private static final com.jayway.jsonpath.Configuration jsonPathConf
       = com.jayway.jsonpath.Configuration.builder().options(Option.SUPPRESS_EXCEPTIONS).build();
 
+  @SuppressWarnings("WeakerAccess")
   public KeycloakJwtConverter() {
   }
 

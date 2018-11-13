@@ -17,8 +17,6 @@
 package org.bremersee.security.authentication;
 
 import java.io.IOException;
-import lombok.AllArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import net.minidev.json.JSONObject;
 import net.minidev.json.JSONValue;
 import org.bremersee.exception.PasswordFlowAuthenticationException;
@@ -37,20 +35,30 @@ import org.springframework.web.client.RestTemplate;
 /**
  * @author Christian Bremer
  */
-@AllArgsConstructor
 public class PasswordFlowAccessTokenRetriever
     implements AccessTokenRetriever<MultiValueMap<String, String>, String> {
+
+  private final ErrorHandler errorHandler = new ErrorHandler();
+
+  private final HttpHeaders headers = new HttpHeaders();
 
   private final RestTemplateBuilder restTemplateBuilder;
 
   private final String tokenEndpoint;
 
+  @SuppressWarnings("WeakerAccess")
+  public PasswordFlowAccessTokenRetriever(
+      final RestTemplateBuilder restTemplateBuilder,
+      final String tokenEndpoint) {
+    this.restTemplateBuilder = restTemplateBuilder;
+    this.tokenEndpoint = tokenEndpoint;
+    this.headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+  }
+
   @Override
   public String retrieveAccessToken(final MultiValueMap<String, String> body) {
     final RestTemplate restTemplate = restTemplateBuilder.build();
-    restTemplate.setErrorHandler(new ErrorHandler());
-    final HttpHeaders headers = new HttpHeaders();
-    headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+    restTemplate.setErrorHandler(errorHandler);
     final HttpEntity<?> request = new HttpEntity<>(body, headers);
     final String response = restTemplate.exchange(
         tokenEndpoint,
@@ -67,7 +75,6 @@ public class PasswordFlowAccessTokenRetriever
         "There is no access token in the response: " + accessToken);
   }
 
-  @Slf4j
   private static class ErrorHandler extends DefaultResponseErrorHandler {
 
     @Override

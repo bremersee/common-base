@@ -16,31 +16,36 @@
 
 package org.bremersee.security.authentication;
 
-import lombok.AllArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import net.minidev.json.JSONObject;
 import net.minidev.json.JSONValue;
 import org.bremersee.exception.PasswordFlowAuthenticationException;
 import org.bremersee.web.ErrorDetectors;
-import org.bremersee.web.reactive.function.client.ExceptionCreator;
+import org.bremersee.web.reactive.function.client.AbstractWebClientErrorDecoder;
 import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.reactive.function.BodyInserters;
+import org.springframework.web.reactive.function.client.ClientResponse;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
 /**
  * @author Christian Bremer
  */
-@Slf4j
-@AllArgsConstructor
 public class PasswordFlowAccessTokenReactiveRetriever
     implements AccessTokenRetriever<MultiValueMap<String, String>, Mono<String>> {
 
+  private final AuthenticationExceptionCreator exceptionCreator
+      = new AuthenticationExceptionCreator();
+
   private final WebClient webClient;
+
+  @SuppressWarnings("WeakerAccess")
+  public PasswordFlowAccessTokenReactiveRetriever(
+      final WebClient webClient) {
+    this.webClient = webClient;
+  }
 
   @Override
   public Mono<String> retrieveAccessToken(final MultiValueMap<String, String> body) {
@@ -49,17 +54,18 @@ public class PasswordFlowAccessTokenReactiveRetriever
         .contentType(MediaType.APPLICATION_FORM_URLENCODED)
         .body(BodyInserters.fromFormData(body))
         .retrieve()
-        .onStatus(ErrorDetectors.DEFAULT, new AuthenticationExceptionCreator())
+        .onStatus(ErrorDetectors.DEFAULT, exceptionCreator)
         .bodyToMono(String.class)
         .map(s -> ((JSONObject) JSONValue.parse(s)).getAsString("access_token"));
   }
 
   private static class AuthenticationExceptionCreator
-      extends ExceptionCreator<AuthenticationException> {
+      extends AbstractWebClientErrorDecoder<AuthenticationException> {
 
     @Override
-    protected AuthenticationException createException(HttpStatus httpStatus, String body) {
-      return new PasswordFlowAuthenticationException(httpStatus, body);
+    public AuthenticationException buildException(
+        final ClientResponse clientResponse, final String response) {
+      return new PasswordFlowAuthenticationException(clientResponse.statusCode(), response);
     }
   }
 
