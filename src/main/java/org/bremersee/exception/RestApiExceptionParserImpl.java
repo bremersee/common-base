@@ -89,7 +89,7 @@ public class RestApiExceptionParserImpl implements RestApiExceptionParser {
     }
     if (restApiException == null) {
       restApiException = new RestApiException();
-      // TODO parse headers
+      // TODO parse headers and extend them
       if (StringUtils.hasText(response)) {
         restApiException.setMessage(response);
       }

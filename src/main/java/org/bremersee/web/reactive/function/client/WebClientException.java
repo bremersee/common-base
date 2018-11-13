@@ -28,7 +28,7 @@ public class WebClientException extends AbstractWebClientException {
 
   public WebClientException(
       final HttpStatus status,
-      final Map<String, Collection<String>> headers,
+      final Map<String, ? extends Collection<String>> headers,
       final RestApiException restApiException) {
     super(status, headers, restApiException);
   }

@@ -33,6 +33,6 @@ public interface HttpResponseHeadersAware {
    * @return the response headers
    */
   @NotNull
-  Map<String, Collection<String>> getHeaders();
+  Map<String, ? extends Collection<String>> getHeaders();
 
 }

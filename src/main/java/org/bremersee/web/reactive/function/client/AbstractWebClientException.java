@@ -36,7 +36,7 @@ public abstract class AbstractWebClientException
     implements RestApiExceptionAware, ErrorCodeAware, HttpResponseHeadersAware {
 
   @Getter
-  private final Map<String, Collection<String>> headers;
+  private final Map<String, ? extends Collection<String>> headers;
 
   @Getter
   @Nullable
@@ -44,7 +44,7 @@ public abstract class AbstractWebClientException
 
   public AbstractWebClientException(
       final HttpStatus status,
-      final Map<String, Collection<String>> headers,
+      final Map<String, ? extends Collection<String>> headers,
       final RestApiException restApiException) {
     super(status);
     this.headers = headers != null ? headers : Collections.emptyMap();

@@ -45,7 +45,7 @@ public class FeignClientException extends FeignException implements HttpStatusAw
 
   @Getter
   @NotNull
-  private final Map<String, Collection<String>> headers;
+  private final Map<String, ? extends Collection<String>> headers;
 
   @Getter
   @Nullable
@@ -54,7 +54,7 @@ public class FeignClientException extends FeignException implements HttpStatusAw
   @SuppressWarnings("WeakerAccess")
   public FeignClientException(
       final Request request,
-      final Map<String, Collection<String>> headers,
+      final Map<String, ? extends Collection<String>> headers,
       final int status,
       final String message,
       final RestApiException restApiException) {

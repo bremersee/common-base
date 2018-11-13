@@ -46,7 +46,7 @@ public class DefaultWebClientErrorDecoder
   @Override
   public WebClientException buildException(ClientResponse clientResponse, String response) {
 
-    final Map<String, Collection<String>> headers = Collections
+    final Map<String, ? extends Collection<String>> headers = Collections
         .unmodifiableMap(clientResponse.headers().asHttpHeaders());
     final RestApiException restApiException = parser.parseRestApiException(
         response,
