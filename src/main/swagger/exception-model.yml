@@ -45,6 +45,7 @@ definitions:
   RestApiException:
     description: "The serialized exception."
     type: "object"
+    discriminator: _type
     properties:
       id:
         type: "string"

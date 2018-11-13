@@ -35,7 +35,7 @@ import org.springframework.http.HttpStatus;
 @Data
 public class RestApiExceptionMapperProperties {
 
-  private List<String> apiAntPaths = new ArrayList<>();
+  private List<String> apiPaths = new ArrayList<>();
 
   private ExceptionMapping defaultExceptionMapping;
 
@@ -47,7 +47,7 @@ public class RestApiExceptionMapperProperties {
 
   public RestApiExceptionMapperProperties() {
 
-    apiAntPaths.add("/api/**");
+    apiPaths.add("/api/**");
 
     defaultExceptionMapping = new ExceptionMapping();
     defaultExceptionMapping.setCode(ExceptionConstants.NO_ERROR_CODE_PRESENT);

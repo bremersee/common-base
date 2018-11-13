@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.bremersee.web;
+package org.bremersee.http;
 
 import java.util.List;
 import org.springframework.http.MediaType;
@@ -26,6 +26,7 @@ import org.springframework.validation.annotation.Validated;
  *
  * @author Christian Bremer
  */
+@SuppressWarnings("WeakerAccess")
 @Validated
 public abstract class MediaTypeHelper {
 
@@ -98,6 +99,12 @@ public abstract class MediaTypeHelper {
         || mediaType.toLowerCase().contains("+xml"));
   }
 
+  /**
+   * Creates a header value of the given media types.
+   *
+   * @param mediaTypes the media types
+   * @return the header value
+   */
   @Nullable
   public static String toString(@Nullable final List<MediaType> mediaTypes) {
     return mediaTypes == null || mediaTypes.isEmpty() ? null : MediaType.toString(mediaTypes);

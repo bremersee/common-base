@@ -21,12 +21,14 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
+import org.bremersee.exception.ExceptionConstants;
 
 /**
  * Marks an exception class or method with an error code {@link #value()} of the application.
  *
  * <p>The error code is applied to the HTTP response by the
- * {@link org.bremersee.web.servlet.ApiExceptionResolver}.
+ * {@link org.bremersee.web.servlet.ApiExceptionResolver} or in a reactive environment by the {@link
+ * org.bremersee.web.reactive.ApiExceptionHandler}.
  *
  * @author Christian Bremer
  */
@@ -35,6 +37,12 @@ import java.lang.annotation.Target;
 @Documented
 public @interface ErrorCode {
 
-  String value() default "";
+  /**
+   * The error code of the exception in addition to the HTTP status code. The default value is
+   * {@link ExceptionConstants#NO_ERROR_CODE_PRESENT}.
+   *
+   * @return the error code
+   */
+  String value() default ExceptionConstants.NO_ERROR_CODE_PRESENT;
 
 }

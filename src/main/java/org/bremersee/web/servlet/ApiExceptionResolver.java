@@ -27,7 +27,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.bremersee.exception.ExceptionConstants;
 import org.bremersee.exception.RestApiExceptionMapper;
 import org.bremersee.exception.model.RestApiException;
-import org.bremersee.web.MediaTypeHelper;
+import org.bremersee.http.MediaTypeHelper;
+import org.bremersee.http.converter.ObjectMapperHelper;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -87,7 +88,7 @@ public class ApiExceptionResolver implements HandlerExceptionResolver {
     switch (chooser.getResponseFormat()) {
       case JSON:
         final MappingJackson2JsonView mjv = objectMapperBuilder == null
-            ? new MappingJackson2JsonView()
+            ? new MappingJackson2JsonView(ObjectMapperHelper.getJsonMapper())
             : new MappingJackson2JsonView(objectMapperBuilder.build());
         mjv.setContentType(chooser.getContentType());
         mjv.setPrettyPrint(true);
@@ -98,7 +99,7 @@ public class ApiExceptionResolver implements HandlerExceptionResolver {
 
       case XML:
         final MappingJackson2XmlView mxv = objectMapperBuilder == null
-            ? new MappingJackson2XmlView()
+            ? new MappingJackson2XmlView(ObjectMapperHelper.getXmlMapper())
             : new MappingJackson2XmlView(objectMapperBuilder.createXmlMapper(true).build());
         mxv.setContentType(chooser.getContentType());
         mxv.setPrettyPrint(true);

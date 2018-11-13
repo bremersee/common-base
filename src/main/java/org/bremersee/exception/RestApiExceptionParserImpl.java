@@ -20,7 +20,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.bremersee.exception.model.RestApiException;
-import org.bremersee.web.MediaTypeHelper;
+import org.bremersee.http.MediaTypeHelper;
+import org.bremersee.http.converter.ObjectMapperHelper;
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import org.springframework.util.StringUtils;
 
@@ -45,7 +46,7 @@ public class RestApiExceptionParserImpl implements RestApiExceptionParser {
     if (objectMapperBuilder != null) {
       return objectMapperBuilder.build();
     } else {
-      return Jackson2ObjectMapperBuilder.json().build();
+      return ObjectMapperHelper.getJsonMapper();
     }
   }
 
@@ -53,7 +54,7 @@ public class RestApiExceptionParserImpl implements RestApiExceptionParser {
     if (objectMapperBuilder != null) {
       return objectMapperBuilder.createXmlMapper(true).build();
     } else {
-      return Jackson2ObjectMapperBuilder.xml().build();
+      return ObjectMapperHelper.getXmlMapper();
     }
   }
 

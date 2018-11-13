@@ -21,14 +21,17 @@ import feign.Request;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
+import javax.validation.constraints.NotNull;
 import lombok.Getter;
 import org.bremersee.exception.ErrorCodeAware;
+import org.bremersee.exception.ExceptionConstants;
 import org.bremersee.exception.HttpResponseHeadersAware;
 import org.bremersee.exception.HttpStatusAware;
 import org.bremersee.exception.RestApiExceptionAware;
 import org.bremersee.exception.model.RestApiException;
 import org.springframework.http.HttpStatus;
 import org.springframework.lang.Nullable;
+import org.springframework.util.StringUtils;
 
 /**
  * @author Christian Bremer
@@ -37,15 +40,18 @@ public class FeignClientException extends FeignException implements HttpStatusAw
     HttpResponseHeadersAware, RestApiExceptionAware, ErrorCodeAware {
 
   @Getter
+  @Nullable
   private final Request request;
 
   @Getter
+  @NotNull
   private final Map<String, Collection<String>> headers;
 
   @Getter
   @Nullable
   private final RestApiException restApiException;
 
+  @SuppressWarnings("WeakerAccess")
   public FeignClientException(
       final Request request,
       final Map<String, Collection<String>> headers,
@@ -53,7 +59,9 @@ public class FeignClientException extends FeignException implements HttpStatusAw
       final String message,
       final RestApiException restApiException) {
 
-    super(resolveHttpStatusCode(status), message);
+    super(resolveHttpStatusCode(status), StringUtils.hasText(message)
+        ? message
+        : ExceptionConstants.NO_MESSAGE_PRESENT);
     this.request = request;
     this.headers = headers != null ? headers : Collections.emptyMap();
     this.restApiException = restApiException;

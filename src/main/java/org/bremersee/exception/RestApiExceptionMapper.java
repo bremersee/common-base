@@ -35,7 +35,7 @@ public interface RestApiExceptionMapper {
 
   String CLASS_HEADER_NAME = "X-ERROR-CLASS-NAME";
 
-  @NotNull List<String> getApiAntPaths();
+  @NotNull List<String> getApiPaths();
 
   @NotNull RestApiException build(
       @NotNull Throwable exception,

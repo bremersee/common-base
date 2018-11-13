@@ -24,7 +24,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.bremersee.exception.ExceptionConstants;
 import org.bremersee.exception.RestApiExceptionMapper;
 import org.bremersee.exception.model.RestApiException;
-import org.bremersee.web.MediaTypeHelper;
+import org.bremersee.http.MediaTypeHelper;
 import org.springframework.boot.autoconfigure.web.ResourceProperties;
 import org.springframework.boot.autoconfigure.web.reactive.error.AbstractErrorWebExceptionHandler;
 import org.springframework.boot.web.reactive.error.ErrorAttributes;
@@ -81,7 +81,7 @@ public class ApiExceptionHandler extends AbstractErrorWebExceptionHandler {
 
   @SuppressWarnings("WeakerAccess")
   protected boolean isResponsibleExceptionHandler(ServerRequest request) {
-    return restApiExceptionMapper.getApiAntPaths().stream().anyMatch(
+    return restApiExceptionMapper.getApiPaths().stream().anyMatch(
         s -> pathMatcher.match(s, request.path()));
   }
 

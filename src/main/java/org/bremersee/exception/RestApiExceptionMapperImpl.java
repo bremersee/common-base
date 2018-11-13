@@ -18,6 +18,7 @@ package org.bremersee.exception;
 
 import java.lang.reflect.Method;
 import java.time.OffsetDateTime;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.UUID;
 import javax.validation.constraints.NotNull;
@@ -61,8 +62,8 @@ public class RestApiExceptionMapperImpl implements RestApiExceptionMapper {
   }
 
   @Override
-  public List<String> getApiAntPaths() {
-    return properties.getApiAntPaths();
+  public List<String> getApiPaths() {
+    return properties.getApiPaths();
   }
 
   @Override
@@ -105,16 +106,6 @@ public class RestApiExceptionMapperImpl implements RestApiExceptionMapper {
       httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
     }
     return httpStatus;
-  }
-
-  protected boolean isInstanceOf(@Nullable final Class<?> cls, @Nullable final String clsName) {
-    if (cls == null || clsName == null) {
-      return false;
-    }
-    if (cls.getName().equals(clsName)) {
-      return true;
-    }
-    return isInstanceOf(cls.getSuperclass(), clsName);
   }
 
   @SuppressWarnings("SameParameterValue")
@@ -160,7 +151,7 @@ public class RestApiExceptionMapperImpl implements RestApiExceptionMapper {
     if (httpStatus.series() == HttpStatus.Series.SERVER_ERROR) {
       restApiException.setId(UUID.randomUUID().toString());
     }
-    restApiException.setTimestamp(OffsetDateTime.now());
+    restApiException.setTimestamp(OffsetDateTime.now(ZoneId.of("UTC")));
     restApiException.setMessage(detectMessage(exception, handler, config));
     if (config.isIncludeExceptionClassName()) {
       restApiException.setClassName(exception.getClass().getName());
