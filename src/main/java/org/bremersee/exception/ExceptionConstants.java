@@ -16,15 +16,50 @@
 
 package org.bremersee.exception;
 
+import java.time.OffsetDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import javax.validation.constraints.NotNull;
+import org.springframework.lang.Nullable;
+import org.springframework.util.StringUtils;
+
 /**
  * @author Christian Bremer
  */
 public abstract class ExceptionConstants {
 
-  public static final String NO_MESSAGE_PRESENT = "No message present.";
+  public static final String ID_HEADER_NAME = "X-ERROR-ID";
 
-  public static final String NO_ERROR_CODE_PRESENT = "UNSPECIFIED";
+  public static final String TIMESTAMP_HEADER_NAME = "X-ERROR-TIMESTAMP";
+
+  public static final DateTimeFormatter TIMESTAMP_FORMATTER = DateTimeFormatter.RFC_1123_DATE_TIME;
+
+  public static final String MESSAGE_HEADER_NAME = "X-ERROR-MESSAGE";
+
+  public static final String CODE_HEADER_NAME = "X-ERROR-CODE";
+
+  public static final String CLASS_HEADER_NAME = "X-ERROR-CLASS-NAME";
+
+  public static final String NO_MESSAGE_VALUE = "No message present.";
+
+  public static final String NO_ERROR_CODE_VALUE = "UNSPECIFIED";
+
+  public static final String NO_ID_VALUE = "UNSPECIFIED";
 
   private ExceptionConstants() {
   }
+
+  @NotNull
+  public static OffsetDateTime parseHeaderValue(@Nullable String value) {
+    OffsetDateTime time = null;
+    if (StringUtils.hasText(value)) {
+      try {
+        time = OffsetDateTime.parse(value, TIMESTAMP_FORMATTER);
+      } catch (Exception e) {
+        time = null;
+      }
+    }
+    return time != null ? time : OffsetDateTime.now(ZoneId.of("UTC"));
+  }
+
 }

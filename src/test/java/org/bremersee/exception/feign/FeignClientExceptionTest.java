@@ -38,7 +38,7 @@ public class FeignClientExceptionTest {
     Assert.assertNull(exception.getRequest());
     Assert.assertNotNull(exception.getHeaders());
     Assert.assertEquals(exception.status(), HttpStatus.INTERNAL_SERVER_ERROR.value());
-    Assert.assertEquals(exception.getMessage(), ExceptionConstants.NO_MESSAGE_PRESENT);
+    Assert.assertEquals(exception.getMessage(), ExceptionConstants.NO_MESSAGE_VALUE);
     Assert.assertNull(exception.getRestApiException());
     Assert.assertNull(exception.getErrorCode());
   }

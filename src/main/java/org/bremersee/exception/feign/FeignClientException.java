@@ -61,7 +61,7 @@ public class FeignClientException extends FeignException implements HttpStatusAw
 
     super(resolveHttpStatusCode(status), StringUtils.hasText(message)
         ? message
-        : ExceptionConstants.NO_MESSAGE_PRESENT);
+        : ExceptionConstants.NO_MESSAGE_VALUE);
     this.request = request;
     this.headers = headers != null ? headers : Collections.emptyMap();
     this.restApiException = restApiException;

@@ -1,7 +1,0 @@
-{
-  "importMappings": {
-    "Handler": "org.bremersee.exception.model.Handler",
-    "RestApiException": "org.bremersee.exception.model.RestApiException",
-    "StackTraceItem": "org.bremersee.exception.model.StackTraceItem"
-  }
-}

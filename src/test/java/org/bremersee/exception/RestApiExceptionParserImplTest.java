@@ -72,12 +72,16 @@ public class RestApiExceptionParserImplTest {
     final String response = getJsonMapper()
         .writeValueAsString(TestHelper.otherResponse());
     final RestApiException expected = new RestApiException();
+    expected.setId(ExceptionConstants.NO_ID_VALUE);
+    expected.setErrorCode(ExceptionConstants.NO_ERROR_CODE_VALUE);
+    expected.setClassName(Exception.class.getName());
     expected.setMessage(response);
-    log.info("Expected: {}", expected);
     final RestApiException actual = new RestApiExceptionParserImpl()
         .parseRestApiException(
             response,
             buildHttpHeaders(MediaType.APPLICATION_JSON));
+    expected.setTimestamp(actual.getTimestamp());
+    log.info("Expected: {}", expected);
     log.info("Actual:   {}", actual);
     Assert.assertNotNull(actual);
     Assert.assertEquals(expected, actual);

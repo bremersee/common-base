@@ -16,6 +16,8 @@
 
 package org.bremersee.web.reactive;
 
+import java.time.OffsetDateTime;
+import java.time.ZoneId;
 import javax.validation.constraints.NotNull;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -102,20 +104,30 @@ public class ApiExceptionHandler extends AbstractErrorWebExceptionHandler {
           .contentType(MediaType.APPLICATION_XML)
           .body(BodyInserters.fromObject(response));
     } else {
+      final String id = StringUtils.hasText(response.getId())
+          ? response.getId()
+          : ExceptionConstants.NO_ID_VALUE;
+      final String timestamp = response.getTimestamp() != null
+          ? response.getTimestamp().format(ExceptionConstants.TIMESTAMP_FORMATTER)
+          : OffsetDateTime.now(ZoneId.of("UTC")).format(ExceptionConstants.TIMESTAMP_FORMATTER);
       final String msg = StringUtils.hasText(response.getMessage())
           ? response.getMessage()
-          : ExceptionConstants.NO_MESSAGE_PRESENT;
+          : ExceptionConstants.NO_MESSAGE_VALUE;
       final String code = StringUtils.hasText(response.getErrorCode())
           ? response.getErrorCode()
-          : ExceptionConstants.NO_ERROR_CODE_PRESENT;
+          : ExceptionConstants.NO_ERROR_CODE_VALUE;
       final String cls = StringUtils.hasText(response.getClassName())
           ? response.getClassName()
           : Exception.class.getName();
       return ServerResponse
           .status(restApiExceptionMapper.detectHttpStatus(getError(request), null))
-          .header(RestApiExceptionMapper.MESSAGE_HEADER_NAME, msg)
-          .header(RestApiExceptionMapper.CODE_HEADER_NAME, code)
-          .header(RestApiExceptionMapper.MESSAGE_HEADER_NAME, cls)
+          .header(ExceptionConstants.ID_HEADER_NAME, id)
+          .header(ExceptionConstants.TIMESTAMP_HEADER_NAME, timestamp)
+          .header(ExceptionConstants.MESSAGE_HEADER_NAME, msg)
+          .header(ExceptionConstants.CODE_HEADER_NAME, code)
+          .header(ExceptionConstants.CLASS_HEADER_NAME, cls)
+          .contentType(MediaTypeHelper.findContentType(
+              request.headers().accept(), MediaType.TEXT_PLAIN))
           .body(BodyInserters.empty());
     }
   }

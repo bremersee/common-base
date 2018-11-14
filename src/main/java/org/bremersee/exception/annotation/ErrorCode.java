@@ -39,10 +39,10 @@ public @interface ErrorCode {
 
   /**
    * The error code of the exception in addition to the HTTP status code. The default value is
-   * {@link ExceptionConstants#NO_ERROR_CODE_PRESENT}.
+   * {@link ExceptionConstants#NO_ERROR_CODE_VALUE}.
    *
    * @return the error code
    */
-  String value() default ExceptionConstants.NO_ERROR_CODE_PRESENT;
+  String value() default ExceptionConstants.NO_ERROR_CODE_VALUE;
 
 }

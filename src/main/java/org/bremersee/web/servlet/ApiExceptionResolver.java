@@ -16,6 +16,9 @@
 
 package org.bremersee.web.servlet;
 
+import java.time.OffsetDateTime;
+import java.time.ZoneId;
+import java.util.List;
 import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -111,9 +114,7 @@ public class ApiExceptionResolver implements HandlerExceptionResolver {
         modelAndView = new ModelAndView(new EmptyView(payload));
     }
 
-    if (StringUtils.hasText(chooser.getContentType())) {
-      response.setContentType(chooser.getContentType());
-    }
+    response.setContentType(chooser.getContentType());
     final int statusCode = exceptionMapper.detectHttpStatus(ex, handler).value();
     applyStatusCodeIfPossible(request, response, statusCode);
     return modelAndView;
@@ -175,34 +176,22 @@ public class ApiExceptionResolver implements HandlerExceptionResolver {
         contentType = MediaType.APPLICATION_XML_VALUE;
       } else {
         responseFormat = ResponseFormat.EMPTY;
-        String type = acceptHeader;
-        int i = type.charAt(',');
-        if (i > 0) {
-          type = type.substring(0, i);
+        if (StringUtils.hasText(acceptHeader)) {
+          final List<MediaType> accepts = MediaType.parseMediaTypes(acceptHeader);
+          contentType = MediaTypeHelper.findContentType(accepts, MediaType.TEXT_PLAIN).toString();
+        } else {
+          contentType = MediaType.TEXT_PLAIN_VALUE;
         }
-        i = type.charAt(';');
-        if (i > 0) {
-          type = type.substring(0, i);
-        }
-        contentType = type;
       }
     }
   }
 
   static class EmptyView extends AbstractView {
 
-    final String errorMessage;
-
-    final String errorCode;
-
-    final String errorClassName;
+    final RestApiException restApiException;
 
     EmptyView(final @NotNull RestApiException payload) {
-      this.errorMessage = StringUtils.hasText(payload.getMessage())
-          ? payload.getMessage()
-          : ExceptionConstants.NO_MESSAGE_PRESENT;
-      this.errorCode = payload.getErrorCode();
-      this.errorClassName = payload.getClassName();
+      this.restApiException = payload;
     }
 
     @Override
@@ -211,15 +200,31 @@ public class ApiExceptionResolver implements HandlerExceptionResolver {
         final HttpServletRequest httpServletRequest,
         final HttpServletResponse httpServletResponse) {
 
-      if (StringUtils.hasText(errorMessage)) {
-        httpServletResponse.addHeader(RestApiExceptionMapper.MESSAGE_HEADER_NAME, errorMessage);
-      }
-      if (StringUtils.hasText(errorCode)) {
-        httpServletResponse.addHeader(RestApiExceptionMapper.CODE_HEADER_NAME, errorCode);
-      }
-      if (StringUtils.hasText(errorClassName)) {
-        httpServletResponse.addHeader(RestApiExceptionMapper.CLASS_HEADER_NAME, errorClassName);
-      }
+      httpServletResponse.addHeader(ExceptionConstants.ID_HEADER_NAME,
+          StringUtils.hasText(restApiException.getId())
+              ? restApiException.getId()
+              : ExceptionConstants.NO_ID_VALUE);
+
+      httpServletResponse.addHeader(ExceptionConstants.TIMESTAMP_HEADER_NAME,
+          restApiException.getTimestamp() != null
+              ? restApiException.getTimestamp().format(ExceptionConstants.TIMESTAMP_FORMATTER)
+              : OffsetDateTime.now(ZoneId.of("UTC")).format(
+                  ExceptionConstants.TIMESTAMP_FORMATTER));
+
+      httpServletResponse.addHeader(ExceptionConstants.MESSAGE_HEADER_NAME,
+          StringUtils.hasText(restApiException.getMessage())
+              ? restApiException.getMessage()
+              : ExceptionConstants.NO_MESSAGE_VALUE);
+
+      httpServletResponse.addHeader(ExceptionConstants.CODE_HEADER_NAME,
+          StringUtils.hasText(restApiException.getErrorCode())
+              ? restApiException.getErrorCode()
+              : ExceptionConstants.NO_ERROR_CODE_VALUE);
+
+      httpServletResponse.addHeader(ExceptionConstants.CLASS_HEADER_NAME,
+          StringUtils.hasText(restApiException.getClassName())
+              ? restApiException.getClassName()
+              : Exception.class.getName());
     }
 
   }

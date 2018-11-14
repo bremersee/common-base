@@ -29,12 +29,6 @@ import org.springframework.validation.annotation.Validated;
 @Validated
 public interface RestApiExceptionMapper {
 
-  String MESSAGE_HEADER_NAME = "X-ERROR-MESSAGE";
-
-  String CODE_HEADER_NAME = "X-ERROR-CODE";
-
-  String CLASS_HEADER_NAME = "X-ERROR-CLASS-NAME";
-
   @NotNull List<String> getApiPaths();
 
   @NotNull RestApiException build(

@@ -89,10 +89,23 @@ public class RestApiExceptionParserImpl implements RestApiExceptionParser {
     }
     if (restApiException == null) {
       restApiException = new RestApiException();
-      // TODO parse headers and extend them
+      final String id = httpHeaders.getFirst(ExceptionConstants.ID_HEADER_NAME);
+      restApiException.setId(StringUtils.hasText(id) ? id : ExceptionConstants.NO_ID_VALUE);
+      final String timestamp = httpHeaders.getFirst(ExceptionConstants.TIMESTAMP_HEADER_NAME);
+      restApiException.setTimestamp(ExceptionConstants.parseHeaderValue(timestamp));
       if (StringUtils.hasText(response)) {
         restApiException.setMessage(response);
+      } else {
+        final String message = httpHeaders.getFirst(ExceptionConstants.MESSAGE_HEADER_NAME);
+        restApiException.setMessage(
+            StringUtils.hasText(message) ? message : ExceptionConstants.NO_MESSAGE_VALUE);
       }
+      final String errorCode = httpHeaders.getFirst(ExceptionConstants.CODE_HEADER_NAME);
+      restApiException.setErrorCode(StringUtils.hasText(errorCode)
+          ? errorCode
+          : ExceptionConstants.NO_ERROR_CODE_VALUE);
+      final String cls = httpHeaders.getFirst(ExceptionConstants.CLASS_HEADER_NAME);
+      restApiException.setClassName(StringUtils.hasText(cls) ? cls : Exception.class.getName());
     }
     return restApiException;
   }

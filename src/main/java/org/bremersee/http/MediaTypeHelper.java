@@ -17,6 +17,8 @@
 package org.bremersee.http;
 
 import java.util.List;
+import java.util.function.Predicate;
+import javax.validation.constraints.NotNull;
 import org.springframework.http.MediaType;
 import org.springframework.lang.Nullable;
 import org.springframework.validation.annotation.Validated;
@@ -108,6 +110,20 @@ public abstract class MediaTypeHelper {
   @Nullable
   public static String toString(@Nullable final List<MediaType> mediaTypes) {
     return mediaTypes == null || mediaTypes.isEmpty() ? null : MediaType.toString(mediaTypes);
+  }
+
+  @Nullable
+  public static MediaType findContentType(
+      @Nullable final List<MediaType> accepts,
+      MediaType fallback) {
+    if (accepts == null) {
+      return fallback;
+    }
+    return accepts
+        .stream()
+        .filter(mediaType -> !"*".equals(mediaType.getSubtype()))
+        .findFirst()
+        .orElse(fallback);
   }
 
 }
