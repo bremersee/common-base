@@ -23,11 +23,20 @@ import org.springframework.lang.Nullable;
 import org.springframework.validation.annotation.Validated;
 
 /**
+ * A http response parser that creates a {@link RestApiException}.
+ *
  * @author Christian Bremer
  */
 @Validated
 public interface RestApiExceptionParser {
 
+  /**
+   * Parse the error reponse and create a rest api exception model
+   *
+   * @param response the response body
+   * @param headers  the response headers
+   * @return the rest api exception model
+   */
   RestApiException parseRestApiException(
       @Nullable String response,
       @Nullable Map<String, ? extends Collection<String>> headers);

@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 the original author or authors.
+ * Copyright 2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,42 +18,48 @@ package org.bremersee.exception.feign;
 
 import static feign.Util.RETRY_AFTER;
 import static java.lang.String.format;
-import static java.util.Locale.US;
 import static java.util.concurrent.TimeUnit.SECONDS;
 
 import feign.Response;
 import feign.RetryableException;
 import feign.Util;
 import feign.codec.ErrorDecoder;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Collection;
+import java.time.OffsetDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Collections;
 import java.util.Date;
-import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.bremersee.exception.RestApiExceptionParser;
 import org.bremersee.exception.RestApiExceptionParserImpl;
 import org.bremersee.exception.model.RestApiException;
+import org.bremersee.http.HttpHeadersHelper;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
 
 /**
+ * This error decoder produces either a {@link FeignClientException} or a {@link
+ * feign.RetryableException}.
+ *
  * @author Christian Bremer
  */
 @Slf4j
 public class FeignClientExceptionErrorDecoder implements ErrorDecoder {
 
-  private final DateFormat rfc822Format = new SimpleDateFormat(
-      "EEE, dd MMM yyyy HH:mm:ss 'GMT'", US);
-
   private final RestApiExceptionParser parser;
 
+  /**
+   * Instantiates a new feign client exception error decoder.
+   */
+  @SuppressWarnings("WeakerAccess")
   public FeignClientExceptionErrorDecoder() {
     this.parser = new RestApiExceptionParserImpl();
   }
 
+  /**
+   * Instantiates a new Feign client exception error decoder.
+   *
+   * @param parser the parser
+   */
+  @SuppressWarnings("unused")
   public FeignClientExceptionErrorDecoder(
       final RestApiExceptionParser parser) {
     this.parser = parser != null ? parser : new RestApiExceptionParserImpl();
@@ -80,8 +86,8 @@ public class FeignClientExceptionErrorDecoder implements ErrorDecoder {
         response.status(),
         message,
         restApiException);
-    final Date retryAfter = determineRetryAfter(
-        firstOrDefault(response.headers(), RETRY_AFTER, null));
+    final HttpHeaders httpHeaders = HttpHeadersHelper.buildHttpHeaders(response.headers());
+    final Date retryAfter = determineRetryAfter(httpHeaders.getFirst(RETRY_AFTER));
     if (retryAfter != null) {
       return new RetryableException(feignClientException.getMessage(), feignClientException,
           retryAfter);
@@ -89,7 +95,7 @@ public class FeignClientExceptionErrorDecoder implements ErrorDecoder {
     return feignClientException;
   }
 
-  private String readBody(Response response) {
+  private String readBody(final Response response) {
     if (response.body() == null) {
       return null;
     }
@@ -100,14 +106,7 @@ public class FeignClientExceptionErrorDecoder implements ErrorDecoder {
     }
   }
 
-  private <T> T firstOrDefault(Map<String, Collection<T>> map, String key, T defaultValue) {
-    if (map.containsKey(key) && !map.get(key).isEmpty()) {
-      return map.get(key).iterator().next();
-    }
-    return defaultValue;
-  }
-
-  private Date determineRetryAfter(String retryAfter) {
+  private Date determineRetryAfter(final String retryAfter) {
     if (retryAfter == null) {
       return null;
     }
@@ -115,12 +114,11 @@ public class FeignClientExceptionErrorDecoder implements ErrorDecoder {
       long deltaMillis = SECONDS.toMillis(Long.parseLong(retryAfter));
       return new Date(System.currentTimeMillis() + deltaMillis);
     }
-    synchronized (rfc822Format) {
-      try {
-        return rfc822Format.parse(retryAfter);
-      } catch (ParseException ignored) {
-        return null;
-      }
+    try {
+      return Date.from(OffsetDateTime.parse(retryAfter,
+          DateTimeFormatter.RFC_1123_DATE_TIME).toInstant());
+    } catch (Exception ignored) {
+      return null;
     }
   }
 }

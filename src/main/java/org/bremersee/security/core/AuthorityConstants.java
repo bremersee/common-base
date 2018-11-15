@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 the original author or authors.
+ * Copyright 2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,18 +17,36 @@
 package org.bremersee.security.core;
 
 /**
+ * Some authority constants.
+ *
  * @author Christian Bremer
  */
+@SuppressWarnings("unused")
 public abstract class AuthorityConstants {
 
+  /**
+   * The constant ADMIN_ROLE_NAME.
+   */
   public static final String ADMIN_ROLE_NAME = "ROLE_ADMIN";
 
+  /**
+   * The constant ACTUATOR_ADMIN_ROLE_NAME.
+   */
   public static final String ACTUATOR_ADMIN_ROLE_NAME = "ROLE_ACTUATOR_ADMIN";
 
+  /**
+   * The constant ACTUATOR_ROLE_NAME.
+   */
   public static final String ACTUATOR_ROLE_NAME = "ROLE_ACTUATOR";
 
+  /**
+   * The constant USER_ROLE_NAME.
+   */
   public static final String USER_ROLE_NAME = "ROLE_USER";
 
+  /**
+   * The constant LOCAL_USER_ROLE_NAME.
+   */
   public static final String LOCAL_USER_ROLE_NAME = "ROLE_LOCAL_USER";
 
   private AuthorityConstants() {

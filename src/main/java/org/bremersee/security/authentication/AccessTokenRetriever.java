@@ -17,10 +17,18 @@
 package org.bremersee.security.authentication;
 
 /**
+ * Retrieve the access token from the identity provider.
+ *
  * @author Christian Bremer
  */
 public interface AccessTokenRetriever<I, R> {
 
+  /**
+   * Retrieve the access token from the identity provider.
+   *
+   * @param input the input values
+   * @return the access token
+   */
   R retrieveAccessToken(I input);
 
 }

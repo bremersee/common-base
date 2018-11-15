@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 the original author or authors.
+ * Copyright 2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,9 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtAut
 import reactor.core.publisher.Mono;
 
 /**
+ * A reactive JWT converter for the keycloak identity provider. It use the json path {@code
+ * $.realm_access.roles}** to extract the roles from the token.
+ *
  * @author Christian Bremer
  */
 @SuppressWarnings("unused")
@@ -29,6 +32,9 @@ public class KeycloakReactiveJwtConverter implements Converter<Jwt, Mono<JwtAuth
 
   private final KeycloakJwtConverter converter;
 
+  /**
+   * Instantiates a new keycloak reactive jwt converter.
+   */
   public KeycloakReactiveJwtConverter() {
     this.converter = new KeycloakJwtConverter();
   }

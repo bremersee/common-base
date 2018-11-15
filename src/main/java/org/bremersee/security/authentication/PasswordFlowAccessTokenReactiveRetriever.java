@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 the original author or authors.
+ * Copyright 2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,16 +31,21 @@ import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
 /**
+ * A reactive implementation of the {@link AccessTokenRetriever}.
+ *
  * @author Christian Bremer
  */
 public class PasswordFlowAccessTokenReactiveRetriever
+    extends AbstractWebClientErrorDecoder<AuthenticationException>
     implements AccessTokenRetriever<MultiValueMap<String, String>, Mono<String>> {
-
-  private final AuthenticationExceptionCreator exceptionCreator
-      = new AuthenticationExceptionCreator();
 
   private final WebClient webClient;
 
+  /**
+   * Instantiates a new password flow access token retriever.
+   *
+   * @param webClient the web client
+   */
   @SuppressWarnings("WeakerAccess")
   public PasswordFlowAccessTokenReactiveRetriever(
       final WebClient webClient) {
@@ -54,19 +59,15 @@ public class PasswordFlowAccessTokenReactiveRetriever
         .contentType(MediaType.APPLICATION_FORM_URLENCODED)
         .body(BodyInserters.fromFormData(body))
         .retrieve()
-        .onStatus(ErrorDetectors.DEFAULT, exceptionCreator)
+        .onStatus(ErrorDetectors.DEFAULT, this)
         .bodyToMono(String.class)
         .map(s -> ((JSONObject) JSONValue.parse(s)).getAsString("access_token"));
   }
 
-  private static class AuthenticationExceptionCreator
-      extends AbstractWebClientErrorDecoder<AuthenticationException> {
-
-    @Override
-    public AuthenticationException buildException(
-        final ClientResponse clientResponse, final String response) {
-      return new PasswordFlowAuthenticationException(clientResponse.statusCode(), response);
-    }
+  @Override
+  public AuthenticationException buildException(
+      final ClientResponse clientResponse, final String response) {
+    return new PasswordFlowAuthenticationException(clientResponse.statusCode(), response);
   }
 
 }

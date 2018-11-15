@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 the original author or authors.
+ * Copyright 2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,8 @@ import java.util.function.Predicate;
 import org.springframework.http.HttpStatus;
 
 /**
+ * A collection of error detectors.
+ *
  * @author Christian Bremer
  */
 public abstract class ErrorDetectors {
@@ -27,6 +29,9 @@ public abstract class ErrorDetectors {
   private ErrorDetectors() {
   }
 
+  /**
+   * Detects errors with an http status code 4xx or 5xx.
+   */
   public static final Predicate<HttpStatus> DEFAULT =
       httpStatus -> (httpStatus.series() == HttpStatus.Series.CLIENT_ERROR ||
           httpStatus.series() == HttpStatus.Series.SERVER_ERROR);

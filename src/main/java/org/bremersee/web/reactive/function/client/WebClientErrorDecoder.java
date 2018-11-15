@@ -21,10 +21,21 @@ import org.springframework.web.reactive.function.client.ClientResponse;
 import reactor.core.publisher.Mono;
 
 /**
+ * An error decoder for the {@link org.springframework.web.reactive.function.client.WebClient}.
+ *
+ * @param <E> the type parameter
  * @author Christian Bremer
  */
 public interface WebClientErrorDecoder<E extends Throwable>
     extends Function<ClientResponse, Mono<? extends Throwable>> {
 
+  /**
+   * Build exception.
+   *
+   * @param clientResponse the client response
+   * @param response       the response
+   * @return the exception
+   */
   E buildException(ClientResponse clientResponse, String response);
+
 }

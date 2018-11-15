@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 the original author or authors.
+ * Copyright 2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,18 +24,39 @@ import org.springframework.lang.Nullable;
 import org.springframework.validation.annotation.Validated;
 
 /**
+ * Maps the error response into a {@link RestApiException}.
+ *
  * @author Christian Bremer
  */
 @Validated
 public interface RestApiExceptionMapper {
 
+  /**
+   * Gets the paths this mapper is responsible for.
+   *
+   * @return the list of paths (typically ant paths)
+   */
   @NotNull List<String> getApiPaths();
 
+  /**
+   * Build the exception model from the exception, the requested path and an handler. Typically the
+   * handler is of type {@link org.springframework.web.method.HandlerMethod}.
+   *
+   * @param exception   the exception (required)
+   * @param requestPath the requested path (optional)
+   * @param handler     the handler (optional)
+   */
   @NotNull RestApiException build(
       @NotNull Throwable exception,
       @Nullable String requestPath,
       @Nullable Object handler);
 
+  /**
+   * Detects the http status.
+   *
+   * @param exception the exception (required)
+   * @param handler   the handler (optional)
+   */
   @NotNull
   HttpStatus detectHttpStatus(@NotNull Throwable exception, @Nullable Object handler);
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 the original author or authors.
+ * Copyright 2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,6 +30,8 @@ import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import org.springframework.util.StringUtils;
 
 /**
+ * The default implementation of a http response parser that creates a {@link RestApiException}.
+ *
  * @author Christian Bremer
  */
 @Slf4j
@@ -37,10 +39,19 @@ public class RestApiExceptionParserImpl implements RestApiExceptionParser {
 
   private final Jackson2ObjectMapperBuilder objectMapperBuilder;
 
+  /**
+   * Instantiates a new rest api exception parser.
+   */
   public RestApiExceptionParserImpl() {
     this.objectMapperBuilder = null;
   }
 
+  /**
+   * Instantiates a new rest api exception parser.
+   *
+   * @param objectMapperBuilder the object mapper builder
+   */
+  @SuppressWarnings("unused")
   public RestApiExceptionParserImpl(
       Jackson2ObjectMapperBuilder objectMapperBuilder) {
     this.objectMapperBuilder = objectMapperBuilder;

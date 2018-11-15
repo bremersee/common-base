@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 the original author or authors.
+ * Copyright 2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,8 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.util.StringUtils;
 
 /**
+ * Authentication exception that is thrown by the client that do the OAuth2 Password Flow.
+ *
  * @author Christian Bremer
  */
 public class PasswordFlowAuthenticationException extends AuthenticationException
@@ -28,7 +30,13 @@ public class PasswordFlowAuthenticationException extends AuthenticationException
 
   private HttpStatus httpStatus;
 
-  public PasswordFlowAuthenticationException(HttpStatus httpStatus, String body) {
+  /**
+   * Instantiates a new password flow authentication exception.
+   *
+   * @param httpStatus the http status
+   * @param body       the body
+   */
+  public PasswordFlowAuthenticationException(final HttpStatus httpStatus, final String body) {
     super(buildMessage(httpStatus, body));
     this.httpStatus = httpStatus;
   }
@@ -38,7 +46,7 @@ public class PasswordFlowAuthenticationException extends AuthenticationException
     return httpStatus != null ? httpStatus.value() : HttpStatus.UNAUTHORIZED.value();
   }
 
-  private static String buildMessage(HttpStatus httpStatus, String body) {
+  private static String buildMessage(final HttpStatus httpStatus, final String body) {
     if ((httpStatus == null || !StringUtils.hasText(httpStatus.getReasonPhrase()))
         && !StringUtils.hasText(body)) {
       return RestApiExceptionUtils.NO_MESSAGE_VALUE;

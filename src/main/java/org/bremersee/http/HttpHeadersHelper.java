@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 the original author or authors.
+ * Copyright 2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,8 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.util.MultiValueMap;
 
 /**
+ * Helper to create http headers.
+ *
  * @author Christian Bremer
  */
 public abstract class HttpHeadersHelper {
@@ -32,7 +34,14 @@ public abstract class HttpHeadersHelper {
   private HttpHeadersHelper() {
   }
 
-  public static HttpHeaders buildHttpHeaders(Map<String, ? extends Collection<String>> headers) {
+  /**
+   * Build http headers.
+   *
+   * @param headers the headers
+   * @return the http headers
+   */
+  public static HttpHeaders buildHttpHeaders(
+      final Map<String, ? extends Collection<String>> headers) {
 
     if (headers instanceof HttpHeaders) {
       return (HttpHeaders) headers;

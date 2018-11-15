@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 the original author or authors.
+ * Copyright 2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,14 +17,12 @@
 package org.bremersee.http;
 
 import java.util.List;
-import java.util.function.Predicate;
-import javax.validation.constraints.NotNull;
 import org.springframework.http.MediaType;
 import org.springframework.lang.Nullable;
 import org.springframework.validation.annotation.Validated;
 
 /**
- * The content type helper.
+ * The media type helper.
  *
  * @author Christian Bremer
  */
@@ -112,10 +110,18 @@ public abstract class MediaTypeHelper {
     return mediaTypes == null || mediaTypes.isEmpty() ? null : MediaType.toString(mediaTypes);
   }
 
+  /**
+   * Determine the content type from the given accepts header.
+   *
+   * @param accepts  the accepts header
+   * @param fallback the content type when no one could be found
+   * @return the content type
+   */
   @Nullable
   public static MediaType findContentType(
       @Nullable final List<MediaType> accepts,
-      MediaType fallback) {
+      @Nullable final MediaType fallback) {
+
     if (accepts == null) {
       return fallback;
     }

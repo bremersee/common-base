@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 the original author or authors.
+ * Copyright 2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,8 @@ import lombok.ToString;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**
+ * OAuth2 configuration properties.
+ *
  * @author Christian Bremer
  */
 @ConfigurationProperties(prefix = "bremersee.security.oauth2")
@@ -30,13 +32,18 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @ToString
 public class OAuth2Properties {
 
-  private String userNameClaim;
-
+  /**
+   * The properties for the oauth2 password flow.
+   */
   private PasswordFlowProperties passwordFlow = new PasswordFlowProperties();
 
+  /**
+   * OAuth2 password flow configuration properties.
+   */
   @Getter
   @Setter
   @ToString(exclude = {"clientSecret"})
+  @SuppressWarnings("WeakerAccess")
   public static class PasswordFlowProperties {
 
     private String tokenEndpoint;

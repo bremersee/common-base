@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 the original author or authors.
+ * Copyright 2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,9 @@ import org.springframework.web.reactive.function.client.ClientResponse;
 import reactor.core.publisher.Mono;
 
 /**
+ * An abstract implementation of the error decoder for the 
+ * {@link org.springframework.web.reactive.function.client.WebClient}.
+ *
  * @author Christian Bremer
  */
 public abstract class AbstractWebClientErrorDecoder<E extends Throwable>

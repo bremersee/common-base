@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 the original author or authors.
+ * Copyright 2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -46,6 +46,8 @@ import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
 
 /**
+ * The reactive api exception handler.
+ *
  * @author Christian Bremer
  */
 @Validated
@@ -61,12 +63,22 @@ public class ApiExceptionHandler extends AbstractErrorWebExceptionHandler {
   @NotNull
   private final RestApiExceptionMapper restApiExceptionMapper;
 
+  /**
+   * Instantiates a new api exception handler.
+   *
+   * @param errorAttributes        the error attributes
+   * @param resourceProperties     the resource properties
+   * @param applicationContext     the application context
+   * @param serverCodecConfigurer  the server codec configurer
+   * @param restApiExceptionMapper the rest api exception mapper
+   */
+  @SuppressWarnings("WeakerAccess")
   public ApiExceptionHandler(
-      @NotNull ErrorAttributes errorAttributes,
-      @NotNull ResourceProperties resourceProperties,
-      @NotNull ApplicationContext applicationContext,
-      @Nullable ServerCodecConfigurer serverCodecConfigurer,
-      @NotNull RestApiExceptionMapper restApiExceptionMapper) {
+      @NotNull final ErrorAttributes errorAttributes,
+      @NotNull final ResourceProperties resourceProperties,
+      @NotNull final ApplicationContext applicationContext,
+      @Nullable final ServerCodecConfigurer serverCodecConfigurer,
+      @NotNull final RestApiExceptionMapper restApiExceptionMapper) {
 
     super(errorAttributes, resourceProperties, applicationContext);
     if (serverCodecConfigurer != null) {
@@ -77,18 +89,32 @@ public class ApiExceptionHandler extends AbstractErrorWebExceptionHandler {
   }
 
   @Override
-  protected RouterFunction<ServerResponse> getRoutingFunction(ErrorAttributes errorAttributes) {
+  protected RouterFunction<ServerResponse> getRoutingFunction(
+      final ErrorAttributes errorAttributes) {
+
     return RouterFunctions.route(this::isResponsibleExceptionHandler, this::renderErrorResponse);
   }
 
+  /**
+   * Is this exception handler responsible?
+   *
+   * @param request the request
+   * @return {@code true} if it is responsible, otherwise {@code false}
+   */
   @SuppressWarnings("WeakerAccess")
-  protected boolean isResponsibleExceptionHandler(ServerRequest request) {
+  protected boolean isResponsibleExceptionHandler(final ServerRequest request) {
     return restApiExceptionMapper.getApiPaths().stream().anyMatch(
         s -> pathMatcher.match(s, request.path()));
   }
 
+  /**
+   * Render error response.
+   *
+   * @param request the request
+   * @return the server response
+   */
   @SuppressWarnings("WeakerAccess")
-  protected Mono<ServerResponse> renderErrorResponse(ServerRequest request) {
+  protected Mono<ServerResponse> renderErrorResponse(final ServerRequest request) {
 
     final RestApiException response = restApiExceptionMapper
         .build(getError(request), request.path(), null);

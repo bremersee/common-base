@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 the original author or authors.
+ * Copyright 2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,9 +39,13 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtAut
 import org.springframework.util.MultiValueMap;
 
 /**
+ * An authentication manager that make an OAuth2 Password Flow to authenticate the user. This might
+ * be useful if you want to use Basic Auth with an OAuth2 identity provider.
+ *
  * @author Christian Bremer
  */
 @Slf4j
+@SuppressWarnings("unused")
 public class PasswordFlowAuthenticationManager
     extends AbstractPasswordFlowAuthenticationManager
     implements AuthenticationManager, AuthenticationProvider {
@@ -58,10 +62,18 @@ public class PasswordFlowAuthenticationManager
 
   private final JwtDecoder jwtDecoder;
 
+  /**
+   * Instantiates a new password flow authentication manager.
+   *
+   * @param oauth2Properties    the oauth 2 properties
+   * @param jwtDecoder          the jwt decoder
+   * @param restTemplateBuilder the rest template builder
+   */
   public PasswordFlowAuthenticationManager(
       final OAuth2Properties oauth2Properties,
       final JwtDecoder jwtDecoder,
       final RestTemplateBuilder restTemplateBuilder) {
+
     super(oauth2Properties);
     this.jwtDecoder = jwtDecoder;
     this.accessTokenRetriever = new PasswordFlowAccessTokenRetriever(
@@ -70,7 +82,8 @@ public class PasswordFlowAuthenticationManager
   }
 
   @Override
-  public Authentication authenticate(Authentication authentication) throws AuthenticationException {
+  public Authentication authenticate(final Authentication authentication)
+      throws AuthenticationException {
 
     final String tokenStr = accessTokenRetriever
         .retrieveAccessToken(createPasswordFlowBody(authentication));

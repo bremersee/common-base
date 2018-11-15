@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 the original author or authors.
+ * Copyright 2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,10 +20,13 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import org.bremersee.security.OAuth2Properties;
 import org.springframework.security.core.Authentication;
+import org.springframework.util.Assert;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
 /**
+ * Abstract base implementation of a password flow authentication manager.
+ *
  * @author Christian Bremer
  */
 @SuppressWarnings("WeakerAccess")
@@ -32,18 +35,41 @@ public abstract class AbstractPasswordFlowAuthenticationManager {
   @Getter(AccessLevel.PROTECTED)
   private final OAuth2Properties oauth2Properties;
 
+  /**
+   * Instantiates a new password flow authentication manager.
+   *
+   * @param oauth2Properties the oauth2 properties
+   */
   public AbstractPasswordFlowAuthenticationManager(
       OAuth2Properties oauth2Properties) {
+
+    Assert.notNull(oauth2Properties, "OAuth2 properties must be present.");
+    Assert.notNull(oauth2Properties.getPasswordFlow(),
+        "OAuth2 password flow properties must be present.");
+    Assert.hasText(oauth2Properties.getPasswordFlow().getClientId(),
+        "Client ID must be present.");
     this.oauth2Properties = oauth2Properties;
   }
 
-  protected MultiValueMap<String, String> createPasswordFlowBody(Authentication authentication) {
+  /**
+   * Create body of the oauth2 password flow.
+   *
+   * @param authentication the authentication
+   * @return the body of the oauth2 password flow
+   */
+  protected MultiValueMap<String, String> createPasswordFlowBody(
+      final Authentication authentication) {
+
     final String username = authentication.getName();
     final String presentedPassword = (String) authentication.getCredentials();
     final MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
     body.add("grant_type", "password");
     body.add("client_id", oauth2Properties.getPasswordFlow().getClientId());
-    body.add("client_secret", oauth2Properties.getPasswordFlow().getClientSecret());
+    if (oauth2Properties.getPasswordFlow().getClientSecret() != null) {
+      body.add("client_secret", oauth2Properties.getPasswordFlow().getClientSecret());
+    } else {
+      body.add("client_secret", "");
+    }
     body.add("username", username);
     body.add("password", presentedPassword);
     return body;

@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 the original author or authors.
+ * Copyright 2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,6 +26,8 @@ import org.bremersee.exception.model.RestApiException;
 import org.springframework.web.reactive.function.client.ClientResponse;
 
 /**
+ * This web client error decoder generates a {@link WebClientException} from the error response.
+ *
  * @author Christian Bremer
  */
 @Slf4j
@@ -34,17 +36,29 @@ public class DefaultWebClientErrorDecoder
 
   private final RestApiExceptionParser parser;
 
+  /**
+   * Instantiates a new web client error decoder.
+   */
+  @SuppressWarnings("WeakerAccess")
   public DefaultWebClientErrorDecoder() {
     this.parser = new RestApiExceptionParserImpl();
   }
 
+  /**
+   * Instantiates a new web client error decoder.
+   *
+   * @param parser the parser
+   */
+  @SuppressWarnings("unused")
   public DefaultWebClientErrorDecoder(
       RestApiExceptionParser parser) {
     this.parser = parser != null ? parser : new RestApiExceptionParserImpl();
   }
 
   @Override
-  public WebClientException buildException(ClientResponse clientResponse, String response) {
+  public WebClientException buildException(
+      final ClientResponse clientResponse,
+      final String response) {
 
     final Map<String, ? extends Collection<String>> headers = Collections
         .unmodifiableMap(clientResponse.headers().asHttpHeaders());

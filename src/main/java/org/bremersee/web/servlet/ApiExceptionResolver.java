@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 the original author or authors.
+ * Copyright 2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -52,12 +52,17 @@ import org.springframework.web.servlet.view.xml.MappingJackson2XmlView;
 import org.springframework.web.util.WebUtils;
 
 /**
+ * The api exception resolver.
+ *
  * @author Christian Bremer
  */
 @Validated
 @Slf4j
 public class ApiExceptionResolver implements HandlerExceptionResolver {
 
+  /**
+   * The constant MODEL_KEY.
+   */
   @SuppressWarnings("WeakerAccess")
   protected static final String MODEL_KEY = "error";
 
@@ -72,6 +77,11 @@ public class ApiExceptionResolver implements HandlerExceptionResolver {
   @Setter
   private Jackson2ObjectMapperBuilder objectMapperBuilder;
 
+  /**
+   * Instantiates a new Api exception resolver.
+   *
+   * @param exceptionMapper the exception mapper
+   */
   @SuppressWarnings("WeakerAccess")
   public ApiExceptionResolver(
       final RestApiExceptionMapper exceptionMapper) {
@@ -126,6 +136,13 @@ public class ApiExceptionResolver implements HandlerExceptionResolver {
     return modelAndView;
   }
 
+  /**
+   * Is this exception handler responsible?
+   *
+   * @param request the request
+   * @param handler the handler
+   * @return {@code true} if it is responsible, otherwise {@code false}
+   */
   @SuppressWarnings("WeakerAccess")
   protected boolean isExceptionHandlerResponsible(
       final HttpServletRequest request,
@@ -149,6 +166,13 @@ public class ApiExceptionResolver implements HandlerExceptionResolver {
     return result;
   }
 
+  /**
+   * Apply status code if possible.
+   *
+   * @param request    the request
+   * @param response   the response
+   * @param statusCode the status code
+   */
   @SuppressWarnings("WeakerAccess")
   protected final void applyStatusCodeIfPossible(
       final HttpServletRequest request,
@@ -164,10 +188,30 @@ public class ApiExceptionResolver implements HandlerExceptionResolver {
     }
   }
 
+  /**
+   * The response format.
+   */
   enum ResponseFormat {
-    JSON, XML, EMPTY
+
+    /**
+     * Json response format.
+     */
+    JSON,
+
+    /**
+     * Xml response format.
+     */
+    XML,
+
+    /**
+     * Empty response format.
+     */
+    EMPTY
   }
 
+  /**
+   * The response format and content type.
+   */
   static class ResponseFormatAndContentType {
 
     @Getter(AccessLevel.PROTECTED)
@@ -176,6 +220,11 @@ public class ApiExceptionResolver implements HandlerExceptionResolver {
     @Getter(AccessLevel.PROTECTED)
     private String contentType;
 
+    /**
+     * Instantiates a new response format and content type.
+     *
+     * @param request the request
+     */
     ResponseFormatAndContentType(final @NotNull HttpServletRequest request) {
       final String acceptHeader = request.getHeader(HttpHeaders.ACCEPT);
       if (MediaTypeHelper.canContentTypeBeJson(acceptHeader)) {
@@ -197,10 +246,22 @@ public class ApiExceptionResolver implements HandlerExceptionResolver {
     }
   }
 
+  /**
+   * The empty view.
+   */
   static class EmptyView extends AbstractView {
 
+    /**
+     * The rest api exception.
+     */
     final RestApiException restApiException;
 
+    /**
+     * Instantiates a new empty view.
+     *
+     * @param payload     the payload
+     * @param contentType the content type
+     */
     EmptyView(final @NotNull RestApiException payload, final String contentType) {
       this.restApiException = payload;
       setContentType(contentType);

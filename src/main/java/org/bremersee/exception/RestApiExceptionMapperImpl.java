@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 the original author or authors.
+ * Copyright 2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,6 +42,8 @@ import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.server.ResponseStatusException;
 
 /**
+ * The default implementation of a rest api exception mapper.
+ *
  * @author Christian Bremer
  */
 @Validated
@@ -54,6 +56,12 @@ public class RestApiExceptionMapperImpl implements RestApiExceptionMapper {
   @Getter(AccessLevel.PROTECTED)
   private String applicationName;
 
+  /**
+   * Instantiates a new rest api exception mapper.
+   *
+   * @param properties      the properties
+   * @param applicationName the application name
+   */
   public RestApiExceptionMapperImpl(
       RestApiExceptionMapperProperties properties,
       String applicationName) {
@@ -193,6 +201,12 @@ public class RestApiExceptionMapperImpl implements RestApiExceptionMapper {
     return restApiException;
   }
 
+  /**
+   * Find the handler class.
+   *
+   * @param handler the handler
+   * @return the class
+   */
   @SuppressWarnings("WeakerAccess")
   @Nullable
   protected Class<?> findHandlerClass(Object handler) {
@@ -205,6 +219,12 @@ public class RestApiExceptionMapperImpl implements RestApiExceptionMapper {
     }
   }
 
+  /**
+   * Find the handler method.
+   *
+   * @param handler the handler
+   * @return the method
+   */
   @SuppressWarnings("WeakerAccess")
   @Nullable
   protected Method findHandlerMethod(Object handler) {
@@ -215,6 +235,14 @@ public class RestApiExceptionMapperImpl implements RestApiExceptionMapper {
     }
   }
 
+  /**
+   * Detect message exception message.
+   *
+   * @param exception the exception
+   * @param handler   the handler
+   * @param config    the config
+   * @return the exception message
+   */
   @SuppressWarnings("WeakerAccess")
   @NotNull
   protected String detectMessage(
@@ -243,6 +271,14 @@ public class RestApiExceptionMapperImpl implements RestApiExceptionMapper {
         : getProperties().findExceptionMapping(exception).getMessage();
   }
 
+  /**
+   * Detect the error code.
+   *
+   * @param exception the exception
+   * @param handler   the handler
+   * @param config    the config
+   * @return the string
+   */
   @SuppressWarnings("WeakerAccess")
   @Nullable
   protected String detectErrorCode(
@@ -272,6 +308,12 @@ public class RestApiExceptionMapperImpl implements RestApiExceptionMapper {
         : getProperties().findExceptionMapping(exception).getCode();
   }
 
+  /**
+   * Build the handler model of the rest ape exception.
+   *
+   * @param handler the handler
+   * @return the handler model
+   */
   @SuppressWarnings("WeakerAccess")
   @Nullable
   protected Handler buildHandler(@Nullable Object handler) {
@@ -290,6 +332,12 @@ public class RestApiExceptionMapperImpl implements RestApiExceptionMapper {
     return model;
   }
 
+  /**
+   * Add stack trace items.
+   *
+   * @param restApiException the rest api exception
+   * @param stackTrace       the stack trace
+   */
   @SuppressWarnings("WeakerAccess")
   protected void addStackTraceItems(
       final @NotNull RestApiException restApiException,
@@ -304,6 +352,13 @@ public class RestApiExceptionMapperImpl implements RestApiExceptionMapper {
     }
   }
 
+  /**
+   * Build the cause of a rest api exception.
+   *
+   * @param cause  the cause
+   * @param config the config
+   * @return the rest api exception
+   */
   @SuppressWarnings("WeakerAccess")
   @Nullable
   protected RestApiException buildRestApiExceptionCause(

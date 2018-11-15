@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 the original author or authors.
+ * Copyright 2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,6 +33,8 @@ import org.springframework.web.client.DefaultResponseErrorHandler;
 import org.springframework.web.client.RestTemplate;
 
 /**
+ * A traditional (blocking) implementation of the {@link AccessTokenRetriever}.
+ *
  * @author Christian Bremer
  */
 public class PasswordFlowAccessTokenRetriever
@@ -40,25 +42,30 @@ public class PasswordFlowAccessTokenRetriever
 
   private final ErrorHandler errorHandler = new ErrorHandler();
 
-  private final HttpHeaders headers = new HttpHeaders();
-
   private final RestTemplateBuilder restTemplateBuilder;
 
   private final String tokenEndpoint;
 
+  /**
+   * Instantiates a new password flow access token retriever.
+   *
+   * @param restTemplateBuilder the rest template builder
+   * @param tokenEndpoint       the token endpoint
+   */
   @SuppressWarnings("WeakerAccess")
   public PasswordFlowAccessTokenRetriever(
       final RestTemplateBuilder restTemplateBuilder,
       final String tokenEndpoint) {
     this.restTemplateBuilder = restTemplateBuilder;
     this.tokenEndpoint = tokenEndpoint;
-    this.headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
   }
 
   @Override
   public String retrieveAccessToken(final MultiValueMap<String, String> body) {
     final RestTemplate restTemplate = restTemplateBuilder.build();
     restTemplate.setErrorHandler(errorHandler);
+    final HttpHeaders headers = new HttpHeaders();
+    headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
     final HttpEntity<?> request = new HttpEntity<>(body, headers);
     final String response = restTemplate.exchange(
         tokenEndpoint,
@@ -78,7 +85,7 @@ public class PasswordFlowAccessTokenRetriever
   private static class ErrorHandler extends DefaultResponseErrorHandler {
 
     @Override
-    protected void handleError(ClientHttpResponse response, HttpStatus statusCode)
+    protected void handleError(final ClientHttpResponse response, final HttpStatus statusCode)
         throws IOException {
       final String statusText = response.getStatusText();
       throw new PasswordFlowAuthenticationException(statusCode, statusText);

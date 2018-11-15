@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 the original author or authors.
+ * Copyright 2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,22 +22,43 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 
 /**
+ * The {@link JwtAuthenticationToken} of a keycloak identity provider.
+ *
  * @author Christian Bremer
  */
 @SuppressWarnings({"WeakerAccess", "unused"})
 public class KeycloakJwtAuthenticationToken extends JwtAuthenticationToken {
 
+  /**
+   * The constant KEYCLOAK_PREFERRED_USERNAME.
+   */
   public static final String KEYCLOAK_PREFERRED_USERNAME = "preferred_username";
 
+  /**
+   * Instantiates a new keycloak jwt authentication token.
+   *
+   * @param jwt the jwt
+   */
   public KeycloakJwtAuthenticationToken(Jwt jwt) {
     super(jwt);
   }
 
+  /**
+   * Instantiates a new keycloak jwt authentication token.
+   *
+   * @param jwt         the jwt
+   * @param authorities the authorities
+   */
   public KeycloakJwtAuthenticationToken(Jwt jwt,
       Collection<? extends GrantedAuthority> authorities) {
     super(jwt, authorities);
   }
 
+  /**
+   * Gets preferred name.
+   *
+   * @return the preferred name
+   */
   public String getPreferredName() {
     if (getToken().containsClaim(KEYCLOAK_PREFERRED_USERNAME)) {
       return getToken().getClaimAsString(KEYCLOAK_PREFERRED_USERNAME);

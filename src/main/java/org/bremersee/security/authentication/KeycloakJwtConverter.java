@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 the original author or authors.
+ * Copyright 2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,6 +32,9 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtAut
 import org.springframework.util.StringUtils;
 
 /**
+ * A JWT converter for the keycloak identity provider. It use the json path {@code
+ * $.realm_access.roles}* to extract the roles from the token.
+ *
  * @author Christian Bremer
  */
 public class KeycloakJwtConverter implements Converter<Jwt, JwtAuthenticationToken> {
@@ -41,6 +44,9 @@ public class KeycloakJwtConverter implements Converter<Jwt, JwtAuthenticationTok
   private static final com.jayway.jsonpath.Configuration jsonPathConf
       = com.jayway.jsonpath.Configuration.builder().options(Option.SUPPRESS_EXCEPTIONS).build();
 
+  /**
+   * Instantiates a new keycloak jwt converter.
+   */
   @SuppressWarnings("WeakerAccess")
   public KeycloakJwtConverter() {
   }
