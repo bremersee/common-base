@@ -44,19 +44,19 @@ import org.springframework.web.util.WebUtils;
  */
 public class ApiExceptionResolverTest {
 
-  private static final RestApiExceptionMapperProperties properties
-      = new RestApiExceptionMapperProperties();
-
-  private static final RestApiExceptionMapper mapper
-      = new RestApiExceptionMapperImpl(properties, "testapp");
-
-  private static final ApiExceptionResolver exceptionResolver = new ApiExceptionResolver(mapper);
+  private static ApiExceptionResolver exceptionResolver;
 
   @BeforeClass
   public static void setup() {
+    final RestApiExceptionMapperProperties properties = new RestApiExceptionMapperProperties();
     properties.setApiPaths(Collections.singletonList("/api/**"));
     properties.getDefaultExceptionMappingConfig().setIncludeHandler(true);
     properties.getDefaultExceptionMappingConfig().setIncludeStackTrace(false);
+
+    final RestApiExceptionMapper mapper = new RestApiExceptionMapperImpl(
+        properties, "testapp");
+
+    exceptionResolver = new ApiExceptionResolver(mapper);
   }
 
   @Test
