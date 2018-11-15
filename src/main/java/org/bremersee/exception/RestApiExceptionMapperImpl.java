@@ -193,6 +193,7 @@ public class RestApiExceptionMapperImpl implements RestApiExceptionMapper {
     return restApiException;
   }
 
+  @SuppressWarnings("WeakerAccess")
   @Nullable
   protected Class<?> findHandlerClass(Object handler) {
     if (handler == null) {
@@ -204,6 +205,7 @@ public class RestApiExceptionMapperImpl implements RestApiExceptionMapper {
     }
   }
 
+  @SuppressWarnings("WeakerAccess")
   @Nullable
   protected Method findHandlerMethod(Object handler) {
     if (handler instanceof HandlerMethod) {
@@ -213,6 +215,7 @@ public class RestApiExceptionMapperImpl implements RestApiExceptionMapper {
     }
   }
 
+  @SuppressWarnings("WeakerAccess")
   @NotNull
   protected String detectMessage(
       final @NotNull Throwable exception,
@@ -240,6 +243,7 @@ public class RestApiExceptionMapperImpl implements RestApiExceptionMapper {
         : getProperties().findExceptionMapping(exception).getMessage();
   }
 
+  @SuppressWarnings("WeakerAccess")
   @Nullable
   protected String detectErrorCode(
       final @NotNull Throwable exception,
@@ -268,6 +272,7 @@ public class RestApiExceptionMapperImpl implements RestApiExceptionMapper {
         : getProperties().findExceptionMapping(exception).getCode();
   }
 
+  @SuppressWarnings("WeakerAccess")
   @Nullable
   protected Handler buildHandler(@Nullable Object handler) {
     final Method method = findHandlerMethod(handler);
@@ -285,6 +290,7 @@ public class RestApiExceptionMapperImpl implements RestApiExceptionMapper {
     return model;
   }
 
+  @SuppressWarnings("WeakerAccess")
   protected void addStackTraceItems(
       final @NotNull RestApiException restApiException,
       final @Nullable StackTraceElement[] stackTrace) {
@@ -298,6 +304,7 @@ public class RestApiExceptionMapperImpl implements RestApiExceptionMapper {
     }
   }
 
+  @SuppressWarnings("WeakerAccess")
   @Nullable
   protected RestApiException buildRestApiExceptionCause(
       final @Nullable Throwable cause,
