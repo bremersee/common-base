@@ -24,7 +24,7 @@ import java.util.Map;
 import javax.validation.constraints.NotNull;
 import lombok.Getter;
 import org.bremersee.exception.ErrorCodeAware;
-import org.bremersee.exception.ExceptionConstants;
+import org.bremersee.exception.RestApiExceptionUtils;
 import org.bremersee.exception.HttpResponseHeadersAware;
 import org.bremersee.exception.HttpStatusAware;
 import org.bremersee.exception.RestApiExceptionAware;
@@ -61,7 +61,7 @@ public class FeignClientException extends FeignException implements HttpStatusAw
 
     super(resolveHttpStatusCode(status), StringUtils.hasText(message)
         ? message
-        : ExceptionConstants.NO_MESSAGE_VALUE);
+        : RestApiExceptionUtils.NO_MESSAGE_VALUE);
     this.request = request;
     this.headers = headers != null ? headers : Collections.emptyMap();
     this.restApiException = restApiException;

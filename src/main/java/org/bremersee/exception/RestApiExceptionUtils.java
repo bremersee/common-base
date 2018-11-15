@@ -17,16 +17,14 @@
 package org.bremersee.exception;
 
 import java.time.OffsetDateTime;
-import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import javax.validation.constraints.NotNull;
 import org.springframework.lang.Nullable;
 import org.springframework.util.StringUtils;
 
 /**
  * @author Christian Bremer
  */
-public abstract class ExceptionConstants {
+public abstract class RestApiExceptionUtils {
 
   public static final String ID_HEADER_NAME = "X-ERROR-ID";
 
@@ -40,16 +38,19 @@ public abstract class ExceptionConstants {
 
   public static final String CLASS_HEADER_NAME = "X-ERROR-CLASS-NAME";
 
-  public static final String NO_MESSAGE_VALUE = "No message present.";
+  public static final String NO_ID_VALUE = "UNSPECIFIED";
 
   public static final String NO_ERROR_CODE_VALUE = "UNSPECIFIED";
 
-  public static final String NO_ID_VALUE = "UNSPECIFIED";
+  public static final String NO_MESSAGE_VALUE = "No message present.";
 
-  private ExceptionConstants() {
+  public static final String NO_CLASS_VALUE = "UNSPECIFIED";
+
+  private RestApiExceptionUtils() {
   }
 
-  @NotNull
+  @SuppressWarnings("WeakerAccess")
+  @Nullable
   public static OffsetDateTime parseHeaderValue(@Nullable String value) {
     OffsetDateTime time = null;
     if (StringUtils.hasText(value)) {
@@ -59,7 +60,7 @@ public abstract class ExceptionConstants {
         time = null;
       }
     }
-    return time != null ? time : OffsetDateTime.now(ZoneId.of("UTC"));
+    return time;
   }
 
 }

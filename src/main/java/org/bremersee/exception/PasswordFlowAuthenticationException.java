@@ -41,7 +41,7 @@ public class PasswordFlowAuthenticationException extends AuthenticationException
   private static String buildMessage(HttpStatus httpStatus, String body) {
     if ((httpStatus == null || !StringUtils.hasText(httpStatus.getReasonPhrase()))
         && !StringUtils.hasText(body)) {
-      return ExceptionConstants.NO_MESSAGE_VALUE;
+      return RestApiExceptionUtils.NO_MESSAGE_VALUE;
     }
     if (httpStatus == null) {
       return body;

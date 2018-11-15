@@ -27,13 +27,14 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-import org.bremersee.exception.ExceptionConstants;
 import org.bremersee.exception.RestApiExceptionMapper;
+import org.bremersee.exception.RestApiExceptionUtils;
 import org.bremersee.exception.model.RestApiException;
 import org.bremersee.http.MediaTypeHelper;
 import org.bremersee.http.converter.ObjectMapperHelper;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import org.springframework.lang.Nullable;
@@ -57,17 +58,21 @@ import org.springframework.web.util.WebUtils;
 @Slf4j
 public class ApiExceptionResolver implements HandlerExceptionResolver {
 
-  private static final String MODEL_KEY = "error";
+  @SuppressWarnings("WeakerAccess")
+  protected static final String MODEL_KEY = "error";
 
   @Getter(AccessLevel.PROTECTED)
   @Setter
   private PathMatcher pathMatcher = new AntPathMatcher();
 
+  @Getter(AccessLevel.PROTECTED)
   private final RestApiExceptionMapper exceptionMapper;
 
+  @Getter(AccessLevel.PROTECTED)
   @Setter
   private Jackson2ObjectMapperBuilder objectMapperBuilder;
 
+  @SuppressWarnings("WeakerAccess")
   public ApiExceptionResolver(
       final RestApiExceptionMapper exceptionMapper) {
     this.exceptionMapper = exceptionMapper;
@@ -111,11 +116,12 @@ public class ApiExceptionResolver implements HandlerExceptionResolver {
         break;
 
       default:
-        modelAndView = new ModelAndView(new EmptyView(payload));
+        modelAndView = new ModelAndView(new EmptyView(payload, chooser.getContentType()));
     }
 
     response.setContentType(chooser.getContentType());
     final int statusCode = exceptionMapper.detectHttpStatus(ex, handler).value();
+    modelAndView.setStatus(HttpStatus.resolve(statusCode));
     applyStatusCodeIfPossible(request, response, statusCode);
     return modelAndView;
   }
@@ -125,7 +131,11 @@ public class ApiExceptionResolver implements HandlerExceptionResolver {
       final HttpServletRequest request,
       final @Nullable Object handler) {
 
-    // TODO evaluate path
+    if (!exceptionMapper.getApiPaths().isEmpty()) {
+      return exceptionMapper.getApiPaths().stream().anyMatch(
+          s -> pathMatcher.match(s, request.getPathInfo()));
+    }
+
     if (handler == null) {
       return false;
     }
@@ -178,7 +188,8 @@ public class ApiExceptionResolver implements HandlerExceptionResolver {
         responseFormat = ResponseFormat.EMPTY;
         if (StringUtils.hasText(acceptHeader)) {
           final List<MediaType> accepts = MediaType.parseMediaTypes(acceptHeader);
-          contentType = MediaTypeHelper.findContentType(accepts, MediaType.TEXT_PLAIN).toString();
+          contentType = String
+              .valueOf(MediaTypeHelper.findContentType(accepts, MediaType.TEXT_PLAIN));
         } else {
           contentType = MediaType.TEXT_PLAIN_VALUE;
         }
@@ -190,8 +201,9 @@ public class ApiExceptionResolver implements HandlerExceptionResolver {
 
     final RestApiException restApiException;
 
-    EmptyView(final @NotNull RestApiException payload) {
+    EmptyView(final @NotNull RestApiException payload, final String contentType) {
       this.restApiException = payload;
+      setContentType(contentType);
     }
 
     @Override
@@ -200,31 +212,31 @@ public class ApiExceptionResolver implements HandlerExceptionResolver {
         final HttpServletRequest httpServletRequest,
         final HttpServletResponse httpServletResponse) {
 
-      httpServletResponse.addHeader(ExceptionConstants.ID_HEADER_NAME,
+      httpServletResponse.addHeader(RestApiExceptionUtils.ID_HEADER_NAME,
           StringUtils.hasText(restApiException.getId())
               ? restApiException.getId()
-              : ExceptionConstants.NO_ID_VALUE);
+              : RestApiExceptionUtils.NO_ID_VALUE);
 
-      httpServletResponse.addHeader(ExceptionConstants.TIMESTAMP_HEADER_NAME,
+      httpServletResponse.addHeader(RestApiExceptionUtils.TIMESTAMP_HEADER_NAME,
           restApiException.getTimestamp() != null
-              ? restApiException.getTimestamp().format(ExceptionConstants.TIMESTAMP_FORMATTER)
+              ? restApiException.getTimestamp().format(RestApiExceptionUtils.TIMESTAMP_FORMATTER)
               : OffsetDateTime.now(ZoneId.of("UTC")).format(
-                  ExceptionConstants.TIMESTAMP_FORMATTER));
+                  RestApiExceptionUtils.TIMESTAMP_FORMATTER));
 
-      httpServletResponse.addHeader(ExceptionConstants.MESSAGE_HEADER_NAME,
+      httpServletResponse.addHeader(RestApiExceptionUtils.MESSAGE_HEADER_NAME,
           StringUtils.hasText(restApiException.getMessage())
               ? restApiException.getMessage()
-              : ExceptionConstants.NO_MESSAGE_VALUE);
+              : RestApiExceptionUtils.NO_MESSAGE_VALUE);
 
-      httpServletResponse.addHeader(ExceptionConstants.CODE_HEADER_NAME,
+      httpServletResponse.addHeader(RestApiExceptionUtils.CODE_HEADER_NAME,
           StringUtils.hasText(restApiException.getErrorCode())
               ? restApiException.getErrorCode()
-              : ExceptionConstants.NO_ERROR_CODE_VALUE);
+              : RestApiExceptionUtils.NO_ERROR_CODE_VALUE);
 
-      httpServletResponse.addHeader(ExceptionConstants.CLASS_HEADER_NAME,
+      httpServletResponse.addHeader(RestApiExceptionUtils.CLASS_HEADER_NAME,
           StringUtils.hasText(restApiException.getClassName())
               ? restApiException.getClassName()
-              : Exception.class.getName());
+              : RestApiExceptionUtils.NO_CLASS_VALUE);
     }
 
   }

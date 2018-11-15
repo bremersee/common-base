@@ -17,7 +17,7 @@
 package org.bremersee.exception.feign;
 
 import java.util.Collections;
-import org.bremersee.exception.ExceptionConstants;
+import org.bremersee.exception.RestApiExceptionUtils;
 import org.bremersee.exception.model.RestApiException;
 import org.junit.Assert;
 import org.junit.Test;
@@ -38,7 +38,7 @@ public class FeignClientExceptionTest {
     Assert.assertNull(exception.getRequest());
     Assert.assertNotNull(exception.getHeaders());
     Assert.assertEquals(exception.status(), HttpStatus.INTERNAL_SERVER_ERROR.value());
-    Assert.assertEquals(exception.getMessage(), ExceptionConstants.NO_MESSAGE_VALUE);
+    Assert.assertEquals(exception.getMessage(), RestApiExceptionUtils.NO_MESSAGE_VALUE);
     Assert.assertNull(exception.getRestApiException());
     Assert.assertNull(exception.getErrorCode());
   }

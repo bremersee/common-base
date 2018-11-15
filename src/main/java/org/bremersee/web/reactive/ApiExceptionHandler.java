@@ -23,8 +23,8 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-import org.bremersee.exception.ExceptionConstants;
 import org.bremersee.exception.RestApiExceptionMapper;
+import org.bremersee.exception.RestApiExceptionUtils;
 import org.bremersee.exception.model.RestApiException;
 import org.bremersee.http.MediaTypeHelper;
 import org.springframework.boot.autoconfigure.web.ResourceProperties;
@@ -106,26 +106,26 @@ public class ApiExceptionHandler extends AbstractErrorWebExceptionHandler {
     } else {
       final String id = StringUtils.hasText(response.getId())
           ? response.getId()
-          : ExceptionConstants.NO_ID_VALUE;
+          : RestApiExceptionUtils.NO_ID_VALUE;
       final String timestamp = response.getTimestamp() != null
-          ? response.getTimestamp().format(ExceptionConstants.TIMESTAMP_FORMATTER)
-          : OffsetDateTime.now(ZoneId.of("UTC")).format(ExceptionConstants.TIMESTAMP_FORMATTER);
+          ? response.getTimestamp().format(RestApiExceptionUtils.TIMESTAMP_FORMATTER)
+          : OffsetDateTime.now(ZoneId.of("UTC")).format(RestApiExceptionUtils.TIMESTAMP_FORMATTER);
       final String msg = StringUtils.hasText(response.getMessage())
           ? response.getMessage()
-          : ExceptionConstants.NO_MESSAGE_VALUE;
+          : RestApiExceptionUtils.NO_MESSAGE_VALUE;
       final String code = StringUtils.hasText(response.getErrorCode())
           ? response.getErrorCode()
-          : ExceptionConstants.NO_ERROR_CODE_VALUE;
+          : RestApiExceptionUtils.NO_ERROR_CODE_VALUE;
       final String cls = StringUtils.hasText(response.getClassName())
           ? response.getClassName()
-          : Exception.class.getName();
+          : RestApiExceptionUtils.NO_CLASS_VALUE;
       return ServerResponse
           .status(restApiExceptionMapper.detectHttpStatus(getError(request), null))
-          .header(ExceptionConstants.ID_HEADER_NAME, id)
-          .header(ExceptionConstants.TIMESTAMP_HEADER_NAME, timestamp)
-          .header(ExceptionConstants.MESSAGE_HEADER_NAME, msg)
-          .header(ExceptionConstants.CODE_HEADER_NAME, code)
-          .header(ExceptionConstants.CLASS_HEADER_NAME, cls)
+          .header(RestApiExceptionUtils.ID_HEADER_NAME, id)
+          .header(RestApiExceptionUtils.TIMESTAMP_HEADER_NAME, timestamp)
+          .header(RestApiExceptionUtils.MESSAGE_HEADER_NAME, msg)
+          .header(RestApiExceptionUtils.CODE_HEADER_NAME, code)
+          .header(RestApiExceptionUtils.CLASS_HEADER_NAME, cls)
           .contentType(MediaTypeHelper.findContentType(
               request.headers().accept(), MediaType.TEXT_PLAIN))
           .body(BodyInserters.empty());

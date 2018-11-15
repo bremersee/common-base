@@ -123,8 +123,7 @@ public class DefaultWebClientErrorDecoderTest {
     Assert.assertNotNull(throwable);
     Assert.assertTrue(throwable instanceof WebClientException);
     Assert.assertEquals(httpStatus, ((WebClientException) throwable).getStatus());
-    // TODO wollen wir hier trotzdem ein cause haben? ja
-    //Assert.assertNull(((WebClientException) throwable).getRestApiException());
+    Assert.assertNotNull(((WebClientException) throwable).getRestApiException());
   }
 
 }

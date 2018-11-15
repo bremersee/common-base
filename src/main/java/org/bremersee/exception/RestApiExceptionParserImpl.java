@@ -89,23 +89,33 @@ public class RestApiExceptionParserImpl implements RestApiExceptionParser {
     }
     if (restApiException == null) {
       restApiException = new RestApiException();
-      final String id = httpHeaders.getFirst(ExceptionConstants.ID_HEADER_NAME);
-      restApiException.setId(StringUtils.hasText(id) ? id : ExceptionConstants.NO_ID_VALUE);
-      final String timestamp = httpHeaders.getFirst(ExceptionConstants.TIMESTAMP_HEADER_NAME);
-      restApiException.setTimestamp(ExceptionConstants.parseHeaderValue(timestamp));
+
+      final String id = httpHeaders.getFirst(RestApiExceptionUtils.ID_HEADER_NAME);
+      if (StringUtils.hasText(id) && !RestApiExceptionUtils.NO_ID_VALUE.equals(id)) {
+        restApiException.setId(id);
+      }
+
+      final String timestamp = httpHeaders.getFirst(RestApiExceptionUtils.TIMESTAMP_HEADER_NAME);
+      restApiException.setTimestamp(RestApiExceptionUtils.parseHeaderValue(timestamp));
+
       if (StringUtils.hasText(response)) {
         restApiException.setMessage(response);
       } else {
-        final String message = httpHeaders.getFirst(ExceptionConstants.MESSAGE_HEADER_NAME);
+        final String message = httpHeaders.getFirst(RestApiExceptionUtils.MESSAGE_HEADER_NAME);
         restApiException.setMessage(
-            StringUtils.hasText(message) ? message : ExceptionConstants.NO_MESSAGE_VALUE);
+            StringUtils.hasText(message) ? message : RestApiExceptionUtils.NO_MESSAGE_VALUE);
       }
-      final String errorCode = httpHeaders.getFirst(ExceptionConstants.CODE_HEADER_NAME);
-      restApiException.setErrorCode(StringUtils.hasText(errorCode)
-          ? errorCode
-          : ExceptionConstants.NO_ERROR_CODE_VALUE);
-      final String cls = httpHeaders.getFirst(ExceptionConstants.CLASS_HEADER_NAME);
-      restApiException.setClassName(StringUtils.hasText(cls) ? cls : Exception.class.getName());
+
+      final String errorCode = httpHeaders.getFirst(RestApiExceptionUtils.CODE_HEADER_NAME);
+      if (StringUtils.hasText(errorCode)
+          && !RestApiExceptionUtils.NO_ERROR_CODE_VALUE.equals(errorCode)) {
+        restApiException.setErrorCode(errorCode);
+      }
+
+      final String cls = httpHeaders.getFirst(RestApiExceptionUtils.CLASS_HEADER_NAME);
+      if (StringUtils.hasText(cls) && !RestApiExceptionUtils.NO_CLASS_VALUE.equals(cls)) {
+        restApiException.setClassName(cls);
+      }
     }
     return restApiException;
   }

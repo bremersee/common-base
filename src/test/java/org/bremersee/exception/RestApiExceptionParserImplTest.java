@@ -19,6 +19,9 @@ package org.bremersee.exception;
 import static org.bremersee.http.converter.ObjectMapperHelper.getJsonMapper;
 import static org.bremersee.http.converter.ObjectMapperHelper.getXmlMapper;
 
+import java.time.OffsetDateTime;
+import java.time.ZoneId;
+import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.bremersee.TestHelper;
 import org.bremersee.exception.model.RestApiException;
@@ -26,6 +29,8 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 
 /**
  * @author Christian Bremer
@@ -48,7 +53,7 @@ public class RestApiExceptionParserImplTest {
     final RestApiException actual = new RestApiExceptionParserImpl()
         .parseRestApiException(
             getJsonMapper().writeValueAsString(expected),
-            buildHttpHeaders(MediaType.APPLICATION_JSON_UTF8));
+            buildHttpHeaders(MediaType.APPLICATION_JSON_UTF8, null));
     log.info("Actual:   {}", actual);
     Assert.assertNotNull(actual);
     Assert.assertEquals(expected, actual);
@@ -61,7 +66,7 @@ public class RestApiExceptionParserImplTest {
     final RestApiException actual = new RestApiExceptionParserImpl()
         .parseRestApiException(
             getXmlMapper().writeValueAsString(expected),
-            buildHttpHeaders(MediaType.APPLICATION_XML));
+            buildHttpHeaders(MediaType.APPLICATION_XML, null));
     log.info("Actual:   {}", actual);
     Assert.assertNotNull(actual);
     Assert.assertEquals(expected, actual);
@@ -72,14 +77,11 @@ public class RestApiExceptionParserImplTest {
     final String response = getJsonMapper()
         .writeValueAsString(TestHelper.otherResponse());
     final RestApiException expected = new RestApiException();
-    expected.setId(ExceptionConstants.NO_ID_VALUE);
-    expected.setErrorCode(ExceptionConstants.NO_ERROR_CODE_VALUE);
-    expected.setClassName(Exception.class.getName());
     expected.setMessage(response);
     final RestApiException actual = new RestApiExceptionParserImpl()
         .parseRestApiException(
             response,
-            buildHttpHeaders(MediaType.APPLICATION_JSON));
+            buildHttpHeaders(MediaType.APPLICATION_JSON, null));
     expected.setTimestamp(actual.getTimestamp());
     log.info("Expected: {}", expected);
     log.info("Actual:   {}", actual);
@@ -87,11 +89,57 @@ public class RestApiExceptionParserImplTest {
     Assert.assertEquals(expected, actual);
   }
 
-  // TODO add test for empty + headers and totally empty
+  @Test
+  public void testResponseIsEmpty() {
+    final String response = "";
+    final RestApiException expected = new RestApiException();
+    expected.setMessage(RestApiExceptionUtils.NO_MESSAGE_VALUE);
+    final RestApiException actual = new RestApiExceptionParserImpl()
+        .parseRestApiException(
+            response,
+            buildHttpHeaders(MediaType.APPLICATION_JSON, null));
+    expected.setTimestamp(actual.getTimestamp());
+    log.info("Expected: {}", expected);
+    log.info("Actual:   {}", actual);
+    Assert.assertNotNull(actual);
+    Assert.assertEquals(expected, actual);
+  }
 
-  private HttpHeaders buildHttpHeaders(MediaType contentType) {
+  @Test
+  public void testResponseIsEmptyButHeadersArePresent() {
+    final OffsetDateTime now = OffsetDateTime.now(ZoneId.of("UTC"));
+    final String nowStr = now.format(RestApiExceptionUtils.TIMESTAMP_FORMATTER);
+    final String response = "";
+    final RestApiException expected = new RestApiException();
+    expected.setMessage("Something went wrong");
+    expected.setId(UUID.randomUUID().toString());
+    expected.setErrorCode("TEST:4711");
+    expected.setTimestamp(OffsetDateTime.parse(nowStr, RestApiExceptionUtils.TIMESTAMP_FORMATTER));
+    expected.setClassName(ServiceException.class.getName());
+    final MultiValueMap<String, String> errorHeaders = new LinkedMultiValueMap<>();
+    errorHeaders.add(RestApiExceptionUtils.ID_HEADER_NAME, expected.getId());
+    errorHeaders.add(RestApiExceptionUtils.TIMESTAMP_HEADER_NAME, nowStr);
+    errorHeaders.add(RestApiExceptionUtils.MESSAGE_HEADER_NAME, expected.getMessage());
+    errorHeaders.add(RestApiExceptionUtils.CODE_HEADER_NAME, expected.getErrorCode());
+    errorHeaders.add(RestApiExceptionUtils.CLASS_HEADER_NAME, expected.getClassName());
+    final RestApiException actual = new RestApiExceptionParserImpl()
+        .parseRestApiException(
+            response,
+            buildHttpHeaders(MediaType.APPLICATION_JSON, errorHeaders));
+    log.info("Expected: {}", expected);
+    log.info("Actual:   {}", actual);
+    Assert.assertNotNull(actual);
+    Assert.assertEquals(expected, actual);
+  }
+
+  private HttpHeaders buildHttpHeaders(
+      MediaType contentType,
+      MultiValueMap<String, String> errorHeaders) {
     final HttpHeaders httpHeaders = new HttpHeaders();
     httpHeaders.setContentType(contentType);
+    if (errorHeaders != null) {
+      httpHeaders.putAll(errorHeaders);
+    }
     return httpHeaders;
   }
 

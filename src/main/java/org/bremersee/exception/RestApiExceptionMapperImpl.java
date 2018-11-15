@@ -177,7 +177,8 @@ public class RestApiExceptionMapperImpl implements RestApiExceptionMapper {
     } else {
       cause = buildRestApiExceptionCause(exception.getCause(), config);
     }
-    if (cause != null && StringUtils.hasText(cause.getErrorCode())) {
+    if (cause != null && StringUtils.hasText(cause.getErrorCode())
+        && !RestApiExceptionUtils.NO_ERROR_CODE_VALUE.equals(cause.getErrorCode())) {
       restApiException.setErrorCode(cause.getErrorCode());
       restApiException.setErrorCodeInherited(true);
     } else {
@@ -314,6 +315,7 @@ public class RestApiExceptionMapperImpl implements RestApiExceptionMapper {
 
     final RestApiException restApiException = new RestApiException();
     restApiException.setMessage(detectMessage(cause, null, config));
+    restApiException.setErrorCode(detectErrorCode(cause, null, config));
     if (config.isIncludeExceptionClassName()) {
       restApiException.setClassName(cause.getClass().getName());
     }
