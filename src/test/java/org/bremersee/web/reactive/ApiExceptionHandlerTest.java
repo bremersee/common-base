@@ -56,7 +56,7 @@ public class ApiExceptionHandlerTest {
     final RestApiExceptionMapper mapper = new RestApiExceptionMapperImpl(
         properties, "testapp");
 
-    exception = new ServiceException(409, "Oops, a conflict", "TEST:4711");
+    exception = new ServiceException(500, "Oops, a conflict", "TEST:4711");
     ErrorAttributes errorAttributes = Mockito.mock(ErrorAttributes.class);
     Mockito.when(errorAttributes.getError(Mockito.any(ServerRequest.class))).thenReturn(exception);
 
@@ -113,7 +113,7 @@ public class ApiExceptionHandlerTest {
     Mono<ServerResponse> responseMono = exceptionHandler.renderErrorResponse(serverRequest);
     ServerResponse response = responseMono.block();
     Assert.assertNotNull(response);
-    Assert.assertEquals(HttpStatus.CONFLICT, response.statusCode());
+    Assert.assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.statusCode());
     Assert.assertTrue(mediaType.isCompatibleWith(response.headers().getContentType()));
 
     if (MediaType.IMAGE_JPEG.isCompatibleWith(mediaType)) {
@@ -126,6 +126,10 @@ public class ApiExceptionHandlerTest {
       Assert.assertEquals(
           exception.getClass().getName(),
           response.headers().getFirst(RestApiExceptionUtils.CLASS_HEADER_NAME));
+      Assert.assertNotNull(response.headers().getFirst(RestApiExceptionUtils.ID_HEADER_NAME));
+      Assert.assertNotEquals(
+          RestApiExceptionUtils.NO_ID_VALUE,
+          response.headers().getFirst(RestApiExceptionUtils.ID_HEADER_NAME));
     }
   }
 
