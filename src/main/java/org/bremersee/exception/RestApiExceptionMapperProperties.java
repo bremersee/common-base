@@ -166,7 +166,7 @@ public class RestApiExceptionMapperProperties {
   public RestApiExceptionMapperProperties() {
 
     defaultExceptionMapping = new ExceptionMapping();
-    defaultExceptionMapping.setCode(RestApiExceptionUtils.NO_ERROR_CODE_VALUE);
+    defaultExceptionMapping.setCode(null);
     defaultExceptionMapping.setMessage(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase());
     defaultExceptionMapping.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
     defaultExceptionMapping.setExceptionClassName("*");

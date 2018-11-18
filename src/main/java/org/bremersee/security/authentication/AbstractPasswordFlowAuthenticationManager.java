@@ -18,10 +18,10 @@ package org.bremersee.security.authentication;
 
 import lombok.AccessLevel;
 import lombok.Getter;
+import org.bremersee.security.OAuth2Helper;
 import org.bremersee.security.OAuth2Properties;
 import org.springframework.security.core.Authentication;
 import org.springframework.util.Assert;
-import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
 /**
@@ -60,20 +60,11 @@ public abstract class AbstractPasswordFlowAuthenticationManager {
   protected MultiValueMap<String, String> createPasswordFlowBody(
       final Authentication authentication) {
 
-    final String username = authentication.getName();
-    final String presentedPassword = (String) authentication.getCredentials();
-    final MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
-    body.add("grant_type", "password");
-    body.add("client_id", oauth2Properties.getPasswordFlow().getClientId());
-    if (oauth2Properties.getPasswordFlow().getClientSecret() != null) {
-      body.add("client_secret", oauth2Properties.getPasswordFlow().getClientSecret());
-    } else {
-      body.add("client_secret", "");
-    }
-    body.add("username", username);
-    body.add("password", presentedPassword);
-    return body;
+    return OAuth2Helper.createPasswordFlowBody(
+        oauth2Properties.getPasswordFlow().getClientId(),
+        oauth2Properties.getPasswordFlow().getClientSecret(),
+        authentication.getName(),
+        (String) authentication.getCredentials());
   }
-
 
 }

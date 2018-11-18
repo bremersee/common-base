@@ -42,7 +42,7 @@ public class OAuth2Properties {
    */
   @Getter
   @Setter
-  @ToString(exclude = {"clientSecret"})
+  @ToString(exclude = {"clientSecret", "systemPassword"})
   @SuppressWarnings("WeakerAccess")
   public static class PasswordFlowProperties {
 
@@ -51,6 +51,12 @@ public class OAuth2Properties {
     private String clientId;
 
     private String clientSecret;
+
+    private String systemUsername;
+
+    private String systemPassword;
+
+    private long expirationTimeRemainsMillis = 30000L;
 
   }
 

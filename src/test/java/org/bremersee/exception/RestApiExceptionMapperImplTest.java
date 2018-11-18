@@ -19,6 +19,8 @@ package org.bremersee.exception;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.util.Collections;
+import org.bremersee.exception.RestApiExceptionMapperProperties.ExceptionMapping;
+import org.bremersee.exception.RestApiExceptionMapperProperties.ExceptionMappingConfig;
 import org.bremersee.exception.model.RestApiException;
 import org.bremersee.web.reactive.function.client.WebClientException;
 import org.junit.Assert;
@@ -38,7 +40,7 @@ public class RestApiExceptionMapperImplTest {
   private static RestApiExceptionMapper mapper;
 
   @BeforeClass
-  public static void init() {
+  public static void setup() {
     final RestApiExceptionMapperProperties properties = new RestApiExceptionMapperProperties();
     properties.setApiPaths(Collections.singletonList("/api/**"));
     mapper = new RestApiExceptionMapperImpl(properties, "test");
@@ -101,6 +103,65 @@ public class RestApiExceptionMapperImplTest {
     Assert.assertEquals("/api/this", model.getRequestPath());
     Assert.assertNotNull(model.getId());
     Assert.assertEquals(cause, model.getCause());
+  }
+
+  @Test
+  public void testBuildWithDefaultExceptionMapping() {
+    final RuntimeException exception = new RuntimeException("Something went wrong");
+    final RestApiException model = mapper.build(
+        exception, "/api/something", null);
+    Assert.assertNotNull(model);
+    Assert.assertNull(model.getErrorCode());
+    Assert.assertFalse(model.isErrorCodeInherited());
+    Assert.assertEquals(exception.getMessage(), model.getMessage());
+    Assert.assertEquals("/api/something", model.getRequestPath());
+    Assert.assertNotNull(model.getId());
+  }
+
+  @Test
+  public void testBuildWithDefaultExceptionMappingAndIllegalArgumentException() {
+    final IllegalArgumentException exception = new IllegalArgumentException();
+    final RestApiException model = mapper.build(exception, "/api/illegal", null);
+    Assert.assertNotNull(model);
+    Assert.assertNull(model.getErrorCode());
+    Assert.assertFalse(model.isErrorCodeInherited());
+    Assert.assertEquals(HttpStatus.BAD_REQUEST.getReasonPhrase(), model.getMessage());
+    Assert.assertEquals("/api/illegal", model.getRequestPath());
+    Assert.assertNull(model.getId());
+    Assert.assertEquals(IllegalArgumentException.class.getName(), model.getClassName());
+  }
+
+  @Test
+  public void testBuildWithConfiguredExceptionMapping() {
+    final RestApiExceptionMapperProperties properties = new RestApiExceptionMapperProperties();
+    properties.setApiPaths(Collections.singletonList("/null-api/**"));
+    properties.getExceptionMappings().add(new ExceptionMapping(
+        NullPointerException.class.getName(),
+        503,
+        "A variable is null.",
+        "NULLPOINTER"));
+    properties.getExceptionMappingConfigs().add(new ExceptionMappingConfig(
+        NullPointerException.class.getName(),
+        false,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true));
+    final RestApiExceptionMapper configuredMapper = new RestApiExceptionMapperImpl(
+        properties, "configured");
+
+    final NullPointerException exception = new NullPointerException();
+    final RestApiException model = configuredMapper.build(
+        exception, "/null-api/something", null);
+    Assert.assertNotNull(model);
+    Assert.assertEquals("NULLPOINTER", model.getErrorCode());
+    Assert.assertFalse(model.isErrorCodeInherited());
+    Assert.assertEquals("A variable is null.", model.getMessage());
+    Assert.assertEquals("/null-api/something", model.getRequestPath());
+    Assert.assertNotNull(model.getId());
+    Assert.assertNull(model.getClassName());
   }
 
 }
