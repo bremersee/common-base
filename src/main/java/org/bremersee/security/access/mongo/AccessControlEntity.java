@@ -18,6 +18,7 @@ package org.bremersee.security.access.mongo;
 
 import java.util.Optional;
 import org.bremersee.security.access.AuthorizationSet;
+import org.bremersee.security.access.DefaultAuthorizationSet;
 import org.bremersee.security.access.MutableAccessControl;
 import org.bremersee.security.access.PermissionConstants;
 import org.springframework.data.annotation.Id;
@@ -51,15 +52,15 @@ public class AccessControlEntity implements MutableAccessControl {
 
   private String owner;
 
-  private AuthorizationSetEntity administration = new AuthorizationSetEntity();
+  private DefaultAuthorizationSet administration = new DefaultAuthorizationSet();
 
-  private AuthorizationSetEntity create = new AuthorizationSetEntity();
+  private DefaultAuthorizationSet create = new DefaultAuthorizationSet();
 
-  private AuthorizationSetEntity delete = new AuthorizationSetEntity();
+  private DefaultAuthorizationSet delete = new DefaultAuthorizationSet();
 
-  private AuthorizationSetEntity read = new AuthorizationSetEntity();
+  private DefaultAuthorizationSet read = new DefaultAuthorizationSet();
 
-  private AuthorizationSetEntity write = new AuthorizationSetEntity();
+  private DefaultAuthorizationSet write = new DefaultAuthorizationSet();
 
   public AccessControlEntity() {
   }
@@ -112,23 +113,23 @@ public class AccessControlEntity implements MutableAccessControl {
     this.owner = owner;
   }
 
-  public AuthorizationSetEntity getAdministration() {
+  public DefaultAuthorizationSet getAdministration() {
     return administration;
   }
 
-  public AuthorizationSetEntity getCreate() {
+  public DefaultAuthorizationSet getCreate() {
     return create;
   }
 
-  public AuthorizationSetEntity getDelete() {
+  public DefaultAuthorizationSet getDelete() {
     return delete;
   }
 
-  public AuthorizationSetEntity getRead() {
+  public DefaultAuthorizationSet getRead() {
     return read;
   }
 
-  public AuthorizationSetEntity getWrite() {
+  public DefaultAuthorizationSet getWrite() {
     return write;
   }
 

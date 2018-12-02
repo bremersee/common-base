@@ -14,15 +14,22 @@
  * limitations under the License.
  */
 
-package org.bremersee.security.access.traditional;
+package org.bremersee.security.access;
 
-import java.util.Set;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**
  * @author Christian Bremer
  */
-public interface GroupMemberResolver {
+@Getter
+@Setter
+@ToString
+@ConfigurationProperties(prefix = "bremersee.access-control")
+public class AccessControlProperties {
 
-  Set<String> resolveMembership();
+  private String groupMembershipUrl;
 
 }

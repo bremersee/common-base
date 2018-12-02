@@ -14,16 +14,15 @@
  * limitations under the License.
  */
 
-package org.bremersee.security.access.reactive;
+package org.bremersee.security.access.traditional;
 
 import java.util.Set;
-import reactor.core.publisher.Mono;
 
 /**
  * @author Christian Bremer
  */
-public interface GroupMemberReactiveResolver {
+public interface GroupResolver {
 
-  Mono<Set<String>> resolveMembership();
+  Set<String> resolveMembership();
 
 }

@@ -37,11 +37,11 @@ public class AccessControlReactivePermissionEvaluator implements ReactivePermiss
 
   private AccessControlReactiveDao accessControlDao;
 
-  private GroupMemberReactiveResolver groupMemberResolver;
+  private GroupReactiveResolver groupMemberResolver;
 
   public AccessControlReactivePermissionEvaluator(
       final AccessControlReactiveDao accessControlDao,
-      final GroupMemberReactiveResolver groupMemberResolver) {
+      final GroupReactiveResolver groupMemberResolver) {
     this.accessControlDao = accessControlDao;
     this.groupMemberResolver = groupMemberResolver;
   }

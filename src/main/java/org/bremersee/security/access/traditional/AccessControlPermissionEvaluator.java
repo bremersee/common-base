@@ -37,11 +37,11 @@ public class AccessControlPermissionEvaluator implements PermissionEvaluator {
 
   private AccessControlDao accessControlDao;
 
-  private GroupMemberResolver groupMemberResolver;
+  private GroupResolver groupMemberResolver;
 
   public AccessControlPermissionEvaluator(
       final AccessControlDao accessControlDao,
-      final GroupMemberResolver groupMemberResolver) {
+      final GroupResolver groupMemberResolver) {
     this.accessControlDao = accessControlDao;
     this.groupMemberResolver = groupMemberResolver;
   }

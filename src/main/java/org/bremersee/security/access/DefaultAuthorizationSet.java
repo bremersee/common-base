@@ -14,17 +14,16 @@
  * limitations under the License.
  */
 
-package org.bremersee.security.access.mongo;
+package org.bremersee.security.access;
 
 import java.util.HashSet;
 import java.util.Set;
 import javax.validation.constraints.NotNull;
-import org.bremersee.security.access.MutableAuthorizationSet;
 
 /**
  * @author Christian Bremer
  */
-public class AuthorizationSetEntity implements MutableAuthorizationSet {
+public class DefaultAuthorizationSet implements MutableAuthorizationSet {
 
   private boolean guest;
 

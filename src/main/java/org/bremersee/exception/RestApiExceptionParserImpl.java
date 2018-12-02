@@ -87,7 +87,7 @@ public class RestApiExceptionParserImpl implements RestApiExceptionParser {
         restApiException = getJsonMapper().readValue(response, RestApiException.class);
       }
     } catch (Exception ignored) {
-      log.debug("msg=[Response is not a 'RestApiException' as JSON.]");
+      log.info("msg=[Response is not a 'RestApiException' as JSON.]");
     }
     try {
       if (restApiException == null
