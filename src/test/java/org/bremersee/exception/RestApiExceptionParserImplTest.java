@@ -50,8 +50,6 @@ public class RestApiExceptionParserImplTest {
   public void testResponseIsJson() throws Exception {
     final RestApiException expected = TestHelper.restApiException();
     log.info("Expected: {}", expected);
-    log.info("=======> json? {}", getJsonMapper().writeValueAsString(expected),
-        buildHttpHeaders(MediaType.APPLICATION_JSON_UTF8, null));
     final RestApiException actual = new RestApiExceptionParserImpl()
         .parseRestApiException(
             getJsonMapper().writeValueAsString(expected),
