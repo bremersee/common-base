@@ -22,10 +22,15 @@ import org.junit.Test;
 import org.springframework.http.MediaType;
 
 /**
+ * The media type helper test.
+ *
  * @author Christian Bremer
  */
 public class MediaTypeHelperTest {
 
+  /**
+   * Test media type helper.
+   */
   @Test
   public void testMediaTypeHelper() {
     Assert.assertTrue(MediaTypeHelper.canContentTypeBeJson(MediaTypeHelper.toString(Arrays.asList(

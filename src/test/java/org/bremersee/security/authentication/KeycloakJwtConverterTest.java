@@ -27,10 +27,15 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 
 /**
+ * The keycloak jwt converter test.
+ *
  * @author Christian Bremer
  */
 public class KeycloakJwtConverterTest {
 
+  /**
+   * Test convert roles.
+   */
   @Test
   public void testConvertRoles() {
 

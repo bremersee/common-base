@@ -28,10 +28,15 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
 /**
+ * The feign client exception test.
+ *
  * @author Christian Bremer
  */
 public class FeignClientExceptionTest {
 
+  /**
+   * Test with no useful values.
+   */
   @Test
   public void testWithNoUsefulValues() {
     final FeignClientException exception = new FeignClientException(null, null, 0, null, null);
@@ -43,6 +48,9 @@ public class FeignClientExceptionTest {
     Assert.assertNull(exception.getErrorCode());
   }
 
+  /**
+   * Test with some useful values.
+   */
   @Test
   public void testWithSomeUsefulValues() {
     final RestApiException restApiException = new RestApiException();

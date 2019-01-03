@@ -33,12 +33,17 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
 /**
+ * The rest api exception mapper impl test.
+ *
  * @author Christian Bremer
  */
 public class RestApiExceptionMapperImplTest {
 
   private static RestApiExceptionMapper mapper;
 
+  /**
+   * Setup test.
+   */
   @BeforeClass
   public static void setup() {
     final RestApiExceptionMapperProperties properties = new RestApiExceptionMapperProperties();
@@ -46,11 +51,17 @@ public class RestApiExceptionMapperImplTest {
     mapper = new RestApiExceptionMapperImpl(properties, "test");
   }
 
+  /**
+   * Test get api paths.
+   */
   @Test
   public void testGetApiPaths() {
     Assert.assertTrue(mapper.getApiPaths().contains("/api/**"));
   }
 
+  /**
+   * Test build 409.
+   */
   @Test
   public void testBuild409() {
     final ServiceException exception = new ServiceException(409, "Either a or b", "TEST:4711");
@@ -63,6 +74,9 @@ public class RestApiExceptionMapperImplTest {
     Assert.assertNull(model.getId());
   }
 
+  /**
+   * Test build 500.
+   */
   @Test
   public void testBuild500() {
     final ServiceException exception = new ServiceException(500, "Something failed.", "TEST:4711");
@@ -75,6 +89,9 @@ public class RestApiExceptionMapperImplTest {
     Assert.assertNotNull(model.getId());
   }
 
+  /**
+   * Test build with cause.
+   */
   @Test
   public void testBuildWithCause() {
     final MultiValueMap<String, String> headers = new LinkedMultiValueMap<>();
@@ -105,6 +122,9 @@ public class RestApiExceptionMapperImplTest {
     Assert.assertEquals(cause, model.getCause());
   }
 
+  /**
+   * Test build with default exception mapping.
+   */
   @Test
   public void testBuildWithDefaultExceptionMapping() {
     final RuntimeException exception = new RuntimeException("Something went wrong");
@@ -118,6 +138,9 @@ public class RestApiExceptionMapperImplTest {
     Assert.assertNotNull(model.getId());
   }
 
+  /**
+   * Test build with default exception mapping and illegal argument exception.
+   */
   @Test
   public void testBuildWithDefaultExceptionMappingAndIllegalArgumentException() {
     final IllegalArgumentException exception = new IllegalArgumentException();
@@ -131,6 +154,9 @@ public class RestApiExceptionMapperImplTest {
     Assert.assertEquals(IllegalArgumentException.class.getName(), model.getClassName());
   }
 
+  /**
+   * Test build with configured exception mapping.
+   */
   @Test
   public void testBuildWithConfiguredExceptionMapping() {
     final RestApiExceptionMapperProperties properties = new RestApiExceptionMapperProperties();

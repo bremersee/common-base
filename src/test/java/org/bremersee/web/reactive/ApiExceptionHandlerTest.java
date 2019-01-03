@@ -38,6 +38,8 @@ import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
 
 /**
+ * The api exception handler test.
+ *
  * @author Christian Bremer
  */
 public class ApiExceptionHandlerTest {
@@ -46,6 +48,9 @@ public class ApiExceptionHandlerTest {
 
   private static ApiExceptionHandler exceptionHandler;
 
+  /**
+   * Setup test.
+   */
   @BeforeClass
   public static void setup() {
     final RestApiExceptionMapperProperties properties = new RestApiExceptionMapperProperties();
@@ -77,6 +82,9 @@ public class ApiExceptionHandlerTest {
         mapper);
   }
 
+  /**
+   * Test responsible exception handler.
+   */
   @Test
   public void testResponsibleExceptionHandler() {
     ServerRequest serverRequest = Mockito.mock(ServerRequest.class);
@@ -84,16 +92,25 @@ public class ApiExceptionHandlerTest {
     Assert.assertTrue(exceptionHandler.isResponsibleExceptionHandler(serverRequest));
   }
 
+  /**
+   * Test render error response as json.
+   */
   @Test
   public void testRenderErrorResponseAsJson() {
     doTestingRenderErrorResponse(MediaType.APPLICATION_JSON);
   }
 
+  /**
+   * Test render error response as xml.
+   */
   @Test
   public void testRenderErrorResponseAsXml() {
     doTestingRenderErrorResponse(MediaType.APPLICATION_XML);
   }
 
+  /**
+   * Test render error response as something else.
+   */
   @Test
   public void testRenderErrorResponseAsSomethingElse() {
     doTestingRenderErrorResponse(MediaType.IMAGE_JPEG);

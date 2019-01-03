@@ -16,17 +16,29 @@ import org.springframework.web.reactive.function.client.ClientResponse;
 import reactor.core.publisher.Mono;
 
 /**
+ * The default web client error decoder test.
+ *
  * @author Christian Bremer
  */
 public class DefaultWebClientErrorDecoderTest {
 
   private static final DefaultWebClientErrorDecoder decoder = new DefaultWebClientErrorDecoder();
 
+  /**
+   * Test decode json.
+   *
+   * @throws Exception the exception
+   */
   @Test
   public void testDecodeJson() throws Exception {
     testDecode(MediaType.APPLICATION_JSON_VALUE);
   }
 
+  /**
+   * Test decode xml.
+   *
+   * @throws Exception the exception
+   */
   @Test
   public void testDecodeXml() throws Exception {
     testDecode(MediaType.APPLICATION_XML_VALUE);
@@ -68,6 +80,11 @@ public class DefaultWebClientErrorDecoderTest {
     Assert.assertEquals(expected, ((WebClientException) throwable).getRestApiException());
   }
 
+  /**
+   * Test decode something else.
+   *
+   * @throws Exception the exception
+   */
   @Test
   public void testDecodeSomethingElse() throws Exception {
 
@@ -100,6 +117,9 @@ public class DefaultWebClientErrorDecoderTest {
         ((WebClientException) throwable).getRestApiException().getMessage());
   }
 
+  /**
+   * Test decode empty response.
+   */
   @Test
   public void testDecodeEmptyResponse() {
     final HttpStatus httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;

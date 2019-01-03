@@ -40,12 +40,17 @@ import org.springframework.web.servlet.view.json.MappingJackson2JsonView;
 import org.springframework.web.util.WebUtils;
 
 /**
+ * The api exception resolver test.
+ *
  * @author Christian Bremer
  */
 public class ApiExceptionResolverTest {
 
   private static ApiExceptionResolver exceptionResolver;
 
+  /**
+   * Setup test.
+   */
   @BeforeClass
   public static void setup() {
     final RestApiExceptionMapperProperties properties = new RestApiExceptionMapperProperties();
@@ -59,6 +64,11 @@ public class ApiExceptionResolverTest {
     exceptionResolver = new ApiExceptionResolver(mapper);
   }
 
+  /**
+   * Test resolve exception with json content.
+   *
+   * @throws Exception the exception
+   */
   @Test
   public void testResolveExceptionWithJsonContent() throws Exception {
 
@@ -127,6 +137,14 @@ public class ApiExceptionResolverTest {
 
   private static class TestHandler {
 
+    /**
+     * Test method string.
+     *
+     * @param uuid  the uuid
+     * @param name  the name
+     * @param value the value
+     * @return the string
+     */
     @SuppressWarnings({"WeakerAccess", "unused"})
     public String testMethod(UUID uuid, String name, int value) {
       return "test";

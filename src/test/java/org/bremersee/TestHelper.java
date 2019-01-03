@@ -25,6 +25,8 @@ import org.bremersee.exception.ServiceException;
 import org.bremersee.exception.model.RestApiException;
 
 /**
+ * The test helper.
+ *
  * @author Christian Bremer
  */
 public abstract class TestHelper {
@@ -32,6 +34,11 @@ public abstract class TestHelper {
   private TestHelper() {
   }
 
+  /**
+   * Returns a rest api exception.
+   *
+   * @return the rest api exception
+   */
   public static RestApiException restApiException() {
     RestApiException restApiException = new RestApiException();
     restApiException.setApplication("test");
@@ -45,6 +52,11 @@ public abstract class TestHelper {
     return restApiException;
   }
 
+  /**
+   * Returns an other response.
+   *
+   * @return the map
+   */
   public static Map<String, Object> otherResponse() {
     final Map<String, Object> map = new LinkedHashMap<>();
     map.put("timestamp", OffsetDateTime.now(ZoneId.of("UTC")));

@@ -32,6 +32,8 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
 /**
+ * The feign client exception error decoder test.
+ *
  * @author Christian Bremer
  */
 public class FeignClientExceptionErrorDecoderTest {
@@ -39,6 +41,11 @@ public class FeignClientExceptionErrorDecoderTest {
   private static final FeignClientExceptionErrorDecoder decoder
       = new FeignClientExceptionErrorDecoder();
 
+  /**
+   * Test decode json.
+   *
+   * @throws Exception the exception
+   */
   @Test
   public void testDecodeJson() throws Exception {
     final MultiValueMap<String, String> headers = new LinkedMultiValueMap<>();
@@ -59,6 +66,11 @@ public class FeignClientExceptionErrorDecoderTest {
     Assert.assertEquals(expected, ((FeignClientException) actual).getRestApiException());
   }
 
+  /**
+   * Test decode xml.
+   *
+   * @throws Exception the exception
+   */
   @Test
   public void testDecodeXml() throws Exception {
     final MultiValueMap<String, String> headers = new LinkedMultiValueMap<>();
@@ -79,6 +91,11 @@ public class FeignClientExceptionErrorDecoderTest {
     Assert.assertEquals(expected, ((FeignClientException) actual).getRestApiException());
   }
 
+  /**
+   * Test decode something else.
+   *
+   * @throws Exception the exception
+   */
   @Test
   public void testDecodeSomethingElse() throws Exception {
     final MultiValueMap<String, String> headers = new LinkedMultiValueMap<>();
@@ -101,6 +118,9 @@ public class FeignClientExceptionErrorDecoderTest {
     Assert.assertEquals(body, ((FeignClientException) actual).getRestApiException().getMessage());
   }
 
+  /**
+   * Test decode empty response.
+   */
   @Test
   public void testDecodeEmptyResponse() {
     final MultiValueMap<String, String> headers = new LinkedMultiValueMap<>();

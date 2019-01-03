@@ -33,11 +33,16 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
 /**
+ * The rest api exception parser impl test.
+ *
  * @author Christian Bremer
  */
 @Slf4j
 public class RestApiExceptionParserImplTest {
 
+  /**
+   * Test response is null.
+   */
   @Test
   public void testResponseIsNull() {
     final RestApiException actual = new RestApiExceptionParserImpl()
@@ -46,6 +51,11 @@ public class RestApiExceptionParserImplTest {
     Assert.assertEquals(new RestApiException().getMessage(), actual.getMessage());
   }
 
+  /**
+   * Test response is json.
+   *
+   * @throws Exception the exception
+   */
   @Test
   public void testResponseIsJson() throws Exception {
     final RestApiException expected = TestHelper.restApiException();
@@ -59,6 +69,11 @@ public class RestApiExceptionParserImplTest {
     Assert.assertEquals(expected, actual);
   }
 
+  /**
+   * Test response is xml.
+   *
+   * @throws Exception the exception
+   */
   @Test
   public void testResponseIsXml() throws Exception {
     final RestApiException expected = TestHelper.restApiException();
@@ -72,6 +87,11 @@ public class RestApiExceptionParserImplTest {
     Assert.assertEquals(expected, actual);
   }
 
+  /**
+   * Test response is something else.
+   *
+   * @throws Exception the exception
+   */
   @Test
   public void testResponseIsSomethingElse() throws Exception {
     final String response = getJsonMapper()
@@ -89,6 +109,9 @@ public class RestApiExceptionParserImplTest {
     Assert.assertEquals(expected, actual);
   }
 
+  /**
+   * Test response is empty.
+   */
   @Test
   public void testResponseIsEmpty() {
     final String response = "";
@@ -105,6 +128,9 @@ public class RestApiExceptionParserImplTest {
     Assert.assertEquals(expected, actual);
   }
 
+  /**
+   * Test response is empty but headers are present.
+   */
   @Test
   public void testResponseIsEmptyButHeadersArePresent() {
     final OffsetDateTime now = OffsetDateTime.now(ZoneId.of("UTC"));
