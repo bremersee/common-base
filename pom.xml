@@ -12,15 +12,6 @@
   <name>common-base</name>
   <description>Common Base</description>
 
-  <!--
-  <parent>
-    <groupId>org.springframework.boot</groupId>
-    <artifactId>spring-boot-starter-parent</artifactId>
-    <version>2.1.1.RELEASE</version>
-    <relativePath/>
-  </parent>
-  -->
-
   <properties>
     <github.global.server>github</github.global.server>
     <java.version>1.8</java.version>
@@ -31,8 +22,6 @@
 
     <spring-boot.version>2.1.1.RELEASE</spring-boot.version>
     <spring-cloud.version>Greenwich.M3</spring-cloud.version>
-    <common-model-plain.version>1.0.0-SNAPSHOT</common-model-plain.version>
-    <jts.version>1.16.0</jts.version>
 
     <plantuml.version>1.2018.11</plantuml.version>
     <wagon-webdav-jackrabbit.version>3.0.0</wagon-webdav-jackrabbit.version>
