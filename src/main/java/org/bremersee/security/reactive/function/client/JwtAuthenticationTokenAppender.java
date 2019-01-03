@@ -43,6 +43,7 @@ public class JwtAuthenticationTokenAppender implements ExchangeFilterFunction {
         .flatMap((Function<String, Mono<ClientResponse>>) tokenValue -> {
           request.headers().set(HttpHeaders.AUTHORIZATION, "Bearer " + tokenValue);
           return next.exchange(request);
-        });
+        })
+        .switchIfEmpty(next.exchange(request));
   }
 }

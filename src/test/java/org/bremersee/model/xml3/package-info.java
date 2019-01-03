@@ -14,32 +14,9 @@
  * limitations under the License.
  */
 
-package org.bremersee.security.access;
-
 /**
+ * Test model 3 package.
+ *
  * @author Christian Bremer
  */
-public abstract class PermissionConstants {
-
-  public static final String ADMINISTRATION = "ADMINISTRATION";
-
-  public static final String CREATE = "CREATE";
-
-  public static final String DELETE = "DELETE";
-
-  public static final String READ = "READ";
-
-  public static final String WRITE = "WRITE";
-
-  public static final String[] ALL = new String[]{
-      ADMINISTRATION,
-      CREATE,
-      DELETE,
-      READ,
-      WRITE
-  };
-
-  private PermissionConstants() {
-  }
-
-}
+package org.bremersee.model.xml3;

@@ -14,32 +14,26 @@
  * limitations under the License.
  */
 
-package org.bremersee.security.access;
+package org.bremersee.model.xml4;
+
+import javax.xml.bind.annotation.XmlRegistry;
 
 /**
+ * The xml object factory.
+ *
  * @author Christian Bremer
  */
-public abstract class PermissionConstants {
+@XmlRegistry
+@SuppressWarnings("unused")
+public class ObjectFactory {
 
-  public static final String ADMINISTRATION = "ADMINISTRATION";
-
-  public static final String CREATE = "CREATE";
-
-  public static final String DELETE = "DELETE";
-
-  public static final String READ = "READ";
-
-  public static final String WRITE = "WRITE";
-
-  public static final String[] ALL = new String[]{
-      ADMINISTRATION,
-      CREATE,
-      DELETE,
-      READ,
-      WRITE
-  };
-
-  private PermissionConstants() {
+  /**
+   * Create address.
+   *
+   * @return the address
+   */
+  public Address createAddress() {
+    return new Address();
   }
 
 }

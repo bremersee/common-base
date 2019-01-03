@@ -14,32 +14,12 @@
  * limitations under the License.
  */
 
-package org.bremersee.security.access;
-
 /**
+ * Test model 2 package.
+ *
  * @author Christian Bremer
  */
-public abstract class PermissionConstants {
-
-  public static final String ADMINISTRATION = "ADMINISTRATION";
-
-  public static final String CREATE = "CREATE";
-
-  public static final String DELETE = "DELETE";
-
-  public static final String READ = "READ";
-
-  public static final String WRITE = "WRITE";
-
-  public static final String[] ALL = new String[]{
-      ADMINISTRATION,
-      CREATE,
-      DELETE,
-      READ,
-      WRITE
-  };
-
-  private PermissionConstants() {
-  }
-
-}
+@javax.xml.bind.annotation.XmlSchema(
+    namespace = "http://bremersee.org/xmlschemas/common-xml-test-model-2",
+    elementFormDefault = javax.xml.bind.annotation.XmlNsForm.QUALIFIED)
+package org.bremersee.model.xml2;
