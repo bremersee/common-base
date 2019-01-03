@@ -41,9 +41,9 @@ public class HttpClientException extends RuntimeException
   /**
    * Instantiates a new http client exception.
    *
-   * @param status the status
-   * @param message the message
-   * @param headers the headers
+   * @param status           the status
+   * @param message          the message
+   * @param headers          the headers
    * @param restApiException the rest api exception
    */
   public HttpClientException(

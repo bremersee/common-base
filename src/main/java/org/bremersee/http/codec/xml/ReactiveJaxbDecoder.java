@@ -81,7 +81,7 @@ public class ReactiveJaxbDecoder extends AbstractDecoder<Object> {
    * Instantiates a new reactive jaxb decoder.
    *
    * @param jaxbContextBuilder the jaxb context builder
-   * @param nameSpaces the name spaces
+   * @param nameSpaces         the name spaces
    */
   @SuppressWarnings("WeakerAccess")
   public ReactiveJaxbDecoder(

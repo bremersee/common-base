@@ -20,8 +20,7 @@ import org.springframework.web.reactive.function.client.ClientResponse;
 import reactor.core.publisher.Mono;
 
 /**
- * An abstract implementation of the error decoder for the 
- * {@link org.springframework.web.reactive.function.client.WebClient}.
+ * An abstract implementation of the error decoder for the {@link org.springframework.web.reactive.function.client.WebClient}.
  *
  * @author Christian Bremer
  */

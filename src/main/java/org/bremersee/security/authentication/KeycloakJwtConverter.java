@@ -33,7 +33,7 @@ import org.springframework.util.StringUtils;
 
 /**
  * A JWT converter for the keycloak identity provider. It use the json path {@code
- * $.realm_access.roles}* to extract the roles from the token.
+ * $.realm_access.roles} to extract the roles from the token.
  *
  * @author Christian Bremer
  */

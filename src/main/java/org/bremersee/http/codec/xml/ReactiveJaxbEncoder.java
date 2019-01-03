@@ -60,7 +60,7 @@ public class ReactiveJaxbEncoder extends AbstractSingleValueEncoder<Object> {
    * Instantiates a new reactive jaxb encoder.
    *
    * @param jaxbContextBuilder the jaxb context builder
-   * @param nameSpaces the name spaces
+   * @param nameSpaces         the name spaces
    */
   @SuppressWarnings("WeakerAccess")
   public ReactiveJaxbEncoder(
