@@ -150,7 +150,7 @@ public class ApiExceptionResolver implements HandlerExceptionResolver {
 
     if (!exceptionMapper.getApiPaths().isEmpty()) {
       return exceptionMapper.getApiPaths().stream().anyMatch(
-          s -> pathMatcher.match(s, request.getPathInfo()));
+          s -> pathMatcher.match(s, request.getServletPath()));
     }
 
     if (handler == null) {

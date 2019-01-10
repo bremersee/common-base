@@ -84,7 +84,7 @@ public class ApiExceptionResolverTest {
 
     HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
     Mockito.when(request.getRequestURI()).thenReturn("/api/resource");
-    Mockito.when(request.getPathInfo()).thenReturn("/api/resource");
+    Mockito.when(request.getServletPath()).thenReturn("/api/resource");
     Mockito
         .when(request.getHeader(Mockito.eq(HttpHeaders.ACCEPT)))
         .thenReturn(MediaType.APPLICATION_JSON_VALUE);
