@@ -111,7 +111,7 @@ public class RestApiExceptionMapperProperties {
    * <td style="border: 1px solid">true</td>
    * </tr>
    * <tr>
-   * <td style="border: 1px solid">includeRequestPath</td>
+   * <td style="border: 1px solid">includePath</td>
    * <td style="border: 1px solid">true</td>
    * </tr>
    * <tr>
@@ -337,7 +337,7 @@ public class RestApiExceptionMapperProperties {
 
     @Getter
     @Setter
-    private boolean includeRequestPath = true;
+    private boolean includePath = true;
 
     @Getter
     @Setter

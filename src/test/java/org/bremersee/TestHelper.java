@@ -47,7 +47,7 @@ public abstract class TestHelper {
     restApiException.setErrorCodeInherited(false);
     restApiException.setId(UUID.randomUUID().toString());
     restApiException.setMessage("Something failed.");
-    restApiException.setRequestPath("/api/something");
+    restApiException.setPath("/api/something");
     restApiException.setTimestamp(OffsetDateTime.now(ZoneId.of("UTC")));
     return restApiException;
   }

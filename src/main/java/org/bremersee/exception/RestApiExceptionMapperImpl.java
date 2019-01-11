@@ -167,8 +167,8 @@ public class RestApiExceptionMapperImpl implements RestApiExceptionMapper {
     if (config.isIncludeApplicationName()) {
       restApiException.setApplication(getApplicationName());
     }
-    if (config.isIncludeRequestPath()) {
-      restApiException.setRequestPath(requestPath);
+    if (config.isIncludePath()) {
+      restApiException.setPath(requestPath);
     }
     if (config.isIncludeHandler()) {
       restApiException.setHandler(buildHandler(handler));
@@ -409,8 +409,8 @@ public class RestApiExceptionMapperImpl implements RestApiExceptionMapper {
     if (config.isIncludeApplicationName()) {
       destination.setApplication(source.getApplication());
     }
-    if (config.isIncludeRequestPath()) {
-      destination.setRequestPath(source.getRequestPath());
+    if (config.isIncludePath()) {
+      destination.setPath(source.getPath());
     }
     if (config.isIncludeHandler()) {
       destination.setHandler(cloneHandler(source.getHandler()));
