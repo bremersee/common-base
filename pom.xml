@@ -20,8 +20,8 @@
     <product.vendor>bremersee.org</product.vendor>
     <inceptionYear>2019</inceptionYear>
 
-    <spring-boot.version>2.1.1.RELEASE</spring-boot.version>
-    <spring-cloud.version>Greenwich.M3</spring-cloud.version>
+    <spring-boot.version>2.1.2.RELEASE</spring-boot.version>
+    <spring-cloud.version>Greenwich.RELEASE</spring-cloud.version>
 
     <plantuml.version>1.2018.11</plantuml.version>
     <wagon-webdav-jackrabbit.version>3.0.0</wagon-webdav-jackrabbit.version>
