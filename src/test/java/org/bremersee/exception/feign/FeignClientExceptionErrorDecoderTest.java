@@ -19,8 +19,11 @@ package org.bremersee.exception.feign;
 import static org.bremersee.http.converter.ObjectMapperHelper.getJsonMapper;
 import static org.bremersee.http.converter.ObjectMapperHelper.getXmlMapper;
 
+import feign.Request;
+import feign.Request.HttpMethod;
 import feign.Response;
 import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
 import java.util.Map;
 import org.bremersee.TestHelper;
 import org.bremersee.exception.model.RestApiException;
@@ -54,6 +57,13 @@ public class FeignClientExceptionErrorDecoderTest {
     //noinspection unchecked
     final Response response = Response
         .builder()
+        .request(Request
+            .create(
+                HttpMethod.GET,
+                "http://example.org",
+                new HashMap<>(),
+                null,
+                StandardCharsets.UTF_8))
         .body(getJsonMapper().writeValueAsBytes(expected))
         .headers((Map) headers)
         .reason("Something bad")
@@ -79,6 +89,13 @@ public class FeignClientExceptionErrorDecoderTest {
     //noinspection unchecked
     final Response response = Response
         .builder()
+        .request(Request
+            .create(
+                HttpMethod.GET,
+                "http://example.org",
+                new HashMap<>(),
+                null,
+                StandardCharsets.UTF_8))
         .body(getXmlMapper().writeValueAsBytes(expected))
         .headers((Map) headers)
         .reason("Nothing found")
@@ -104,6 +121,13 @@ public class FeignClientExceptionErrorDecoderTest {
     //noinspection unchecked
     final Response response = Response
         .builder()
+        .request(Request
+            .create(
+                HttpMethod.GET,
+                "http://example.org",
+                new HashMap<>(),
+                null,
+                StandardCharsets.UTF_8))
         .body(body.getBytes(StandardCharsets.UTF_8))
         .headers((Map) headers)
         .reason("Something bad")
@@ -129,6 +153,13 @@ public class FeignClientExceptionErrorDecoderTest {
     //noinspection unchecked
     final Response response = Response
         .builder()
+        .request(Request
+            .create(
+                HttpMethod.GET,
+                "http://example.org",
+                new HashMap<>(),
+                null,
+                StandardCharsets.UTF_8))
         .body(body.getBytes(StandardCharsets.UTF_8))
         .headers((Map) headers)
         .reason("Something bad")

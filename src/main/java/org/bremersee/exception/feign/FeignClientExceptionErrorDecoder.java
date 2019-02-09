@@ -20,6 +20,7 @@ import static feign.Util.RETRY_AFTER;
 import static java.lang.String.format;
 import static java.util.concurrent.TimeUnit.SECONDS;
 
+import feign.Request.HttpMethod;
 import feign.Response;
 import feign.RetryableException;
 import feign.Util;
@@ -65,6 +66,15 @@ public class FeignClientExceptionErrorDecoder implements ErrorDecoder {
     this.parser = parser != null ? parser : new RestApiExceptionParserImpl();
   }
 
+  private static HttpMethod findHttpMethod(final Response response) {
+    if (response == null) {
+      return null;
+    }
+    if (response.request() == null) {
+      return null;
+    }
+    return response.request().httpMethod();
+  }
 
   @Override
   public Exception decode(final String methodKey, final Response response) {
@@ -89,7 +99,10 @@ public class FeignClientExceptionErrorDecoder implements ErrorDecoder {
     final HttpHeaders httpHeaders = HttpHeadersHelper.buildHttpHeaders(response.headers());
     final Date retryAfter = determineRetryAfter(httpHeaders.getFirst(RETRY_AFTER));
     if (retryAfter != null) {
-      return new RetryableException(feignClientException.getMessage(), feignClientException,
+      return new RetryableException(
+          feignClientException.getMessage(),
+          findHttpMethod(response),
+          feignClientException,
           retryAfter);
     }
     return feignClientException;
