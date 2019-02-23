@@ -21,12 +21,14 @@ import java.time.format.DateTimeFormatter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.lang.Nullable;
 import org.springframework.util.StringUtils;
+import org.springframework.validation.annotation.Validated;
 
 /**
  * Some utilities.
  *
  * @author Christian Bremer
  */
+@Validated
 @Slf4j
 public abstract class RestApiExceptionUtils {
 

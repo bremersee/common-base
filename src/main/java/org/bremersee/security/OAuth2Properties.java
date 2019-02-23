@@ -26,6 +26,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
  *
  * @author Christian Bremer
  */
+@SuppressWarnings("ConfigurationProperties")
 @ConfigurationProperties(prefix = "bremersee.security.oauth2")
 @Getter
 @Setter

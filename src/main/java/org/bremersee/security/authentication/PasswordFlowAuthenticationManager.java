@@ -39,7 +39,7 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtAut
 import org.springframework.util.MultiValueMap;
 
 /**
- * An authentication manager that make an OAuth2 Password Flow to authenticate the user. This might
+ * An authentication manager that makes an OAuth2 Password Flow to authenticate the user. This might
  * be useful if you want to use Basic Auth with an OAuth2 identity provider.
  *
  * @author Christian Bremer

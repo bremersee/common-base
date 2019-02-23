@@ -27,6 +27,7 @@ import org.bremersee.http.MediaTypeHelper;
 import org.bremersee.http.converter.ObjectMapperHelper;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
+import org.springframework.lang.Nullable;
 import org.springframework.util.StringUtils;
 
 /**
@@ -75,8 +76,8 @@ public class RestApiExceptionParserImpl implements RestApiExceptionParser {
 
   @Override
   public RestApiException parseRestApiException(
-      final String response,
-      final Map<String, ? extends Collection<String>> headers) {
+      @Nullable final String response,
+      @Nullable final Map<String, ? extends Collection<String>> headers) {
 
     final HttpHeaders httpHeaders = HttpHeadersHelper.buildHttpHeaders(headers);
     final String contentType = String.valueOf(httpHeaders.getContentType());

@@ -33,6 +33,7 @@ import org.springframework.http.HttpStatus;
  *
  * @author Christian Bremer
  */
+@SuppressWarnings("ConfigurationProperties")
 @ConfigurationProperties(prefix = "bremersee.exception-mapping")
 @Data
 public class RestApiExceptionMapperProperties {

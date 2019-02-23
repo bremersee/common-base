@@ -63,7 +63,7 @@ public class KeycloakJwtAuthenticationToken extends JwtAuthenticationToken {
     if (getToken().containsClaim(KEYCLOAK_PREFERRED_USERNAME)) {
       return getToken().getClaimAsString(KEYCLOAK_PREFERRED_USERNAME);
     }
-    return super.getName(); // return sub
+    return super.getName(); // returns claim sub
   }
 
 }

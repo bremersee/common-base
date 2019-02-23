@@ -29,8 +29,13 @@ import org.springframework.web.reactive.function.client.ExchangeFunction;
 import reactor.core.publisher.Mono;
 
 /**
+ * This exchange filter appends the JWT access token from the current authentication {@link
+ * JwtAuthenticationToken} to the request headers. The header name will be {@code Authentication},
+ * the header value will be {@code Bearer [ACCESS_TOKEN]}.
+ *
  * @author Christian Bremer
  */
+@SuppressWarnings("unused")
 public class JwtAuthenticationTokenAppender implements ExchangeFilterFunction {
 
   @Override

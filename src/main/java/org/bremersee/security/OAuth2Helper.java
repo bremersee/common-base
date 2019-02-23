@@ -16,22 +16,37 @@
 
 package org.bremersee.security;
 
+import javax.validation.constraints.NotNull;
+import org.springframework.lang.Nullable;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import org.springframework.validation.annotation.Validated;
 
 /**
+ * The oauth2 helper.
+ *
  * @author Christian Bremer
  */
+@Validated
 public abstract class OAuth2Helper {
 
   private OAuth2Helper() {
   }
 
+  /**
+   * Creates a password flow body.
+   *
+   * @param clientId     the client id
+   * @param clientSecret the client secret
+   * @param username     the username
+   * @param password     the password
+   * @return the multi value map of a password flow body
+   */
   public static MultiValueMap<String, String> createPasswordFlowBody(
-      final String clientId,
-      final String clientSecret,
-      final String username,
-      final String password) {
+      @NotNull final String clientId,
+      @Nullable final String clientSecret,
+      @NotNull final String username,
+      @NotNull final String password) {
 
     final MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
     body.add("grant_type", "password");

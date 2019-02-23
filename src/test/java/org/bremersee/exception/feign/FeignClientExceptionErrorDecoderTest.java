@@ -169,9 +169,6 @@ public class FeignClientExceptionErrorDecoderTest {
     Assert.assertNotNull(actual);
     Assert.assertTrue(actual instanceof FeignClientException);
     Assert.assertEquals(500, ((FeignClientException) actual).status());
-
-    // TODO wollen wir hier trotzdem ein cause haben? ja
-    //Assert.assertNull(((FeignClientException) actual).getRestApiException());
   }
 
 }

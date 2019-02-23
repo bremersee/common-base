@@ -35,6 +35,7 @@ import org.springframework.core.log.LogFormatUtils;
 import org.springframework.lang.Nullable;
 import org.springframework.util.MimeType;
 import org.springframework.util.MimeTypeUtils;
+import org.springframework.validation.annotation.Validated;
 import reactor.core.publisher.Flux;
 
 /**
@@ -50,6 +51,7 @@ import reactor.core.publisher.Flux;
  * @author Arjen Poutsma
  * @author Christian Bremer
  */
+@Validated
 public class ReactiveJaxbEncoder extends AbstractSingleValueEncoder<Object> {
 
   private final JaxbContextBuilder jaxbContextBuilder;

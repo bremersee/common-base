@@ -38,7 +38,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
 /**
- * A reactive authentication manager that make an OAuth2 Password Flow to authenticate the user.
+ * A reactive authentication manager that makes an OAuth2 Password Flow to authenticate the user.
  * This might be useful if you want to use Basic Auth with an OAuth2 identity provider.
  *
  * @author Christian Bremer

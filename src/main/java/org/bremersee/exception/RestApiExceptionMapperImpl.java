@@ -148,9 +148,9 @@ public class RestApiExceptionMapperImpl implements RestApiExceptionMapper {
 
   @Override
   public RestApiException build(
-      final Throwable exception,
-      final String requestPath,
-      final Object handler) {
+      @NotNull final Throwable exception,
+      @Nullable final String requestPath,
+      @Nullable final Object handler) {
 
     final ExceptionMappingConfig config = getProperties().findExceptionMappingConfig(exception);
     final HttpStatus httpStatus = detectHttpStatus(exception, handler);
@@ -209,7 +209,7 @@ public class RestApiExceptionMapperImpl implements RestApiExceptionMapper {
    */
   @SuppressWarnings("WeakerAccess")
   @Nullable
-  protected Class<?> findHandlerClass(Object handler) {
+  protected Class<?> findHandlerClass(@Nullable Object handler) {
     if (handler == null) {
       return null;
     } else if (handler instanceof HandlerMethod) {
