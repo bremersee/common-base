@@ -27,7 +27,9 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtAut
  * @author Christian Bremer
  */
 @SuppressWarnings({"WeakerAccess", "unused"})
-public class KeycloakJwtAuthenticationToken extends JwtAuthenticationToken {
+public class KeycloakJwtAuthenticationToken
+    extends JwtAuthenticationToken
+    implements BremerseeAuthenticationToken {
 
   /**
    * The constant KEYCLOAK_PREFERRED_USERNAME.
@@ -59,6 +61,7 @@ public class KeycloakJwtAuthenticationToken extends JwtAuthenticationToken {
    *
    * @return the preferred name
    */
+  @Override
   public String getPreferredName() {
     if (getToken().containsClaim(KEYCLOAK_PREFERRED_USERNAME)) {
       return getToken().getClaimAsString(KEYCLOAK_PREFERRED_USERNAME);
