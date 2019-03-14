@@ -79,6 +79,9 @@ public class PasswordFlowReactiveAuthenticationManager
 
   @Override
   public Mono<Authentication> authenticate(final Authentication authentication) {
+    if (log.isDebugEnabled()) {
+      log.debug("msg=[Authenticating basic authentication with OAuth2 password flow.]");
+    }
     return Mono.just(createPasswordFlowBody(authentication))
         .flatMap(accessTokenRetriever::retrieveAccessToken)
         .flatMap(jwtDecoder::decode)
@@ -88,6 +91,7 @@ public class PasswordFlowReactiveAuthenticationManager
   }
 
   private OAuth2AuthenticationException onError(JwtException e) {
+    log.error("msg=[Basic authentication with password flow failed.]", e);
     OAuth2Error invalidRequest = invalidToken(e.getMessage());
     return new OAuth2AuthenticationException(invalidRequest, e.getMessage());
   }

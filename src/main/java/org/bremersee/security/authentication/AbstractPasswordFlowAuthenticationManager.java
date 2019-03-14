@@ -18,6 +18,7 @@ package org.bremersee.security.authentication;
 
 import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 import org.bremersee.security.OAuth2Helper;
 import org.bremersee.security.OAuth2Properties;
 import org.springframework.security.core.Authentication;
@@ -30,6 +31,7 @@ import org.springframework.util.MultiValueMap;
  * @author Christian Bremer
  */
 @SuppressWarnings("WeakerAccess")
+@Slf4j
 public abstract class AbstractPasswordFlowAuthenticationManager {
 
   @Getter(AccessLevel.PROTECTED)
@@ -60,6 +62,10 @@ public abstract class AbstractPasswordFlowAuthenticationManager {
   protected MultiValueMap<String, String> createPasswordFlowBody(
       final Authentication authentication) {
 
+    if (log.isDebugEnabled()) {
+      log.debug("msg=[Creating password flow body.] clientId=[{}] userName=[{}]",
+          oauth2Properties.getPasswordFlow().getClientId(), authentication.getName());
+    }
     return OAuth2Helper.createPasswordFlowBody(
         oauth2Properties.getPasswordFlow().getClientId(),
         oauth2Properties.getPasswordFlow().getClientSecret(),

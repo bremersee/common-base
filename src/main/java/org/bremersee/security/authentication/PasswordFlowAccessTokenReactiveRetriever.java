@@ -16,6 +16,7 @@
 
 package org.bremersee.security.authentication;
 
+import lombok.extern.slf4j.Slf4j;
 import net.minidev.json.JSONObject;
 import net.minidev.json.JSONValue;
 import org.bremersee.exception.PasswordFlowAuthenticationException;
@@ -35,6 +36,7 @@ import reactor.core.publisher.Mono;
  *
  * @author Christian Bremer
  */
+@Slf4j
 public class PasswordFlowAccessTokenReactiveRetriever
     extends AbstractWebClientErrorDecoder<AuthenticationException>
     implements AccessTokenRetriever<MultiValueMap<String, String>, Mono<String>> {
@@ -46,7 +48,6 @@ public class PasswordFlowAccessTokenReactiveRetriever
    *
    * @param webClient the web client
    */
-  @SuppressWarnings("WeakerAccess")
   public PasswordFlowAccessTokenReactiveRetriever(
       final WebClient webClient) {
     this.webClient = webClient;
@@ -54,6 +55,9 @@ public class PasswordFlowAccessTokenReactiveRetriever
 
   @Override
   public Mono<String> retrieveAccessToken(final MultiValueMap<String, String> body) {
+    if (log.isDebugEnabled()) {
+      log.debug("msg=[Retrieving access token with password flow.]");
+    }
     return webClient
         .method(HttpMethod.POST)
         .contentType(MediaType.APPLICATION_FORM_URLENCODED)
@@ -67,7 +71,10 @@ public class PasswordFlowAccessTokenReactiveRetriever
   @Override
   public AuthenticationException buildException(
       final ClientResponse clientResponse, final String response) {
-    return new PasswordFlowAuthenticationException(clientResponse.statusCode(), response);
+    final PasswordFlowAuthenticationException exception = new PasswordFlowAuthenticationException(
+        clientResponse.statusCode(), response);
+    log.error("msg=[Retrieving access token with password flow failed.]", exception);
+    return exception;
   }
 
 }
