@@ -17,29 +17,26 @@
 package org.bremersee.security.access;
 
 import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Objects;
+import java.util.TreeMap;
 import lombok.ToString;
 
 /**
  * @author Christian Bremer
  */
-@ToString
-class AclImpl implements Acl<Ace> {
+@ToString(callSuper = true)
+class AclImpl extends TreeMap<String, Ace> implements Acl<Ace> {
 
   private final String owner;
-
-  private final Map<String, ? extends Ace> entries;
 
   AclImpl(
       final String owner,
       final Map<String, ? extends Ace> entries) {
     this.owner = owner;
-    this.entries = entries != null ? entries : new HashMap<>();
+    if (entries != null) {
+      putAll(entries);
+    }
   }
 
   @Override
@@ -49,7 +46,7 @@ class AclImpl implements Acl<Ace> {
 
   @Override
   public Map<String, ? extends Ace> entryMap() {
-    return Collections.unmodifiableMap(entries);
+    return Collections.unmodifiableMap(this);
   }
 
   @Override
@@ -62,24 +59,12 @@ class AclImpl implements Acl<Ace> {
     }
     Acl<? extends Ace> acl = (Acl<? extends Ace>) o;
     return Objects.equals(owner, acl.getOwner())
-        && sort(entries).equals(sort(acl.entryMap()));
+        && (new TreeMap<>(this)).equals(new TreeMap<>(acl.entryMap()));
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(owner, sort(entries));
+    return Objects.hash(owner, new TreeMap<>(this));
   }
 
-  private LinkedHashMap<String, Ace> sort(final Map<String, ? extends Ace> map) {
-    final LinkedHashMap<String, Ace> sortedMap = new LinkedHashMap<>();
-    if (map != null) {
-      map
-          .entrySet()
-          .stream()
-          .sorted((Comparator<Entry<String, ? extends Ace>>) (o1, o2) -> o1.getKey()
-              .compareToIgnoreCase(o2.getKey()))
-          .forEachOrdered(entry -> sortedMap.put(entry.getKey(), entry.getValue()));
-    }
-    return sortedMap;
-  }
 }

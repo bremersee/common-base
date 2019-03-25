@@ -8,7 +8,6 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import org.bremersee.common.model.AccessControlEntry;
 import org.bremersee.common.model.AccessControlList;
 import org.bremersee.security.core.AuthorityConstants;
@@ -21,9 +20,8 @@ public class AclMapperImplTest {
 
   @Test
   public void mapWithDefaultsAndAdminSwitch() {
-    //noinspection unchecked
-    AclMapper<Acl<? extends Ace>> mapper = new AclMapperImpl(
-        (o, e) -> new AclImpl(o, new HashMap<>(e)),
+    AclMapper<Acl<? extends Ace>> mapper = new AclMapperImpl<>(
+        AclImpl::new,
         PermissionConstants.ALL,
         true,
         false
@@ -82,9 +80,8 @@ public class AclMapperImplTest {
 
   @Test
   public void map() {
-    //noinspection unchecked
-    AclMapper<Acl<? extends Ace>> mapper = new AclMapperImpl(
-        (o, e) -> new AclImpl(o, new HashMap<>(e)),
+    AclMapper<Acl<? extends Ace>> mapper = new AclMapperImpl<>(
+        AclImpl::new,
         null,
         false,
         true

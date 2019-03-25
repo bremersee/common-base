@@ -55,6 +55,7 @@ public interface AclFactory<T> {
                   .roles(new ArrayList<>(ace.getRoles()))
                   .groups(new ArrayList<>(ace.getGroups()));
             })
+            .sorted(new AccessControlEntryComparator())
             .collect(Collectors.toList()));
       }
       return acl;

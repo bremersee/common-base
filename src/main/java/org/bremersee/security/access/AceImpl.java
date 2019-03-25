@@ -16,7 +16,7 @@
 
 package org.bremersee.security.access;
 
-import java.util.HashSet;
+import java.util.Collection;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
@@ -45,9 +45,9 @@ class AceImpl implements Ace {
    * Instantiates a new access control entry.
    */
   AceImpl() {
-    this.users = new HashSet<>();
-    this.roles = new HashSet<>();
-    this.groups = new HashSet<>();
+    this.users = new TreeSet<>();
+    this.roles = new TreeSet<>();
+    this.groups = new TreeSet<>();
   }
 
   @Override
@@ -76,7 +76,7 @@ class AceImpl implements Ace {
   }
 
   @Override
-  public boolean equals(Object o) {
+  public boolean equals(final Object o) {
     if (this == o) {
       return true;
     }
@@ -84,20 +84,24 @@ class AceImpl implements Ace {
       return false;
     }
     Ace ace = (Ace) o;
-    TreeSet<String> g1 = new TreeSet<>(getGroups());
-    TreeSet<String> g2 = new TreeSet<>(ace.getGroups());
-    TreeSet<String> r1 = new TreeSet<>(getRoles());
-    TreeSet<String> r2 = new TreeSet<>(ace.getRoles());
-    TreeSet<String> u1 = new TreeSet<>(getUsers());
-    TreeSet<String> u2 = new TreeSet<>(ace.getUsers());
     return guest == ace.isGuest() &&
-        g1.equals(g2) &&
-        r1.equals(r2) &&
-        u1.equals(u2);
+        treeSet(groups).equals(treeSet(ace.getGroups())) &&
+        treeSet(roles).equals(treeSet(ace.getRoles())) &&
+        treeSet(users).equals(treeSet(ace.getUsers()));
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(guest, new TreeSet<>(users), new TreeSet<>(roles), new TreeSet<>(groups));
+    return Objects.hash(guest, treeSet(users), treeSet(roles), treeSet(groups));
+  }
+
+  private TreeSet<String> treeSet(Collection<String> collection) {
+    if (collection == null) {
+      return new TreeSet<>();
+    }
+    if (collection instanceof TreeSet) {
+      return (TreeSet<String>) collection;
+    }
+    return new TreeSet<>(collection);
   }
 }
