@@ -14,10 +14,15 @@ import org.bremersee.security.core.AuthorityConstants;
 import org.junit.Test;
 
 /**
+ * The acl mapper impl test.
+ *
  * @author Christian Bremer
  */
 public class AclMapperImplTest {
 
+  /**
+   * Map with defaults and admin switch.
+   */
   @Test
   public void mapWithDefaultsAndAdminSwitch() {
     AclMapper<Acl<? extends Ace>> mapper = new AclMapperImpl<>(
@@ -78,6 +83,9 @@ public class AclMapperImplTest {
     assertFalse(ace.getRoles().contains(AuthorityConstants.ADMIN_ROLE_NAME));
   }
 
+  /**
+   * Map.
+   */
   @Test
   public void map() {
     AclMapper<Acl<? extends Ace>> mapper = new AclMapperImpl<>(

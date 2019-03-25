@@ -60,23 +60,23 @@ public interface AclBuilder {
   AclBuilder defaults(@Nullable String... permissions);
 
   /**
-   * From acl builder.
+   * From access control list DTO.
    *
-   * @param acl the acl
+   * @param acl the acl dto
    * @return the acl builder
    */
   AclBuilder from(@Nullable AccessControlList acl);
 
   /**
-   * From acl builder.
+   * From acl (entity).
    *
-   * @param acl the acl
+   * @param acl the acl (entity)
    * @return the acl builder
    */
   AclBuilder from(@Nullable Acl acl);
 
   /**
-   * Owner acl builder.
+   * Sets owner.
    *
    * @param owner the owner
    * @return the acl builder
@@ -84,16 +84,16 @@ public interface AclBuilder {
   AclBuilder owner(@Nullable String owner);
 
   /**
-   * Guest acl builder.
+   * Sets guest.
    *
-   * @param isPublic    the is public
+   * @param isPublic    is public
    * @param permissions the permissions
    * @return the acl builder
    */
   AclBuilder guest(@Nullable Boolean isPublic, @Nullable String... permissions);
 
   /**
-   * Add user acl builder.
+   * Adds user.
    *
    * @param user        the user
    * @param permissions the permissions
@@ -102,7 +102,7 @@ public interface AclBuilder {
   AclBuilder addUser(@Nullable String user, @Nullable String... permissions);
 
   /**
-   * Add role acl builder.
+   * Adds role.
    *
    * @param role        the role
    * @param permissions the permissions
@@ -111,7 +111,7 @@ public interface AclBuilder {
   AclBuilder addRole(@Nullable String role, @Nullable String... permissions);
 
   /**
-   * Add group acl builder.
+   * Adds group.
    *
    * @param group       the group
    * @param permissions the permissions
@@ -120,7 +120,7 @@ public interface AclBuilder {
   AclBuilder addGroup(@Nullable String group, @Nullable String... permissions);
 
   /**
-   * Remove user acl builder.
+   * Removes user.
    *
    * @param user        the user
    * @param permissions the permissions
@@ -129,7 +129,7 @@ public interface AclBuilder {
   AclBuilder removeUser(@Nullable String user, @Nullable String... permissions);
 
   /**
-   * Remove role acl builder.
+   * Removes role.
    *
    * @param role        the role
    * @param permissions the permissions
@@ -138,7 +138,7 @@ public interface AclBuilder {
   AclBuilder removeRole(@Nullable String role, @Nullable String... permissions);
 
   /**
-   * Remove group acl builder.
+   * Removes group.
    *
    * @param group       the group
    * @param permissions the permissions
@@ -147,7 +147,7 @@ public interface AclBuilder {
   AclBuilder removeGroup(@Nullable String group, @Nullable String... permissions);
 
   /**
-   * Ensure admin access acl builder.
+   * Ensures admin access.
    *
    * @return the acl builder
    */
@@ -156,7 +156,7 @@ public interface AclBuilder {
   }
 
   /**
-   * Ensure admin access acl builder.
+   * acl builder.
    *
    * @param adminRole   the admin role
    * @param permissions the permissions
@@ -165,7 +165,7 @@ public interface AclBuilder {
   AclBuilder ensureAdminAccess(@Nullable String adminRole, @Nullable String... permissions);
 
   /**
-   * Remove admin access acl builder.
+   * Removes admin access.
    *
    * @return the acl builder
    */
@@ -174,7 +174,7 @@ public interface AclBuilder {
   }
 
   /**
-   * Remove admin access acl builder.
+   * Removes admin access.
    *
    * @param adminRole   the admin role
    * @param permissions the permissions
@@ -183,16 +183,16 @@ public interface AclBuilder {
   AclBuilder removeAdminAccess(@Nullable String adminRole, @Nullable String... permissions);
 
   /**
-   * Build t.
+   * Build acl.
    *
-   * @param <T>     the type parameter
+   * @param <T>     the type of the acl
    * @param factory the factory
-   * @return the t
+   * @return the acl
    */
   <T> T build(@NotNull AclFactory<T> factory);
 
   /**
-   * Build acl acl.
+   * Build acl.
    *
    * @return the acl
    */
@@ -201,7 +201,7 @@ public interface AclBuilder {
   }
 
   /**
-   * Build access control list access control list.
+   * Build access control list.
    *
    * @return the access control list
    */

@@ -18,6 +18,9 @@ package org.bremersee.exception.feign;
 
 import static org.bremersee.http.converter.ObjectMapperHelper.getJsonMapper;
 import static org.bremersee.http.converter.ObjectMapperHelper.getXmlMapper;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import feign.Request;
 import feign.Request.HttpMethod;
@@ -70,10 +73,10 @@ public class FeignClientExceptionErrorDecoderTest {
         .status(500)
         .build();
     final Exception actual = decoder.decode("getSomething", response);
-    Assert.assertNotNull(actual);
-    Assert.assertTrue(actual instanceof FeignClientException);
-    Assert.assertEquals(500, ((FeignClientException) actual).status());
-    Assert.assertEquals(expected, ((FeignClientException) actual).getRestApiException());
+    assertNotNull(actual);
+    assertTrue(actual instanceof FeignClientException);
+    assertEquals(500, ((FeignClientException) actual).status());
+    assertEquals(expected, ((FeignClientException) actual).getRestApiException());
   }
 
   /**
@@ -102,10 +105,10 @@ public class FeignClientExceptionErrorDecoderTest {
         .status(404)
         .build();
     final Exception actual = decoder.decode("getSomethingThatNotNotExists", response);
-    Assert.assertNotNull(actual);
-    Assert.assertTrue(actual instanceof FeignClientException);
-    Assert.assertEquals(404, ((FeignClientException) actual).status());
-    Assert.assertEquals(expected, ((FeignClientException) actual).getRestApiException());
+    assertNotNull(actual);
+    assertTrue(actual instanceof FeignClientException);
+    assertEquals(404, ((FeignClientException) actual).status());
+    assertEquals(expected, ((FeignClientException) actual).getRestApiException());
   }
 
   /**
@@ -134,12 +137,12 @@ public class FeignClientExceptionErrorDecoderTest {
         .status(500)
         .build();
     final Exception actual = decoder.decode("getSomething", response);
-    Assert.assertNotNull(actual);
-    Assert.assertTrue(actual instanceof FeignClientException);
-    Assert.assertEquals(500, ((FeignClientException) actual).status());
-    Assert.assertNotNull(((FeignClientException) actual).getRestApiException());
+    assertNotNull(actual);
+    assertTrue(actual instanceof FeignClientException);
+    assertEquals(500, ((FeignClientException) actual).status());
+    assertNotNull(((FeignClientException) actual).getRestApiException());
     //noinspection ConstantConditions
-    Assert.assertEquals(body, ((FeignClientException) actual).getRestApiException().getMessage());
+    assertEquals(body, ((FeignClientException) actual).getRestApiException().getMessage());
   }
 
   /**
@@ -166,9 +169,9 @@ public class FeignClientExceptionErrorDecoderTest {
         .status(500)
         .build();
     final Exception actual = decoder.decode("getNothing", response);
-    Assert.assertNotNull(actual);
-    Assert.assertTrue(actual instanceof FeignClientException);
-    Assert.assertEquals(500, ((FeignClientException) actual).status());
+    assertNotNull(actual);
+    assertTrue(actual instanceof FeignClientException);
+    assertEquals(500, ((FeignClientException) actual).status());
   }
 
 }

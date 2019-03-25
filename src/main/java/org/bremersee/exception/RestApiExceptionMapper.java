@@ -45,6 +45,7 @@ public interface RestApiExceptionMapper {
    * @param exception   the exception (required)
    * @param requestPath the requested path (optional)
    * @param handler     the handler (optional)
+   * @return the rest api exception
    */
   @NotNull RestApiException build(
       @NotNull Throwable exception,
@@ -56,6 +57,7 @@ public interface RestApiExceptionMapper {
    *
    * @param exception the exception (required)
    * @param handler   the handler (optional)
+   * @return the http status
    */
   @NotNull
   HttpStatus detectHttpStatus(@NotNull Throwable exception, @Nullable Object handler);

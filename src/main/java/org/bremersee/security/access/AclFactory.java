@@ -23,16 +23,34 @@ import org.bremersee.common.model.AccessControlEntry;
 import org.bremersee.common.model.AccessControlList;
 
 /**
+ * The acl factory.
+ *
+ * @param <T> the acl type
  * @author Christian Bremer
  */
 public interface AclFactory<T> {
 
+  /**
+   * Create access control list of the specified type.
+   *
+   * @param owner   the owner
+   * @param entries the entries
+   * @return the acl type
+   */
   T createAccessControlList(String owner, Map<String, ? extends Ace> entries);
 
+  /**
+   * Acl dto factory.
+   *
+   * @return the acl factory
+   */
   static AclFactory<AccessControlList> dtoFactory() {
     return new DtoAclFactory();
   }
 
+  /**
+   * The dto acl factory.
+   */
   class DtoAclFactory implements AclFactory<AccessControlList> {
 
     @Override

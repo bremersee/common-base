@@ -18,6 +18,8 @@ package org.bremersee.exception;
 
 import static org.bremersee.http.converter.ObjectMapperHelper.getJsonMapper;
 import static org.bremersee.http.converter.ObjectMapperHelper.getXmlMapper;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
@@ -47,8 +49,8 @@ public class RestApiExceptionParserImplTest {
   public void testResponseIsNull() {
     final RestApiException actual = new RestApiExceptionParserImpl()
         .parseRestApiException(null, null);
-    Assert.assertNotNull(actual);
-    Assert.assertEquals(new RestApiException().getMessage(), actual.getMessage());
+    assertNotNull(actual);
+    assertEquals(new RestApiException().getMessage(), actual.getMessage());
   }
 
   /**
@@ -65,8 +67,8 @@ public class RestApiExceptionParserImplTest {
             getJsonMapper().writeValueAsString(expected),
             buildHttpHeaders(MediaType.APPLICATION_JSON_UTF8, null));
     log.info("Actual:   {}", actual);
-    Assert.assertNotNull(actual);
-    Assert.assertEquals(expected, actual);
+    assertNotNull(actual);
+    assertEquals(expected, actual);
   }
 
   /**
@@ -83,8 +85,8 @@ public class RestApiExceptionParserImplTest {
             getXmlMapper().writeValueAsString(expected),
             buildHttpHeaders(MediaType.APPLICATION_XML, null));
     log.info("Actual:   {}", actual);
-    Assert.assertNotNull(actual);
-    Assert.assertEquals(expected, actual);
+    assertNotNull(actual);
+    assertEquals(expected, actual);
   }
 
   /**
@@ -105,8 +107,8 @@ public class RestApiExceptionParserImplTest {
     expected.setTimestamp(actual.getTimestamp());
     log.info("Expected: {}", expected);
     log.info("Actual:   {}", actual);
-    Assert.assertNotNull(actual);
-    Assert.assertEquals(expected, actual);
+    assertNotNull(actual);
+    assertEquals(expected, actual);
   }
 
   /**
@@ -124,8 +126,8 @@ public class RestApiExceptionParserImplTest {
     expected.setTimestamp(actual.getTimestamp());
     log.info("Expected: {}", expected);
     log.info("Actual:   {}", actual);
-    Assert.assertNotNull(actual);
-    Assert.assertEquals(expected, actual);
+    assertNotNull(actual);
+    assertEquals(expected, actual);
   }
 
   /**
@@ -154,8 +156,8 @@ public class RestApiExceptionParserImplTest {
             buildHttpHeaders(MediaType.APPLICATION_JSON, errorHeaders));
     log.info("Expected: {}", expected);
     log.info("Actual:   {}", actual);
-    Assert.assertNotNull(actual);
-    Assert.assertEquals(expected, actual);
+    assertNotNull(actual);
+    assertEquals(expected, actual);
   }
 
   private HttpHeaders buildHttpHeaders(

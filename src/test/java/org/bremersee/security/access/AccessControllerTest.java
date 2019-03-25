@@ -9,10 +9,15 @@ import org.bremersee.common.model.AccessControlList;
 import org.junit.Test;
 
 /**
+ * The access controller test.
+ *
  * @author Christian Bremer
  */
 public class AccessControllerTest {
 
+  /**
+   * Has any permission.
+   */
   @Test
   public void hasAnyPermission() {
     AccessControlList acl = new AccessControlList()
@@ -86,6 +91,9 @@ public class AccessControllerTest {
                 "delete"));
   }
 
+  /**
+   * Has all permissions.
+   */
   @Test
   public void hasAllPermissions() {
     AccessControlList acl = new AccessControlList()

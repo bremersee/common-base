@@ -22,19 +22,41 @@ import org.springframework.lang.Nullable;
 import org.springframework.validation.annotation.Validated;
 
 /**
+ * The acl mapper interface.
+ *
+ * @param <T> the acl type
  * @author Christian Bremer
  */
 @Validated
 public interface AclMapper<T extends Acl<? extends Ace>> {
 
+  /**
+   * Map access control list (entity) to dto.
+   *
+   * @param acl the acl
+   * @return the access control list
+   */
   default AccessControlList map(@Nullable T acl) {
     return AclBuilder.builder().from(acl).buildAccessControlList();
   }
 
+  /**
+   * Map access control list dto to entity.
+   *
+   * @param accessControlList the access control list
+   * @param aclFactory        the acl factory
+   * @return the acl of the specified type
+   */
   default T map(@Nullable AccessControlList accessControlList, @NotNull AclFactory<T> aclFactory) {
     return AclBuilder.builder().from(accessControlList).build(aclFactory);
   }
 
+  /**
+   * Map access control list dto to entity.
+   *
+   * @param accessControlList the access control list
+   * @return the acl of the specified type
+   */
   T map(@Nullable AccessControlList accessControlList);
 
 }

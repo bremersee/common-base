@@ -2,11 +2,13 @@ package org.bremersee.web.reactive.function.client;
 
 import static org.bremersee.http.converter.ObjectMapperHelper.getJsonMapper;
 import static org.bremersee.http.converter.ObjectMapperHelper.getXmlMapper;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import org.bremersee.TestHelper;
 import org.bremersee.exception.model.RestApiException;
 import org.bremersee.http.MediaTypeHelper;
-import org.junit.Assert;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.springframework.http.HttpHeaders;
@@ -14,6 +16,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.reactive.function.client.ClientResponse;
 import reactor.core.publisher.Mono;
+import reactor.test.StepVerifier;
 
 /**
  * The default web client error decoder test.
@@ -71,13 +74,16 @@ public class DefaultWebClientErrorDecoderTest {
       throw new Exception("Content type is not supported in this test.");
     }
 
-    Mono<? extends Throwable> throwableMono = decoder.apply(clientResponse);
-    Assert.assertNotNull(throwableMono);
-    Throwable throwable = throwableMono.block();
-    Assert.assertNotNull(throwable);
-    Assert.assertTrue(throwable instanceof WebClientException);
-    Assert.assertEquals(httpStatus, ((WebClientException) throwable).getStatus());
-    Assert.assertEquals(expected, ((WebClientException) throwable).getRestApiException());
+    StepVerifier
+        .create(decoder.apply(clientResponse))
+        .assertNext(throwable -> {
+          assertNotNull(throwable);
+          assertTrue(throwable instanceof WebClientException);
+          assertEquals(httpStatus, ((WebClientException) throwable).getStatus());
+          assertEquals(expected, ((WebClientException) throwable).getRestApiException());
+        })
+        .expectNextCount(0)
+        .verifyComplete();
   }
 
   /**
@@ -105,16 +111,19 @@ public class DefaultWebClientErrorDecoderTest {
         clientResponse.bodyToMono(String.class))
         .thenReturn(Mono.just(expected));
 
-    Mono<? extends Throwable> throwableMono = decoder.apply(clientResponse);
-    Assert.assertNotNull(throwableMono);
-    Throwable throwable = throwableMono.block();
-    Assert.assertNotNull(throwable);
-    Assert.assertTrue(throwable instanceof WebClientException);
-    Assert.assertEquals(httpStatus, ((WebClientException) throwable).getStatus());
-    Assert.assertNotNull(((WebClientException) throwable).getRestApiException());
-    //noinspection ConstantConditions
-    Assert.assertEquals(expected,
-        ((WebClientException) throwable).getRestApiException().getMessage());
+    StepVerifier
+        .create(decoder.apply(clientResponse))
+        .assertNext(throwable -> {
+          assertNotNull(throwable);
+          assertTrue(throwable instanceof WebClientException);
+          assertEquals(httpStatus, ((WebClientException) throwable).getStatus());
+          assertNotNull(((WebClientException) throwable).getRestApiException());
+          //noinspection ConstantConditions
+          assertEquals(expected,
+              ((WebClientException) throwable).getRestApiException().getMessage());
+        })
+        .expectNextCount(0)
+        .verifyComplete();
   }
 
   /**
@@ -137,13 +146,16 @@ public class DefaultWebClientErrorDecoderTest {
         clientResponse.bodyToMono(String.class))
         .thenReturn(Mono.empty());
 
-    Mono<? extends Throwable> throwableMono = decoder.apply(clientResponse);
-    Assert.assertNotNull(throwableMono);
-    Throwable throwable = throwableMono.block();
-    Assert.assertNotNull(throwable);
-    Assert.assertTrue(throwable instanceof WebClientException);
-    Assert.assertEquals(httpStatus, ((WebClientException) throwable).getStatus());
-    Assert.assertNotNull(((WebClientException) throwable).getRestApiException());
+    StepVerifier
+        .create(decoder.apply(clientResponse))
+        .assertNext(throwable -> {
+          assertNotNull(throwable);
+          assertTrue(throwable instanceof WebClientException);
+          assertEquals(httpStatus, ((WebClientException) throwable).getStatus());
+          assertNotNull(((WebClientException) throwable).getRestApiException());
+        })
+        .expectNextCount(0)
+        .verifyComplete();
   }
 
 }

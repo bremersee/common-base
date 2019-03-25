@@ -16,6 +16,9 @@
 
 package org.bremersee.http.codec.xml;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import java.util.ServiceLoader;
 import org.bremersee.model.XmlTestJaxbContextDataProvider;
 import org.bremersee.model.xml1.Person;
@@ -47,31 +50,31 @@ public class ReactiveJaxbDecoderTest {
 
     ReactiveJaxbDecoder decoder = new ReactiveJaxbDecoder(jaxbContextBuilder);
 
-    Assert.assertTrue(
+    assertTrue(
         decoder
             .canDecode(ResolvableType.forRawClass(Person.class), null));
 
-    Assert.assertTrue(
+    assertTrue(
         decoder
             .canDecode(ResolvableType.forRawClass(Person.class), MimeTypeUtils.APPLICATION_XML));
 
-    Assert.assertTrue(
+    assertTrue(
         decoder
             .canDecode(ResolvableType.forRawClass(Vehicle.class), MimeTypeUtils.APPLICATION_XML));
 
-    Assert.assertTrue(
+    assertTrue(
         decoder
             .canDecode(ResolvableType.forRawClass(Company.class), MimeTypeUtils.APPLICATION_XML));
 
-    Assert.assertTrue(
+    assertTrue(
         decoder
             .canDecode(ResolvableType.forRawClass(Address.class), MimeTypeUtils.APPLICATION_XML));
 
-    Assert.assertFalse(
+    assertFalse(
         decoder
             .canDecode(ResolvableType.forRawClass(Vehicle.class), MimeTypeUtils.APPLICATION_JSON));
 
-    Assert.assertFalse(
+    assertFalse(
         decoder
             .canDecode(
                 ResolvableType.forRawClass(XmlTestJaxbContextDataProvider.class),
@@ -81,19 +84,19 @@ public class ReactiveJaxbDecoderTest {
         jaxbContextBuilder,
         "http://bremersee.org/xmlschemas/common-xml-test-model-2");
 
-    Assert.assertFalse(
+    assertFalse(
         decoder
             .canDecode(ResolvableType.forRawClass(Person.class), MimeTypeUtils.APPLICATION_XML));
 
-    Assert.assertTrue(
+    assertTrue(
         decoder
             .canDecode(ResolvableType.forRawClass(Vehicle.class), MimeTypeUtils.APPLICATION_XML));
 
-    Assert.assertFalse(
+    assertFalse(
         decoder
             .canDecode(ResolvableType.forRawClass(Company.class), MimeTypeUtils.APPLICATION_XML));
 
-    Assert.assertFalse(
+    assertFalse(
         decoder
             .canDecode(ResolvableType.forRawClass(Address.class), MimeTypeUtils.APPLICATION_XML));
   }

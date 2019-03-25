@@ -16,6 +16,10 @@
 
 package org.bremersee.web.servlet;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -107,31 +111,31 @@ public class ApiExceptionResolverTest {
 
     ModelAndView mv = exceptionResolver.resolveException(request, response, handler, exception);
 
-    Assert.assertNotNull(mv);
-    Assert.assertEquals(HttpStatus.UNAUTHORIZED, mv.getStatus());
-    Assert.assertNotNull(mv.getView());
-    Assert.assertTrue(mv.getView() instanceof MappingJackson2JsonView);
-    Assert.assertNotNull(mv.getModel());
-    Assert.assertNotNull(mv.getModel().get(ApiExceptionResolver.MODEL_KEY));
-    Assert.assertTrue(
+    assertNotNull(mv);
+    assertEquals(HttpStatus.UNAUTHORIZED, mv.getStatus());
+    assertNotNull(mv.getView());
+    assertTrue(mv.getView() instanceof MappingJackson2JsonView);
+    assertNotNull(mv.getModel());
+    assertNotNull(mv.getModel().get(ApiExceptionResolver.MODEL_KEY));
+    assertTrue(
         mv.getModel().get(ApiExceptionResolver.MODEL_KEY) instanceof RestApiException);
 
     RestApiException actual = (RestApiException) mv.getModel().get(ApiExceptionResolver.MODEL_KEY);
 
-    Assert.assertNotNull(actual.getCause());
-    Assert.assertEquals(cause.getMessage(), actual.getCause().getMessage());
+    assertNotNull(actual.getCause());
+    assertEquals(cause.getMessage(), actual.getCause().getMessage());
 
-    Assert.assertTrue(actual.isErrorCodeInherited());
-    Assert.assertEquals(cause.getErrorCode(), actual.getErrorCode());
+    assertTrue(actual.isErrorCodeInherited());
+    assertEquals(cause.getErrorCode(), actual.getErrorCode());
 
-    Assert.assertNotNull(actual.getHandler());
-    Assert.assertEquals(TestHandler.class.getName(), actual.getHandler().getClassName());
-    Assert.assertEquals("testMethod", actual.getHandler().getMethodName());
+    assertNotNull(actual.getHandler());
+    assertEquals(TestHandler.class.getName(), actual.getHandler().getClassName());
+    assertEquals("testMethod", actual.getHandler().getMethodName());
     final List<String> expectedMethodParameters = new ArrayList<>(3);
     expectedMethodParameters.add(UUID.class.getName());
     expectedMethodParameters.add(String.class.getName());
     expectedMethodParameters.add(int.class.getName());
-    Assert.assertEquals(expectedMethodParameters, actual.getHandler().getMethodParameterTypes());
+    assertEquals(expectedMethodParameters, actual.getHandler().getMethodParameterTypes());
     System.out.println(actual);
   }
 

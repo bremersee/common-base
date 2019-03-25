@@ -16,6 +16,11 @@
 
 package org.bremersee.web.reactive;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import java.util.Collections;
 import org.bremersee.exception.RestApiExceptionMapper;
 import org.bremersee.exception.RestApiExceptionMapperImpl;
@@ -89,7 +94,7 @@ public class ApiExceptionHandlerTest {
   public void testResponsibleExceptionHandler() {
     ServerRequest serverRequest = Mockito.mock(ServerRequest.class);
     Mockito.when(serverRequest.path()).thenReturn("/api/resource");
-    Assert.assertTrue(exceptionHandler.isResponsibleExceptionHandler(serverRequest));
+    assertTrue(exceptionHandler.isResponsibleExceptionHandler(serverRequest));
   }
 
   /**
@@ -129,22 +134,22 @@ public class ApiExceptionHandlerTest {
 
     Mono<ServerResponse> responseMono = exceptionHandler.renderErrorResponse(serverRequest);
     ServerResponse response = responseMono.block();
-    Assert.assertNotNull(response);
-    Assert.assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.statusCode());
-    Assert.assertTrue(mediaType.isCompatibleWith(response.headers().getContentType()));
+    assertNotNull(response);
+    assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.statusCode());
+    assertTrue(mediaType.isCompatibleWith(response.headers().getContentType()));
 
     if (MediaType.IMAGE_JPEG.isCompatibleWith(mediaType)) {
-      Assert.assertEquals(
+      assertEquals(
           exception.getMessage(),
           response.headers().getFirst(RestApiExceptionUtils.MESSAGE_HEADER_NAME));
-      Assert.assertEquals(
+      assertEquals(
           exception.getErrorCode(),
           response.headers().getFirst(RestApiExceptionUtils.CODE_HEADER_NAME));
-      Assert.assertEquals(
+      assertEquals(
           exception.getClass().getName(),
           response.headers().getFirst(RestApiExceptionUtils.CLASS_HEADER_NAME));
-      Assert.assertNotNull(response.headers().getFirst(RestApiExceptionUtils.ID_HEADER_NAME));
-      Assert.assertNotEquals(
+      assertNotNull(response.headers().getFirst(RestApiExceptionUtils.ID_HEADER_NAME));
+      assertNotEquals(
           RestApiExceptionUtils.NO_ID_VALUE,
           response.headers().getFirst(RestApiExceptionUtils.ID_HEADER_NAME));
     }

@@ -16,12 +16,17 @@ import org.bremersee.security.core.AuthorityConstants;
 import org.junit.Test;
 
 /**
+ * The acl builder test.
+ *
  * @author Christian Bremer
  */
 public class AclBuilderTest {
 
   private static final AclBuilder aclBuilder = AclBuilder.builder();
 
+  /**
+   * Reset.
+   */
   @Test
   public void reset() {
     Acl<? extends Ace> acl = aclBuilder
@@ -36,6 +41,9 @@ public class AclBuilderTest {
     assertTrue(acl.entryMap().isEmpty());
   }
 
+  /**
+   * Defaults.
+   */
   @Test
   public void defaults() {
     Acl<? extends Ace> acl = aclBuilder
@@ -54,6 +62,9 @@ public class AclBuilderTest {
     assertTrue(acl.entryMap().keySet().containsAll(Arrays.asList(PermissionConstants.ALL)));
   }
 
+  /**
+   * From access control list.
+   */
   @Test
   public void fromAccessControlList() {
     AccessControlList expected = new AccessControlList()
@@ -83,6 +94,9 @@ public class AclBuilderTest {
     assertEquals(expected, actual);
   }
 
+  /**
+   * From acl.
+   */
   @Test
   public void fromAcl() {
     AceImpl ace0 = new AceImpl();
@@ -106,6 +120,9 @@ public class AclBuilderTest {
     assertEquals(expected, actual);
   }
 
+  /**
+   * Owner.
+   */
   @Test
   public void owner() {
     assertEquals(
@@ -122,6 +139,9 @@ public class AclBuilderTest {
             .buildAcl().getOwner());
   }
 
+  /**
+   * Guest.
+   */
   @Test
   public void guest() {
     assertTrue(aclBuilder
@@ -139,6 +159,9 @@ public class AclBuilderTest {
         .isGuest());
   }
 
+  /**
+   * Add and remove user.
+   */
   @Test
   public void addAndRemoveUser() {
     assertTrue(aclBuilder
@@ -158,6 +181,9 @@ public class AclBuilderTest {
         .contains("test"));
   }
 
+  /**
+   * Add and remove role.
+   */
   @Test
   public void addAndRemoveRole() {
     assertTrue(aclBuilder
@@ -177,6 +203,9 @@ public class AclBuilderTest {
         .contains("test"));
   }
 
+  /**
+   * Add and remove group.
+   */
   @Test
   public void addAndRemoveGroup() {
     assertTrue(aclBuilder
@@ -196,6 +225,9 @@ public class AclBuilderTest {
         .contains("test"));
   }
 
+  /**
+   * Admin access.
+   */
   @Test
   public void adminAccess() {
     assertTrue(aclBuilder

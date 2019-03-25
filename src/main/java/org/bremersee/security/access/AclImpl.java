@@ -23,6 +23,8 @@ import java.util.TreeMap;
 import lombok.ToString;
 
 /**
+ * The internal acl implementation.
+ *
  * @author Christian Bremer
  */
 @ToString(callSuper = true)
@@ -30,6 +32,12 @@ class AclImpl extends TreeMap<String, Ace> implements Acl<Ace> {
 
   private final String owner;
 
+  /**
+   * Instantiates a new internal acl.
+   *
+   * @param owner   the owner
+   * @param entries the entries
+   */
   AclImpl(
       final String owner,
       final Map<String, ? extends Ace> entries) {

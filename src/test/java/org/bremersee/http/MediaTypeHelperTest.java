@@ -16,6 +16,9 @@
 
 package org.bremersee.http;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import java.util.Arrays;
 import org.junit.Assert;
 import org.junit.Test;
@@ -33,13 +36,13 @@ public class MediaTypeHelperTest {
    */
   @Test
   public void testMediaTypeHelper() {
-    Assert.assertTrue(MediaTypeHelper.canContentTypeBeJson(MediaTypeHelper.toString(Arrays.asList(
+    assertTrue(MediaTypeHelper.canContentTypeBeJson(MediaTypeHelper.toString(Arrays.asList(
         MediaType.IMAGE_JPEG, MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON_UTF8))));
-    Assert.assertFalse(MediaTypeHelper.canContentTypeBeJson(MediaTypeHelper.toString(Arrays.asList(
+    assertFalse(MediaTypeHelper.canContentTypeBeJson(MediaTypeHelper.toString(Arrays.asList(
         MediaType.IMAGE_JPEG, MediaType.APPLICATION_XML))));
-    Assert.assertTrue(MediaTypeHelper.canContentTypeBeXml(MediaTypeHelper.toString(Arrays.asList(
+    assertTrue(MediaTypeHelper.canContentTypeBeXml(MediaTypeHelper.toString(Arrays.asList(
         MediaType.IMAGE_JPEG, MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML))));
-    Assert.assertFalse(MediaTypeHelper.canContentTypeBeXml(MediaTypeHelper.toString(Arrays.asList(
+    assertFalse(MediaTypeHelper.canContentTypeBeXml(MediaTypeHelper.toString(Arrays.asList(
         MediaType.IMAGE_JPEG, MediaType.APPLICATION_JSON_UTF8))));
   }
 

@@ -16,10 +16,14 @@
 
 package org.bremersee.exception.feign;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
 import java.util.Collections;
 import org.bremersee.exception.RestApiExceptionUtils;
 import org.bremersee.exception.model.RestApiException;
-import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -40,12 +44,12 @@ public class FeignClientExceptionTest {
   @Test
   public void testWithNoUsefulValues() {
     final FeignClientException exception = new FeignClientException(null, null, 0, null, null);
-    Assert.assertNull(exception.getRequest());
-    Assert.assertNotNull(exception.getHeaders());
-    Assert.assertEquals(exception.status(), HttpStatus.INTERNAL_SERVER_ERROR.value());
-    Assert.assertEquals(exception.getMessage(), RestApiExceptionUtils.NO_MESSAGE_VALUE);
-    Assert.assertNull(exception.getRestApiException());
-    Assert.assertNull(exception.getErrorCode());
+    assertNull(exception.getRequest());
+    assertNotNull(exception.getHeaders());
+    assertEquals(exception.status(), HttpStatus.INTERNAL_SERVER_ERROR.value());
+    assertEquals(exception.getMessage(), RestApiExceptionUtils.NO_MESSAGE_VALUE);
+    assertNull(exception.getRestApiException());
+    assertNull(exception.getErrorCode());
   }
 
   /**
@@ -63,15 +67,15 @@ public class FeignClientExceptionTest {
         404,
         "Fatal",
         restApiException);
-    Assert.assertNull(exception.getRequest());
-    Assert.assertNotNull(exception.getHeaders());
-    Assert.assertTrue(exception.getHeaders().containsKey(HttpHeaders.CONTENT_TYPE));
-    Assert.assertTrue(exception.getHeaders().get(HttpHeaders.CONTENT_TYPE)
+    assertNull(exception.getRequest());
+    assertNotNull(exception.getHeaders());
+    assertTrue(exception.getHeaders().containsKey(HttpHeaders.CONTENT_TYPE));
+    assertTrue(exception.getHeaders().get(HttpHeaders.CONTENT_TYPE)
         .contains(MediaType.APPLICATION_JSON_VALUE));
-    Assert.assertEquals(exception.status(), HttpStatus.NOT_FOUND.value());
-    Assert.assertEquals("Fatal", exception.getMessage());
-    Assert.assertEquals(restApiException, exception.getRestApiException());
-    Assert.assertEquals("TEST:0001", exception.getErrorCode());
+    assertEquals(exception.status(), HttpStatus.NOT_FOUND.value());
+    assertEquals("Fatal", exception.getMessage());
+    assertEquals(restApiException, exception.getRestApiException());
+    assertEquals("TEST:0001", exception.getErrorCode());
   }
 
 }

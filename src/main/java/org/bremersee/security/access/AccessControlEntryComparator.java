@@ -20,7 +20,7 @@ import java.util.Comparator;
 import org.bremersee.common.model.AccessControlEntry;
 
 /**
- * The access control entry comparator.
+ * The access control entry comparator sorts the entries by permission.
  *
  * @author Christian Bremer
  */

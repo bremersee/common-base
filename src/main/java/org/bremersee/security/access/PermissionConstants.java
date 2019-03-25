@@ -17,21 +17,41 @@
 package org.bremersee.security.access;
 
 /**
+ * The permission constants.
+ *
  * @author Christian Bremer
  */
 @SuppressWarnings("WeakerAccess")
 public abstract class PermissionConstants {
 
+  /**
+   * The constant ADMINISTRATION.
+   */
   public static final String ADMINISTRATION = "administration";
 
+  /**
+   * The constant CREATE.
+   */
   public static final String CREATE = "create";
 
+  /**
+   * The constant DELETE.
+   */
   public static final String DELETE = "delete";
 
+  /**
+   * The constant READ.
+   */
   public static final String READ = "read";
 
+  /**
+   * The constant WRITE.
+   */
   public static final String WRITE = "write";
 
+  /**
+   * The constant ALL.
+   */
   public static final String[] ALL = new String[]{
       ADMINISTRATION,
       CREATE,

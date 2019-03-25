@@ -16,6 +16,12 @@
 
 package org.bremersee.exception;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.util.Collections;
@@ -23,7 +29,6 @@ import org.bremersee.exception.RestApiExceptionMapperProperties.ExceptionMapping
 import org.bremersee.exception.RestApiExceptionMapperProperties.ExceptionMappingConfig;
 import org.bremersee.exception.model.RestApiException;
 import org.bremersee.web.reactive.function.client.WebClientException;
-import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.springframework.http.HttpHeaders;
@@ -56,7 +61,7 @@ public class RestApiExceptionMapperImplTest {
    */
   @Test
   public void testGetApiPaths() {
-    Assert.assertTrue(mapper.getApiPaths().contains("/api/**"));
+    assertTrue(mapper.getApiPaths().contains("/api/**"));
   }
 
   /**
@@ -66,12 +71,12 @@ public class RestApiExceptionMapperImplTest {
   public void testBuild409() {
     final ServiceException exception = new ServiceException(409, "Either a or b", "TEST:4711");
     final RestApiException model = mapper.build(exception, "/api/something", null);
-    Assert.assertNotNull(model);
-    Assert.assertEquals(exception.getErrorCode(), model.getErrorCode());
-    Assert.assertFalse(model.isErrorCodeInherited());
-    Assert.assertEquals(exception.getMessage(), model.getMessage());
-    Assert.assertEquals("/api/something", model.getPath());
-    Assert.assertNull(model.getId());
+    assertNotNull(model);
+    assertEquals(exception.getErrorCode(), model.getErrorCode());
+    assertFalse(model.isErrorCodeInherited());
+    assertEquals(exception.getMessage(), model.getMessage());
+    assertEquals("/api/something", model.getPath());
+    assertNull(model.getId());
   }
 
   /**
@@ -81,12 +86,12 @@ public class RestApiExceptionMapperImplTest {
   public void testBuild500() {
     final ServiceException exception = new ServiceException(500, "Something failed.", "TEST:4711");
     final RestApiException model = mapper.build(exception, "/api/something", null);
-    Assert.assertNotNull(model);
-    Assert.assertEquals(exception.getErrorCode(), model.getErrorCode());
-    Assert.assertFalse(model.isErrorCodeInherited());
-    Assert.assertEquals(exception.getMessage(), model.getMessage());
-    Assert.assertEquals("/api/something", model.getPath());
-    Assert.assertNotNull(model.getId());
+    assertNotNull(model);
+    assertEquals(exception.getErrorCode(), model.getErrorCode());
+    assertFalse(model.isErrorCodeInherited());
+    assertEquals(exception.getMessage(), model.getMessage());
+    assertEquals("/api/something", model.getPath());
+    assertNotNull(model.getId());
   }
 
   /**
@@ -113,13 +118,13 @@ public class RestApiExceptionMapperImplTest {
         cause);
 
     final RestApiException model = mapper.build(exception, "/api/this", null);
-    Assert.assertNotNull(model);
-    Assert.assertEquals(cause.getErrorCode(), model.getErrorCode());
-    Assert.assertTrue(model.isErrorCodeInherited());
-    Assert.assertEquals(exception.getMessage(), model.getMessage());
-    Assert.assertEquals("/api/this", model.getPath());
-    Assert.assertNotNull(model.getId());
-    Assert.assertEquals(cause, model.getCause());
+    assertNotNull(model);
+    assertEquals(cause.getErrorCode(), model.getErrorCode());
+    assertTrue(model.isErrorCodeInherited());
+    assertEquals(exception.getMessage(), model.getMessage());
+    assertEquals("/api/this", model.getPath());
+    assertNotNull(model.getId());
+    assertEquals(cause, model.getCause());
   }
 
   /**
@@ -130,12 +135,12 @@ public class RestApiExceptionMapperImplTest {
     final RuntimeException exception = new RuntimeException("Something went wrong");
     final RestApiException model = mapper.build(
         exception, "/api/something", null);
-    Assert.assertNotNull(model);
-    Assert.assertNull(model.getErrorCode());
-    Assert.assertFalse(model.isErrorCodeInherited());
-    Assert.assertEquals(exception.getMessage(), model.getMessage());
-    Assert.assertEquals("/api/something", model.getPath());
-    Assert.assertNotNull(model.getId());
+    assertNotNull(model);
+    assertNull(model.getErrorCode());
+    assertFalse(model.isErrorCodeInherited());
+    assertEquals(exception.getMessage(), model.getMessage());
+    assertEquals("/api/something", model.getPath());
+    assertNotNull(model.getId());
   }
 
   /**
@@ -145,13 +150,13 @@ public class RestApiExceptionMapperImplTest {
   public void testBuildWithDefaultExceptionMappingAndIllegalArgumentException() {
     final IllegalArgumentException exception = new IllegalArgumentException();
     final RestApiException model = mapper.build(exception, "/api/illegal", null);
-    Assert.assertNotNull(model);
-    Assert.assertNull(model.getErrorCode());
-    Assert.assertFalse(model.isErrorCodeInherited());
-    Assert.assertEquals(HttpStatus.BAD_REQUEST.getReasonPhrase(), model.getMessage());
-    Assert.assertEquals("/api/illegal", model.getPath());
-    Assert.assertNull(model.getId());
-    Assert.assertEquals(IllegalArgumentException.class.getName(), model.getClassName());
+    assertNotNull(model);
+    assertNull(model.getErrorCode());
+    assertFalse(model.isErrorCodeInherited());
+    assertEquals(HttpStatus.BAD_REQUEST.getReasonPhrase(), model.getMessage());
+    assertEquals("/api/illegal", model.getPath());
+    assertNull(model.getId());
+    assertEquals(IllegalArgumentException.class.getName(), model.getClassName());
   }
 
   /**
@@ -181,13 +186,13 @@ public class RestApiExceptionMapperImplTest {
     final NullPointerException exception = new NullPointerException();
     final RestApiException model = configuredMapper.build(
         exception, "/null-api/something", null);
-    Assert.assertNotNull(model);
-    Assert.assertEquals("NULLPOINTER", model.getErrorCode());
-    Assert.assertFalse(model.isErrorCodeInherited());
-    Assert.assertEquals("A variable is null.", model.getMessage());
-    Assert.assertEquals("/null-api/something", model.getPath());
-    Assert.assertNotNull(model.getId());
-    Assert.assertNull(model.getClassName());
+    assertNotNull(model);
+    assertEquals("NULLPOINTER", model.getErrorCode());
+    assertFalse(model.isErrorCodeInherited());
+    assertEquals("A variable is null.", model.getMessage());
+    assertEquals("/null-api/something", model.getPath());
+    assertNotNull(model.getId());
+    assertNull(model.getClassName());
   }
 
 }

@@ -25,6 +25,9 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
+ * The acl mapper implementation.
+ *
+ * @param <T> the acl type
  * @author Christian Bremer
  */
 @SuppressWarnings({"unused", "WeakerAccess"})
@@ -42,11 +45,23 @@ public class AclMapperImpl<T extends Acl<? extends Ace>> implements AclMapper<T>
   @Setter
   private String adminRole = AuthorityConstants.ADMIN_ROLE_NAME;
 
+  /**
+   * Instantiates a new acl mapper.
+   *
+   * @param aclFactory the acl factory
+   */
   public AclMapperImpl(
       @NotNull AclFactory<T> aclFactory) {
     this(aclFactory, null, false);
   }
 
+  /**
+   * Instantiates a new acl mapper.
+   *
+   * @param aclFactory         the acl factory
+   * @param defaultPermissions the default permissions
+   * @param switchAdminAccess  the switch admin access
+   */
   public AclMapperImpl(
       @NotNull AclFactory<T> aclFactory,
       @Nullable String[] defaultPermissions,
@@ -54,6 +69,14 @@ public class AclMapperImpl<T extends Acl<? extends Ace>> implements AclMapper<T>
     this(aclFactory, defaultPermissions, switchAdminAccess, false);
   }
 
+  /**
+   * Instantiates a new acl mapper.
+   *
+   * @param aclFactory         the acl factory
+   * @param defaultPermissions the default permissions
+   * @param switchAdminAccess  the switch admin access
+   * @param returnNull         the return null
+   */
   public AclMapperImpl(
       @NotNull AclFactory<T> aclFactory,
       @Nullable String[] defaultPermissions,
