@@ -151,12 +151,6 @@ public class AclMapperImplTest {
     assertTrue(ace.getRoles().contains("role"));
     assertTrue(ace.getUsers().contains("user"));
     assertFalse(ace.getRoles().contains(AuthorityConstants.ADMIN_ROLE_NAME));
-
-    AccessControlList accessControlList = mapper.defaultAccessControlList("owner");
-    assertNull(accessControlList);
-
-    Acl<? extends Ace> acl = mapper.defaultAcl("owner");
-    assertNull(acl);
   }
 
 }

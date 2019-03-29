@@ -37,11 +37,7 @@ public interface AclMapper<T extends Acl<? extends Ace>> {
    * @return the access control list (can be null)
    */
   default AccessControlList defaultAccessControlList(@Nullable String owner) {
-    AccessControlList acl = map((T) null);
-    if (acl != null) {
-      acl.setOwner(owner);
-    }
-    return acl;
+    return AclBuilder.builder().owner(owner).buildAccessControlList();
   }
 
   /**

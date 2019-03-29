@@ -90,6 +90,15 @@ public class AclMapperImpl<T extends Acl<? extends Ace>> implements AclMapper<T>
   }
 
   @Override
+  public AccessControlList defaultAccessControlList(String owner) {
+    return AclBuilder
+        .builder()
+        .owner(owner)
+        .addUser(owner, defaultPermissions)
+        .buildAccessControlList();
+  }
+
+  @Override
   public AccessControlList map(Acl acl) {
     if (acl == null && returnNull) {
       return null;
@@ -116,6 +125,21 @@ public class AclMapperImpl<T extends Acl<? extends Ace>> implements AclMapper<T>
         .builder()
         .from(accessControlList)
         .defaults(defaultPermissions);
+    if (switchAdminAccess) {
+      return aclBuilder
+          .ensureAdminAccess(adminRole)
+          .build(aclFactory);
+    }
+    return aclBuilder
+        .build(aclFactory);
+  }
+
+  @Override
+  public T defaultAcl(@Nullable String owner) {
+    final AclBuilder aclBuilder = AclBuilder
+        .builder()
+        .owner(owner)
+        .addUser(owner, defaultPermissions);
     if (switchAdminAccess) {
       return aclBuilder
           .ensureAdminAccess(adminRole)
