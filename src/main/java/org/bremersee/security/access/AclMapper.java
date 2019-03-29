@@ -31,6 +31,20 @@ import org.springframework.validation.annotation.Validated;
 public interface AclMapper<T extends Acl<? extends Ace>> {
 
   /**
+   * Default access control list (dto).
+   *
+   * @param owner the owner
+   * @return the access control list (can be null)
+   */
+  default AccessControlList defaultAccessControlList(@Nullable String owner) {
+    AccessControlList acl = map((T) null);
+    if (acl != null) {
+      acl.setOwner(owner);
+    }
+    return acl;
+  }
+
+  /**
    * Map access control list (entity) to dto.
    *
    * @param acl the acl
@@ -58,5 +72,19 @@ public interface AclMapper<T extends Acl<? extends Ace>> {
    * @return the acl of the specified type
    */
   T map(@Nullable AccessControlList accessControlList);
+
+  /**
+   * Default acl (entity).
+   *
+   * @param owner the owner
+   * @return the acl (can be null)
+   */
+  default T defaultAcl(@Nullable String owner) {
+    T acl = map((AccessControlList) null);
+    if (acl != null) {
+      acl.setOwner(owner);
+    }
+    return acl;
+  }
 
 }

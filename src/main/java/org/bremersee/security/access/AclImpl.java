@@ -30,7 +30,7 @@ import lombok.ToString;
 @ToString(callSuper = true)
 class AclImpl extends TreeMap<String, Ace> implements Acl<Ace> {
 
-  private final String owner;
+  private String owner;
 
   /**
    * Instantiates a new internal acl.
@@ -50,6 +50,11 @@ class AclImpl extends TreeMap<String, Ace> implements Acl<Ace> {
   @Override
   public String getOwner() {
     return owner;
+  }
+
+  @Override
+  public void setOwner(String owner) {
+    this.owner = owner;
   }
 
   @Override
