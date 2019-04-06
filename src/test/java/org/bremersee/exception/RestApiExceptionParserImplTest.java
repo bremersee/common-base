@@ -27,7 +27,6 @@ import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.bremersee.TestHelper;
 import org.bremersee.exception.model.RestApiException;
-import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -48,7 +47,7 @@ public class RestApiExceptionParserImplTest {
   @Test
   public void testResponseIsNull() {
     final RestApiException actual = new RestApiExceptionParserImpl()
-        .parseRestApiException(null, null);
+        .parseException(null, null);
     assertNotNull(actual);
     assertEquals(new RestApiException().getMessage(), actual.getMessage());
   }
@@ -63,7 +62,7 @@ public class RestApiExceptionParserImplTest {
     final RestApiException expected = TestHelper.restApiException();
     log.info("Expected: {}", expected);
     final RestApiException actual = new RestApiExceptionParserImpl()
-        .parseRestApiException(
+        .parseException(
             getJsonMapper().writeValueAsString(expected),
             buildHttpHeaders(MediaType.APPLICATION_JSON_UTF8, null));
     log.info("Actual:   {}", actual);
@@ -81,7 +80,7 @@ public class RestApiExceptionParserImplTest {
     final RestApiException expected = TestHelper.restApiException();
     log.info("Expected: {}", expected);
     final RestApiException actual = new RestApiExceptionParserImpl()
-        .parseRestApiException(
+        .parseException(
             getXmlMapper().writeValueAsString(expected),
             buildHttpHeaders(MediaType.APPLICATION_XML, null));
     log.info("Actual:   {}", actual);
@@ -101,7 +100,7 @@ public class RestApiExceptionParserImplTest {
     final RestApiException expected = new RestApiException();
     expected.setMessage(response);
     final RestApiException actual = new RestApiExceptionParserImpl()
-        .parseRestApiException(
+        .parseException(
             response,
             buildHttpHeaders(MediaType.APPLICATION_JSON, null));
     expected.setTimestamp(actual.getTimestamp());
@@ -120,7 +119,7 @@ public class RestApiExceptionParserImplTest {
     final RestApiException expected = new RestApiException();
     expected.setMessage(RestApiExceptionUtils.NO_MESSAGE_VALUE);
     final RestApiException actual = new RestApiExceptionParserImpl()
-        .parseRestApiException(
+        .parseException(
             response,
             buildHttpHeaders(MediaType.APPLICATION_JSON, null));
     expected.setTimestamp(actual.getTimestamp());
@@ -151,7 +150,7 @@ public class RestApiExceptionParserImplTest {
     errorHeaders.add(RestApiExceptionUtils.CODE_HEADER_NAME, expected.getErrorCode());
     errorHeaders.add(RestApiExceptionUtils.CLASS_HEADER_NAME, expected.getClassName());
     final RestApiException actual = new RestApiExceptionParserImpl()
-        .parseRestApiException(
+        .parseException(
             response,
             buildHttpHeaders(MediaType.APPLICATION_JSON, errorHeaders));
     log.info("Expected: {}", expected);

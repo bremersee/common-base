@@ -84,7 +84,7 @@ public class FeignClientExceptionErrorDecoder implements ErrorDecoder {
     }
     final String body = readBody(response);
     final String message = format("status %s reading %s", response.status(), methodKey);
-    final RestApiException restApiException = parser.parseRestApiException(
+    final RestApiException restApiException = parser.parseException(
         body, response.headers());
     if (log.isDebugEnabled() && body != null) {
       log.debug("msg=[Is error formatted as rest api exception? {}]",

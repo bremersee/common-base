@@ -75,7 +75,7 @@ public class RestApiExceptionParserImpl implements RestApiExceptionParser {
   }
 
   @Override
-  public RestApiException parseRestApiException(
+  public RestApiException parseException(
       @Nullable final String response,
       @Nullable final Map<String, ? extends Collection<String>> headers) {
 

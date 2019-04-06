@@ -20,9 +20,10 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
-import org.bremersee.exception.RestApiExceptionParser;
-import org.bremersee.exception.RestApiExceptionParserImpl;
+import org.bremersee.exception.ExceptionParser;
+import org.bremersee.exception.MessageExceptionParser;
 import org.bremersee.exception.model.RestApiException;
+import org.springframework.util.StringUtils;
 import org.springframework.web.reactive.function.client.ClientResponse;
 
 /**
@@ -31,28 +32,50 @@ import org.springframework.web.reactive.function.client.ClientResponse;
  * @author Christian Bremer
  */
 @Slf4j
-public class DefaultWebClientErrorDecoder
+@SuppressWarnings({"unused", "WeakerAccess"})
+public class MessageAwareWebClientErrorDecoder
     extends AbstractWebClientErrorDecoder<WebClientException> {
 
-  private final RestApiExceptionParser parser;
+  private final ExceptionParser<String> parser;
+
+  private String errorCode;
 
   /**
-   * Instantiates a new web client error decoder.
+   * Instantiates a new message aware web client error decoder.
    */
-  @SuppressWarnings("WeakerAccess")
-  public DefaultWebClientErrorDecoder() {
-    this.parser = new RestApiExceptionParserImpl();
+  public MessageAwareWebClientErrorDecoder() {
+    this(null, null);
   }
 
   /**
-   * Instantiates a new web client error decoder.
+   * Instantiates a new message aware web client error decoder.
+   *
+   * @param errorCode the error code
+   */
+  public MessageAwareWebClientErrorDecoder(String errorCode) {
+    this(new MessageExceptionParser(), errorCode);
+  }
+
+  /**
+   * Instantiates a new message aware web client error decoder.
    *
    * @param parser the parser
    */
-  @SuppressWarnings("unused")
-  public DefaultWebClientErrorDecoder(
-      RestApiExceptionParser parser) {
-    this.parser = parser != null ? parser : new RestApiExceptionParserImpl();
+  public MessageAwareWebClientErrorDecoder(
+      ExceptionParser<String> parser) {
+    this(parser, null);
+  }
+
+  /**
+   * Instantiates a new message aware web client error decoder.
+   *
+   * @param parser    the parser
+   * @param errorCode the error code
+   */
+  public MessageAwareWebClientErrorDecoder(
+      ExceptionParser<String> parser, String errorCode) {
+    this.parser = parser != null ? parser : new MessageExceptionParser();
+    this.errorCode = errorCode;
   }
 
   @Override
@@ -62,12 +85,10 @@ public class DefaultWebClientErrorDecoder
 
     final Map<String, ? extends Collection<String>> headers = Collections
         .unmodifiableMap(clientResponse.headers().asHttpHeaders());
-    final RestApiException restApiException = parser.parseException(
-        response,
-        clientResponse.headers().asHttpHeaders());
-    if (log.isDebugEnabled() && response != null) {
-      log.debug("msg=[Is error formatted as rest api exception? {}]",
-          restApiException != null && !response.equals(restApiException.getMessage()));
+    final RestApiException restApiException = new RestApiException();
+    restApiException.setMessage(parser.parseException(response, headers));
+    if (StringUtils.hasText(errorCode)) {
+      restApiException.setErrorCode(errorCode);
     }
     return new WebClientException(clientResponse.statusCode(), headers, restApiException);
   }

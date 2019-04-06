@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 the original author or authors.
+ * Copyright 2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,15 +16,19 @@
 
 package org.bremersee.exception;
 
-import org.bremersee.exception.model.RestApiException;
-import org.springframework.validation.annotation.Validated;
+import java.util.Collection;
+import java.util.Map;
 
 /**
- * A http response parser that creates a {@link RestApiException}.
+ * The message aware exception parser.
  *
  * @author Christian Bremer
  */
-@Validated
-public interface RestApiExceptionParser extends ExceptionParser<RestApiException> {
+public class MessageExceptionParser implements ExceptionParser<String> {
+
+  @Override
+  public String parseException(String response, Map<String, ? extends Collection<String>> headers) {
+    return response;
+  }
 
 }
