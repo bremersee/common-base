@@ -8,6 +8,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import org.bremersee.common.model.AccessControlEntry;
@@ -67,19 +68,27 @@ public class AclBuilderTest {
    */
   @Test
   public void fromAccessControlList() {
-    AccessControlList expected = new AccessControlList()
+    AccessControlList expected = AccessControlList
+        .builder()
         .owner("test")
-        .addEntriesItem(new AccessControlEntry()
-            .permission("write")
-            .addGroupsItem("group")
-            .addRolesItem("role")
-            .addUsersItem("user"))
-        .addEntriesItem(new AccessControlEntry()
-            .permission("read")
-            .groups(new ArrayList<>())
-            .roles(new ArrayList<>())
-            .users(new ArrayList<>())
-            .guest(true));
+        .entries(Arrays.asList(
+            AccessControlEntry
+                .builder()
+                .permission("write")
+                .groups(Collections.singletonList("group"))
+                .roles(Collections.singletonList("role"))
+                .users(Collections.singletonList("user"))
+                .build(),
+            AccessControlEntry
+                .builder()
+                .permission("read")
+                .groups(new ArrayList<>())
+                .roles(new ArrayList<>())
+                .users(new ArrayList<>())
+                .guest(true)
+                .build()
+        ))
+        .build();
     expected.getEntries().sort(new AccessControlEntryComparator());
 
     AccessControlList actual = aclBuilder

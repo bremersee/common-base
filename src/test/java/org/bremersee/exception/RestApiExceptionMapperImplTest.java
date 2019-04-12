@@ -73,7 +73,7 @@ public class RestApiExceptionMapperImplTest {
     final RestApiException model = mapper.build(exception, "/api/something", null);
     assertNotNull(model);
     assertEquals(exception.getErrorCode(), model.getErrorCode());
-    assertFalse(model.isErrorCodeInherited());
+    assertFalse(model.getErrorCodeInherited());
     assertEquals(exception.getMessage(), model.getMessage());
     assertEquals("/api/something", model.getPath());
     assertNull(model.getId());
@@ -88,7 +88,7 @@ public class RestApiExceptionMapperImplTest {
     final RestApiException model = mapper.build(exception, "/api/something", null);
     assertNotNull(model);
     assertEquals(exception.getErrorCode(), model.getErrorCode());
-    assertFalse(model.isErrorCodeInherited());
+    assertFalse(model.getErrorCodeInherited());
     assertEquals(exception.getMessage(), model.getMessage());
     assertEquals("/api/something", model.getPath());
     assertNotNull(model.getId());
@@ -120,7 +120,7 @@ public class RestApiExceptionMapperImplTest {
     final RestApiException model = mapper.build(exception, "/api/this", null);
     assertNotNull(model);
     assertEquals(cause.getErrorCode(), model.getErrorCode());
-    assertTrue(model.isErrorCodeInherited());
+    assertTrue(model.getErrorCodeInherited());
     assertEquals(exception.getMessage(), model.getMessage());
     assertEquals("/api/this", model.getPath());
     assertNotNull(model.getId());
@@ -137,7 +137,7 @@ public class RestApiExceptionMapperImplTest {
         exception, "/api/something", null);
     assertNotNull(model);
     assertNull(model.getErrorCode());
-    assertFalse(model.isErrorCodeInherited());
+    assertFalse(model.getErrorCodeInherited());
     assertEquals(exception.getMessage(), model.getMessage());
     assertEquals("/api/something", model.getPath());
     assertNotNull(model.getId());
@@ -152,7 +152,7 @@ public class RestApiExceptionMapperImplTest {
     final RestApiException model = mapper.build(exception, "/api/illegal", null);
     assertNotNull(model);
     assertNull(model.getErrorCode());
-    assertFalse(model.isErrorCodeInherited());
+    assertFalse(model.getErrorCodeInherited());
     assertEquals(HttpStatus.BAD_REQUEST.getReasonPhrase(), model.getMessage());
     assertEquals("/api/illegal", model.getPath());
     assertNull(model.getId());
@@ -188,7 +188,7 @@ public class RestApiExceptionMapperImplTest {
         exception, "/null-api/something", null);
     assertNotNull(model);
     assertEquals("NULLPOINTER", model.getErrorCode());
-    assertFalse(model.isErrorCodeInherited());
+    assertFalse(model.getErrorCodeInherited());
     assertEquals("A variable is null.", model.getMessage());
     assertEquals("/null-api/something", model.getPath());
     assertNotNull(model.getId());

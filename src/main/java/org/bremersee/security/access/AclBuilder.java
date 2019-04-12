@@ -247,7 +247,7 @@ public interface AclBuilder {
               .filter(Objects::nonNull)
               .filter(accessControlEntry -> StringUtils.hasText(accessControlEntry.getPermission()))
               .forEach(accessControlEntry -> {
-                guest(accessControlEntry.isGuest(), accessControlEntry.getPermission());
+                guest(accessControlEntry.getGuest(), accessControlEntry.getPermission());
                 if (accessControlEntry.getGroups() != null) {
                   accessControlEntry
                       .getGroups()

@@ -66,12 +66,14 @@ public interface AclFactory<T> {
             .map(entry -> {
               final String permission = entry.getKey();
               final Ace ace = entry.getValue();
-              return new AccessControlEntry()
+              return AccessControlEntry
+                  .builder()
                   .permission(permission)
                   .guest(ace.isGuest())
                   .users(new ArrayList<>(ace.getUsers()))
                   .roles(new ArrayList<>(ace.getRoles()))
-                  .groups(new ArrayList<>(ace.getGroups()));
+                  .groups(new ArrayList<>(ace.getGroups()))
+                  .build();
             })
             .sorted(new AccessControlEntryComparator())
             .collect(Collectors.toList()));

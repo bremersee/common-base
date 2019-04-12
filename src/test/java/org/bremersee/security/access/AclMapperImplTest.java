@@ -8,6 +8,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import org.bremersee.common.model.AccessControlEntry;
 import org.bremersee.common.model.AccessControlList;
 import org.bremersee.security.core.AuthorityConstants;
@@ -35,19 +36,27 @@ public class AclMapperImplTest {
     assertNotNull(mapper.map((Acl<? extends Ace>) null));
     assertNotNull(mapper.map((AccessControlList) null));
 
-    AccessControlList source = new AccessControlList()
+    AccessControlList source = AccessControlList
+        .builder()
         .owner("owner")
-        .addEntriesItem(new AccessControlEntry()
-            .permission("write")
-            .addGroupsItem("group")
-            .addRolesItem("role")
-            .addUsersItem("user"))
-        .addEntriesItem(new AccessControlEntry()
-            .permission("read")
-            .groups(new ArrayList<>())
-            .roles(new ArrayList<>())
-            .users(new ArrayList<>())
-            .guest(true));
+        .entries(Arrays.asList(
+            AccessControlEntry
+                .builder()
+                .permission("write")
+                .groups(Collections.singletonList("group"))
+                .roles(Collections.singletonList("role"))
+                .users(Collections.singletonList("user"))
+                .build(),
+            AccessControlEntry
+                .builder()
+                .permission("read")
+                .groups(new ArrayList<>())
+                .roles(new ArrayList<>())
+                .users(new ArrayList<>())
+                .guest(true)
+                .build()
+        ))
+        .build();
 
     Acl<? extends Ace> destination = mapper.map(source);
     assertNotNull(destination);
@@ -106,19 +115,27 @@ public class AclMapperImplTest {
     assertNull(mapper.map((Acl<? extends Ace>) null));
     assertNull(mapper.map((AccessControlList) null));
 
-    AccessControlList source = new AccessControlList()
+    AccessControlList source = AccessControlList
+        .builder()
         .owner("owner")
-        .addEntriesItem(new AccessControlEntry()
-            .permission("write")
-            .addGroupsItem("group")
-            .addRolesItem("role")
-            .addUsersItem("user"))
-        .addEntriesItem(new AccessControlEntry()
-            .permission("read")
-            .groups(new ArrayList<>())
-            .roles(new ArrayList<>())
-            .users(new ArrayList<>())
-            .guest(true));
+        .entries(Arrays.asList(
+            AccessControlEntry
+                .builder()
+                .permission("write")
+                .groups(Collections.singletonList("group"))
+                .roles(Collections.singletonList("role"))
+                .users(Collections.singletonList("user"))
+                .build(),
+            AccessControlEntry
+                .builder()
+                .permission("read")
+                .groups(new ArrayList<>())
+                .roles(new ArrayList<>())
+                .users(new ArrayList<>())
+                .guest(true)
+                .build()
+        ))
+        .build();
 
     Acl<? extends Ace> destination = mapper.map(source);
     assertNotNull(destination);

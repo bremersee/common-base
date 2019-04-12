@@ -31,7 +31,6 @@ import org.bremersee.exception.RestApiExceptionMapperImpl;
 import org.bremersee.exception.RestApiExceptionMapperProperties;
 import org.bremersee.exception.ServiceException;
 import org.bremersee.exception.model.RestApiException;
-import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -125,7 +124,7 @@ public class ApiExceptionResolverTest {
     assertNotNull(actual.getCause());
     assertEquals(cause.getMessage(), actual.getCause().getMessage());
 
-    assertTrue(actual.isErrorCodeInherited());
+    assertTrue(actual.getErrorCodeInherited());
     assertEquals(cause.getErrorCode(), actual.getErrorCode());
 
     assertNotNull(actual.getHandler());

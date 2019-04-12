@@ -19,8 +19,10 @@ package org.bremersee.exception;
 import java.lang.reflect.Method;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import javax.validation.constraints.NotNull;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -326,9 +328,11 @@ public class RestApiExceptionMapperImpl implements RestApiExceptionMapper {
     final Class<?> handlerClass = findHandlerClass(handler);
     model.setClassName(handlerClass != null ? handlerClass.getName() : null);
     final Class<?>[] types = method.getParameterTypes();
-    for (Class<?> type : types) {
-      model.addMethodParameterTypesItem(type.getName());
-    }
+    model.setMethodParameterTypes(
+        Arrays
+            .stream(types)
+            .map(Class::getName)
+            .collect(Collectors.toList()));
     return model;
   }
 
@@ -344,11 +348,17 @@ public class RestApiExceptionMapperImpl implements RestApiExceptionMapper {
       final @Nullable StackTraceElement[] stackTrace) {
 
     if (stackTrace != null) {
-      for (StackTraceElement elem : stackTrace) {
-        restApiException.addStackTraceItem(
-            new StackTraceItem().declaringClass(elem.getClassName()).fileName(elem.getFileName())
-                .lineNumber(elem.getLineNumber()).methodName(elem.getMethodName()));
-      }
+      restApiException.setStackTrace(
+          Arrays
+              .stream(stackTrace)
+              .map(st -> StackTraceItem
+                  .builder()
+                  .declaringClass(st.getClassName())
+                  .fileName(st.getFileName())
+                  .lineNumber(st.getLineNumber())
+                  .methodName(st.getMethodName())
+                  .build())
+              .collect(Collectors.toList()));
     }
   }
 
@@ -402,7 +412,7 @@ public class RestApiExceptionMapperImpl implements RestApiExceptionMapper {
     destination.setTimestamp(source.getTimestamp());
     destination.setMessage(source.getMessage());
     destination.setErrorCode(source.getErrorCode());
-    destination.setErrorCodeInherited(source.isErrorCodeInherited());
+    destination.setErrorCodeInherited(source.getErrorCodeInherited());
     if (config.isIncludeExceptionClassName()) {
       destination.setClassName(source.getClassName());
     }
@@ -415,10 +425,8 @@ public class RestApiExceptionMapperImpl implements RestApiExceptionMapper {
     if (config.isIncludeHandler()) {
       destination.setHandler(cloneHandler(source.getHandler()));
     }
-    if (source.getStackTrace() != null) {
-      for (final StackTraceItem item : source.getStackTrace()) {
-        destination.addStackTraceItem(item);
-      }
+    if (config.isIncludeStackTrace()) {
+      destination.setStackTrace(source.getStackTrace());
     }
     if (config.isIncludeCause()) {
       destination.setCause(cloneRestApiException(source.getCause(), config));
@@ -434,11 +442,7 @@ public class RestApiExceptionMapperImpl implements RestApiExceptionMapper {
     final Handler destination = new Handler();
     destination.setClassName(destination.getClassName());
     destination.setMethodName(source.getMethodName());
-    if (source.getMethodParameterTypes() != null) {
-      for (final String item : source.getMethodParameterTypes()) {
-        destination.addMethodParameterTypesItem(item);
-      }
-    }
+    destination.setMethodParameterTypes(source.getMethodParameterTypes());
     return destination;
   }
 
