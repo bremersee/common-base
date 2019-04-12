@@ -30,9 +30,9 @@ public interface BremerseeAuthenticationToken extends Authentication {
 
   /**
    * Gets preferred name.
-   * <p>
-   * Some identity providers have two names: The ID of the user, that is normally returned by {@link
-   * #getName()}, and the user name of the user, that can be returned here.
+   *
+   * <p>Some identity providers have two names: The ID of the user, that is normally returned by
+   * {@link #getName()}, and the user name of the user, that can be returned here.
    *
    * @return the preferred name
    */

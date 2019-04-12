@@ -137,7 +137,7 @@ public class ApiExceptionResolver implements HandlerExceptionResolver {
   }
 
   /**
-   * Is this exception handler responsible?
+   * Is this exception handler responsible.
    *
    * @param request the request
    * @param handler the handler

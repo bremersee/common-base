@@ -112,7 +112,8 @@ public class PasswordFlowAuthenticationManager
           message,
           "https://tools.ietf.org/html/rfc6750#section-3.1");
     } catch (IllegalArgumentException malformed) {
-      // some third-party library error messages are not suitable for RFC 6750's error message charset
+      // some third-party library error messages are not suitable for RFC 6750's error message
+      // charset
       return DEFAULT_INVALID_TOKEN;
     }
   }

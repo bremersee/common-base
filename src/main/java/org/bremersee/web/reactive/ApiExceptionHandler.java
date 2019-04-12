@@ -96,7 +96,7 @@ public class ApiExceptionHandler extends AbstractErrorWebExceptionHandler {
   }
 
   /**
-   * Is this exception handler responsible?
+   * Is this exception handler responsible.
    *
    * @param request the request
    * @return {@code true} if it is responsible, otherwise {@code false}

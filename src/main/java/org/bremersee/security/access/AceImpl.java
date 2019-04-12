@@ -84,10 +84,10 @@ class AceImpl implements Ace {
       return false;
     }
     Ace ace = (Ace) o;
-    return guest == ace.isGuest() &&
-        treeSet(groups).equals(treeSet(ace.getGroups())) &&
-        treeSet(roles).equals(treeSet(ace.getRoles())) &&
-        treeSet(users).equals(treeSet(ace.getUsers()));
+    return guest == ace.isGuest()
+        && treeSet(groups).equals(treeSet(ace.getGroups()))
+        && treeSet(roles).equals(treeSet(ace.getRoles()))
+        && treeSet(users).equals(treeSet(ace.getUsers()));
   }
 
   @Override

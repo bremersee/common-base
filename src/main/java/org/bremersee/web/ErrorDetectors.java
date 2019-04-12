@@ -33,7 +33,7 @@ public abstract class ErrorDetectors {
    * Detects errors with an http status code 4xx or 5xx.
    */
   public static final Predicate<HttpStatus> DEFAULT =
-      httpStatus -> (httpStatus.series() == HttpStatus.Series.CLIENT_ERROR ||
-          httpStatus.series() == HttpStatus.Series.SERVER_ERROR);
+      httpStatus -> (httpStatus.series() == HttpStatus.Series.CLIENT_ERROR
+          || httpStatus.series() == HttpStatus.Series.SERVER_ERROR);
 
 }

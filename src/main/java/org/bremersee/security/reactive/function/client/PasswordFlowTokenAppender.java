@@ -74,8 +74,8 @@ public class PasswordFlowTokenAppender implements ExchangeFilterFunction {
    * @param accessTokenRetriever the access token retriever
    */
   public PasswordFlowTokenAppender(
-      final OAuth2Properties properties,
-      final AccessTokenRetriever<MultiValueMap<String, String>, Mono<String>> accessTokenRetriever) {
+      OAuth2Properties properties,
+      AccessTokenRetriever<MultiValueMap<String, String>, Mono<String>> accessTokenRetriever) {
     Assert.notNull(properties, "OAuth2 properties must not be null.");
     Assert.notNull(accessTokenRetriever, "Access token retriever must not be null.");
     this.properties = properties;
