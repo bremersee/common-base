@@ -16,7 +16,6 @@
 
 package org.bremersee.security.reactive.function.client;
 
-import java.util.function.Function;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.core.context.ReactiveSecurityContextHolder;
 import org.springframework.security.core.context.SecurityContext;
@@ -42,13 +41,15 @@ public class JwtAuthenticationTokenAppender implements ExchangeFilterFunction {
   public Mono<ClientResponse> filter(ClientRequest request, ExchangeFunction next) {
     return ReactiveSecurityContextHolder.getContext()
         .map(SecurityContext::getAuthentication)
+        .filter(authentication -> authentication instanceof JwtAuthenticationToken)
         .cast(JwtAuthenticationToken.class)
         .map(JwtAuthenticationToken::getToken)
         .map(Jwt::getTokenValue)
-        .flatMap((Function<String, Mono<ClientResponse>>) tokenValue -> {
-          request.headers().set(HttpHeaders.AUTHORIZATION, "Bearer " + tokenValue);
-          return next.exchange(request);
-        })
+        .flatMap(tokenValue -> next
+            .exchange(ClientRequest
+                .from(request)
+                .headers(headers -> headers.set(HttpHeaders.AUTHORIZATION, "Bearer " + tokenValue))
+                .build()))
         .switchIfEmpty(next.exchange(request));
   }
 }
