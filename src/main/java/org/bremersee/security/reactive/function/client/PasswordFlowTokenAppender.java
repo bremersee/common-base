@@ -19,7 +19,6 @@ package org.bremersee.security.reactive.function.client;
 import com.nimbusds.jwt.JWT;
 import com.nimbusds.jwt.JWTParser;
 import java.util.Date;
-import java.util.function.Function;
 import org.bremersee.security.OAuth2Helper;
 import org.bremersee.security.OAuth2Properties;
 import org.bremersee.security.authentication.AccessTokenRetriever;
@@ -98,18 +97,18 @@ public class PasswordFlowTokenAppender implements ExchangeFilterFunction {
                   properties.getPasswordFlow().getSystemUsername(),
                   properties.getPasswordFlow().getSystemPassword()))
           .map(this::parse)
-          .flatMap((Function<Mono<String>, Mono<ClientResponse>>) accessToken -> {
-            request.headers().set(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken);
-            return next.exchange(request);
-          });
+          .flatMap(accessToken -> next.exchange(ClientRequest
+              .from(request)
+              .headers(headers -> headers.set(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken))
+              .build()));
 
     } else {
 
       return Mono.just(accessToken)
-          .flatMap((Function<String, Mono<ClientResponse>>) tokenValue -> {
-            request.headers().set(HttpHeaders.AUTHORIZATION, "Bearer " + tokenValue);
-            return next.exchange(request);
-          });
+          .flatMap(accessToken -> next.exchange(ClientRequest
+              .from(request)
+              .headers(headers -> headers.set(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken))
+              .build()));
     }
   }
 
