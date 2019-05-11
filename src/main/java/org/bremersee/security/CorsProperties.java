@@ -48,7 +48,7 @@ public class CorsProperties {
    *
    * @return the allow all configuration
    */
-  @SuppressWarnings("unused")
+  @SuppressWarnings("WeakerAccess")
   public static List<CorsConfiguration> allowAllConfiguration() {
     return Collections.singletonList(CorsConfiguration.allowAllConfiguration());
   }
@@ -59,6 +59,9 @@ public class CorsProperties {
    * @return the configs
    */
   public List<CorsConfiguration> getConfigs() {
+    if (allowAll) {
+      return allowAllConfiguration();
+    }
     if (configs == null) {
       configs = new ArrayList<>();
     }
