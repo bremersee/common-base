@@ -49,14 +49,13 @@ public class PasswordFlowReactiveAuthenticationManager
     extends AbstractPasswordFlowAuthenticationManager
     implements ReactiveAuthenticationManager {
 
-  @Setter
-  private AccessTokenRetriever<MultiValueMap<String, String>, Mono<String>> accessTokenRetriever;
+  private final AccessTokenRetriever<MultiValueMap<String, String>, Mono<String>> accessTokenRetriever;
+
+  private final ReactiveJwtDecoder jwtDecoder;
 
   @Setter
   private Converter<Jwt, ? extends Mono<? extends AbstractAuthenticationToken>> jwtAuthenticationConverter
       = new ReactiveJwtAuthenticationConverterAdapter(new JwtAuthenticationConverter());
-
-  private final ReactiveJwtDecoder jwtDecoder;
 
   /**
    * Instantiates a new password flow authentication manager.
@@ -65,8 +64,8 @@ public class PasswordFlowReactiveAuthenticationManager
    * @param jwtDecoder       the jwt decoder
    */
   public PasswordFlowReactiveAuthenticationManager(
-      final OAuth2Properties oauth2Properties,
-      final ReactiveJwtDecoder jwtDecoder) {
+      OAuth2Properties oauth2Properties,
+      ReactiveJwtDecoder jwtDecoder) {
 
     super(oauth2Properties);
     this.jwtDecoder = jwtDecoder;
@@ -75,6 +74,23 @@ public class PasswordFlowReactiveAuthenticationManager
             .builder()
             .baseUrl(oauth2Properties.getPasswordFlow().getTokenEndpoint())
             .build());
+  }
+
+  /**
+   * Instantiates a new password flow reactive authentication manager.
+   *
+   * @param oauth2Properties     the oauth 2 properties
+   * @param jwtDecoder           the jwt decoder
+   * @param accessTokenRetriever the access token retriever
+   */
+  public PasswordFlowReactiveAuthenticationManager(
+      OAuth2Properties oauth2Properties,
+      ReactiveJwtDecoder jwtDecoder,
+      AccessTokenRetriever<MultiValueMap<String, String>, Mono<String>> accessTokenRetriever) {
+
+    super(oauth2Properties);
+    this.jwtDecoder = jwtDecoder;
+    this.accessTokenRetriever = accessTokenRetriever;
   }
 
   @Override

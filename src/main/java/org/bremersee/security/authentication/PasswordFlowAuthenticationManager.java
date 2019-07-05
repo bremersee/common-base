@@ -53,14 +53,13 @@ public class PasswordFlowAuthenticationManager
   private static final OAuth2Error DEFAULT_INVALID_TOKEN =
       invalidToken("An error occurred while attempting to decode the Jwt: Invalid token");
 
-  @Setter
-  private AccessTokenRetriever<MultiValueMap<String, String>, String> accessTokenRetriever;
+  private final AccessTokenRetriever<MultiValueMap<String, String>, String> accessTokenRetriever;
+
+  private final JwtDecoder jwtDecoder;
 
   @Setter
   private Converter<Jwt, ? extends AbstractAuthenticationToken> jwtAuthenticationConverter
       = new JwtAuthenticationConverter();
-
-  private final JwtDecoder jwtDecoder;
 
   /**
    * Instantiates a new password flow authentication manager.
@@ -79,6 +78,23 @@ public class PasswordFlowAuthenticationManager
     this.accessTokenRetriever = new PasswordFlowAccessTokenRetriever(
         restTemplateBuilder,
         oauth2Properties.getPasswordFlow().getTokenEndpoint());
+  }
+
+  /**
+   * Instantiates a new password flow authentication manager.
+   *
+   * @param oauth2Properties     the oauth 2 properties
+   * @param jwtDecoder           the jwt decoder
+   * @param accessTokenRetriever the access token retriever
+   */
+  public PasswordFlowAuthenticationManager(
+      final OAuth2Properties oauth2Properties,
+      final JwtDecoder jwtDecoder,
+      final AccessTokenRetriever<MultiValueMap<String, String>, String> accessTokenRetriever) {
+
+    super(oauth2Properties);
+    this.jwtDecoder = jwtDecoder;
+    this.accessTokenRetriever = accessTokenRetriever;
   }
 
   @Override

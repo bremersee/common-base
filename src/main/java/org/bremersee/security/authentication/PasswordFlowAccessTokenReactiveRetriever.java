@@ -53,6 +53,19 @@ public class PasswordFlowAccessTokenReactiveRetriever
     this.webClient = webClient;
   }
 
+  /**
+   * Instantiates a new password flow access token reactive retriever.
+   *
+   * @param tokenUrl the token url
+   */
+  @SuppressWarnings("unused")
+  public PasswordFlowAccessTokenReactiveRetriever(
+      final String tokenUrl) {
+    this.webClient = WebClient.builder()
+        .baseUrl(tokenUrl)
+        .build();
+  }
+
   @Override
   public Mono<String> retrieveAccessToken(final MultiValueMap<String, String> body) {
     if (log.isDebugEnabled()) {

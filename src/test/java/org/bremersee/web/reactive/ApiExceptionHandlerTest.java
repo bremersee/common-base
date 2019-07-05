@@ -27,7 +27,6 @@ import org.bremersee.exception.RestApiExceptionMapperImpl;
 import org.bremersee.exception.RestApiExceptionMapperProperties;
 import org.bremersee.exception.RestApiExceptionUtils;
 import org.bremersee.exception.ServiceException;
-import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -39,8 +38,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.codec.support.DefaultServerCodecConfigurer;
 import org.springframework.web.reactive.function.server.ServerRequest;
-import org.springframework.web.reactive.function.server.ServerResponse;
-import reactor.core.publisher.Mono;
+import reactor.test.StepVerifier;
 
 /**
  * The api exception handler test.
@@ -132,27 +130,29 @@ public class ApiExceptionHandlerTest {
     Mockito.when(serverRequest.path()).thenReturn("/api/resource");
     Mockito.when(serverRequest.headers()).thenReturn(headers);
 
-    Mono<ServerResponse> responseMono = exceptionHandler.renderErrorResponse(serverRequest);
-    ServerResponse response = responseMono.block();
-    assertNotNull(response);
-    assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.statusCode());
-    assertTrue(mediaType.isCompatibleWith(response.headers().getContentType()));
+    StepVerifier.create(exceptionHandler.renderErrorResponse(serverRequest))
+        .assertNext(response -> {
+          assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.statusCode());
+          assertTrue(mediaType.isCompatibleWith(response.headers().getContentType()));
 
-    if (MediaType.IMAGE_JPEG.isCompatibleWith(mediaType)) {
-      assertEquals(
-          exception.getMessage(),
-          response.headers().getFirst(RestApiExceptionUtils.MESSAGE_HEADER_NAME));
-      assertEquals(
-          exception.getErrorCode(),
-          response.headers().getFirst(RestApiExceptionUtils.CODE_HEADER_NAME));
-      assertEquals(
-          exception.getClass().getName(),
-          response.headers().getFirst(RestApiExceptionUtils.CLASS_HEADER_NAME));
-      assertNotNull(response.headers().getFirst(RestApiExceptionUtils.ID_HEADER_NAME));
-      assertNotEquals(
-          RestApiExceptionUtils.NO_ID_VALUE,
-          response.headers().getFirst(RestApiExceptionUtils.ID_HEADER_NAME));
-    }
+          if (MediaType.IMAGE_JPEG.isCompatibleWith(mediaType)) {
+            assertEquals(
+                exception.getMessage(),
+                response.headers().getFirst(RestApiExceptionUtils.MESSAGE_HEADER_NAME));
+            assertEquals(
+                exception.getErrorCode(),
+                response.headers().getFirst(RestApiExceptionUtils.CODE_HEADER_NAME));
+            assertEquals(
+                exception.getClass().getName(),
+                response.headers().getFirst(RestApiExceptionUtils.CLASS_HEADER_NAME));
+            assertNotNull(response.headers().getFirst(RestApiExceptionUtils.ID_HEADER_NAME));
+            assertNotEquals(
+                RestApiExceptionUtils.NO_ID_VALUE,
+                response.headers().getFirst(RestApiExceptionUtils.ID_HEADER_NAME));
+          }
+        })
+        .expectNextCount(0)
+        .verifyComplete();
   }
 
 }

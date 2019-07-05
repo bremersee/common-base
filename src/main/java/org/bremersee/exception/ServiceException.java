@@ -16,6 +16,8 @@
 
 package org.bremersee.exception;
 
+import java.util.function.Supplier;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
 import org.springframework.util.StringUtils;
@@ -26,7 +28,10 @@ import org.springframework.util.StringUtils;
  * @author Christian Bremer
  */
 @SuppressWarnings({"WeakerAccess", "unused"})
-public class ServiceException extends RuntimeException implements ErrorCodeAware {
+@EqualsAndHashCode(callSuper = true)
+public class ServiceException
+    extends RuntimeException
+    implements ErrorCodeAware, Supplier<ServiceException> {
 
   /**
    * Default error code for an 'already exists exception'.
@@ -150,6 +155,11 @@ public class ServiceException extends RuntimeException implements ErrorCodeAware
     this.errorCode = errorCode;
   }
 
+  @Override
+  public ServiceException get() {
+    return this;
+  }
+
   /**
    * Get the http status.
    *
@@ -173,6 +183,15 @@ public class ServiceException extends RuntimeException implements ErrorCodeAware
     return httpStatus != null ? httpStatus.value() : null;
   }
 
+
+  /**
+   * Internal server error service exception.
+   *
+   * @return the service exception
+   */
+  public static ServiceException internalServerError() {
+    return internalServerError(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(), (String) null);
+  }
 
   /**
    * Internal server error service exception.
@@ -219,6 +238,15 @@ public class ServiceException extends RuntimeException implements ErrorCodeAware
     return new ServiceException(HttpStatus.INTERNAL_SERVER_ERROR.value(), reason, errorCode, cause);
   }
 
+
+  /**
+   * Bad request service exception.
+   *
+   * @return the service exception
+   */
+  public static ServiceException badRequest() {
+    return badRequest(HttpStatus.BAD_REQUEST.getReasonPhrase(), (String) null);
+  }
 
   /**
    * Bad request service exception.
@@ -322,6 +350,15 @@ public class ServiceException extends RuntimeException implements ErrorCodeAware
       String errorCode) {
     return new ServiceException(HttpStatus.NOT_FOUND.value(),
         entityType + " with identifier [" + entityName + "] was not found.", errorCode);
+  }
+
+  /**
+   * Already exists service exception.
+   *
+   * @return the service exception
+   */
+  public static ServiceException alreadyExists() {
+    return new ServiceException(HttpStatus.CONFLICT);
   }
 
   /**

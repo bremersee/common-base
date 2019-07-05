@@ -30,6 +30,38 @@ import org.springframework.util.StringUtils;
 /**
  * CORS configuration properties.
  *
+ * <p>Can be used with {@code WebFlux} like this:
+ * <pre>
+ * import org.bremersee.security.CorsProperties;
+ * import org.springframework.boot.context.properties.EnableConfigurationProperties;
+ * import org.springframework.context.annotation.Configuration;
+ * import org.springframework.web.reactive.config.CorsRegistry;
+ * import org.springframework.web.reactive.config.WebFluxConfigurer;
+ *
+ * &#064;EnableConfigurationProperties(CorsProperties.class)
+ * &#064;Configuration
+ * public class CorsGlobalConfiguration implements WebFluxConfigurer {
+ *
+ *   private CorsProperties corsProperties;
+ *
+ *   public CorsGlobalConfiguration(CorsProperties corsProperties) {
+ *     this.corsProperties = corsProperties;
+ *   }
+ *
+ *   &#064;Override
+ *   public void addCorsMappings(CorsRegistry corsRegistry) {
+ *     for (CorsProperties.CorsConfiguration config : corsProperties.getConfigs()) {
+ *       corsRegistry.addMapping(config.getPathPattern())
+ *           .allowedOrigins(config.getAllowedOrigins().toArray(new String[0]))
+ *           .allowedMethods(config.getAllowedMethods().toArray(new String[0]))
+ *           .allowedHeaders(config.getAllowedHeaders().toArray(new String[0]))
+ *           .maxAge(config.getMaxAge())
+ *           .allowCredentials(config.isAllowCredentials());
+ *     }
+ *   }
+ * }
+ * </pre>
+ *
  * @author Christian Bremer
  */
 @SuppressWarnings("ConfigurationProperties")
@@ -71,7 +103,7 @@ public class CorsProperties {
   }
 
   /**
-   * The type Cors configuration.
+   * The cors configuration.
    */
   @Setter
   @ToString
