@@ -19,6 +19,8 @@ package org.bremersee.web.reactive.function.client;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
+import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.bremersee.exception.ExceptionParser;
 import org.bremersee.exception.MessageExceptionParser;
@@ -36,8 +38,10 @@ import org.springframework.web.reactive.function.client.ClientResponse;
 public class MessageAwareWebClientErrorDecoder
     extends AbstractWebClientErrorDecoder<WebClientException> {
 
+  @Getter(AccessLevel.PACKAGE)
   private final ExceptionParser<String> parser;
 
+  @Getter(AccessLevel.PACKAGE)
   private String errorCode;
 
   /**
