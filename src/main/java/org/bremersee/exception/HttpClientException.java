@@ -19,7 +19,9 @@ package org.bremersee.exception;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.ToString;
 import org.bremersee.exception.model.RestApiException;
 
 /**
@@ -27,6 +29,8 @@ import org.bremersee.exception.model.RestApiException;
  *
  * @author Christian Bremer
  */
+@ToString(callSuper = true)
+@EqualsAndHashCode(callSuper = false)
 public class HttpClientException extends RuntimeException
     implements HttpStatusAware, RestApiExceptionAware, HttpResponseHeadersAware {
 
@@ -46,6 +50,7 @@ public class HttpClientException extends RuntimeException
    * @param headers          the headers
    * @param restApiException the rest api exception
    */
+  @SuppressWarnings("WeakerAccess")
   public HttpClientException(
       final int status,
       final String message,

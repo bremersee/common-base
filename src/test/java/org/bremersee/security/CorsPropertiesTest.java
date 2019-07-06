@@ -100,4 +100,18 @@ public class CorsPropertiesTest {
     assertFalse(properties.isAllowAll());
   }
 
+  /**
+   * Tests to string and equals.
+   */
+  @Test
+  public void toStringAndEquals() {
+    CorsProperties cp0 = new CorsProperties();
+    cp0.setConfigs(CorsProperties.allowAllConfiguration());
+    assertEquals(cp0, cp0);
+    CorsProperties cp1 = new CorsProperties();
+    cp1.setConfigs(CorsProperties.allowAllConfiguration());
+    assertEquals(cp0, cp1);
+    assertNotNull(cp0.toString());
+  }
+
 }

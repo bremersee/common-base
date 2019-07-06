@@ -1,6 +1,7 @@
 package org.bremersee.security.reactive.function.client;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -32,6 +33,16 @@ import reactor.test.StepVerifier;
  * @author Christian Bremer
  */
 public class PasswordFlowTokenAppenderTest {
+
+  /**
+   * Tests creation.
+   */
+  @Test
+  public void create() {
+    PasswordFlowTokenAppender tokenAppender = new PasswordFlowTokenAppender(properties());
+    assertEquals(properties(), tokenAppender.getProperties());
+    assertNotNull(tokenAppender.getAccessTokenRetriever());
+  }
 
   /**
    * Tests filter.
@@ -123,8 +134,7 @@ public class PasswordFlowTokenAppenderTest {
         .verify();
   }
 
-  private static PasswordFlowTokenAppender tokenAppender(
-      AccessTokenRetriever<MultiValueMap<String, String>, Mono<String>> tokenRetriever) {
+  private static OAuth2Properties properties() {
     PasswordFlowProperties passwordFlowProperties = new PasswordFlowProperties();
     passwordFlowProperties.setClientId("clientId");
     passwordFlowProperties.setClientSecret("clientSecret");
@@ -134,7 +144,12 @@ public class PasswordFlowTokenAppenderTest {
     passwordFlowProperties.setTokenEndpoint("http://localhost/token");
     OAuth2Properties properties = new OAuth2Properties();
     properties.setPasswordFlow(passwordFlowProperties);
-    return new PasswordFlowTokenAppender(properties, tokenRetriever);
+    return properties;
+  }
+
+  private static PasswordFlowTokenAppender tokenAppender(
+      AccessTokenRetriever<MultiValueMap<String, String>, Mono<String>> tokenRetriever) {
+    return new PasswordFlowTokenAppender(properties(), tokenRetriever);
   }
 
   private static String validAccessToken() {

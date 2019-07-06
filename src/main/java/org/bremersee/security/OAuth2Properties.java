@@ -16,6 +16,7 @@
 
 package org.bremersee.security;
 
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -31,6 +32,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @Getter
 @Setter
 @ToString
+@EqualsAndHashCode
 public class OAuth2Properties {
 
   /**
@@ -44,6 +46,7 @@ public class OAuth2Properties {
   @Getter
   @Setter
   @ToString(exclude = {"clientSecret", "systemPassword"})
+  @EqualsAndHashCode
   public static class PasswordFlowProperties {
 
     private String tokenEndpoint;

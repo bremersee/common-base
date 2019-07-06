@@ -16,13 +16,15 @@
 
 package org.bremersee.security.authentication;
 
+import static org.springframework.util.Assert.hasText;
+import static org.springframework.util.Assert.notNull;
+
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.bremersee.security.OAuth2Helper;
 import org.bremersee.security.OAuth2Properties;
 import org.springframework.security.core.Authentication;
-import org.springframework.util.Assert;
 import org.springframework.util.MultiValueMap;
 
 /**
@@ -45,10 +47,10 @@ public abstract class AbstractPasswordFlowAuthenticationManager {
   public AbstractPasswordFlowAuthenticationManager(
       OAuth2Properties oauth2Properties) {
 
-    Assert.notNull(oauth2Properties, "OAuth2 properties must be present.");
-    Assert.notNull(oauth2Properties.getPasswordFlow(),
+    notNull(oauth2Properties, "OAuth2 properties must be present.");
+    notNull(oauth2Properties.getPasswordFlow(),
         "OAuth2 password flow properties must be present.");
-    Assert.hasText(oauth2Properties.getPasswordFlow().getClientId(),
+    hasText(oauth2Properties.getPasswordFlow().getClientId(),
         "Client ID must be present.");
     this.oauth2Properties = oauth2Properties;
   }

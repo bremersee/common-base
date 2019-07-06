@@ -16,16 +16,19 @@
 
 package org.bremersee.security.reactive.function.client;
 
+import static org.springframework.util.Assert.notNull;
+
 import com.nimbusds.jwt.JWT;
 import com.nimbusds.jwt.JWTParser;
 import java.util.Date;
+import lombok.AccessLevel;
+import lombok.Getter;
 import org.bremersee.security.OAuth2Helper;
 import org.bremersee.security.OAuth2Properties;
 import org.bremersee.security.authentication.AccessTokenRetriever;
 import org.bremersee.security.authentication.PasswordFlowAccessTokenReactiveRetriever;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.oauth2.jwt.JwtException;
-import org.springframework.util.Assert;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.reactive.function.client.ClientRequest;
 import org.springframework.web.reactive.function.client.ClientResponse;
@@ -40,11 +43,13 @@ import reactor.core.publisher.Mono;
  *
  * @author Christian Bremer
  */
-@SuppressWarnings({"unused", "WeakerAccess"})
+@SuppressWarnings({"WeakerAccess"})
 public class PasswordFlowTokenAppender implements ExchangeFilterFunction {
 
+  @Getter(AccessLevel.PACKAGE)
   private OAuth2Properties properties;
 
+  @Getter(AccessLevel.PACKAGE)
   private AccessTokenRetriever<MultiValueMap<String, String>, Mono<String>> accessTokenRetriever;
 
   private String accessToken;
@@ -57,7 +62,7 @@ public class PasswordFlowTokenAppender implements ExchangeFilterFunction {
    * @param properties the properties
    */
   public PasswordFlowTokenAppender(final OAuth2Properties properties) {
-    Assert.notNull(properties, "OAuth2 properties must not be null.");
+    notNull(properties, "OAuth2 properties must not be null.");
     this.properties = properties;
     this.accessTokenRetriever = new PasswordFlowAccessTokenReactiveRetriever(
         WebClient
@@ -75,8 +80,8 @@ public class PasswordFlowTokenAppender implements ExchangeFilterFunction {
   public PasswordFlowTokenAppender(
       OAuth2Properties properties,
       AccessTokenRetriever<MultiValueMap<String, String>, Mono<String>> accessTokenRetriever) {
-    Assert.notNull(properties, "OAuth2 properties must not be null.");
-    Assert.notNull(accessTokenRetriever, "Access token retriever must not be null.");
+    notNull(properties, "OAuth2 properties must not be null.");
+    notNull(accessTokenRetriever, "Access token retriever must not be null.");
     this.properties = properties;
     this.accessTokenRetriever = accessTokenRetriever;
   }

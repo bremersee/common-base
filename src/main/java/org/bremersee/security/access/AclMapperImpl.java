@@ -16,13 +16,14 @@
 
 package org.bremersee.security.access;
 
+import static org.springframework.util.Assert.notNull;
+
 import javax.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 import org.bremersee.common.model.AccessControlList;
 import org.bremersee.security.core.AuthorityConstants;
 import org.springframework.lang.Nullable;
-import org.springframework.util.Assert;
 
 /**
  * The acl mapper implementation.
@@ -82,7 +83,7 @@ public class AclMapperImpl<T extends Acl<? extends Ace>> implements AclMapper<T>
       @Nullable String[] defaultPermissions,
       boolean switchAdminAccess,
       boolean returnNull) {
-    Assert.notNull(aclFactory, "Acl factory must not be null.");
+    notNull(aclFactory, "Acl factory must not be null.");
     this.aclFactory = aclFactory;
     this.defaultPermissions = defaultPermissions;
     this.switchAdminAccess = switchAdminAccess;

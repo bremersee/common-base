@@ -20,6 +20,9 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import java.util.Collections;
 import org.bremersee.exception.RestApiExceptionMapper;
@@ -29,7 +32,6 @@ import org.bremersee.exception.RestApiExceptionUtils;
 import org.bremersee.exception.ServiceException;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.mockito.Mockito;
 import org.springframework.boot.autoconfigure.web.ResourceProperties;
 import org.springframework.boot.web.reactive.error.ErrorAttributes;
 import org.springframework.context.ApplicationContext;
@@ -65,14 +67,13 @@ public class ApiExceptionHandlerTest {
         properties, "testapp");
 
     exception = new ServiceException(500, "Oops, a conflict", "TEST:4711");
-    ErrorAttributes errorAttributes = Mockito.mock(ErrorAttributes.class);
-    Mockito.when(errorAttributes.getError(Mockito.any(ServerRequest.class))).thenReturn(exception);
+    ErrorAttributes errorAttributes = mock(ErrorAttributes.class);
+    when(errorAttributes.getError(any(ServerRequest.class))).thenReturn(exception);
 
     final ResourceProperties resourceProperties = new ResourceProperties();
 
-    ApplicationContext applicationContext = Mockito.mock(ApplicationContext.class);
-    Mockito
-        .when(applicationContext.getClassLoader())
+    ApplicationContext applicationContext = mock(ApplicationContext.class);
+    when(applicationContext.getClassLoader())
         .thenReturn(ApplicationContext.class.getClassLoader());
 
     final DefaultServerCodecConfigurer codecConfigurer = new DefaultServerCodecConfigurer();
@@ -90,8 +91,8 @@ public class ApiExceptionHandlerTest {
    */
   @Test
   public void testResponsibleExceptionHandler() {
-    ServerRequest serverRequest = Mockito.mock(ServerRequest.class);
-    Mockito.when(serverRequest.path()).thenReturn("/api/resource");
+    ServerRequest serverRequest = mock(ServerRequest.class);
+    when(serverRequest.path()).thenReturn("/api/resource");
     assertTrue(exceptionHandler.isResponsibleExceptionHandler(serverRequest));
   }
 
@@ -122,13 +123,13 @@ public class ApiExceptionHandlerTest {
   private void doTestingRenderErrorResponse(MediaType mediaType) {
     final HttpHeaders httpHeaders = new HttpHeaders();
     httpHeaders.put(HttpHeaders.ACCEPT, Collections.singletonList(String.valueOf(mediaType)));
-    ServerRequest.Headers headers = Mockito.mock(ServerRequest.Headers.class);
-    Mockito.when(headers.asHttpHeaders()).thenReturn(httpHeaders);
-    Mockito.when(headers.accept()).thenReturn(httpHeaders.getAccept());
+    ServerRequest.Headers headers = mock(ServerRequest.Headers.class);
+    when(headers.asHttpHeaders()).thenReturn(httpHeaders);
+    when(headers.accept()).thenReturn(httpHeaders.getAccept());
 
-    ServerRequest serverRequest = Mockito.mock(ServerRequest.class);
-    Mockito.when(serverRequest.path()).thenReturn("/api/resource");
-    Mockito.when(serverRequest.headers()).thenReturn(headers);
+    ServerRequest serverRequest = mock(ServerRequest.class);
+    when(serverRequest.path()).thenReturn("/api/resource");
+    when(serverRequest.headers()).thenReturn(headers);
 
     StepVerifier.create(exceptionHandler.renderErrorResponse(serverRequest))
         .assertNext(response -> {

@@ -92,7 +92,7 @@ public class PasswordFlowReactiveAuthenticationManagerTest {
     return properties;
   }
 
-  private static AccessTokenRetriever<MultiValueMap<String, String>, Mono<String>> tokenRetriever() {
+  private static AccessTokenRetriever<MultiValueMap<String, String>, Mono<String>> retriever() {
     //noinspection unchecked
     AccessTokenRetriever<MultiValueMap<String, String>, Mono<String>> accessTokenRetriever = mock(
         AccessTokenRetriever.class);
@@ -119,7 +119,7 @@ public class PasswordFlowReactiveAuthenticationManagerTest {
     return new PasswordFlowReactiveAuthenticationManager(
         oAuth2Properties(),
         workingJwtDecoder(jwt),
-        tokenRetriever());
+        retriever());
   }
 
   private static ReactiveJwtDecoder notWorkingJwtDecoder() {
@@ -132,7 +132,7 @@ public class PasswordFlowReactiveAuthenticationManagerTest {
     return new PasswordFlowReactiveAuthenticationManager(
         oAuth2Properties(),
         notWorkingJwtDecoder(),
-        tokenRetriever());
+        retriever());
   }
 
 }

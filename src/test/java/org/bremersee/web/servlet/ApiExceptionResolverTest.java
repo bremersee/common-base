@@ -19,6 +19,9 @@ package org.bremersee.web.servlet;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -33,7 +36,6 @@ import org.bremersee.exception.ServiceException;
 import org.bremersee.exception.model.RestApiException;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.mockito.Mockito;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -85,26 +87,22 @@ public class ApiExceptionResolverTest {
         null,
         cause);
 
-    HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
-    Mockito.when(request.getRequestURI()).thenReturn("/api/resource");
-    Mockito.when(request.getServletPath()).thenReturn("/api/resource");
-    Mockito
-        .when(request.getHeader(Mockito.eq(HttpHeaders.ACCEPT)))
+    HttpServletRequest request = mock(HttpServletRequest.class);
+    when(request.getRequestURI()).thenReturn("/api/resource");
+    when(request.getServletPath()).thenReturn("/api/resource");
+    when(request.getHeader(eq(HttpHeaders.ACCEPT)))
         .thenReturn(MediaType.APPLICATION_JSON_VALUE);
-    Mockito
-        .when(request.getAttribute(Mockito.eq(WebUtils.INCLUDE_REQUEST_URI_ATTRIBUTE)))
+    when(request.getAttribute(eq(WebUtils.INCLUDE_REQUEST_URI_ATTRIBUTE)))
         .thenReturn(null);
-    Mockito
-        .when(request.getAttribute(Mockito.eq(WebUtils.ERROR_STATUS_CODE_ATTRIBUTE)))
+    when(request.getAttribute(eq(WebUtils.ERROR_STATUS_CODE_ATTRIBUTE)))
         .thenReturn(exception.status());
 
-    HttpServletResponse response = Mockito.mock(HttpServletResponse.class);
-    Mockito.when(response.getStatus()).thenReturn(exception.status());
+    HttpServletResponse response = mock(HttpServletResponse.class);
+    when(response.getStatus()).thenReturn(exception.status());
 
-    HandlerMethod handler = Mockito.mock(HandlerMethod.class);
-    Mockito.when(handler.getBean()).thenReturn(new TestHandler());
-    Mockito
-        .when(handler.getMethod())
+    HandlerMethod handler = mock(HandlerMethod.class);
+    when(handler.getBean()).thenReturn(new TestHandler());
+    when(handler.getMethod())
         .thenReturn(
             TestHandler.class.getMethod("testMethod", UUID.class, String.class, int.class));
 

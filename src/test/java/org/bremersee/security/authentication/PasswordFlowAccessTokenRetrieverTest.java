@@ -1,12 +1,13 @@
 package org.bremersee.security.authentication;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import org.bremersee.exception.PasswordFlowAuthenticationException;
-import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.HttpEntity;
@@ -29,6 +30,7 @@ public class PasswordFlowAccessTokenRetrieverTest {
   @Test
   public void retrieveAccessToken() {
     RestTemplate restTemplate = mock(RestTemplate.class);
+    //noinspection unchecked
     when(restTemplate.exchange(
         anyString(), any(HttpMethod.class), any(HttpEntity.class), any(Class.class)))
         .thenReturn(ResponseEntity.ok("{\"access_token\":\"junit_access_token_value\"}"));
@@ -39,8 +41,8 @@ public class PasswordFlowAccessTokenRetrieverTest {
 
     MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
     String token = tokenRetriever.retrieveAccessToken(body);
-    Assert.assertNotNull(token);
-    Assert.assertEquals("junit_access_token_value", token);
+    assertNotNull(token);
+    assertEquals("junit_access_token_value", token);
   }
 
   /**
@@ -49,6 +51,7 @@ public class PasswordFlowAccessTokenRetrieverTest {
   @Test(expected = PasswordFlowAuthenticationException.class)
   public void retrieveAccessTokenFails() {
     RestTemplate restTemplate = mock(RestTemplate.class);
+    //noinspection unchecked
     when(restTemplate.exchange(
         anyString(), any(HttpMethod.class), any(HttpEntity.class), any(Class.class)))
         .thenReturn(ResponseEntity.ok("{\"illegal_token\":\"junit_access_token_value\"}"));
