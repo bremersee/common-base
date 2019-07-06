@@ -40,7 +40,7 @@ import reactor.core.publisher.Mono;
  *
  * @author Christian Bremer
  */
-@SuppressWarnings("unused")
+@SuppressWarnings({"unused", "WeakerAccess"})
 public class PasswordFlowTokenAppender implements ExchangeFilterFunction {
 
   private OAuth2Properties properties;
@@ -87,7 +87,7 @@ public class PasswordFlowTokenAppender implements ExchangeFilterFunction {
     final long remainingMillis = properties.getPasswordFlow().getExpirationTimeRemainsMillis();
     if (accessToken == null
         || expirationTime == null
-        || expirationTime.after(new Date(System.currentTimeMillis() - remainingMillis))) {
+        || expirationTime.before(new Date(System.currentTimeMillis() - remainingMillis))) {
 
       return accessTokenRetriever
           .retrieveAccessToken(OAuth2Helper

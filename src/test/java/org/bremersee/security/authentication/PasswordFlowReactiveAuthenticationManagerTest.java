@@ -32,6 +32,53 @@ import reactor.test.StepVerifier;
  */
 public class PasswordFlowReactiveAuthenticationManagerTest {
 
+  /**
+   * Tests authenticate.
+   */
+  @Test
+  public void authenticate() {
+    Map<String, Object> headers = new HashMap<>();
+    headers.put("test-key", "test-value");
+    Map<String, Object> claims = new HashMap<>();
+    claims.put("sub", "an_username");
+    Jwt jwt = jwt(headers, claims);
+
+    PasswordFlowReactiveAuthenticationManager manager = workingManager(jwt);
+
+    Authentication loginAuthentication = mock(Authentication.class);
+    when(loginAuthentication.getName()).thenReturn("an_username");
+    when(loginAuthentication.getCredentials()).thenReturn("a_password");
+
+    StepVerifier.create(manager.authenticate(loginAuthentication))
+        .assertNext(authentication -> {
+          assertTrue(authentication instanceof JwtAuthenticationToken);
+          JwtAuthenticationToken authenticationToken = (JwtAuthenticationToken) authentication;
+          Jwt actualJwt = authenticationToken.getToken();
+          assertNotNull(actualJwt);
+          assertEquals(jwt.getClaims(), actualJwt.getClaims());
+          assertEquals(jwt.getHeaders(), actualJwt.getHeaders());
+        })
+        .expectNextCount(0)
+        .verifyComplete();
+  }
+
+  /**
+   * Tests authenticate fails.
+   */
+  @Test
+  public void authenticateFails() {
+    PasswordFlowReactiveAuthenticationManager manager = notWorkingManager();
+
+    Authentication loginAuthentication = mock(Authentication.class);
+    when(loginAuthentication.getName()).thenReturn("an_username");
+    when(loginAuthentication.getCredentials()).thenReturn("a_password");
+
+    StepVerifier.create(manager.authenticate(loginAuthentication))
+        .expectErrorMatches(throwable -> throwable instanceof OAuth2AuthenticationException)
+        .verify();
+
+  }
+
   private static OAuth2Properties oAuth2Properties() {
     PasswordFlowProperties passwordFlowProperties = new PasswordFlowProperties();
     passwordFlowProperties.setClientId("abc");
@@ -86,53 +133,6 @@ public class PasswordFlowReactiveAuthenticationManagerTest {
         oAuth2Properties(),
         notWorkingJwtDecoder(),
         tokenRetriever());
-  }
-
-  /**
-   * Tests authenticate.
-   */
-  @Test
-  public void authenticate() {
-    Map<String, Object> headers = new HashMap<>();
-    headers.put("test-key", "test-value");
-    Map<String, Object> claims = new HashMap<>();
-    claims.put("sub", "an_username");
-    Jwt jwt = jwt(headers, claims);
-
-    PasswordFlowReactiveAuthenticationManager manager = workingManager(jwt);
-
-    Authentication loginAuthentication = mock(Authentication.class);
-    when(loginAuthentication.getName()).thenReturn("an_username");
-    when(loginAuthentication.getCredentials()).thenReturn("a_password");
-
-    StepVerifier.create(manager.authenticate(loginAuthentication))
-        .assertNext(authentication -> {
-          assertTrue(authentication instanceof JwtAuthenticationToken);
-          JwtAuthenticationToken authenticationToken = (JwtAuthenticationToken) authentication;
-          Jwt actualJwt = authenticationToken.getToken();
-          assertNotNull(actualJwt);
-          assertEquals(jwt.getClaims(), actualJwt.getClaims());
-          assertEquals(jwt.getHeaders(), actualJwt.getHeaders());
-        })
-        .expectNextCount(0)
-        .verifyComplete();
-  }
-
-  /**
-   * Tests authenticate fails.
-   */
-  @Test
-  public void authenticateFails() {
-    PasswordFlowReactiveAuthenticationManager manager = notWorkingManager();
-
-    Authentication loginAuthentication = mock(Authentication.class);
-    when(loginAuthentication.getName()).thenReturn("an_username");
-    when(loginAuthentication.getCredentials()).thenReturn("a_password");
-
-    StepVerifier.create(manager.authenticate(loginAuthentication))
-        .expectErrorMatches(throwable -> throwable instanceof OAuth2AuthenticationException)
-        .verify();
-
   }
 
 }

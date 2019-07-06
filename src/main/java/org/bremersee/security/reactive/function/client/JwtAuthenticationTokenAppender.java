@@ -21,6 +21,7 @@ import org.springframework.security.core.context.ReactiveSecurityContextHolder;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
+import org.springframework.util.StringUtils;
 import org.springframework.web.reactive.function.client.ClientRequest;
 import org.springframework.web.reactive.function.client.ClientResponse;
 import org.springframework.web.reactive.function.client.ExchangeFilterFunction;
@@ -45,11 +46,23 @@ public class JwtAuthenticationTokenAppender implements ExchangeFilterFunction {
         .cast(JwtAuthenticationToken.class)
         .map(JwtAuthenticationToken::getToken)
         .map(Jwt::getTokenValue)
-        .flatMap(tokenValue -> next
-            .exchange(ClientRequest
-                .from(request)
-                .headers(headers -> headers.set(HttpHeaders.AUTHORIZATION, "Bearer " + tokenValue))
-                .build()))
-        .switchIfEmpty(next.exchange(request));
+        .switchIfEmpty(Mono.just(""))
+        .flatMap(tokenValue -> exchangeWithToken(request, tokenValue, next));
   }
+
+  private Mono<ClientResponse> exchangeWithToken(
+      ClientRequest request,
+      String tokenValue,
+      ExchangeFunction next) {
+
+    if (StringUtils.hasText(tokenValue)) {
+      return next.exchange(ClientRequest
+          .from(request)
+          .headers(headers -> headers.set(HttpHeaders.AUTHORIZATION, "Bearer " + tokenValue))
+          .build());
+    } else {
+      return next.exchange(request);
+    }
+  }
+
 }

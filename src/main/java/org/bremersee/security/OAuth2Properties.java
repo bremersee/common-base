@@ -44,7 +44,6 @@ public class OAuth2Properties {
   @Getter
   @Setter
   @ToString(exclude = {"clientSecret", "systemPassword"})
-  @SuppressWarnings("WeakerAccess")
   public static class PasswordFlowProperties {
 
     private String tokenEndpoint;

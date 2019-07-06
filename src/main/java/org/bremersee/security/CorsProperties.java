@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -68,6 +69,7 @@ import org.springframework.util.StringUtils;
 @ConfigurationProperties(prefix = "bremersee.security.cors")
 @Setter
 @ToString
+@EqualsAndHashCode
 public class CorsProperties {
 
   @Getter
@@ -107,6 +109,7 @@ public class CorsProperties {
    */
   @Setter
   @ToString
+  @EqualsAndHashCode
   public static class CorsConfiguration {
 
     @Getter
