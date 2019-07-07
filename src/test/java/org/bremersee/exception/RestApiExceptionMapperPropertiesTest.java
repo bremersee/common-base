@@ -70,7 +70,6 @@ public class RestApiExceptionMapperPropertiesTest {
     assertNotNull(properties.toString());
     assertEquals(properties, properties);
 
-    RestApiExceptionMapperProperties moreProperties = new RestApiExceptionMapperProperties();
     ExceptionMappingConfig moreConfig = new ExceptionMappingConfig();
     moreConfig.setEvaluateAnnotationFirst(true);
     moreConfig.setExceptionClassName(IllegalAccessException.class.getName());
@@ -81,6 +80,7 @@ public class RestApiExceptionMapperPropertiesTest {
     moreConfig.setIncludePath(false);
     moreConfig.setIncludeStackTrace(true);
 
+    RestApiExceptionMapperProperties moreProperties = new RestApiExceptionMapperProperties();
     moreProperties.getExceptionMappingConfigs().add(moreConfig);
     assertEquals(properties, moreProperties);
   }

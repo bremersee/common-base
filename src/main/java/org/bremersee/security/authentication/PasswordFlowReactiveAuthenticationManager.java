@@ -43,18 +43,17 @@ import reactor.core.publisher.Mono;
  *
  * @author Christian Bremer
  */
-@SuppressWarnings("unused")
 @Slf4j
 public class PasswordFlowReactiveAuthenticationManager
     extends AbstractPasswordFlowAuthenticationManager
     implements ReactiveAuthenticationManager {
 
-  private final AccessTokenRetriever<MultiValueMap<String, String>, Mono<String>> accessTokenRetriever;
+  private final AccessTokenRetriever<MultiValueMap<String, String>, Mono<String>> retriever;
 
   private final ReactiveJwtDecoder jwtDecoder;
 
   @Setter
-  private Converter<Jwt, ? extends Mono<? extends AbstractAuthenticationToken>> jwtAuthenticationConverter
+  private Converter<Jwt, ? extends Mono<? extends AbstractAuthenticationToken>> jwtConverter
       = new ReactiveJwtAuthenticationConverterAdapter(new JwtAuthenticationConverter());
 
   /**
@@ -63,13 +62,14 @@ public class PasswordFlowReactiveAuthenticationManager
    * @param oauth2Properties the oauth 2 properties
    * @param jwtDecoder       the jwt decoder
    */
+  @SuppressWarnings("unused")
   public PasswordFlowReactiveAuthenticationManager(
       OAuth2Properties oauth2Properties,
       ReactiveJwtDecoder jwtDecoder) {
 
     super(oauth2Properties);
     this.jwtDecoder = jwtDecoder;
-    this.accessTokenRetriever = new PasswordFlowAccessTokenReactiveRetriever(
+    this.retriever = new PasswordFlowAccessTokenReactiveRetriever(
         WebClient
             .builder()
             .baseUrl(oauth2Properties.getPasswordFlow().getTokenEndpoint())
@@ -83,6 +83,7 @@ public class PasswordFlowReactiveAuthenticationManager
    * @param jwtDecoder           the jwt decoder
    * @param accessTokenRetriever the access token retriever
    */
+  @SuppressWarnings("WeakerAccess")
   public PasswordFlowReactiveAuthenticationManager(
       OAuth2Properties oauth2Properties,
       ReactiveJwtDecoder jwtDecoder,
@@ -90,7 +91,7 @@ public class PasswordFlowReactiveAuthenticationManager
 
     super(oauth2Properties);
     this.jwtDecoder = jwtDecoder;
-    this.accessTokenRetriever = accessTokenRetriever;
+    this.retriever = accessTokenRetriever;
   }
 
   @Override
@@ -99,9 +100,9 @@ public class PasswordFlowReactiveAuthenticationManager
       log.debug("msg=[Authenticating basic authentication with OAuth2 password flow.]");
     }
     return Mono.just(createPasswordFlowBody(authentication))
-        .flatMap(accessTokenRetriever::retrieveAccessToken)
+        .flatMap(retriever::retrieveAccessToken)
         .flatMap(jwtDecoder::decode)
-        .flatMap(jwtAuthenticationConverter::convert)
+        .flatMap(jwtConverter::convert)
         .cast(Authentication.class)
         .onErrorMap(JwtException.class, this::onError);
   }

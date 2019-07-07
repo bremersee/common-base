@@ -79,7 +79,7 @@ public class PasswordFlowReactiveAuthenticationManagerTest {
 
   }
 
-  private static OAuth2Properties oAuth2Properties() {
+  private static OAuth2Properties oauth2Properties() {
     PasswordFlowProperties passwordFlowProperties = new PasswordFlowProperties();
     passwordFlowProperties.setClientId("abc");
     passwordFlowProperties.setClientSecret("xyz");
@@ -117,7 +117,7 @@ public class PasswordFlowReactiveAuthenticationManagerTest {
 
   private static PasswordFlowReactiveAuthenticationManager workingManager(Jwt jwt) {
     return new PasswordFlowReactiveAuthenticationManager(
-        oAuth2Properties(),
+        oauth2Properties(),
         workingJwtDecoder(jwt),
         retriever());
   }
@@ -130,7 +130,7 @@ public class PasswordFlowReactiveAuthenticationManagerTest {
 
   private static PasswordFlowReactiveAuthenticationManager notWorkingManager() {
     return new PasswordFlowReactiveAuthenticationManager(
-        oAuth2Properties(),
+        oauth2Properties(),
         notWorkingJwtDecoder(),
         retriever());
   }
