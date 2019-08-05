@@ -100,6 +100,7 @@ public class FeignClientExceptionErrorDecoder implements ErrorDecoder {
     final Date retryAfter = determineRetryAfter(httpHeaders.getFirst(RETRY_AFTER));
     if (retryAfter != null) {
       return new RetryableException(
+          response.status(),
           feignClientException.getMessage(),
           findHttpMethod(response),
           feignClientException,
