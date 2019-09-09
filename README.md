@@ -7,4 +7,4 @@ This library contains
 - An Access Control List (Acl) definition 
 
 The generated maven site is available 
-[here](https://nexus.bremersee.org/repository/maven-sites/common-base/1.2.2/index.html).
+[here](https://nexus.bremersee.org/repository/maven-sites/common-base/1.3.0-SNAPSHOT/index.html).

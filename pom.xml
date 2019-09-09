@@ -6,12 +6,12 @@
   <parent>
     <groupId>org.bremersee</groupId>
     <artifactId>common-parent</artifactId>
-    <version>1.0.2</version>
+    <version>1.0.3</version>
     <relativePath/>
   </parent>
 
   <artifactId>common-base-parent</artifactId>
-  <version>1.2.2</version>
+  <version>1.3.0-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <name>common-base-parent</name>
@@ -25,6 +25,7 @@
 
   <properties>
     <common-model.version>1.1.2</common-model.version>
+    <ldaptive.version>1.2.4</ldaptive.version>
   </properties>
 
   <scm>
@@ -57,6 +58,27 @@
         <groupId>org.bremersee</groupId>
         <artifactId>common-model</artifactId>
         <version>${common-model.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.ldaptive</groupId>
+        <artifactId>ldaptive</artifactId>
+        <version>${ldaptive.version}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+      <dependency>
+        <groupId>org.ldaptive</groupId>
+        <artifactId>ldaptive-beans</artifactId>
+        <version>${ldaptive.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.ldaptive</groupId>
+        <artifactId>ldaptive-unboundid</artifactId>
+        <version>${ldaptive.version}</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
