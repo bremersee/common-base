@@ -26,6 +26,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.bremersee.exception.ServiceException;
 import org.ldaptive.AddOperation;
 import org.ldaptive.AddRequest;
+import org.ldaptive.AttributeModification;
 import org.ldaptive.Connection;
 import org.ldaptive.ConnectionFactory;
 import org.ldaptive.DeleteOperation;
@@ -112,12 +113,7 @@ public class LdaptiveTemplate implements LdaptiveOperations {
    * @param addRequest the add request
    */
   public void add(@NotNull final AddRequest addRequest) {
-    execute(new LdaptiveConnectionCallbackWithoutResult() {
-      @Override
-      protected void doWithoutResult(Connection connection) throws LdapException {
-        new AddOperation(connection).execute(addRequest);
-      }
-    });
+    execute(connection -> new AddOperation(connection).execute(addRequest));
   }
 
   /**
@@ -126,12 +122,10 @@ public class LdaptiveTemplate implements LdaptiveOperations {
    * @param modifyRequest the modify request
    */
   public void modify(@NotNull final ModifyRequest modifyRequest) {
-    execute(new LdaptiveConnectionCallbackWithoutResult() {
-      @Override
-      protected void doWithoutResult(Connection connection) throws LdapException {
-        new ModifyOperation(connection).execute(modifyRequest);
-      }
-    });
+    if (modifyRequest.getAttributeModifications() != null
+        && modifyRequest.getAttributeModifications().length > 0) {
+      execute(connection -> new ModifyOperation(connection).execute(modifyRequest));
+    }
   }
 
   /**
@@ -140,12 +134,8 @@ public class LdaptiveTemplate implements LdaptiveOperations {
    * @param deleteRequest the delete request
    */
   public void delete(@NotNull final DeleteRequest deleteRequest) {
-    execute(new LdaptiveConnectionCallbackWithoutResult() {
-      @Override
-      protected void doWithoutResult(Connection connection) throws LdapException {
-        new DeleteOperation(connection).execute(deleteRequest);
-      }
-    });
+    execute((LdaptiveConnectionCallbackWithoutResult) connection -> new DeleteOperation(connection)
+        .execute(deleteRequest));
   }
 
   /**
@@ -253,10 +243,12 @@ public class LdaptiveTemplate implements LdaptiveOperations {
         new AddOperation(connection)
             .execute(new AddRequest(dn, destination.getAttributes()));
       } else {
-        new ModifyOperation(connection)
-            .execute(new ModifyRequest(
-                dn,
-                entryMapper.mapAndComputeModifications(domainObject, destination)));
+        final AttributeModification[] modifications = entryMapper
+            .mapAndComputeModifications(domainObject, destination);
+        if (modifications != null && modifications.length > 0) {
+          new ModifyOperation(connection)
+              .execute(new ModifyRequest(dn, modifications));
+        }
       }
       return entryMapper.map(destination);
 
@@ -321,12 +313,9 @@ public class LdaptiveTemplate implements LdaptiveOperations {
   public <T> void delete(
       @NotNull final T domainObject,
       @NotNull final LdaptiveEntryMapper<T> entryMapper) {
-    execute(new LdaptiveConnectionCallbackWithoutResult() {
-      @Override
-      protected void doWithoutResult(Connection connection) {
-        delete(domainObject, entryMapper, connection);
-      }
-    });
+    execute(
+        (LdaptiveConnectionCallbackWithoutResult) connection -> delete(
+            domainObject, entryMapper, connection));
   }
 
   /**
@@ -340,12 +329,9 @@ public class LdaptiveTemplate implements LdaptiveOperations {
       final Collection<T> domainObjects,
       @NotNull final LdaptiveEntryMapper<T> entryMapper) {
     if (domainObjects != null) {
-      execute(new LdaptiveConnectionCallbackWithoutResult() {
-        @Override
-        protected void doWithoutResult(Connection connection) {
-          for (T domainModel : domainObjects) {
-            delete(domainModel, entryMapper, connection);
-          }
+      execute((LdaptiveConnectionCallbackWithoutResult) connection -> {
+        for (T domainModel : domainObjects) {
+          delete(domainModel, entryMapper, connection);
         }
       });
     }

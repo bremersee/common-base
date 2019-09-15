@@ -24,11 +24,11 @@ import org.ldaptive.LdapException;
  *
  * @author Christian Bremer
  */
-public abstract class LdaptiveConnectionCallbackWithoutResult
-    implements LdaptiveConnectionCallback<Object> {
+public interface LdaptiveConnectionCallbackWithoutResult
+    extends LdaptiveConnectionCallback<Object> {
 
   @Override
-  public Object doWithConnection(final Connection connection) throws LdapException {
+  default Object doWithConnection(final Connection connection) throws LdapException {
     doWithoutResult(connection);
     return null;
   }
@@ -39,6 +39,6 @@ public abstract class LdaptiveConnectionCallbackWithoutResult
    * @param connection the connection
    * @throws LdapException the ldap exception
    */
-  protected abstract void doWithoutResult(Connection connection) throws LdapException;
+  void doWithoutResult(Connection connection) throws LdapException;
 
 }

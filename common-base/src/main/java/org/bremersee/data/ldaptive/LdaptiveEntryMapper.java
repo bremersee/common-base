@@ -16,8 +16,11 @@
 
 package org.bremersee.data.ldaptive;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 import javax.validation.constraints.NotNull;
 import org.ldaptive.AttributeModification;
 import org.ldaptive.AttributeModificationType;
@@ -75,6 +78,39 @@ public interface LdaptiveEntryMapper<T> extends LdapEntryMapper<T> {
       @NotNull T source,
       @NotNull LdapEntry destination) {
     return new ModifyRequest(destination.getDn(), mapAndComputeModifications(source, destination));
+  }
+
+  static <T> T getAttributeValue(
+      @Nullable final LdapEntry ldapEntry,
+      @NotNull final String name,
+      final ValueTranscoder<T> valueTranscoder,
+      final T defaultValue) {
+    final LdapAttribute attr = ldapEntry == null ? null : ldapEntry.getAttribute(name);
+    final T value = attr != null ? attr.getValue(valueTranscoder) : null;
+    return value != null ? value : defaultValue;
+  }
+
+  static <T> Collection<T> getAttributeValues(
+      @Nullable final LdapEntry ldapEntry,
+      @NotNull final String name,
+      final ValueTranscoder<T> valueTranscoder) {
+    final LdapAttribute attr = ldapEntry == null ? null : ldapEntry.getAttribute(name);
+    final Collection<T> values = attr != null ? attr.getValues(valueTranscoder) : null;
+    return values != null ? values : new ArrayList<>();
+  }
+
+  static <T> Set<T> getAttributeValuesAsSet(
+      @Nullable final LdapEntry ldapEntry,
+      @NotNull final String name,
+      final ValueTranscoder<T> valueTranscoder) {
+    return new LinkedHashSet<>(getAttributeValues(ldapEntry, name, valueTranscoder));
+  }
+
+  static <T> List<T> getAttributeValuesAsList(
+      @Nullable final LdapEntry ldapEntry,
+      @NotNull final String name,
+      final ValueTranscoder<T> valueTranscoder) {
+    return new ArrayList<>(getAttributeValues(ldapEntry, name, valueTranscoder));
   }
 
   /**
@@ -266,6 +302,42 @@ public interface LdaptiveEntryMapper<T> extends LdapEntryMapper<T> {
         new AttributeModification(
             AttributeModificationType.REMOVE,
             attr));
+  }
+
+  /**
+   * Create dn string.
+   *
+   * @param rdn      the rdn
+   * @param rdnValue the rdn value
+   * @param baseDn   the base dn
+   * @return the string
+   */
+  static String createDn(
+      @NotNull final String rdn,
+      @NotNull final String rdnValue,
+      @NotNull final String baseDn) {
+    return rdn + "=" + rdnValue + "," + baseDn;
+  }
+
+  /**
+   * Gets rdn.
+   *
+   * @param dn the dn
+   * @return the rdn
+   */
+  static String getRdn(final String dn) {
+    if (dn == null) {
+      return null;
+    }
+    int start = dn.indexOf('=');
+    if (start < 0) {
+      return dn;
+    }
+    int end = dn.indexOf(',', start);
+    if (end < 0) {
+      return dn.substring(start + 1).trim();
+    }
+    return dn.substring(start + 1, end).trim();
   }
 
 }
