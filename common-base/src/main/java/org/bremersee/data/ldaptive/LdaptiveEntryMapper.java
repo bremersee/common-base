@@ -22,7 +22,6 @@ import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 import javax.validation.constraints.NotNull;
 import org.ldaptive.AttributeModification;
 import org.ldaptive.AttributeModificationType;
@@ -210,7 +209,8 @@ public interface LdaptiveEntryMapper<T> extends LdapEntryMapper<T> {
                 AttributeModificationType.REMOVE,
                 attr));
       } else {
-        final LdapAttribute newAttr = new LdapAttribute(name);
+        final LdapAttribute newAttr = new LdapAttribute(attr.isBinary());
+        newAttr.setName(name);
         newAttr.addValues(valueTranscoder, values);
         ldapEntry.addAttribute(newAttr);
         modifications.add(
@@ -271,14 +271,9 @@ public interface LdaptiveEntryMapper<T> extends LdapEntryMapper<T> {
     }
     final LdapAttribute attr = ldapEntry.getAttribute(name);
     if (attr == null) {
-      final LdapAttribute newAttr = new LdapAttribute(name);
-      if (isBinary) {
-        newAttr.addBinaryValues(
-            values.stream().map(valueTranscoder::encodeBinaryValue).collect(Collectors.toList()));
-      } else {
-        newAttr.addStringValues(
-            values.stream().map(valueTranscoder::encodeStringValue).collect(Collectors.toList()));
-      }
+      final LdapAttribute newAttr = new LdapAttribute(isBinary);
+      newAttr.setName(name);
+      newAttr.addValues(valueTranscoder, values);
       ldapEntry.addAttribute(newAttr);
       modifications.add(
           new AttributeModification(
@@ -288,13 +283,7 @@ public interface LdaptiveEntryMapper<T> extends LdapEntryMapper<T> {
       final List<T> newValues = new ArrayList<>(
           getAttributeValues(ldapEntry, name, valueTranscoder));
       newValues.addAll(values);
-      final LdapAttribute newAttr = new LdapAttribute(name);
-      newAttr.addValues(valueTranscoder, newValues);
-      ldapEntry.addAttribute(newAttr);
-      modifications.add(
-          new AttributeModification(
-              AttributeModificationType.REPLACE,
-              newAttr));
+      setAttributes(ldapEntry, name, newValues, attr.isBinary(), valueTranscoder, modifications);
     }
   }
 
@@ -373,12 +362,7 @@ public interface LdaptiveEntryMapper<T> extends LdapEntryMapper<T> {
     }
     final List<T> newValues = new ArrayList<>(getAttributeValues(ldapEntry, name, valueTranscoder));
     newValues.removeAll(values);
-    final LdapAttribute newAttr = new LdapAttribute(name);
-    newAttr.addValues(valueTranscoder, newValues);
-    modifications.add(
-        new AttributeModification(
-            AttributeModificationType.REPLACE,
-            attr));
+    setAttributes(ldapEntry, name, newValues, attr.isBinary(), valueTranscoder, modifications);
   }
 
   /**
