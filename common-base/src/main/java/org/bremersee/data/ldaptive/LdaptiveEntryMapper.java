@@ -18,9 +18,11 @@ package org.bremersee.data.ldaptive;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 import javax.validation.constraints.NotNull;
 import org.ldaptive.AttributeModification;
 import org.ldaptive.AttributeModificationType;
@@ -57,7 +59,7 @@ public interface LdaptiveEntryMapper<T> extends LdapEntryMapper<T> {
 
   /**
    * Map and compute attribute modifications (see {@link LdapEntry#computeModifications(LdapEntry,
-   * LdapEntry)}).
+   * LdapEntry)}*).
    *
    * @param source      the source (domain object)
    * @param destination the destination (ldap entry)
@@ -80,6 +82,16 @@ public interface LdaptiveEntryMapper<T> extends LdapEntryMapper<T> {
     return new ModifyRequest(destination.getDn(), mapAndComputeModifications(source, destination));
   }
 
+  /**
+   * Gets attribute value.
+   *
+   * @param <T>             the type parameter
+   * @param ldapEntry       the ldap entry
+   * @param name            the name
+   * @param valueTranscoder the value transcoder
+   * @param defaultValue    the default value
+   * @return the attribute value
+   */
   static <T> T getAttributeValue(
       @Nullable final LdapEntry ldapEntry,
       @NotNull final String name,
@@ -90,6 +102,15 @@ public interface LdaptiveEntryMapper<T> extends LdapEntryMapper<T> {
     return value != null ? value : defaultValue;
   }
 
+  /**
+   * Gets attribute values.
+   *
+   * @param <T>             the type parameter
+   * @param ldapEntry       the ldap entry
+   * @param name            the name
+   * @param valueTranscoder the value transcoder
+   * @return the attribute values
+   */
   static <T> Collection<T> getAttributeValues(
       @Nullable final LdapEntry ldapEntry,
       @NotNull final String name,
@@ -99,6 +120,15 @@ public interface LdaptiveEntryMapper<T> extends LdapEntryMapper<T> {
     return values != null ? values : new ArrayList<>();
   }
 
+  /**
+   * Gets attribute values as set.
+   *
+   * @param <T>             the type parameter
+   * @param ldapEntry       the ldap entry
+   * @param name            the name
+   * @param valueTranscoder the value transcoder
+   * @return the attribute values as set
+   */
   static <T> Set<T> getAttributeValuesAsSet(
       @Nullable final LdapEntry ldapEntry,
       @NotNull final String name,
@@ -106,6 +136,15 @@ public interface LdaptiveEntryMapper<T> extends LdapEntryMapper<T> {
     return new LinkedHashSet<>(getAttributeValues(ldapEntry, name, valueTranscoder));
   }
 
+  /**
+   * Gets attribute values as list.
+   *
+   * @param <T>             the type parameter
+   * @param ldapEntry       the ldap entry
+   * @param name            the name
+   * @param valueTranscoder the value transcoder
+   * @return the attribute values as list
+   */
   static <T> List<T> getAttributeValuesAsList(
       @Nullable final LdapEntry ldapEntry,
       @NotNull final String name,
@@ -114,7 +153,7 @@ public interface LdaptiveEntryMapper<T> extends LdapEntryMapper<T> {
   }
 
   /**
-   * Sets a single attribute value or removes the attribute when the given value is {@code null}.
+   * Replaces the value of the attribute with the specified value.
    *
    * @param <T>             the type of the domain object
    * @param ldapEntry       the ldap entry
@@ -132,28 +171,17 @@ public interface LdaptiveEntryMapper<T> extends LdapEntryMapper<T> {
       final ValueTranscoder<T> valueTranscoder,
       @NotNull final List<AttributeModification> modifications) {
 
-    LdapAttribute attr = ldapEntry.getAttribute(name);
-    if (attr == null && value != null) {
-      addAttribute(ldapEntry, name, value, isBinary, valueTranscoder, modifications);
-    } else if (attr != null) {
-      if (value == null) {
-        removeAttribute(ldapEntry, name, null, valueTranscoder, modifications);
-      } else {
-        final LdapAttribute newAttr = attr.isBinary()
-            ? new LdapAttribute(name, valueTranscoder.encodeBinaryValue(value))
-            : new LdapAttribute(name, valueTranscoder.encodeStringValue(value));
-        ldapEntry.removeAttribute(attr);
-        ldapEntry.addAttribute(newAttr);
-        modifications.add(
-            new AttributeModification(
-                AttributeModificationType.REPLACE,
-                newAttr));
-      }
-    }
+    setAttributes(
+        ldapEntry,
+        name,
+        value != null ? Collections.singleton(value) : null,
+        isBinary,
+        valueTranscoder,
+        modifications);
   }
 
   /**
-   * Sets attribute values.
+   * Replaces the values of the attribute with the specified values.
    *
    * @param <T>             the type of the domain object
    * @param ldapEntry       the ldap entry
@@ -171,19 +199,19 @@ public interface LdaptiveEntryMapper<T> extends LdapEntryMapper<T> {
       final ValueTranscoder<T> valueTranscoder,
       @NotNull final List<AttributeModification> modifications) {
 
-    // Can I use replace here? That would keep the order?
     LdapAttribute attr = ldapEntry.getAttribute(name);
-    if (attr == null && values != null) {
-      for (final T value : values) {
-        addAttribute(ldapEntry, name, value, isBinary, valueTranscoder, modifications);
-      }
+    if (attr == null && values != null && !values.isEmpty()) {
+      addAttributes(ldapEntry, name, values, isBinary, valueTranscoder, modifications);
     } else if (attr != null) {
       if (values == null || values.isEmpty()) {
-        removeAttribute(ldapEntry, name, null, valueTranscoder, modifications);
+        ldapEntry.removeAttribute(name);
+        modifications.add(
+            new AttributeModification(
+                AttributeModificationType.REMOVE,
+                attr));
       } else {
         final LdapAttribute newAttr = new LdapAttribute(name);
         newAttr.addValues(valueTranscoder, values);
-        ldapEntry.removeAttribute(attr);
         ldapEntry.addAttribute(newAttr);
         modifications.add(
             new AttributeModification(
@@ -191,57 +219,10 @@ public interface LdaptiveEntryMapper<T> extends LdapEntryMapper<T> {
                 newAttr));
       }
     }
-    /*
-    final LdapAttribute attr = ldapEntry.getAttribute(name);
-    if (attr == null && values != null) {
-      for (final T value : values) {
-        addAttribute(ldapEntry, name, value, isBinary, valueTranscoder, modifications);
-      }
-    } else if (attr != null) {
-      if (values == null || values.isEmpty()) {
-        removeAttribute(ldapEntry, name, null, valueTranscoder, modifications);
-      } else {
-        final Set<String> oldValueSet = isBinary
-            ? attr.getBinaryValues().stream()
-            .map(value -> Base64.getEncoder().encodeToString(value))
-            .collect(Collectors.toSet())
-            : new HashSet<>(attr.getStringValues());
-        final List<String> newValues = values.stream()
-            .map(value -> isBinary
-                ? Base64.getEncoder().encodeToString(valueTranscoder.encodeBinaryValue(value))
-                : valueTranscoder.encodeStringValue(value))
-            .filter(newValue -> !oldValueSet.contains(newValue))
-            .collect(Collectors.toList());
-        final Set<String> newValueSet = new HashSet<>(newValues);
-        for (final String oldValue : oldValueSet) {
-          if (!newValueSet.contains(oldValue)) {
-            final LdapAttribute oldAttr = isBinary
-                ? new LdapAttribute(name, Base64.getDecoder().decode(oldValue))
-                : new LdapAttribute(name, oldValue);
-            ldapEntry.removeAttribute(oldAttr);
-            modifications.add(
-                new AttributeModification(
-                    AttributeModificationType.REMOVE,
-                    oldAttr));
-          }
-        }
-        for (final String newValue : newValues) {
-          final LdapAttribute newAttr = isBinary
-              ? new LdapAttribute(name, Base64.getDecoder().decode(newValue))
-              : new LdapAttribute(name, newValue);
-          ldapEntry.addAttribute(newAttr);
-          modifications.add(
-              new AttributeModification(
-                  AttributeModificationType.ADD,
-                  newAttr));
-        }
-      }
-    }
-    */
   }
 
   /**
-   * Adds an attribute to the ldap entry.
+   * Adds the specified value to the attribute with the specified name.
    *
    * @param <T>             the type of the domain object
    * @param ldapEntry       the ldap entry
@@ -254,22 +235,94 @@ public interface LdaptiveEntryMapper<T> extends LdapEntryMapper<T> {
   static <T> void addAttribute(
       @NotNull final LdapEntry ldapEntry,
       @NotNull final String name,
-      @NotNull final T value,
+      @Nullable final T value,
       final boolean isBinary,
       @NotNull final ValueTranscoder<T> valueTranscoder,
       @NotNull final List<AttributeModification> modifications) {
-    final LdapAttribute attr = isBinary
-        ? new LdapAttribute(name, valueTranscoder.encodeBinaryValue(value))
-        : new LdapAttribute(name, valueTranscoder.encodeStringValue(value));
-    ldapEntry.addAttribute(attr);
+    addAttributes(
+        ldapEntry,
+        name,
+        value != null ? Collections.singleton(value) : null,
+        isBinary,
+        valueTranscoder,
+        modifications);
+  }
+
+  /**
+   * Adds the specified values to the attribute with the specified name.
+   *
+   * @param <T>             the type of the domain object
+   * @param ldapEntry       the ldap entry
+   * @param name            the attribute name
+   * @param values          the attribute values
+   * @param isBinary        specifies whether the attribute value is binary or not
+   * @param valueTranscoder the value transcoder
+   * @param modifications   the list of modifications
+   */
+  static <T> void addAttributes(
+      @NotNull final LdapEntry ldapEntry,
+      @NotNull final String name,
+      @Nullable final Collection<T> values,
+      final boolean isBinary,
+      @NotNull final ValueTranscoder<T> valueTranscoder,
+      @NotNull final List<AttributeModification> modifications) {
+    if (values == null || values.isEmpty()) {
+      return;
+    }
+    final LdapAttribute attr = ldapEntry.getAttribute(name);
+    if (attr == null) {
+      final LdapAttribute newAttr = new LdapAttribute(name);
+      if (isBinary) {
+        newAttr.addBinaryValues(
+            values.stream().map(valueTranscoder::encodeBinaryValue).collect(Collectors.toList()));
+      } else {
+        newAttr.addStringValues(
+            values.stream().map(valueTranscoder::encodeStringValue).collect(Collectors.toList()));
+      }
+      ldapEntry.addAttribute(newAttr);
+      modifications.add(
+          new AttributeModification(
+              AttributeModificationType.ADD,
+              newAttr));
+    } else {
+      final List<T> newValues = new ArrayList<>(
+          getAttributeValues(ldapEntry, name, valueTranscoder));
+      newValues.addAll(values);
+      final LdapAttribute newAttr = new LdapAttribute(name);
+      newAttr.addValues(valueTranscoder, newValues);
+      ldapEntry.addAttribute(newAttr);
+      modifications.add(
+          new AttributeModification(
+              AttributeModificationType.REPLACE,
+              newAttr));
+    }
+  }
+
+  /**
+   * Removes an attribute with the specified name.
+   *
+   * @param ldapEntry     the ldap entry
+   * @param name          the name
+   * @param modifications the modifications
+   */
+  static void removeAttribute(
+      @NotNull final LdapEntry ldapEntry,
+      @NotNull final String name,
+      @NotNull final List<AttributeModification> modifications) {
+    final LdapAttribute attr = ldapEntry.getAttribute(name);
+    if (attr == null) {
+      return;
+    }
+    ldapEntry.removeAttribute(attr);
     modifications.add(
         new AttributeModification(
-            AttributeModificationType.ADD,
+            AttributeModificationType.REMOVE,
             attr));
   }
 
   /**
-   * Removes an attribute from the ldap entry.
+   * Removes an attribute with the specified value. If the value is {@code null}, the whole
+   * attribute will be removed.
    *
    * @param <T>             the type of the domain object
    * @param ldapEntry       the ldap entry
@@ -288,19 +341,43 @@ public interface LdaptiveEntryMapper<T> extends LdapEntryMapper<T> {
     if (attr == null) {
       return;
     }
-    boolean isBinary = attr.isBinary();
     if (value == null) {
-      ldapEntry.removeAttribute(name);
-    } else if (isBinary) {
-      attr = new LdapAttribute(name, valueTranscoder.encodeBinaryValue(value));
-      ldapEntry.removeAttribute(attr);
+      removeAttribute(ldapEntry, name, modifications);
     } else {
-      attr = new LdapAttribute(name, valueTranscoder.encodeStringValue(value));
-      ldapEntry.removeAttribute(attr);
+      removeAttributes(ldapEntry, name, Collections.singleton(value), valueTranscoder,
+          modifications);
     }
+  }
+
+  /**
+   * Remove attributes with the specified values. If values are empty or {@code null}, no attributes
+   * will be removed.
+   *
+   * @param <T>             the type of the domain object
+   * @param ldapEntry       the ldap entry
+   * @param name            the name
+   * @param values          the values
+   * @param valueTranscoder the value transcoder
+   * @param modifications   the modifications
+   */
+  static <T> void removeAttributes(
+      @NotNull final LdapEntry ldapEntry,
+      @NotNull final String name,
+      @Nullable final Collection<T> values,
+      final ValueTranscoder<T> valueTranscoder,
+      @NotNull final List<AttributeModification> modifications) {
+
+    final LdapAttribute attr = ldapEntry.getAttribute(name);
+    if (attr == null || values == null || values.isEmpty()) {
+      return;
+    }
+    final List<T> newValues = new ArrayList<>(getAttributeValues(ldapEntry, name, valueTranscoder));
+    newValues.removeAll(values);
+    final LdapAttribute newAttr = new LdapAttribute(name);
+    newAttr.addValues(valueTranscoder, newValues);
     modifications.add(
         new AttributeModification(
-            AttributeModificationType.REMOVE,
+            AttributeModificationType.REPLACE,
             attr));
   }
 
