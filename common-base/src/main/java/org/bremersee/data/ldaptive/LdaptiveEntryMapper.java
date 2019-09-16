@@ -259,8 +259,8 @@ public interface LdaptiveEntryMapper<T> extends LdapEntryMapper<T> {
       @NotNull final ValueTranscoder<T> valueTranscoder,
       @NotNull final List<AttributeModification> modifications) {
     final LdapAttribute attr = isBinary
-        ? new LdapAttribute(name, valueTranscoder.encodeStringValue(value))
-        : new LdapAttribute(name, valueTranscoder.encodeBinaryValue(value));
+        ? new LdapAttribute(name, valueTranscoder.encodeBinaryValue(value))
+        : new LdapAttribute(name, valueTranscoder.encodeStringValue(value));
     ldapEntry.addAttribute(attr);
     modifications.add(
         new AttributeModification(
