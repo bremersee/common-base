@@ -224,11 +224,10 @@ public class LdaptiveTemplate implements LdaptiveOperations {
       @NotNull final LdaptiveEntryMapper<T> entryMapper) {
     return execute(connection -> {
       try {
-        final LdapEntry ldapEntry = new SearchOperation(connection)
+        return entryMapper.map(new SearchOperation(connection)
             .execute(SearchRequest.newObjectScopeSearchRequest(entryMapper.mapDn(domainObject)))
             .getResult()
-            .getEntry();
-        return ldapEntry == null || entryMapper.map(ldapEntry) == null;
+            .getEntry()) != null;
 
       } catch (LdapException e) {
         if (e.getCause() instanceof javax.naming.NameNotFoundException) {
