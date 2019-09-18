@@ -220,10 +220,20 @@ public class LdaptiveTemplate implements LdaptiveOperations {
   public <T> boolean exists(
       @NotNull final T domainObject,
       @NotNull final LdaptiveEntryMapper<T> entryMapper) {
-    return execute(connection -> new SearchOperation(connection)
-        .execute(SearchRequest.newObjectScopeSearchRequest(entryMapper.mapDn(domainObject)))
-        .getResult()
-        .getEntry() != null);
+    return execute(connection -> {
+      try {
+        return new SearchOperation(connection)
+            .execute(SearchRequest.newObjectScopeSearchRequest(entryMapper.mapDn(domainObject)))
+            .getResult()
+            .getEntry() != null;
+
+      } catch (LdapException e) {
+        if (e.getCause() instanceof javax.naming.NameNotFoundException) {
+          return false;
+        }
+        throw e;
+      }
+    });
   }
 
   private <T> T save(

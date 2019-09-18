@@ -208,7 +208,8 @@ public interface LdaptiveEntryMapper<T> extends LdapEntryMapper<T> {
             new AttributeModification(
                 AttributeModificationType.REMOVE,
                 attr));
-      } else {
+      } else if (!new ArrayList<>(values)
+          .equals(new ArrayList<>(attr.getValues(valueTranscoder)))) {
         final LdapAttribute newAttr = new LdapAttribute(attr.isBinary());
         newAttr.setName(name);
         newAttr.addValues(valueTranscoder, values);
