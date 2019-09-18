@@ -17,6 +17,7 @@
 package org.bremersee.data.ldaptive;
 
 import java.util.Collection;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Stream;
 import javax.validation.constraints.NotNull;
@@ -206,7 +207,8 @@ public class LdaptiveTemplate implements LdaptiveOperations {
         .getResult()
         .getEntries()
         .stream()
-        .map(entryMapper::map));
+        .map(entryMapper::map))
+        .filter(Objects::nonNull);
   }
 
   /**
@@ -222,10 +224,11 @@ public class LdaptiveTemplate implements LdaptiveOperations {
       @NotNull final LdaptiveEntryMapper<T> entryMapper) {
     return execute(connection -> {
       try {
-        return new SearchOperation(connection)
+        final LdapEntry ldapEntry = new SearchOperation(connection)
             .execute(SearchRequest.newObjectScopeSearchRequest(entryMapper.mapDn(domainObject)))
             .getResult()
-            .getEntry() != null;
+            .getEntry();
+        return ldapEntry == null || entryMapper.map(ldapEntry) == null;
 
       } catch (LdapException e) {
         if (e.getCause() instanceof javax.naming.NameNotFoundException) {
@@ -297,6 +300,7 @@ public class LdaptiveTemplate implements LdaptiveOperations {
     }
     return execute(connection -> domainModels
         .stream()
+        .filter(Objects::nonNull)
         .map(domainModel -> save(domainModel, entryMapper, connection)));
   }
 
@@ -341,7 +345,9 @@ public class LdaptiveTemplate implements LdaptiveOperations {
     if (domainObjects != null) {
       execute((LdaptiveConnectionCallbackWithoutResult) connection -> {
         for (T domainModel : domainObjects) {
-          delete(domainModel, entryMapper, connection);
+          if (domainModel != null) {
+            delete(domainModel, entryMapper, connection);
+          }
         }
       });
     }
