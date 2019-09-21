@@ -49,17 +49,17 @@ public interface RequestUriBuilder {
 
     @Override
     public URI build(final InvocationParameters parameters, final UriBuilder uriBuilder) {
-      final Object proxy = parameters.getProxy();
+      final Class<?> targetClass = parameters.getTargetClass();
       final Method method = parameters.getMethod();
       final Object[] args = parameters.getArgs();
-      final String uriTemplate = getCommonPath(proxy) + getPath(method);
+      final String uriTemplate = getCommonPath(targetClass) + getPath(method);
       return addQueries(uriBuilder.path(uriTemplate), method, args)
           .build(getPathVariables(method, args));
     }
 
-    private String getCommonPath(final Object proxy) {
+    private String getCommonPath(final Class<?> targetClass) {
       return findRequestMappingValue(
-          proxy,
+          targetClass,
           mapping -> mapping.path().length > 0,
           mapping -> mapping.path()[0])
           .orElse("");

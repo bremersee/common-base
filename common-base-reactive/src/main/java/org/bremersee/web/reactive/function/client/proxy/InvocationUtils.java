@@ -43,7 +43,7 @@ abstract class InvocationUtils {
   }
 
   static <T> Optional<T> findRequestMappingValue(
-      Object obj,
+      Object obj, // can be method or target class
       Predicate<RequestMapping> condition,
       Function<RequestMapping, T> selector) {
 

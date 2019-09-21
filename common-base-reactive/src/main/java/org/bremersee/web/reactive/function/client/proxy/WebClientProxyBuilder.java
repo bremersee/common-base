@@ -25,9 +25,6 @@ import java.util.Map;
 import javax.validation.constraints.NotNull;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.reactive.function.client.WebClient;
-import org.springframework.web.util.DefaultUriBuilderFactory;
-import org.springframework.web.util.UriBuilder;
-import org.springframework.web.util.UriBuilderFactory;
 
 /**
  * @author Christian Bremer
@@ -36,8 +33,6 @@ import org.springframework.web.util.UriBuilderFactory;
 public interface WebClientProxyBuilder {
 
   WebClientProxyBuilder webClient(WebClient webClient);
-
-  WebClientProxyBuilder uriBuilderFactory(UriBuilderFactory uriBuilderFactory);
 
   WebClientProxyBuilder commonFunctions(InvocationFunctions functions);
 
@@ -57,17 +52,9 @@ public interface WebClientProxyBuilder {
 
     private WebClient webClient;
 
-    private UriBuilderFactory uriBuilderFactory;
-
     @Override
     public WebClientProxyBuilder webClient(final WebClient webClient) {
       this.webClient = webClient;
-      return this;
-    }
-
-    @Override
-    public WebClientProxyBuilder uriBuilderFactory(final UriBuilderFactory uriBuilderFactory) {
-      this.uriBuilderFactory = uriBuilderFactory;
       return this;
     }
 
@@ -91,14 +78,11 @@ public interface WebClientProxyBuilder {
     @Override
     public <T> T build(final Class<T> target) {
 
-      final UriBuilder uriBuilder = uriBuilderFactory != null
-          ? uriBuilderFactory.builder()
-          : new DefaultUriBuilderFactory().builder();
       final InvocationHandler handler = new WebClientInvocationHandler(
           Collections.unmodifiableMap(methodFunctions),
           commonFunctions,
           webClient != null ? webClient : WebClient.builder().build(),
-          uriBuilder);
+          target);
       //noinspection unchecked
       return (T) Proxy.newProxyInstance(target.getClassLoader(), new Class<?>[]{target}, handler);
     }

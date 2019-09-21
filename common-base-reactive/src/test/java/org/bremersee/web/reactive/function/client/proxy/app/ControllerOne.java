@@ -24,7 +24,11 @@ import reactor.core.publisher.Mono;
  */
 public interface ControllerOne {
 
+  String OK_RESPONSE = "OK";
+
   @GetMapping
   Mono<String> simpleGet();
+
+
 
 }

@@ -28,7 +28,7 @@ import lombok.Getter;
 @SuppressWarnings("WeakerAccess")
 public class InvocationParameters {
 
-  private Object proxy;
+  private Class<?> targetClass;
 
   private Method method;
 

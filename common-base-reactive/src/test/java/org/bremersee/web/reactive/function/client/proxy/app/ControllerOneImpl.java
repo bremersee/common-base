@@ -27,6 +27,6 @@ public class ControllerOneImpl implements ControllerOne {
 
   @Override
   public Mono<String> simpleGet() {
-    return Mono.just("Hello");
+    return Mono.just(OK_RESPONSE);
   }
 }

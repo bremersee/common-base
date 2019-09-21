@@ -19,15 +19,16 @@ package org.bremersee.web.reactive.function.client.proxy;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.util.Map;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClient.RequestBodyUriSpec;
 import org.springframework.web.reactive.function.client.WebClient.RequestHeadersUriSpec;
 import org.springframework.web.reactive.function.client.WebClient.ResponseSpec;
-import org.springframework.web.util.UriBuilder;
 
 /**
  * @author Christian Bremer
  */
+@Slf4j
 class WebClientInvocationHandler implements InvocationHandler {
 
   private final Map<MethodDescription, InvocationFunctions> methodFunctions;
@@ -36,29 +37,29 @@ class WebClientInvocationHandler implements InvocationHandler {
 
   private final WebClient webClient;
 
-  private final UriBuilder uriBuilder;
+  private final Class<?> targetClass;
 
   WebClientInvocationHandler(
       final Map<MethodDescription, InvocationFunctions> methodFunctions,
       final InvocationFunctions commonFunctions,
       final WebClient webClient,
-      final UriBuilder uriBuilder) {
+      final Class<?> targetClass) {
     this.methodFunctions = methodFunctions;
     this.commonFunctions = commonFunctions;
     this.webClient = webClient;
-    this.uriBuilder = uriBuilder;
+    this.targetClass = targetClass;
   }
 
   @Override
   public Object invoke(final Object proxy, final Method method, final Object[] args) {
-    final InvocationParameters parameters = new InvocationParameters(proxy, method, args);
+    final InvocationParameters parameters = new InvocationParameters(targetClass, method, args);
     final InvocationFunctions functions = InvocationFunctions.merge(
         commonFunctions,
         methodFunctions.get(new MethodDescription(method)));
     final RequestHeadersUriSpec<?> uriSpec = functions.getUriSpecBuilder()
         .build(parameters, webClient);
     uriSpec
-        .uri(functions.getUriBuilder().build(parameters, uriBuilder))
+        .uri(uriBuilder -> functions.getUriBuilder().build(parameters, uriBuilder))
         .headers(
             httpHeaders -> functions.getHeadersBuilder().build(parameters, httpHeaders))
         .cookies(cookies -> functions.getCookiesBuilder().build(parameters, cookies));
@@ -67,6 +68,6 @@ class WebClientInvocationHandler implements InvocationHandler {
     }
     final ResponseSpec responseSpec = uriSpec.retrieve();
     responseSpec.onStatus(functions.getErrorDetector(), functions.getErrorDecoder());
-    return functions.getResponseBuilder();
+    return functions.getResponseBuilder().build(parameters, responseSpec);
   }
 }

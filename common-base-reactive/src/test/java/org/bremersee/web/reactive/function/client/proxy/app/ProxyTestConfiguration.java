@@ -16,14 +16,19 @@
 
 package org.bremersee.web.reactive.function.client.proxy.app;
 
+import org.springframework.boot.SpringBootConfiguration;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.autoconfigure.security.reactive.ReactiveSecurityAutoConfiguration;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.web.reactive.config.EnableWebFlux;
+
 /**
  * @author Christian Bremer
  */
-//@SpringBootConfiguration
-//@EnableAutoConfiguration(exclude = { ServletWebServerFactoryAutoConfiguration.class })
-//@EnableWebFlux
-//@ComponentScan(basePackageClasses = {ControllerOne.class})
-//@Import({WebFluxAutoConfiguration.class})
+@SpringBootConfiguration
+@EnableAutoConfiguration(exclude = {ReactiveSecurityAutoConfiguration.class})
+@EnableWebFlux
+@ComponentScan(basePackageClasses = {ControllerOne.class})
 public class ProxyTestConfiguration {
 
 }
