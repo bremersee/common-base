@@ -11,7 +11,7 @@
   </parent>
 
   <artifactId>common-base</artifactId>
-  <packaging>jar</packaging>
+  <packaging>pom</packaging>
 
   <name>common-base</name>
   <description>Common Base</description>
@@ -141,6 +141,24 @@
     <dependency>
       <groupId>org.springframework.security</groupId>
       <artifactId>spring-security-test</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <!--
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-web</artifactId>
+      <scope>test</scope>
+    </dependency>
+    -->
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-webflux</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-reactor-netty</artifactId>
       <scope>test</scope>
     </dependency>
   </dependencies>
