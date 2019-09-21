@@ -83,8 +83,8 @@ public interface RequestUriSpecBuilder {
       if (findAnnotation(method, DeleteMapping.class) != null) {
         return webClient.delete();
       }
-      throw ServiceException.internalServerError("Cannot find request method or "
-          + method.getName());
+      throw ServiceException.internalServerError("Cannot find request method on method '"
+          + method.getName() + "'.");
     }
   }
 

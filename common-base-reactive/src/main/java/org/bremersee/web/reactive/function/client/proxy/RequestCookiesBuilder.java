@@ -21,6 +21,7 @@ import static org.bremersee.web.reactive.function.client.proxy.InvocationUtils.p
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import org.springframework.util.MultiValueMap;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.CookieValue;
 
 /**
@@ -48,7 +49,7 @@ public interface RequestCookiesBuilder {
         for (final Annotation annotation : parameterAnnotations[i]) {
           if (annotation instanceof CookieValue) {
             final CookieValue param = (CookieValue) annotation;
-            final String name = param.name();
+            final String name = StringUtils.hasText(param.value()) ? param.value() : param.name();
             final Object value = args[i];
             putToMultiValueMap(name, value, cookies);
           }

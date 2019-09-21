@@ -16,8 +16,10 @@
 
 package org.bremersee.web.reactive.function.client.proxy;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -27,12 +29,16 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.util.MultiValueMap;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.util.UriBuilder;
 
 /**
  * @author Christian Bremer
@@ -40,6 +46,150 @@ import org.springframework.web.bind.annotation.RequestMapping;
 abstract class InvocationUtils {
 
   private InvocationUtils() {
+  }
+
+  static String getRequestPath(final Class<?> cls, final Method method) {
+
+    // Request mapping on class
+    String clsPath = findRequestMappingValue(cls, a -> a.value().length > 0, a -> a.value()[0])
+        .orElseGet(() -> findRequestMappingValue(cls, a -> a.path().length > 0, a -> a.path()[0])
+            .orElse(""));
+
+    // Request mapping on method
+    String mPath = findRequestMappingValue(method, a -> a.value().length > 0, a -> a.value()[0])
+        .orElseGet(() -> findRequestMappingValue(method, a -> a.path().length > 0, a -> a.path()[0])
+            .orElse(""));
+    if (StringUtils.hasText(mPath)) {
+      return clsPath + mPath;
+    }
+
+    // Get mapping on method
+    mPath = findGetMappingValue(method, a -> a.value().length > 0, a -> a.value()[0])
+        .orElseGet(() -> findGetMappingValue(method, a -> a.path().length > 0, a -> a.path()[0])
+            .orElse(""));
+    if (StringUtils.hasText(mPath)) {
+      return clsPath + mPath;
+    }
+
+    // Post mapping on method
+    mPath = findPostMappingValue(method, a -> a.value().length > 0, a -> a.value()[0])
+        .orElseGet(() -> findPostMappingValue(method, a -> a.path().length > 0, a -> a.path()[0])
+            .orElse(""));
+    if (StringUtils.hasText(mPath)) {
+      return clsPath + mPath;
+    }
+
+    // Put mapping on method
+    mPath = findPutMappingValue(method, a -> a.value().length > 0, a -> a.value()[0])
+        .orElseGet(() -> findPutMappingValue(method, a -> a.path().length > 0, a -> a.path()[0])
+            .orElse(""));
+    if (StringUtils.hasText(mPath)) {
+      return clsPath + mPath;
+    }
+
+    // Patch mapping on method
+    mPath = findPatchMappingValue(method, a -> a.value().length > 0, a -> a.value()[0])
+        .orElseGet(() -> findPatchMappingValue(method, a -> a.path().length > 0, a -> a.path()[0])
+            .orElse(""));
+    if (StringUtils.hasText(mPath)) {
+      return clsPath + mPath;
+    }
+
+    // Delete mapping on method
+    mPath = findDeleteMappingValue(method, a -> a.value().length > 0, a -> a.value()[0])
+        .orElseGet(() -> findDeleteMappingValue(method, a -> a.path().length > 0, a -> a.path()[0])
+            .orElse(""));
+
+    return clsPath + mPath;
+  }
+
+  static Map<String, Object> getPathVariables(final Method method, final Object[] args) {
+    final Map<String, Object> values = new HashMap<>();
+    final Annotation[][] parameterAnnotations = method.getParameterAnnotations();
+    for (int i = 0; i < parameterAnnotations.length; i++) {
+      for (final Annotation annotation : parameterAnnotations[i]) {
+        if (annotation instanceof PathVariable) {
+          final PathVariable param = (PathVariable) annotation;
+          final String name = StringUtils.hasText(param.value()) ? param.value() : param.name();
+          final Object value = args[i];
+          values.put(name, value);
+        }
+      }
+    }
+    return values;
+  }
+
+  @SuppressWarnings("WeakerAccess")
+  static Map<String, Object[]> getRequestParams(final Method method, final Object[] args) {
+    final Map<String, Object[]> values = new HashMap<>();
+    final Annotation[][] parameterAnnotations = method.getParameterAnnotations();
+    for (int i = 0; i < parameterAnnotations.length; i++) {
+      for (final Annotation annotation : parameterAnnotations[i]) {
+        if (annotation instanceof RequestParam) {
+          final RequestParam param = (RequestParam) annotation;
+          final String name = StringUtils.hasText(param.value()) ? param.value() : param.name();
+          final Object value = args[i];
+          if (value instanceof Map) {
+            final Map<?, ?> map = (Map) value;
+            for (Map.Entry<?, ?> entry : map.entrySet()) {
+              final String key = String.valueOf(entry.getKey());
+              final Object mapValue = entry.getValue();
+              if (mapValue instanceof Collection) {
+                values.put(key, ((Collection<?>) mapValue).toArray(new Object[0]));
+              } else {
+                values.put(key, new Object[]{mapValue});
+              }
+            }
+          } else if (value instanceof Collection) {
+            values.put(name, ((Collection<?>) value).toArray(new Object[0]));
+          } else {
+            values.put(name, new Object[]{value});
+          }
+        }
+      }
+    }
+    return values;
+  }
+
+  static UriBuilder setRequestParams(final Method method, final Object[] args,
+      final UriBuilder uriBuilder) {
+    UriBuilder builder = uriBuilder;
+    for (Map.Entry<String, Object[]> param : getRequestParams(method, args).entrySet()) {
+      builder = builder.queryParam(param.getKey(), param.getValue());
+    }
+    return builder;
+  }
+
+  static String findAcceptHeader(final Method method) {
+    return findRequestMappingValue(
+        method, a -> a.produces().length > 0, a -> a.produces()[0])
+        .orElse(findGetMappingValue(
+            method, a -> a.produces().length > 0, a -> a.produces()[0])
+            .orElse(findPostMappingValue(
+                method, a -> a.produces().length > 0, a -> a.produces()[0])
+                .orElse(findPutMappingValue(
+                    method, a -> a.produces().length > 0, a -> a.produces()[0])
+                    .orElse(findPatchMappingValue(
+                        method, a -> a.produces().length > 0, a -> a.produces()[0])
+                        .orElse(findDeleteMappingValue(
+                            method, a -> a.produces().length > 0, a -> a.produces()[0])
+                            .orElse(null))))));
+  }
+
+  static String findContentTypeHeader(final Method method) {
+    return findRequestMappingValue(
+        method, a -> a.consumes().length > 0, a -> a.consumes()[0])
+        .orElse(findGetMappingValue(
+            method, a -> a.consumes().length > 0, a -> a.consumes()[0])
+            .orElse(findPostMappingValue(
+                method, a -> a.consumes().length > 0, a -> a.consumes()[0])
+                .orElse(findPutMappingValue(
+                    method, a -> a.consumes().length > 0, a -> a.consumes()[0])
+                    .orElse(findPatchMappingValue(
+                        method, a -> a.consumes().length > 0, a -> a.consumes()[0])
+                        .orElse(findDeleteMappingValue(
+                            method, a -> a.consumes().length > 0, a -> a.consumes()[0])
+                            .orElse(null))))));
   }
 
   static <T> Optional<T> findRequestMappingValue(
@@ -62,7 +212,7 @@ abstract class InvocationUtils {
     }
   }
 
-  static <T> Optional<T> findGetMappingValue(Method method, Predicate<GetMapping> condition,
+  private static <T> Optional<T> findGetMappingValue(Method method, Predicate<GetMapping> condition,
       Function<GetMapping, T> selector) {
     return Optional.of(method)
         .map(m -> AnnotationUtils.findAnnotation(m, GetMapping.class))
@@ -70,7 +220,8 @@ abstract class InvocationUtils {
         .map(selector);
   }
 
-  static <T> Optional<T> findPostMappingValue(Method method, Predicate<PostMapping> condition,
+  private static <T> Optional<T> findPostMappingValue(Method method,
+      Predicate<PostMapping> condition,
       Function<PostMapping, T> selector) {
     return Optional.of(method)
         .map(m -> AnnotationUtils.findAnnotation(m, PostMapping.class))
@@ -78,7 +229,7 @@ abstract class InvocationUtils {
         .map(selector);
   }
 
-  static <T> Optional<T> findPutMappingValue(Method method, Predicate<PutMapping> condition,
+  private static <T> Optional<T> findPutMappingValue(Method method, Predicate<PutMapping> condition,
       Function<PutMapping, T> selector) {
     return Optional.of(method)
         .map(m -> AnnotationUtils.findAnnotation(m, PutMapping.class))
@@ -86,7 +237,8 @@ abstract class InvocationUtils {
         .map(selector);
   }
 
-  static <T> Optional<T> findPatchMappingValue(Method method, Predicate<PatchMapping> condition,
+  private static <T> Optional<T> findPatchMappingValue(Method method,
+      Predicate<PatchMapping> condition,
       Function<PatchMapping, T> selector) {
     return Optional.of(method)
         .map(m -> AnnotationUtils.findAnnotation(m, PatchMapping.class))
@@ -94,7 +246,8 @@ abstract class InvocationUtils {
         .map(selector);
   }
 
-  static <T> Optional<T> findDeleteMappingValue(Method method, Predicate<DeleteMapping> condition,
+  private static <T> Optional<T> findDeleteMappingValue(Method method,
+      Predicate<DeleteMapping> condition,
       Function<DeleteMapping, T> selector) {
     return Optional.of(method)
         .map(m -> AnnotationUtils.findAnnotation(m, DeleteMapping.class))

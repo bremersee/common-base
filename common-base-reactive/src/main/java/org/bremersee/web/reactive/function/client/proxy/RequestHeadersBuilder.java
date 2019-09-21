@@ -16,12 +16,12 @@
 
 package org.bremersee.web.reactive.function.client.proxy;
 
-import static org.bremersee.web.reactive.function.client.proxy.InvocationUtils.findRequestMappingValue;
 import static org.bremersee.web.reactive.function.client.proxy.InvocationUtils.putToMultiValueMap;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import org.springframework.http.HttpHeaders;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestHeader;
 
 /**
@@ -29,30 +29,34 @@ import org.springframework.web.bind.annotation.RequestHeader;
  */
 public interface RequestHeadersBuilder {
 
-  void addHeaders(InvocationParameters parameters, HttpHeaders headers);
+  void setHeaders(InvocationParameters parameters, HttpHeaders headers);
 
   default void build(InvocationParameters parameters, HttpHeaders headers) {
-    addAccepts(parameters, headers);
-    addContentType(parameters, headers);
-    addHeaders(parameters, headers);
+    setAcceptHeader(parameters, headers);
+    setContentTypeHeader(parameters, headers);
+    setHeaders(parameters, headers);
   }
 
-  default void addAccepts(final InvocationParameters parameters, final HttpHeaders headers) {
+  default void setAcceptHeader(
+      final InvocationParameters parameters,
+      final HttpHeaders headers) {
+
     final Method method = parameters.getMethod();
-    findRequestMappingValue(
-        method,
-        mapping -> mapping.produces().length > 0,
-        mapping -> mapping.produces()[0])
-        .ifPresent(accepts -> headers.set(HttpHeaders.ACCEPT, accepts));
+    final String value = InvocationUtils.findAcceptHeader(method);
+    if (StringUtils.hasText(value)) {
+      headers.set(HttpHeaders.ACCEPT, value);
+    }
   }
 
-  default void addContentType(final InvocationParameters parameters, final HttpHeaders headers) {
+  default void setContentTypeHeader(
+      final InvocationParameters parameters,
+      final HttpHeaders headers) {
+
     final Method method = parameters.getMethod();
-    findRequestMappingValue(
-        method,
-        mapping -> mapping.consumes().length > 0,
-        mapping -> mapping.consumes()[0])
-        .ifPresent(accepts -> headers.set(HttpHeaders.CONTENT_TYPE, accepts));
+    final String value = InvocationUtils.findContentTypeHeader(method);
+    if (StringUtils.hasText(value)) {
+      headers.set(HttpHeaders.CONTENT_TYPE, value);
+    }
   }
 
   static RequestHeadersBuilder defaultBuilder() {
@@ -62,7 +66,7 @@ public interface RequestHeadersBuilder {
   class Default implements RequestHeadersBuilder {
 
     @Override
-    public void addHeaders(final InvocationParameters parameters, final HttpHeaders headers) {
+    public void setHeaders(final InvocationParameters parameters, final HttpHeaders headers) {
       final Method method = parameters.getMethod();
       final Object[] args = parameters.getArgs();
       final Annotation[][] parameterAnnotations = method.getParameterAnnotations();
@@ -70,7 +74,7 @@ public interface RequestHeadersBuilder {
         for (final Annotation annotation : parameterAnnotations[i]) {
           if (annotation instanceof RequestHeader) {
             final RequestHeader param = (RequestHeader) annotation;
-            final String name = param.name();
+            final String name = StringUtils.hasText(param.value()) ? param.value() : param.name();
             final Object value = args[i];
             putToMultiValueMap(name, value, headers);
           }
