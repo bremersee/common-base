@@ -23,6 +23,8 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.web.reactive.config.EnableWebFlux;
 
 /**
+ * The test configuration to test the web client proxy builder.
+ *
  * @author Christian Bremer
  */
 @SpringBootConfiguration

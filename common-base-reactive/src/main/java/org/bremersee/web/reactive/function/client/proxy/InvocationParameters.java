@@ -21,6 +21,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 /**
+ * The invocation parameters.
+ *
  * @author Christian Bremer
  */
 @Getter

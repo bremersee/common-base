@@ -27,6 +27,8 @@ import org.bremersee.web.reactive.function.client.WebClientErrorDecoder;
 import org.springframework.http.HttpStatus;
 
 /**
+ * The invocation functions.
+ *
  * @author Christian Bremer
  */
 @Getter
@@ -61,6 +63,18 @@ public class InvocationFunctions {
         RequestResponseBuilder.defaultBuilder());
   }
 
+  /**
+   * Instantiates new invocation functions.
+   *
+   * @param uriSpecBuilder  the uri spec builder
+   * @param uriBuilder      the uri builder
+   * @param headersBuilder  the headers builder
+   * @param cookiesBuilder  the cookies builder
+   * @param bodyInserter    the body inserter
+   * @param errorDetector   the error detector
+   * @param errorDecoder    the error decoder
+   * @param responseBuilder the response builder
+   */
   @Builder
   public InvocationFunctions(
       final RequestUriSpecBuilder uriSpecBuilder,
@@ -81,6 +95,13 @@ public class InvocationFunctions {
     this.responseBuilder = responseBuilder;
   }
 
+  /**
+   * Merge invocation functions.
+   *
+   * @param commonFunctions the common functions
+   * @param methodFunctions the method functions
+   * @return the invocation functions
+   */
   static InvocationFunctions merge(
       final InvocationFunctions commonFunctions,
       final InvocationFunctions methodFunctions) {

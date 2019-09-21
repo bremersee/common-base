@@ -30,16 +30,33 @@ import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClient.RequestHeadersUriSpec;
 
 /**
+ * The request uri spec builder.
+ *
  * @author Christian Bremer
  */
 public interface RequestUriSpecBuilder {
 
+  /**
+   * Build request headers uri spec.
+   *
+   * @param parameters the parameters
+   * @param webClient  the web client
+   * @return the request headers uri spec
+   */
   RequestHeadersUriSpec<?> build(InvocationParameters parameters, WebClient webClient);
 
+  /**
+   * Default request uri spec builder.
+   *
+   * @return the request uri spec builder
+   */
   static RequestUriSpecBuilder defaultBuilder() {
     return new Default();
   }
 
+  /**
+   * The default request uri spec builder.
+   */
   class Default implements RequestUriSpecBuilder {
 
     @Override

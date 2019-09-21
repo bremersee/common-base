@@ -41,6 +41,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.util.UriBuilder;
 
 /**
+ * The invocation utils.
+ *
  * @author Christian Bremer
  */
 abstract class InvocationUtils {
@@ -48,16 +50,23 @@ abstract class InvocationUtils {
   private InvocationUtils() {
   }
 
+  /**
+   * Gets request path.
+   *
+   * @param cls    the cls
+   * @param method the method
+   * @return the request path
+   */
   static String getRequestPath(final Class<?> cls, final Method method) {
 
     // Request mapping on class
     String clsPath = findRequestMappingValue(cls, a -> a.value().length > 0, a -> a.value()[0])
-        .orElseGet(() -> findRequestMappingValue(cls, a -> a.path().length > 0, a -> a.path()[0])
+        .orElse(findRequestMappingValue(cls, a -> a.path().length > 0, a -> a.path()[0])
             .orElse(""));
 
     // Request mapping on method
     String mPath = findRequestMappingValue(method, a -> a.value().length > 0, a -> a.value()[0])
-        .orElseGet(() -> findRequestMappingValue(method, a -> a.path().length > 0, a -> a.path()[0])
+        .orElse(findRequestMappingValue(method, a -> a.path().length > 0, a -> a.path()[0])
             .orElse(""));
     if (StringUtils.hasText(mPath)) {
       return clsPath + mPath;
@@ -65,7 +74,7 @@ abstract class InvocationUtils {
 
     // Get mapping on method
     mPath = findGetMappingValue(method, a -> a.value().length > 0, a -> a.value()[0])
-        .orElseGet(() -> findGetMappingValue(method, a -> a.path().length > 0, a -> a.path()[0])
+        .orElse(findGetMappingValue(method, a -> a.path().length > 0, a -> a.path()[0])
             .orElse(""));
     if (StringUtils.hasText(mPath)) {
       return clsPath + mPath;
@@ -73,7 +82,7 @@ abstract class InvocationUtils {
 
     // Post mapping on method
     mPath = findPostMappingValue(method, a -> a.value().length > 0, a -> a.value()[0])
-        .orElseGet(() -> findPostMappingValue(method, a -> a.path().length > 0, a -> a.path()[0])
+        .orElse(findPostMappingValue(method, a -> a.path().length > 0, a -> a.path()[0])
             .orElse(""));
     if (StringUtils.hasText(mPath)) {
       return clsPath + mPath;
@@ -81,7 +90,7 @@ abstract class InvocationUtils {
 
     // Put mapping on method
     mPath = findPutMappingValue(method, a -> a.value().length > 0, a -> a.value()[0])
-        .orElseGet(() -> findPutMappingValue(method, a -> a.path().length > 0, a -> a.path()[0])
+        .orElse(findPutMappingValue(method, a -> a.path().length > 0, a -> a.path()[0])
             .orElse(""));
     if (StringUtils.hasText(mPath)) {
       return clsPath + mPath;
@@ -89,7 +98,7 @@ abstract class InvocationUtils {
 
     // Patch mapping on method
     mPath = findPatchMappingValue(method, a -> a.value().length > 0, a -> a.value()[0])
-        .orElseGet(() -> findPatchMappingValue(method, a -> a.path().length > 0, a -> a.path()[0])
+        .orElse(findPatchMappingValue(method, a -> a.path().length > 0, a -> a.path()[0])
             .orElse(""));
     if (StringUtils.hasText(mPath)) {
       return clsPath + mPath;
@@ -97,12 +106,19 @@ abstract class InvocationUtils {
 
     // Delete mapping on method
     mPath = findDeleteMappingValue(method, a -> a.value().length > 0, a -> a.value()[0])
-        .orElseGet(() -> findDeleteMappingValue(method, a -> a.path().length > 0, a -> a.path()[0])
+        .orElse(findDeleteMappingValue(method, a -> a.path().length > 0, a -> a.path()[0])
             .orElse(""));
 
     return clsPath + mPath;
   }
 
+  /**
+   * Gets path variables.
+   *
+   * @param method the method
+   * @param args   the args
+   * @return the path variables
+   */
   static Map<String, Object> getPathVariables(final Method method, final Object[] args) {
     final Map<String, Object> values = new HashMap<>();
     final Annotation[][] parameterAnnotations = method.getParameterAnnotations();
@@ -119,6 +135,13 @@ abstract class InvocationUtils {
     return values;
   }
 
+  /**
+   * Gets request params.
+   *
+   * @param method the method
+   * @param args   the args
+   * @return the request params
+   */
   @SuppressWarnings("WeakerAccess")
   static Map<String, Object[]> getRequestParams(final Method method, final Object[] args) {
     final Map<String, Object[]> values = new HashMap<>();
@@ -151,6 +174,14 @@ abstract class InvocationUtils {
     return values;
   }
 
+  /**
+   * Sets request params.
+   *
+   * @param method     the method
+   * @param args       the args
+   * @param uriBuilder the uri builder
+   * @return the request params
+   */
   static UriBuilder setRequestParams(final Method method, final Object[] args,
       final UriBuilder uriBuilder) {
     UriBuilder builder = uriBuilder;
@@ -160,6 +191,12 @@ abstract class InvocationUtils {
     return builder;
   }
 
+  /**
+   * Find accept header string.
+   *
+   * @param method the method
+   * @return the string
+   */
   static String findAcceptHeader(final Method method) {
     return findRequestMappingValue(
         method, a -> a.produces().length > 0, a -> a.produces()[0])
@@ -176,6 +213,12 @@ abstract class InvocationUtils {
                             .orElse(null))))));
   }
 
+  /**
+   * Find content type header string.
+   *
+   * @param method the method
+   * @return the string
+   */
   static String findContentTypeHeader(final Method method) {
     return findRequestMappingValue(
         method, a -> a.consumes().length > 0, a -> a.consumes()[0])
@@ -192,6 +235,15 @@ abstract class InvocationUtils {
                             .orElse(null))))));
   }
 
+  /**
+   * Find request mapping value optional.
+   *
+   * @param <T>       the type parameter
+   * @param obj       the obj
+   * @param condition the condition
+   * @param selector  the selector
+   * @return the optional
+   */
   static <T> Optional<T> findRequestMappingValue(
       Object obj, // can be method or target class
       Predicate<RequestMapping> condition,
@@ -255,6 +307,13 @@ abstract class InvocationUtils {
         .map(selector);
   }
 
+  /**
+   * Put to multi value map.
+   *
+   * @param name          the name
+   * @param value         the value
+   * @param multiValueMap the multi value map
+   */
   static void putToMultiValueMap(
       final String name,
       final Object value,

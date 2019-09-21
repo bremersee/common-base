@@ -20,6 +20,8 @@ import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
 
 /**
+ * Test Controller two implementation.
+ *
  * @author Christian Bremer
  */
 @RestController

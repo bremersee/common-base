@@ -25,16 +25,33 @@ import java.net.URI;
 import org.springframework.web.util.UriBuilder;
 
 /**
+ * The request uri builder.
+ *
  * @author Christian Bremer
  */
 public interface RequestUriBuilder {
 
+  /**
+   * Build uri.
+   *
+   * @param parameters the parameters
+   * @param uriBuilder the uri builder
+   * @return the uri
+   */
   URI build(InvocationParameters parameters, UriBuilder uriBuilder);
 
+  /**
+   * Default request uri builder.
+   *
+   * @return the request uri builder
+   */
   static RequestUriBuilder defaultBuilder() {
     return new Default();
   }
 
+  /**
+   * The default request response builder.
+   */
   class Default implements RequestUriBuilder {
 
     @Override

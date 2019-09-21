@@ -27,23 +27,59 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.reactive.function.client.WebClient;
 
 /**
+ * The web client proxy builder.
+ *
  * @author Christian Bremer
  */
 @Validated
 public interface WebClientProxyBuilder {
 
+  /**
+   * Sets web client.
+   *
+   * @param webClient the web client
+   * @return the web client proxy builder
+   */
   WebClientProxyBuilder webClient(WebClient webClient);
 
+  /**
+   * Sets common functions.
+   *
+   * @param functions the functions
+   * @return the web client proxy builder
+   */
   WebClientProxyBuilder commonFunctions(InvocationFunctions functions);
 
+  /**
+   * Sets method functions.
+   *
+   * @param method    the method
+   * @param functions the functions
+   * @return the web client proxy builder
+   */
   WebClientProxyBuilder methodFunctions(Method method, InvocationFunctions functions);
 
+  /**
+   * Build the proxy.
+   *
+   * @param <T>    the type of the target
+   * @param target the target
+   * @return the proxy
+   */
   <T> T build(@NotNull Class<T> target);
 
+  /**
+   * Default web client proxy builder.
+   *
+   * @return the web client proxy builder
+   */
   static WebClientProxyBuilder defaultBuilder() {
     return new Default();
   }
 
+  /**
+   * The default web client proxy builder.
+   */
   class Default implements WebClientProxyBuilder {
 
     private final Map<MethodDescription, InvocationFunctions> methodFunctions = new HashMap<>();

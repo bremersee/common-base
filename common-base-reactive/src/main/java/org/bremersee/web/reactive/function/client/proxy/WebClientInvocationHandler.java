@@ -26,6 +26,8 @@ import org.springframework.web.reactive.function.client.WebClient.RequestHeaders
 import org.springframework.web.reactive.function.client.WebClient.ResponseSpec;
 
 /**
+ * The web client invocation handler.
+ *
  * @author Christian Bremer
  */
 @Slf4j
@@ -39,6 +41,14 @@ class WebClientInvocationHandler implements InvocationHandler {
 
   private final Class<?> targetClass;
 
+  /**
+   * Instantiates a new web client invocation handler.
+   *
+   * @param methodFunctions the method functions
+   * @param commonFunctions the common functions
+   * @param webClient       the web client
+   * @param targetClass     the target class
+   */
   WebClientInvocationHandler(
       final Map<MethodDescription, InvocationFunctions> methodFunctions,
       final InvocationFunctions commonFunctions,

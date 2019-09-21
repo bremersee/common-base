@@ -27,16 +27,32 @@ import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient.RequestBodyUriSpec;
 
 /**
+ * The request body inserter.
+ *
  * @author Christian Bremer
  */
 public interface RequestBodyInserter {
 
+  /**
+   * Insert.
+   *
+   * @param parameters the parameters
+   * @param uriSpec    the uri spec
+   */
   void insert(InvocationParameters parameters, RequestBodyUriSpec uriSpec);
 
+  /**
+   * Default request body inserter.
+   *
+   * @return the request body inserter
+   */
   static RequestBodyInserter defaultInserter() {
     return new Default();
   }
 
+  /**
+   * The default request body inserter.
+   */
   class Default implements RequestBodyInserter {
 
     @Override

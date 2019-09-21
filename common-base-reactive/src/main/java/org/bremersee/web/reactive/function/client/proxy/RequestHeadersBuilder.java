@@ -25,18 +25,38 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestHeader;
 
 /**
+ * The request headers builder.
+ *
  * @author Christian Bremer
  */
 public interface RequestHeadersBuilder {
 
+  /**
+   * Sets headers.
+   *
+   * @param parameters the parameters
+   * @param headers    the headers
+   */
   void setHeaders(InvocationParameters parameters, HttpHeaders headers);
 
+  /**
+   * Build.
+   *
+   * @param parameters the parameters
+   * @param headers    the headers
+   */
   default void build(InvocationParameters parameters, HttpHeaders headers) {
     setAcceptHeader(parameters, headers);
     setContentTypeHeader(parameters, headers);
     setHeaders(parameters, headers);
   }
 
+  /**
+   * Sets accept header.
+   *
+   * @param parameters the parameters
+   * @param headers    the headers
+   */
   default void setAcceptHeader(
       final InvocationParameters parameters,
       final HttpHeaders headers) {
@@ -48,6 +68,12 @@ public interface RequestHeadersBuilder {
     }
   }
 
+  /**
+   * Sets content type header.
+   *
+   * @param parameters the parameters
+   * @param headers    the headers
+   */
   default void setContentTypeHeader(
       final InvocationParameters parameters,
       final HttpHeaders headers) {
@@ -59,10 +85,18 @@ public interface RequestHeadersBuilder {
     }
   }
 
+  /**
+   * Default request headers builder.
+   *
+   * @return the request headers builder
+   */
   static RequestHeadersBuilder defaultBuilder() {
     return new Default();
   }
 
+  /**
+   * The default request headers builder.
+   */
   class Default implements RequestHeadersBuilder {
 
     @Override

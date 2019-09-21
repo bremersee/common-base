@@ -25,16 +25,33 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 /**
+ * The request response builder.
+ *
  * @author Christian Bremer
  */
 public interface RequestResponseBuilder {
 
+  /**
+   * Build object.
+   *
+   * @param parameters   the parameters
+   * @param responseSpec the response spec
+   * @return the object
+   */
   Object build(final InvocationParameters parameters, final ResponseSpec responseSpec);
 
+  /**
+   * Default request response builder.
+   *
+   * @return the request response builder
+   */
   static RequestResponseBuilder defaultBuilder() {
     return new Default();
   }
 
+  /**
+   * The default request response builder.
+   */
   class Default implements RequestResponseBuilder {
 
     @Override

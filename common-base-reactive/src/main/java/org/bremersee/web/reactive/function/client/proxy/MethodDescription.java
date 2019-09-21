@@ -23,6 +23,8 @@ import lombok.ToString;
 import org.springframework.util.Assert;
 
 /**
+ * The method description.
+ *
  * @author Christian Bremer
  */
 @Getter
@@ -36,6 +38,11 @@ class MethodDescription {
 
   private final Class<?> responseType;
 
+  /**
+   * Instantiates a new method description.
+   *
+   * @param method the method
+   */
   MethodDescription(final Method method) {
     Assert.notNull(method, "Method must not be null");
     this.methodName = method.getName();

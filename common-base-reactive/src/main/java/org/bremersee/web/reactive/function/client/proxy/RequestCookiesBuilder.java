@@ -25,16 +25,32 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.CookieValue;
 
 /**
+ * The request cookies builder.
+ *
  * @author Christian Bremer
  */
 public interface RequestCookiesBuilder {
 
+  /**
+   * Build.
+   *
+   * @param parameters the parameters
+   * @param cookies    the cookies
+   */
   void build(InvocationParameters parameters, MultiValueMap<String, String> cookies);
 
+  /**
+   * Default request cookies builder.
+   *
+   * @return the request cookies builder
+   */
   static RequestCookiesBuilder defaultBuilder() {
     return new Default();
   }
 
+  /**
+   * The default request cookies builder.
+   */
   class Default implements RequestCookiesBuilder {
 
     @Override

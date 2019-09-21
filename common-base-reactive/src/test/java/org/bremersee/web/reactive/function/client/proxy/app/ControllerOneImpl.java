@@ -26,6 +26,8 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 /**
+ * Test controller one implementation.
+ *
  * @author Christian Bremer
  */
 @RestController

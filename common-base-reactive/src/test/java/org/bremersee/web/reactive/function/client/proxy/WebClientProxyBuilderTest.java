@@ -24,6 +24,8 @@ import reactor.test.StepVerifier;
 
 
 /**
+ * The web client proxy builder test.
+ *
  * @author Christian Bremer
  */
 @RunWith(SpringRunner.class)
@@ -63,12 +65,18 @@ public class WebClientProxyBuilderTest {
         .build(ControllerTwo.class);
   }
 
+  /**
+   * Call with web test client.
+   */
   @Test
   public void callWithWebTestClient() {
     webClient.get().uri("/").exchange().expectStatus().isOk().expectBody(String.class)
         .isEqualTo(OK_RESPONSE);
   }
 
+  /**
+   * Call with web client.
+   */
   @Test
   public void callWithWebClient() {
     StepVerifier
@@ -78,6 +86,9 @@ public class WebClientProxyBuilderTest {
         .verifyComplete();
   }
 
+  /**
+   * Simple get.
+   */
   @Test
   public void simpleGet() {
     StepVerifier.create(newControllerOneClient().simpleGet())
@@ -86,6 +97,9 @@ public class WebClientProxyBuilderTest {
         .verifyComplete();
   }
 
+  /**
+   * Do get.
+   */
   @Test
   public void doGet() {
     StepVerifier.create(newControllerOneClient().getOks())
@@ -96,6 +110,9 @@ public class WebClientProxyBuilderTest {
         .verifyComplete();
   }
 
+  /**
+   * Do post.
+   */
   @Test
   public void doPost() {
     MultiValueMap<String, String> form = new LinkedMultiValueMap<>();
@@ -106,6 +123,9 @@ public class WebClientProxyBuilderTest {
         .verifyComplete();
   }
 
+  /**
+   * Do put.
+   */
   @Test
   public void doPut() {
     StepVerifier.create(newControllerOneClient().updateOk("value", "ok"))
@@ -114,6 +134,9 @@ public class WebClientProxyBuilderTest {
         .verifyComplete();
   }
 
+  /**
+   * Do patch.
+   */
   @Test
   public void doPatch() {
     StepVerifier.create(newControllerOneClient().patchOk("name", "suffix", "payload"))
@@ -125,6 +148,9 @@ public class WebClientProxyBuilderTest {
         .verifyThenAssertThat();
   }
 
+  /**
+   * Do delete.
+   */
   @Test
   public void doDelete() {
     StepVerifier.create(newControllerOneClient().deleteOk("value"))
@@ -133,6 +159,9 @@ public class WebClientProxyBuilderTest {
         .verifyComplete();
   }
 
+  /**
+   * Upload.
+   */
   @Test
   public void upload() {
     MultiValueMap<String, String> data = new LinkedMultiValueMap<>();
@@ -150,6 +179,9 @@ public class WebClientProxyBuilderTest {
         .verifyComplete();
   }
 
+  /**
+   * Say hello with name.
+   */
   @Test
   public void sayHelloWithName() {
     StepVerifier.create(newControllerTwoClient().sayHello("Anna"))
@@ -158,6 +190,9 @@ public class WebClientProxyBuilderTest {
         .verifyComplete();
   }
 
+  /**
+   * Say hello without name.
+   */
   @Test
   public void sayHelloWithoutName() {
     StepVerifier.create(newControllerTwoClient().sayHello(null))
@@ -166,6 +201,9 @@ public class WebClientProxyBuilderTest {
         .verifyComplete();
   }
 
+  /**
+   * Say hello to.
+   */
   @Test
   public void sayHelloTo() {
     StepVerifier.create(newControllerTwoClient().sayHelloTo("Anna Livia"))
@@ -174,6 +212,9 @@ public class WebClientProxyBuilderTest {
         .verifyComplete();
   }
 
+  /**
+   * Sets name.
+   */
   @Test
   public void setName() {
     StepVerifier.create(newControllerTwoClient().setName("Anna Livia"))
@@ -182,6 +223,9 @@ public class WebClientProxyBuilderTest {
         .verifyComplete();
   }
 
+  /**
+   * Sets no name.
+   */
   @Test
   public void setNoName() {
     StepVerifier.create(newControllerTwoClient().setName(null))

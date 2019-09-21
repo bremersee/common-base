@@ -27,17 +27,37 @@ import org.springframework.web.bind.annotation.RequestParam;
 import reactor.core.publisher.Mono;
 
 /**
+ * Test controller two.
+ *
  * @author Christian Bremer
  */
 @RequestMapping("/some/base/path")
 public interface ControllerTwo {
 
+  /**
+   * Say hello mono.
+   *
+   * @param name the name
+   * @return the mono
+   */
   @RequestMapping(method = RequestMethod.GET)
   Mono<String> sayHello(@RequestParam(value = "name", defaultValue = "Tom") String name);
 
+  /**
+   * Say hello to mono.
+   *
+   * @param name the name
+   * @return the mono
+   */
   @GetMapping("/greeting/{name}")
   Mono<String> sayHelloTo(@PathVariable(value = "name") String name);
 
+  /**
+   * Sets name.
+   *
+   * @param name the name
+   * @return the name
+   */
   @PostMapping("/name")
   default Mono<String> setName(@RequestBody(required = false) String name) {
     return StringUtils.hasText(name) ? Mono.just(name) : Mono.just("null");

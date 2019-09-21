@@ -35,29 +35,65 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 /**
+ * Test controller one.
+ *
  * @author Christian Bremer
  */
 public interface ControllerOne {
 
+  /**
+   * The constant OK_RESPONSE.
+   */
   String OK_RESPONSE = "OK";
 
+  /**
+   * Simple get mono.
+   *
+   * @return the mono
+   */
   @GetMapping
   Mono<String> simpleGet();
 
+  /**
+   * Gets oks.
+   *
+   * @return the oks
+   */
   @GetMapping(path = "/api/oks", produces = MediaType.APPLICATION_JSON_VALUE)
   Flux<Map<String, Object>> getOks();
 
+  /**
+   * Add ok mono.
+   *
+   * @param form the form
+   * @return the mono
+   */
   @PostMapping(path = "/api/oks",
       produces = MediaType.TEXT_PLAIN_VALUE,
       consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
   Mono<String> addOk(@RequestBody MultiValueMap<String, String> form);
 
+  /**
+   * Update ok mono.
+   *
+   * @param name    the name
+   * @param payload the payload
+   * @return the mono
+   */
   @PutMapping(path = "/api/oks/{name}",
       produces = MediaType.TEXT_PLAIN_VALUE,
       consumes = MediaType.TEXT_PLAIN_VALUE)
   Mono<String> updateOk(@PathVariable("name") String name,
       @RequestBody String payload);
 
+  /**
+   * Patch ok mono.
+   *
+   * @param name    the name
+   * @param suffix  the suffix
+   * @param payload the payload
+   * @return the mono
+   */
   @PatchMapping(path = "/api/oks/{name}",
       consumes = MediaType.TEXT_PLAIN_VALUE)
   Mono<Void> patchOk(
@@ -65,9 +101,23 @@ public interface ControllerOne {
       @RequestParam(name = "suffix") String suffix,
       @RequestBody String payload);
 
+  /**
+   * Delete ok mono.
+   *
+   * @param name the name
+   * @return the mono
+   */
   @DeleteMapping(path = "/api/oks/{name}", produces = MediaType.APPLICATION_JSON_VALUE)
   Mono<Boolean> deleteOk(@PathVariable("name") String name);
 
+  /**
+   * Upload mono.
+   *
+   * @param xHeaderValue the x header value
+   * @param lastValue    the last value
+   * @param data         the data
+   * @return the mono
+   */
   @RequestMapping(path = "/upload",
       method = RequestMethod.POST,
       consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE,
