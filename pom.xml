@@ -21,8 +21,8 @@
   <modules>
     <module>common-base</module>
     <module>common-base-test</module>
-    <module>common-base-web</module>
-    <module>common-base-webflux</module>
+    <module>common-base-servlet</module>
+    <module>common-base-reactive</module>
     <module>common-base-ldaptive</module>
   </modules>
 

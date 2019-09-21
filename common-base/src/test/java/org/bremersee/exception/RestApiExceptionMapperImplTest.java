@@ -22,20 +22,13 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
-import java.time.OffsetDateTime;
-import java.time.ZoneId;
 import java.util.Collections;
 import org.bremersee.exception.RestApiExceptionMapperProperties.ExceptionMapping;
 import org.bremersee.exception.RestApiExceptionMapperProperties.ExceptionMappingConfig;
 import org.bremersee.exception.model.RestApiException;
-import org.bremersee.web.reactive.function.client.WebClientException;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
 
 /**
  * The rest api exception mapper impl test.
@@ -92,39 +85,6 @@ public class RestApiExceptionMapperImplTest {
     assertEquals(exception.getMessage(), model.getMessage());
     assertEquals("/api/something", model.getPath());
     assertNotNull(model.getId());
-  }
-
-  /**
-   * Test build with cause.
-   */
-  @Test
-  public void testBuildWithCause() {
-    final MultiValueMap<String, String> headers = new LinkedMultiValueMap<>();
-    headers.add(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE);
-
-    final RestApiException cause = new RestApiException();
-    cause.setApplication("cause");
-    cause.setClassName(ServiceException.class.getName());
-    cause.setErrorCode("CBR:0123");
-    cause.setErrorCodeInherited(false);
-    cause.setId("1");
-    cause.setMessage("Something failed in service 'cause'");
-    cause.setPath("/api/cause");
-    cause.setTimestamp(OffsetDateTime.now(ZoneId.of("UTC")));
-
-    final WebClientException exception = new WebClientException(
-        HttpStatus.INTERNAL_SERVER_ERROR,
-        Collections.unmodifiableMap(headers),
-        cause);
-
-    final RestApiException model = mapper.build(exception, "/api/this", null);
-    assertNotNull(model);
-    assertEquals(cause.getErrorCode(), model.getErrorCode());
-    assertTrue(model.getErrorCodeInherited());
-    assertEquals(exception.getMessage(), model.getMessage());
-    assertEquals("/api/this", model.getPath());
-    assertNotNull(model.getId());
-    assertEquals(cause, model.getCause());
   }
 
   /**
