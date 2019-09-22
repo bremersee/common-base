@@ -66,7 +66,9 @@ public interface RequestResponseBuilder {
         final Class<?> typeClass = resolveReturnTypeArgument(method, Flux.class);
         return responseSpec.bodyToFlux(typeClass);
       }
-      throw ServiceException.internalServerError("Response class must be Mono or Flux.");
+      throw ServiceException.internalServerError(
+          "Response class must be Mono or Flux.",
+          "common-base:e3716a97-f1c9-4c70-9eac-d966284d528c");
     }
   }
 

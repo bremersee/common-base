@@ -15,7 +15,7 @@
  */
 
 /**
- * The package contains classes for LDAP operations with the ldaptive framework.
+ * The package contains classes for LDAP operations with the ldaptive library.
  *
  * @author Christian Bremer
  */

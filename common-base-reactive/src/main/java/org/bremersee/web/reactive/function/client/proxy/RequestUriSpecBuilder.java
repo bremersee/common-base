@@ -101,7 +101,8 @@ public interface RequestUriSpecBuilder {
         return webClient.delete();
       }
       throw ServiceException.internalServerError("Cannot find request method on method '"
-          + method.getName() + "'.");
+          + method.getName() + "'.",
+          "common-base:5222f2b4-1810-41bf-acfc-37988571304b");
     }
   }
 
