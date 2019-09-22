@@ -94,13 +94,15 @@ public class LdaptiveTemplate implements LdaptiveOperations {
     } catch (final LdapRuntimeException e) {
       final ServiceException serviceException = new ServiceException(
           HttpStatus.INTERNAL_SERVER_ERROR,
-          "Executing ldap operation failed.",
+          "org.bremersee:base-common-ldaptive:8150d733-cfb2-46a9-94f6-4f3395e7cecf",
           e.getLdapException());
       log.error("Executing ldap operation failed.", serviceException);
       throw serviceException;
     } catch (final LdapException e) {
       final ServiceException serviceException = new ServiceException(
-          HttpStatus.INTERNAL_SERVER_ERROR, "Executing ldap operation failed.", e);
+          HttpStatus.INTERNAL_SERVER_ERROR,
+          "org.bremersee:base-common-ldaptive:af8cb1fc-f9c2-4592-8bd6-de59c6f2a8e6",
+          e);
       log.error("Executing ldap operation failed.", serviceException);
       throw serviceException;
     } finally {
