@@ -61,12 +61,12 @@ abstract class InvocationUtils {
 
     // Request mapping on class
     String clsPath = findRequestMappingValue(cls, a -> a.value().length > 0, a -> a.value()[0])
-        .orElse(findRequestMappingValue(cls, a -> a.path().length > 0, a -> a.path()[0])
+        .orElseGet(() -> findRequestMappingValue(cls, a -> a.path().length > 0, a -> a.path()[0])
             .orElse(""));
 
     // Request mapping on method
     String mPath = findRequestMappingValue(method, a -> a.value().length > 0, a -> a.value()[0])
-        .orElse(findRequestMappingValue(method, a -> a.path().length > 0, a -> a.path()[0])
+        .orElseGet(() -> findRequestMappingValue(method, a -> a.path().length > 0, a -> a.path()[0])
             .orElse(""));
     if (StringUtils.hasText(mPath)) {
       return clsPath + mPath;
@@ -74,7 +74,7 @@ abstract class InvocationUtils {
 
     // Get mapping on method
     mPath = findGetMappingValue(method, a -> a.value().length > 0, a -> a.value()[0])
-        .orElse(findGetMappingValue(method, a -> a.path().length > 0, a -> a.path()[0])
+        .orElseGet(() -> findGetMappingValue(method, a -> a.path().length > 0, a -> a.path()[0])
             .orElse(""));
     if (StringUtils.hasText(mPath)) {
       return clsPath + mPath;
@@ -82,7 +82,7 @@ abstract class InvocationUtils {
 
     // Post mapping on method
     mPath = findPostMappingValue(method, a -> a.value().length > 0, a -> a.value()[0])
-        .orElse(findPostMappingValue(method, a -> a.path().length > 0, a -> a.path()[0])
+        .orElseGet(() -> findPostMappingValue(method, a -> a.path().length > 0, a -> a.path()[0])
             .orElse(""));
     if (StringUtils.hasText(mPath)) {
       return clsPath + mPath;
@@ -90,7 +90,7 @@ abstract class InvocationUtils {
 
     // Put mapping on method
     mPath = findPutMappingValue(method, a -> a.value().length > 0, a -> a.value()[0])
-        .orElse(findPutMappingValue(method, a -> a.path().length > 0, a -> a.path()[0])
+        .orElseGet(() -> findPutMappingValue(method, a -> a.path().length > 0, a -> a.path()[0])
             .orElse(""));
     if (StringUtils.hasText(mPath)) {
       return clsPath + mPath;
@@ -98,7 +98,7 @@ abstract class InvocationUtils {
 
     // Patch mapping on method
     mPath = findPatchMappingValue(method, a -> a.value().length > 0, a -> a.value()[0])
-        .orElse(findPatchMappingValue(method, a -> a.path().length > 0, a -> a.path()[0])
+        .orElseGet(() -> findPatchMappingValue(method, a -> a.path().length > 0, a -> a.path()[0])
             .orElse(""));
     if (StringUtils.hasText(mPath)) {
       return clsPath + mPath;
@@ -106,7 +106,7 @@ abstract class InvocationUtils {
 
     // Delete mapping on method
     mPath = findDeleteMappingValue(method, a -> a.value().length > 0, a -> a.value()[0])
-        .orElse(findDeleteMappingValue(method, a -> a.path().length > 0, a -> a.path()[0])
+        .orElseGet(() -> findDeleteMappingValue(method, a -> a.path().length > 0, a -> a.path()[0])
             .orElse(""));
 
     return clsPath + mPath;
@@ -200,15 +200,15 @@ abstract class InvocationUtils {
   static String findAcceptHeader(final Method method) {
     return findRequestMappingValue(
         method, a -> a.produces().length > 0, a -> a.produces()[0])
-        .orElse(findGetMappingValue(
+        .orElseGet(() -> findGetMappingValue(
             method, a -> a.produces().length > 0, a -> a.produces()[0])
-            .orElse(findPostMappingValue(
+            .orElseGet(() -> findPostMappingValue(
                 method, a -> a.produces().length > 0, a -> a.produces()[0])
-                .orElse(findPutMappingValue(
+                .orElseGet(() -> findPutMappingValue(
                     method, a -> a.produces().length > 0, a -> a.produces()[0])
-                    .orElse(findPatchMappingValue(
+                    .orElseGet(() -> findPatchMappingValue(
                         method, a -> a.produces().length > 0, a -> a.produces()[0])
-                        .orElse(findDeleteMappingValue(
+                        .orElseGet(() -> findDeleteMappingValue(
                             method, a -> a.produces().length > 0, a -> a.produces()[0])
                             .orElse(null))))));
   }
@@ -222,15 +222,15 @@ abstract class InvocationUtils {
   static String findContentTypeHeader(final Method method) {
     return findRequestMappingValue(
         method, a -> a.consumes().length > 0, a -> a.consumes()[0])
-        .orElse(findGetMappingValue(
+        .orElseGet(() -> findGetMappingValue(
             method, a -> a.consumes().length > 0, a -> a.consumes()[0])
-            .orElse(findPostMappingValue(
+            .orElseGet(() -> findPostMappingValue(
                 method, a -> a.consumes().length > 0, a -> a.consumes()[0])
-                .orElse(findPutMappingValue(
+                .orElseGet(() -> findPutMappingValue(
                     method, a -> a.consumes().length > 0, a -> a.consumes()[0])
-                    .orElse(findPatchMappingValue(
+                    .orElseGet(() -> findPatchMappingValue(
                         method, a -> a.consumes().length > 0, a -> a.consumes()[0])
-                        .orElse(findDeleteMappingValue(
+                        .orElseGet(() -> findDeleteMappingValue(
                             method, a -> a.consumes().length > 0, a -> a.consumes()[0])
                             .orElse(null))))));
   }
