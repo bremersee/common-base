@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AclFactory.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">common-base</a> &gt; <a href="index.source.html" class="el_package">org.bremersee.security.access</a> &gt; <span class="el_source">AclFactory.java</span></div><h1>AclFactory.java</h1><pre class="source lang-java linenums">/*
+ * Copyright 2019 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package org.bremersee.security.access;
+
+import java.util.ArrayList;
+import java.util.Map;
+import java.util.stream.Collectors;
+import org.bremersee.common.model.AccessControlEntry;
+import org.bremersee.common.model.AccessControlList;
+
+/**
+ * The acl factory.
+ *
+ * @param &lt;T&gt; the acl type
+ * @author Christian Bremer
+ */
+public interface AclFactory&lt;T&gt; {
+
+  /**
+   * Create access control list of the specified type.
+   *
+   * @param owner   the owner
+   * @param entries the entries
+   * @return the acl type
+   */
+  T createAccessControlList(String owner, Map&lt;String, ? extends Ace&gt; entries);
+
+  /**
+   * Acl dto factory.
+   *
+   * @return the acl factory
+   */
+  static AclFactory&lt;AccessControlList&gt; dtoFactory() {
+<span class="fc" id="L48">    return new DtoAclFactory();</span>
+  }
+
+  /**
+   * The dto acl factory.
+   */
+<span class="fc" id="L54">  class DtoAclFactory implements AclFactory&lt;AccessControlList&gt; {</span>
+
+    @Override
+    public AccessControlList createAccessControlList(
+        final String owner,
+        final Map&lt;String, ? extends Ace&gt; entries) {
+<span class="fc" id="L60">      final AccessControlList acl = new AccessControlList();</span>
+<span class="fc" id="L61">      acl.setOwner(owner);</span>
+<span class="pc bpc" id="L62" title="1 of 2 branches missed.">      if (entries != null) {</span>
+<span class="fc" id="L63">        acl.setEntries(entries</span>
+<span class="fc" id="L64">            .entrySet()</span>
+<span class="fc" id="L65">            .stream()</span>
+<span class="fc" id="L66">            .map(entry -&gt; {</span>
+<span class="fc" id="L67">              final String permission = entry.getKey();</span>
+<span class="fc" id="L68">              final Ace ace = entry.getValue();</span>
+<span class="fc" id="L69">              return AccessControlEntry</span>
+<span class="fc" id="L70">                  .builder()</span>
+<span class="fc" id="L71">                  .permission(permission)</span>
+<span class="fc" id="L72">                  .guest(ace.isGuest())</span>
+<span class="fc" id="L73">                  .users(new ArrayList&lt;&gt;(ace.getUsers()))</span>
+<span class="fc" id="L74">                  .roles(new ArrayList&lt;&gt;(ace.getRoles()))</span>
+<span class="fc" id="L75">                  .groups(new ArrayList&lt;&gt;(ace.getGroups()))</span>
+<span class="fc" id="L76">                  .build();</span>
+            })
+<span class="fc" id="L78">            .sorted(new AccessControlEntryComparator())</span>
+<span class="fc" id="L79">            .collect(Collectors.toList()));</span>
+      }
+<span class="fc" id="L81">      return acl;</span>
+    }
+  }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.3.201901230119</span></div></body></html>

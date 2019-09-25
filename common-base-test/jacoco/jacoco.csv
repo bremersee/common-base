@@ -1,0 +1,4 @@
+GROUP,PACKAGE,CLASS,INSTRUCTION_MISSED,INSTRUCTION_COVERED,BRANCH_MISSED,BRANCH_COVERED,LINE_MISSED,LINE_COVERED,COMPLEXITY_MISSED,COMPLEXITY_COVERED,METHOD_MISSED,METHOD_COVERED
+common-base-test,org.bremersee.test.security.authentication,DefaultJwtConverterFactory,0,7,0,0,0,2,0,2,0,2
+common-base-test,org.bremersee.test.security.authentication,KeycloakJwtConverterFactory,0,7,0,0,0,2,0,2,0,2
+common-base-test,org.bremersee.test.security.authentication,JwtAuthenticationTokenSecurityContextFactory,39,317,11,17,10,78,11,12,0,9

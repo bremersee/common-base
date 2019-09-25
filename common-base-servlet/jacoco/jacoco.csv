@@ -1,0 +1,8 @@
+GROUP,PACKAGE,CLASS,INSTRUCTION_MISSED,INSTRUCTION_COVERED,BRANCH_MISSED,BRANCH_COVERED,LINE_MISSED,LINE_COVERED,COMPLEXITY_MISSED,COMPLEXITY_COVERED,METHOD_MISSED,METHOD_COVERED
+common-base-servlet,org.bremersee.web.servlet,ApiExceptionResolver.ResponseFormat,0,34,0,0,0,4,0,1,0,1
+common-base-servlet,org.bremersee.web.servlet,ApiExceptionResolver.EmptyView,80,0,10,0,21,0,7,0,2,0
+common-base-servlet,org.bremersee.web.servlet,ApiExceptionResolver,113,137,17,6,23,32,17,6,5,6
+common-base-servlet,org.bremersee.web.servlet,ApiExceptionResolver.ResponseFormatAndContentType,29,23,5,1,10,8,3,3,0,3
+common-base-servlet,org.bremersee.security.authentication,PasswordFlowAccessTokenRetriever,0,74,0,2,0,17,0,4,0,3
+common-base-servlet,org.bremersee.security.authentication,PasswordFlowAuthenticationManager,49,67,0,0,12,19,3,5,3,5
+common-base-servlet,org.bremersee.security.authentication,PasswordFlowAccessTokenRetriever.ErrorHandler,9,0,0,0,2,0,1,0,1,0

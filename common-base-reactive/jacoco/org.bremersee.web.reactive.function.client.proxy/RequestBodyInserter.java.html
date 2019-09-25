@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>RequestBodyInserter.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">common-base-reactive</a> &gt; <a href="index.source.html" class="el_package">org.bremersee.web.reactive.function.client.proxy</a> &gt; <span class="el_source">RequestBodyInserter.java</span></div><h1>RequestBodyInserter.java</h1><pre class="source lang-java linenums">/*
+ * Copyright 2019 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package org.bremersee.web.reactive.function.client.proxy;
+
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Method;
+import java.util.Arrays;
+import java.util.Optional;
+import org.springframework.http.MediaType;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.reactive.function.BodyInserters;
+import org.springframework.web.reactive.function.client.WebClient.RequestBodyUriSpec;
+
+/**
+ * The request body inserter.
+ *
+ * @author Christian Bremer
+ */
+public interface RequestBodyInserter {
+
+  /**
+   * Insert.
+   *
+   * @param parameters the parameters
+   * @param uriSpec    the uri spec
+   */
+  void insert(InvocationParameters parameters, RequestBodyUriSpec uriSpec);
+
+  /**
+   * Default request body inserter.
+   *
+   * @return the request body inserter
+   */
+  static RequestBodyInserter defaultInserter() {
+<span class="fc" id="L50">    return new Default();</span>
+  }
+
+  /**
+   * The default request body inserter.
+   */
+<span class="fc" id="L56">  class Default implements RequestBodyInserter {</span>
+
+    @Override
+    public void insert(final InvocationParameters parameters, final RequestBodyUriSpec uriSpec) {
+<span class="fc" id="L60">      final Method method = parameters.getMethod();</span>
+<span class="fc" id="L61">      final Object[] args = parameters.getArgs();</span>
+<span class="fc" id="L62">      final Annotation[][] parameterAnnotations = method.getParameterAnnotations();</span>
+<span class="fc bfc" id="L63" title="All 2 branches covered.">      for (int i = 0; i &lt; parameterAnnotations.length; i++) {</span>
+<span class="fc bfc" id="L64" title="All 2 branches covered.">        for (final Annotation annotation : parameterAnnotations[i]) {</span>
+<span class="fc bfc" id="L65" title="All 2 branches covered.">          if (annotation instanceof RequestBody) {</span>
+<span class="fc" id="L66">            final Object value = args[i];</span>
+<span class="fc bfc" id="L67" title="All 2 branches covered.">            if (isMediaType(value, method, MediaType.APPLICATION_FORM_URLENCODED_VALUE)) {</span>
+              //noinspection unchecked
+<span class="fc" id="L69">              uriSpec.body(BodyInserters.fromFormData((MultiValueMap) value));</span>
+<span class="pc bpc" id="L70" title="1 of 2 branches missed.">            } else if (isMediaType(value, method, MediaType.MULTIPART_FORM_DATA_VALUE)) {</span>
+              //noinspection unchecked
+<span class="nc" id="L72">              uriSpec.body(BodyInserters.fromMultipartData((MultiValueMap) value));</span>
+<span class="fc bfc" id="L73" title="All 2 branches covered.">            } else if (value != null) {</span>
+<span class="fc" id="L74">              uriSpec.body(BodyInserters.fromObject(args[i]));</span>
+            }
+          }
+        }
+      }
+<span class="fc" id="L79">    }</span>
+
+    private boolean isMediaType(final Object value, final Method method, final String mediaType) {
+<span class="fc" id="L82">      return Optional.ofNullable(value)</span>
+<span class="fc" id="L83">          .filter(v -&gt; v instanceof MultiValueMap)</span>
+<span class="fc" id="L84">          .flatMap(v -&gt; InvocationUtils.findRequestMappingValue(</span>
+              method,
+<span class="fc" id="L86">              mapping -&gt; isMediaType(mapping.consumes(), mediaType),</span>
+<span class="fc" id="L87">              mapping -&gt; true))</span>
+<span class="fc" id="L88">          .orElse(false);</span>
+    }
+
+    private boolean isMediaType(final String[] consumes, final String mediaType) {
+<span class="fc" id="L92">      return Arrays.stream(consumes)</span>
+<span class="fc" id="L93">          .anyMatch(value -&gt; value.toLowerCase().contains(mediaType.toLowerCase()));</span>
+    }
+
+  }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.3.201901230119</span></div></body></html>

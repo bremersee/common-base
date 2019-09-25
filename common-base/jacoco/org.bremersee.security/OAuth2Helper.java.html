@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>OAuth2Helper.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">common-base</a> &gt; <a href="index.source.html" class="el_package">org.bremersee.security</a> &gt; <span class="el_source">OAuth2Helper.java</span></div><h1>OAuth2Helper.java</h1><pre class="source lang-java linenums">/*
+ * Copyright 2018 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package org.bremersee.security;
+
+import javax.validation.constraints.NotNull;
+import org.springframework.lang.Nullable;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.validation.annotation.Validated;
+
+/**
+ * The oauth2 helper.
+ *
+ * @author Christian Bremer
+ */
+@Validated
+public abstract class OAuth2Helper {
+
+  private OAuth2Helper() {
+  }
+
+  /**
+   * Creates a password flow body.
+   *
+   * @param clientId     the client id
+   * @param clientSecret the client secret
+   * @param username     the username
+   * @param password     the password
+   * @return the multi value map of a password flow body
+   */
+  public static MultiValueMap&lt;String, String&gt; createPasswordFlowBody(
+      @NotNull final String clientId,
+      @Nullable final String clientSecret,
+      @NotNull final String username,
+      @NotNull final String password) {
+
+<span class="nc" id="L51">    final MultiValueMap&lt;String, String&gt; body = new LinkedMultiValueMap&lt;&gt;();</span>
+<span class="nc" id="L52">    body.add(&quot;grant_type&quot;, &quot;password&quot;);</span>
+<span class="nc" id="L53">    body.add(&quot;client_id&quot;, clientId);</span>
+<span class="nc bnc" id="L54" title="All 2 branches missed.">    if (clientSecret != null) {</span>
+<span class="nc" id="L55">      body.add(&quot;client_secret&quot;, clientSecret);</span>
+    } else {
+<span class="nc" id="L57">      body.add(&quot;client_secret&quot;, &quot;&quot;);</span>
+    }
+<span class="nc" id="L59">    body.add(&quot;username&quot;, username);</span>
+<span class="nc" id="L60">    body.add(&quot;password&quot;, password);</span>
+<span class="nc" id="L61">    return body;</span>
+  }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.3.201901230119</span></div></body></html>

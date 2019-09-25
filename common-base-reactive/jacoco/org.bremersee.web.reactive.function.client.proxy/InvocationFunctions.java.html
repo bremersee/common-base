@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>InvocationFunctions.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">common-base-reactive</a> &gt; <a href="index.source.html" class="el_package">org.bremersee.web.reactive.function.client.proxy</a> &gt; <span class="el_source">InvocationFunctions.java</span></div><h1>InvocationFunctions.java</h1><pre class="source lang-java linenums">/*
+ * Copyright 2019 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package org.bremersee.web.reactive.function.client.proxy;
+
+import java.util.function.Predicate;
+import lombok.AccessLevel;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
+import org.bremersee.web.ErrorDetectors;
+import org.bremersee.web.reactive.function.client.DefaultWebClientErrorDecoder;
+import org.bremersee.web.reactive.function.client.WebClientErrorDecoder;
+import org.springframework.http.HttpStatus;
+
+/**
+ * The invocation functions.
+ *
+ * @author Christian Bremer
+ */
+@Getter
+<span class="nc" id="L35">@Setter(AccessLevel.PRIVATE)</span>
+@SuppressWarnings(&quot;WeakerAccess&quot;)
+public class InvocationFunctions {
+
+<span class="fc" id="L39">  private RequestUriSpecBuilder uriSpecBuilder;</span>
+
+<span class="fc" id="L41">  private RequestUriBuilder uriBuilder;</span>
+
+<span class="fc" id="L43">  private RequestHeadersBuilder headersBuilder;</span>
+
+<span class="fc" id="L45">  private RequestCookiesBuilder cookiesBuilder;</span>
+
+<span class="fc" id="L47">  private RequestBodyInserter bodyInserter;</span>
+
+<span class="fc" id="L49">  private Predicate&lt;HttpStatus&gt; errorDetector;</span>
+
+<span class="fc" id="L51">  private WebClientErrorDecoder&lt;? extends Throwable&gt; errorDecoder;</span>
+
+<span class="fc" id="L53">  private RequestResponseBuilder responseBuilder;</span>
+
+  private InvocationFunctions() {
+<span class="fc" id="L56">    this(RequestUriSpecBuilder.defaultBuilder(),</span>
+<span class="fc" id="L57">        RequestUriBuilder.defaultBuilder(),</span>
+<span class="fc" id="L58">        RequestHeadersBuilder.defaultBuilder(),</span>
+<span class="fc" id="L59">        RequestCookiesBuilder.defaultBuilder(),</span>
+<span class="fc" id="L60">        RequestBodyInserter.defaultInserter(),</span>
+        ErrorDetectors.DEFAULT,
+        new DefaultWebClientErrorDecoder(),
+<span class="fc" id="L63">        RequestResponseBuilder.defaultBuilder());</span>
+<span class="fc" id="L64">  }</span>
+
+  /**
+   * Instantiates new invocation functions.
+   *
+   * @param uriSpecBuilder  the uri spec builder
+   * @param uriBuilder      the uri builder
+   * @param headersBuilder  the headers builder
+   * @param cookiesBuilder  the cookies builder
+   * @param bodyInserter    the body inserter
+   * @param errorDetector   the error detector
+   * @param errorDecoder    the error decoder
+   * @param responseBuilder the response builder
+   */
+<span class="nc" id="L78">  @Builder</span>
+  public InvocationFunctions(
+      final RequestUriSpecBuilder uriSpecBuilder,
+      final RequestUriBuilder uriBuilder,
+      final RequestHeadersBuilder headersBuilder,
+      final RequestCookiesBuilder cookiesBuilder,
+      final RequestBodyInserter bodyInserter,
+      final Predicate&lt;HttpStatus&gt; errorDetector,
+      final WebClientErrorDecoder&lt;? extends Throwable&gt; errorDecoder,
+<span class="fc" id="L87">      final RequestResponseBuilder responseBuilder) {</span>
+<span class="fc" id="L88">    this.uriSpecBuilder = uriSpecBuilder;</span>
+<span class="fc" id="L89">    this.uriBuilder = uriBuilder;</span>
+<span class="fc" id="L90">    this.headersBuilder = headersBuilder;</span>
+<span class="fc" id="L91">    this.cookiesBuilder = cookiesBuilder;</span>
+<span class="fc" id="L92">    this.bodyInserter = bodyInserter;</span>
+<span class="fc" id="L93">    this.errorDetector = errorDetector;</span>
+<span class="fc" id="L94">    this.errorDecoder = errorDecoder;</span>
+<span class="fc" id="L95">    this.responseBuilder = responseBuilder;</span>
+<span class="fc" id="L96">  }</span>
+
+  /**
+   * Merge invocation functions.
+   *
+   * @param commonFunctions the common functions
+   * @param methodFunctions the method functions
+   * @return the invocation functions
+   */
+  static InvocationFunctions merge(
+      final InvocationFunctions commonFunctions,
+      final InvocationFunctions methodFunctions) {
+
+<span class="fc" id="L109">    final InvocationFunctions functions = new InvocationFunctions();</span>
+<span class="fc" id="L110">    mergeInto(commonFunctions, functions);</span>
+<span class="fc" id="L111">    mergeInto(methodFunctions, functions);</span>
+<span class="fc" id="L112">    return functions;</span>
+  }
+
+  private static void mergeInto(
+      final InvocationFunctions source,
+      final InvocationFunctions destination) {
+
+<span class="pc bpc" id="L119" title="1 of 2 branches missed.">    if (source != null) {</span>
+<span class="nc bnc" id="L120" title="All 2 branches missed.">      if (source.getUriSpecBuilder() != null) {</span>
+<span class="nc" id="L121">        destination.setUriSpecBuilder(source.getUriSpecBuilder());</span>
+      }
+<span class="nc bnc" id="L123" title="All 2 branches missed.">      if (source.getUriBuilder() != null) {</span>
+<span class="nc" id="L124">        destination.setUriBuilder(source.getUriBuilder());</span>
+      }
+<span class="nc bnc" id="L126" title="All 2 branches missed.">      if (source.getHeadersBuilder() != null) {</span>
+<span class="nc" id="L127">        destination.setHeadersBuilder(source.getHeadersBuilder());</span>
+      }
+<span class="nc bnc" id="L129" title="All 2 branches missed.">      if (source.getCookiesBuilder() != null) {</span>
+<span class="nc" id="L130">        destination.setCookiesBuilder(source.getCookiesBuilder());</span>
+      }
+<span class="nc bnc" id="L132" title="All 2 branches missed.">      if (source.getBodyInserter() != null) {</span>
+<span class="nc" id="L133">        destination.setBodyInserter(source.getBodyInserter());</span>
+      }
+<span class="nc bnc" id="L135" title="All 2 branches missed.">      if (source.getErrorDecoder() != null) {</span>
+<span class="nc" id="L136">        destination.setErrorDecoder(source.getErrorDecoder());</span>
+      }
+<span class="nc bnc" id="L138" title="All 2 branches missed.">      if (source.getErrorDetector() != null) {</span>
+<span class="nc" id="L139">        destination.setErrorDetector(source.getErrorDetector());</span>
+      }
+<span class="nc bnc" id="L141" title="All 2 branches missed.">      if (source.getResponseBuilder() != null) {</span>
+<span class="nc" id="L142">        destination.setResponseBuilder(source.getResponseBuilder());</span>
+      }
+    }
+<span class="fc" id="L145">  }</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.3.201901230119</span></div></body></html>

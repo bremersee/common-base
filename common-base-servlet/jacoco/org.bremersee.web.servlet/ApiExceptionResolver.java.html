@@ -1,0 +1,306 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ApiExceptionResolver.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">common-base-servlet</a> &gt; <a href="index.source.html" class="el_package">org.bremersee.web.servlet</a> &gt; <span class="el_source">ApiExceptionResolver.java</span></div><h1>ApiExceptionResolver.java</h1><pre class="source lang-java linenums">/*
+ * Copyright 2018 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package org.bremersee.web.servlet;
+
+import java.time.OffsetDateTime;
+import java.time.ZoneId;
+import java.util.List;
+import java.util.Map;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.validation.constraints.NotNull;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
+import org.bremersee.exception.RestApiExceptionMapper;
+import org.bremersee.exception.RestApiExceptionUtils;
+import org.bremersee.exception.model.RestApiException;
+import org.bremersee.http.MediaTypeHelper;
+import org.bremersee.http.converter.ObjectMapperHelper;
+import org.springframework.core.annotation.AnnotationUtils;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
+import org.springframework.lang.Nullable;
+import org.springframework.util.AntPathMatcher;
+import org.springframework.util.PathMatcher;
+import org.springframework.util.StringUtils;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.method.HandlerMethod;
+import org.springframework.web.servlet.HandlerExceptionResolver;
+import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.view.AbstractView;
+import org.springframework.web.servlet.view.json.MappingJackson2JsonView;
+import org.springframework.web.servlet.view.xml.MappingJackson2XmlView;
+import org.springframework.web.util.WebUtils;
+
+/**
+ * The api exception resolver.
+ *
+ * @author Christian Bremer
+ */
+@Validated
+<span class="fc" id="L60">@Slf4j</span>
+public class ApiExceptionResolver implements HandlerExceptionResolver {
+
+  /**
+   * The constant MODEL_KEY.
+   */
+  @SuppressWarnings(&quot;WeakerAccess&quot;)
+  protected static final String MODEL_KEY = &quot;error&quot;;
+
+<span class="pc" id="L69">  @Getter(AccessLevel.PROTECTED)</span>
+<span class="nc" id="L70">  @Setter</span>
+  private PathMatcher pathMatcher = new AntPathMatcher();
+
+<span class="nc" id="L73">  @Getter(AccessLevel.PROTECTED)</span>
+  private final RestApiExceptionMapper exceptionMapper;
+
+<span class="nc" id="L76">  @Getter(AccessLevel.PROTECTED)</span>
+<span class="nc" id="L77">  @Setter</span>
+  private Jackson2ObjectMapperBuilder objectMapperBuilder;
+
+  /**
+   * Instantiates a new Api exception resolver.
+   *
+   * @param exceptionMapper the exception mapper
+   */
+  @SuppressWarnings(&quot;WeakerAccess&quot;)
+  public ApiExceptionResolver(
+<span class="fc" id="L87">      final RestApiExceptionMapper exceptionMapper) {</span>
+<span class="fc" id="L88">    this.exceptionMapper = exceptionMapper;</span>
+<span class="fc" id="L89">  }</span>
+
+  @Override
+  public ModelAndView resolveException(
+      final HttpServletRequest request,
+      final HttpServletResponse response,
+      final @Nullable Object handler,
+      final Exception ex) {
+
+<span class="pc bpc" id="L98" title="1 of 2 branches missed.">    if (!isExceptionHandlerResponsible(request, handler)) {</span>
+<span class="nc" id="L99">      return null;</span>
+    }
+
+<span class="fc" id="L102">    final RestApiException payload = exceptionMapper.build(ex, request.getRequestURI(), handler);</span>
+
+    ModelAndView modelAndView;
+<span class="fc" id="L105">    final ResponseFormatAndContentType chooser = new ResponseFormatAndContentType(request);</span>
+<span class="pc bpc" id="L106" title="2 of 3 branches missed.">    switch (chooser.getResponseFormat()) {</span>
+      case JSON:
+<span class="pc bpc" id="L108" title="1 of 2 branches missed.">        final MappingJackson2JsonView mjv = objectMapperBuilder == null</span>
+<span class="pc" id="L109">            ? new MappingJackson2JsonView(ObjectMapperHelper.getJsonMapper())</span>
+<span class="pc" id="L110">            : new MappingJackson2JsonView(objectMapperBuilder.build());</span>
+<span class="fc" id="L111">        mjv.setContentType(chooser.getContentType());</span>
+<span class="fc" id="L112">        mjv.setPrettyPrint(true);</span>
+<span class="fc" id="L113">        mjv.setModelKey(MODEL_KEY);</span>
+<span class="fc" id="L114">        mjv.setExtractValueFromSingleKeyModel(true); // removes the MODEL_KEY from the output</span>
+<span class="fc" id="L115">        modelAndView = new ModelAndView(mjv, MODEL_KEY, payload);</span>
+<span class="fc" id="L116">        break;</span>
+
+      case XML:
+<span class="nc bnc" id="L119" title="All 2 branches missed.">        final MappingJackson2XmlView mxv = objectMapperBuilder == null</span>
+<span class="nc" id="L120">            ? new MappingJackson2XmlView(ObjectMapperHelper.getXmlMapper())</span>
+<span class="nc" id="L121">            : new MappingJackson2XmlView(objectMapperBuilder.createXmlMapper(true).build());</span>
+<span class="nc" id="L122">        mxv.setContentType(chooser.getContentType());</span>
+<span class="nc" id="L123">        mxv.setPrettyPrint(true);</span>
+<span class="nc" id="L124">        mxv.setModelKey(MODEL_KEY);</span>
+<span class="nc" id="L125">        modelAndView = new ModelAndView(mxv, MODEL_KEY, payload);</span>
+<span class="nc" id="L126">        break;</span>
+
+      default:
+<span class="nc" id="L129">        modelAndView = new ModelAndView(new EmptyView(payload, chooser.getContentType()));</span>
+    }
+
+<span class="fc" id="L132">    response.setContentType(chooser.getContentType());</span>
+<span class="fc" id="L133">    final int statusCode = exceptionMapper.detectHttpStatus(ex, handler).value();</span>
+<span class="fc" id="L134">    modelAndView.setStatus(HttpStatus.resolve(statusCode));</span>
+<span class="fc" id="L135">    applyStatusCodeIfPossible(request, response, statusCode);</span>
+<span class="fc" id="L136">    return modelAndView;</span>
+  }
+
+  /**
+   * Is this exception handler responsible.
+   *
+   * @param request the request
+   * @param handler the handler
+   * @return {@code true} if it is responsible, otherwise {@code false}
+   */
+  @SuppressWarnings(&quot;WeakerAccess&quot;)
+  protected boolean isExceptionHandlerResponsible(
+      final HttpServletRequest request,
+      final @Nullable Object handler) {
+
+<span class="pc bpc" id="L151" title="1 of 2 branches missed.">    if (!exceptionMapper.getApiPaths().isEmpty()) {</span>
+<span class="fc" id="L152">      return exceptionMapper.getApiPaths().stream().anyMatch(</span>
+<span class="fc" id="L153">          s -&gt; pathMatcher.match(s, request.getServletPath()));</span>
+    }
+
+<span class="nc bnc" id="L156" title="All 2 branches missed.">    if (handler == null) {</span>
+<span class="nc" id="L157">      return false;</span>
+    }
+<span class="nc bnc" id="L159" title="All 2 branches missed.">    final Class&lt;?&gt; cls = handler instanceof HandlerMethod</span>
+<span class="nc" id="L160">        ? ((HandlerMethod) handler).getBean().getClass()</span>
+<span class="nc" id="L161">        : handler.getClass();</span>
+<span class="nc bnc" id="L162" title="All 2 branches missed.">    final boolean result = AnnotationUtils.findAnnotation(cls, RestController.class) != null;</span>
+<span class="nc bnc" id="L163" title="All 2 branches missed.">    if (log.isDebugEnabled()) {</span>
+<span class="nc" id="L164">      log.debug(&quot;Is handler [&quot; + handler + &quot;] a rest controller? &quot; + result);</span>
+    }
+<span class="nc" id="L166">    return result;</span>
+  }
+
+  /**
+   * Apply status code if possible.
+   *
+   * @param request    the request
+   * @param response   the response
+   * @param statusCode the status code
+   */
+  @SuppressWarnings(&quot;WeakerAccess&quot;)
+  protected final void applyStatusCodeIfPossible(
+      final HttpServletRequest request,
+      final HttpServletResponse response,
+      final int statusCode) {
+
+<span class="pc bpc" id="L182" title="1 of 2 branches missed.">    if (!WebUtils.isIncludeRequest(request)) {</span>
+<span class="pc bpc" id="L183" title="1 of 2 branches missed.">      if (log.isDebugEnabled()) {</span>
+<span class="fc" id="L184">        log.debug(&quot;Applying HTTP status code &quot; + statusCode);</span>
+      }
+<span class="fc" id="L186">      response.setStatus(statusCode);</span>
+<span class="fc" id="L187">      request.setAttribute(WebUtils.ERROR_STATUS_CODE_ATTRIBUTE, statusCode);</span>
+    }
+<span class="fc" id="L189">  }</span>
+
+  /**
+   * The response format.
+   */
+<span class="fc" id="L194">  enum ResponseFormat {</span>
+
+    /**
+     * Json response format.
+     */
+<span class="fc" id="L199">    JSON,</span>
+
+    /**
+     * Xml response format.
+     */
+<span class="fc" id="L204">    XML,</span>
+
+    /**
+     * Empty response format.
+     */
+<span class="fc" id="L209">    EMPTY</span>
+  }
+
+  /**
+   * The response format and content type.
+   */
+  static class ResponseFormatAndContentType {
+
+<span class="fc" id="L217">    @Getter(AccessLevel.PROTECTED)</span>
+    private ResponseFormat responseFormat;
+
+<span class="fc" id="L220">    @Getter(AccessLevel.PROTECTED)</span>
+    private String contentType;
+
+    /**
+     * Instantiates a new response format and content type.
+     *
+     * @param request the request
+     */
+<span class="fc" id="L228">    ResponseFormatAndContentType(final @NotNull HttpServletRequest request) {</span>
+<span class="fc" id="L229">      final String acceptHeader = request.getHeader(HttpHeaders.ACCEPT);</span>
+<span class="pc bpc" id="L230" title="1 of 2 branches missed.">      if (MediaTypeHelper.canContentTypeBeJson(acceptHeader)) {</span>
+<span class="fc" id="L231">        responseFormat = ResponseFormat.JSON;</span>
+<span class="fc" id="L232">        contentType = MediaType.APPLICATION_JSON_VALUE;</span>
+<span class="nc bnc" id="L233" title="All 2 branches missed.">      } else if (MediaTypeHelper.canContentTypeBeXml(acceptHeader)) {</span>
+<span class="nc" id="L234">        responseFormat = ResponseFormat.XML;</span>
+<span class="nc" id="L235">        contentType = MediaType.APPLICATION_XML_VALUE;</span>
+      } else {
+<span class="nc" id="L237">        responseFormat = ResponseFormat.EMPTY;</span>
+<span class="nc bnc" id="L238" title="All 2 branches missed.">        if (StringUtils.hasText(acceptHeader)) {</span>
+<span class="nc" id="L239">          final List&lt;MediaType&gt; accepts = MediaType.parseMediaTypes(acceptHeader);</span>
+<span class="nc" id="L240">          contentType = String</span>
+<span class="nc" id="L241">              .valueOf(MediaTypeHelper.findContentType(accepts, MediaType.TEXT_PLAIN));</span>
+<span class="nc" id="L242">        } else {</span>
+<span class="nc" id="L243">          contentType = MediaType.TEXT_PLAIN_VALUE;</span>
+        }
+      }
+<span class="fc" id="L246">    }</span>
+  }
+
+  /**
+   * The empty view.
+   */
+  static class EmptyView extends AbstractView {
+
+    /**
+     * The rest api exception.
+     */
+    final RestApiException restApiException;
+
+    /**
+     * Instantiates a new empty view.
+     *
+     * @param payload     the payload
+     * @param contentType the content type
+     */
+<span class="nc" id="L265">    EmptyView(final @NotNull RestApiException payload, final String contentType) {</span>
+<span class="nc" id="L266">      this.restApiException = payload;</span>
+<span class="nc" id="L267">      setContentType(contentType);</span>
+<span class="nc" id="L268">    }</span>
+
+    @Override
+    protected void renderMergedOutputModel(
+        @Nullable final Map&lt;String, Object&gt; map,
+        final HttpServletRequest httpServletRequest,
+        final HttpServletResponse httpServletResponse) {
+
+<span class="nc" id="L276">      httpServletResponse.addHeader(RestApiExceptionUtils.ID_HEADER_NAME,</span>
+<span class="nc bnc" id="L277" title="All 2 branches missed.">          StringUtils.hasText(restApiException.getId())</span>
+<span class="nc" id="L278">              ? restApiException.getId()</span>
+              : RestApiExceptionUtils.NO_ID_VALUE);
+
+<span class="nc" id="L281">      httpServletResponse.addHeader(RestApiExceptionUtils.TIMESTAMP_HEADER_NAME,</span>
+<span class="nc bnc" id="L282" title="All 2 branches missed.">          restApiException.getTimestamp() != null</span>
+<span class="nc" id="L283">              ? restApiException.getTimestamp().format(RestApiExceptionUtils.TIMESTAMP_FORMATTER)</span>
+<span class="nc" id="L284">              : OffsetDateTime.now(ZoneId.of(&quot;UTC&quot;)).format(</span>
+                  RestApiExceptionUtils.TIMESTAMP_FORMATTER));
+
+<span class="nc" id="L287">      httpServletResponse.addHeader(RestApiExceptionUtils.MESSAGE_HEADER_NAME,</span>
+<span class="nc bnc" id="L288" title="All 2 branches missed.">          StringUtils.hasText(restApiException.getMessage())</span>
+<span class="nc" id="L289">              ? restApiException.getMessage()</span>
+              : RestApiExceptionUtils.NO_MESSAGE_VALUE);
+
+<span class="nc" id="L292">      httpServletResponse.addHeader(RestApiExceptionUtils.CODE_HEADER_NAME,</span>
+<span class="nc bnc" id="L293" title="All 2 branches missed.">          StringUtils.hasText(restApiException.getErrorCode())</span>
+<span class="nc" id="L294">              ? restApiException.getErrorCode()</span>
+              : RestApiExceptionUtils.NO_ERROR_CODE_VALUE);
+
+<span class="nc" id="L297">      httpServletResponse.addHeader(RestApiExceptionUtils.CLASS_HEADER_NAME,</span>
+<span class="nc bnc" id="L298" title="All 2 branches missed.">          StringUtils.hasText(restApiException.getClassName())</span>
+<span class="nc" id="L299">              ? restApiException.getClassName()</span>
+              : RestApiExceptionUtils.NO_CLASS_VALUE);
+<span class="nc" id="L301">    }</span>
+
+  }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.3.201901230119</span></div></body></html>

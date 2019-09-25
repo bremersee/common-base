@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>CorsProperties.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">common-base</a> &gt; <a href="index.source.html" class="el_package">org.bremersee.security</a> &gt; <span class="el_source">CorsProperties.java</span></div><h1>CorsProperties.java</h1><pre class="source lang-java linenums">/*
+ * Copyright 2018 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package org.bremersee.security;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.http.HttpMethod;
+import org.springframework.util.StringUtils;
+
+/**
+ * CORS configuration properties.
+ *
+ * &lt;p&gt;Can be used with {@code WebFlux} like this:
+ * &lt;pre&gt;
+ * import org.bremersee.security.CorsProperties;
+ * import org.springframework.boot.context.properties.EnableConfigurationProperties;
+ * import org.springframework.context.annotation.Configuration;
+ * import org.springframework.web.reactive.config.CorsRegistry;
+ * import org.springframework.web.reactive.config.WebFluxConfigurer;
+ *
+ * &amp;#064;EnableConfigurationProperties(CorsProperties.class)
+ * &amp;#064;Configuration
+ * public class CorsGlobalConfiguration implements WebFluxConfigurer {
+ *
+ *   private CorsProperties corsProperties;
+ *
+ *   public CorsGlobalConfiguration(CorsProperties corsProperties) {
+ *     this.corsProperties = corsProperties;
+ *   }
+ *
+ *   &amp;#064;Override
+ *   public void addCorsMappings(CorsRegistry corsRegistry) {
+ *     for (CorsProperties.CorsConfiguration config : corsProperties.getConfigs()) {
+ *       corsRegistry.addMapping(config.getPathPattern())
+ *           .allowedOrigins(config.getAllowedOrigins().toArray(new String[0]))
+ *           .allowedMethods(config.getAllowedMethods().toArray(new String[0]))
+ *           .allowedHeaders(config.getAllowedHeaders().toArray(new String[0]))
+ *           .maxAge(config.getMaxAge())
+ *           .allowCredentials(config.isAllowCredentials());
+ *     }
+ *   }
+ * }
+ * &lt;/pre&gt;
+ *
+ * @author Christian Bremer
+ */
+@SuppressWarnings(&quot;ConfigurationProperties&quot;)
+@ConfigurationProperties(prefix = &quot;bremersee.security.cors&quot;)
+<span class="fc" id="L70">@Setter</span>
+<span class="fc" id="L71">@ToString</span>
+<span class="pc bpc" id="L72" title="11 of 18 branches missed.">@EqualsAndHashCode</span>
+<span class="fc" id="L73">public class CorsProperties {</span>
+
+<span class="fc" id="L75">  @Getter</span>
+  private boolean allowAll;
+
+<span class="fc" id="L78">  private List&lt;CorsConfiguration&gt; configs = new ArrayList&lt;&gt;();</span>
+
+  /**
+   * Allow all configuration.
+   *
+   * @return the allow all configuration
+   */
+  @SuppressWarnings(&quot;WeakerAccess&quot;)
+  public static List&lt;CorsConfiguration&gt; allowAllConfiguration() {
+<span class="fc" id="L87">    return Collections.singletonList(CorsConfiguration.allowAllConfiguration());</span>
+  }
+
+  /**
+   * Gets configs.
+   *
+   * @return the configs
+   */
+  public List&lt;CorsConfiguration&gt; getConfigs() {
+<span class="fc bfc" id="L96" title="All 2 branches covered.">    if (allowAll) {</span>
+<span class="fc" id="L97">      return allowAllConfiguration();</span>
+    }
+<span class="pc bpc" id="L99" title="1 of 2 branches missed.">    if (configs == null) {</span>
+<span class="nc" id="L100">      configs = new ArrayList&lt;&gt;();</span>
+    }
+<span class="fc" id="L102">    return configs.stream()</span>
+<span class="fc" id="L103">        .filter(config -&gt; StringUtils.hasText(config.getPathPattern()))</span>
+<span class="fc" id="L104">        .collect(Collectors.toList());</span>
+  }
+
+  /**
+   * The cors configuration.
+   */
+<span class="fc" id="L110">  @Setter</span>
+<span class="fc" id="L111">  @ToString</span>
+<span class="pc bpc" id="L112" title="27 of 44 branches missed.">  @EqualsAndHashCode</span>
+<span class="fc" id="L113">  public static class CorsConfiguration {</span>
+
+<span class="fc" id="L115">    @Getter</span>
+    private String pathPattern;
+
+<span class="fc" id="L118">    private List&lt;String&gt; allowedOrigins = new ArrayList&lt;&gt;();</span>
+
+<span class="fc" id="L120">    private List&lt;String&gt; allowedMethods = new ArrayList&lt;&gt;();</span>
+
+<span class="fc" id="L122">    private List&lt;String&gt; allowedHeaders = new ArrayList&lt;&gt;();</span>
+
+<span class="fc" id="L124">    @Getter</span>
+    private boolean allowCredentials;
+
+<span class="fc" id="L127">    @Getter</span>
+    private long maxAge = 1800L;
+
+    /**
+     * Allow all configuration.
+     *
+     * @return the allow all configuration
+     */
+    static CorsConfiguration allowAllConfiguration() {
+<span class="fc" id="L136">      CorsConfiguration configuration = new CorsConfiguration();</span>
+<span class="fc" id="L137">      configuration.pathPattern = &quot;/**&quot;;</span>
+<span class="fc" id="L138">      configuration.allowedOrigins = Collections.singletonList(&quot;*&quot;);</span>
+<span class="fc" id="L139">      configuration.allowedMethods = Collections.singletonList(&quot;*&quot;);</span>
+<span class="fc" id="L140">      configuration.allowedHeaders = Collections.singletonList(&quot;*&quot;);</span>
+<span class="fc" id="L141">      return configuration;</span>
+    }
+
+    /**
+     * Gets allowed origins.
+     *
+     * @return the allowed origins
+     */
+    public List&lt;String&gt; getAllowedOrigins() {
+<span class="pc bpc" id="L150" title="1 of 2 branches missed.">      if (allowedOrigins == null) {</span>
+<span class="nc" id="L151">        allowedOrigins = new ArrayList&lt;&gt;();</span>
+      }
+<span class="fc bfc" id="L153" title="All 2 branches covered.">      if (allowedOrigins.isEmpty()) {</span>
+<span class="fc" id="L154">        allowedOrigins.add(&quot;*&quot;);</span>
+      }
+<span class="fc" id="L156">      return allowedOrigins;</span>
+    }
+
+    /**
+     * Gets allowed methods.
+     *
+     * @return the allowed methods
+     */
+    public List&lt;String&gt; getAllowedMethods() {
+<span class="pc bpc" id="L165" title="1 of 2 branches missed.">      if (allowedMethods == null) {</span>
+<span class="nc" id="L166">        allowedMethods = new ArrayList&lt;&gt;();</span>
+      }
+<span class="fc bfc" id="L168" title="All 2 branches covered.">      if (allowedMethods.isEmpty()) {</span>
+<span class="fc" id="L169">        allowedMethods.add(HttpMethod.GET.name());</span>
+<span class="fc" id="L170">        allowedMethods.add(HttpMethod.POST.name());</span>
+<span class="fc" id="L171">        allowedMethods.add(HttpMethod.HEAD.name());</span>
+      }
+<span class="fc" id="L173">      return allowedMethods;</span>
+    }
+
+    /**
+     * Gets allowed headers.
+     *
+     * @return the allowed headers
+     */
+    public List&lt;String&gt; getAllowedHeaders() {
+<span class="pc bpc" id="L182" title="1 of 2 branches missed.">      if (allowedHeaders == null) {</span>
+<span class="nc" id="L183">        allowedHeaders = new ArrayList&lt;&gt;();</span>
+      }
+<span class="fc bfc" id="L185" title="All 2 branches covered.">      if (allowedHeaders.isEmpty()) {</span>
+<span class="fc" id="L186">        allowedHeaders.add(&quot;*&quot;);</span>
+      }
+<span class="fc" id="L188">      return allowedHeaders;</span>
+    }
+  }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.3.201901230119</span></div></body></html>

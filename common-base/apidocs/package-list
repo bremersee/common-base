@@ -1,0 +1,10 @@
+org.bremersee.exception
+org.bremersee.exception.annotation
+org.bremersee.exception.feign
+org.bremersee.http
+org.bremersee.http.converter
+org.bremersee.security
+org.bremersee.security.access
+org.bremersee.security.authentication
+org.bremersee.security.core
+org.bremersee.web

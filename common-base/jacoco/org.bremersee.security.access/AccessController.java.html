@@ -1,0 +1,222 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AccessController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">common-base</a> &gt; <a href="index.source.html" class="el_package">org.bremersee.security.access</a> &gt; <span class="el_source">AccessController.java</span></div><h1>AccessController.java</h1><pre class="source lang-java linenums">/*
+ * Copyright 2019 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package org.bremersee.security.access;
+
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Map;
+import org.bremersee.common.model.AccessControlList;
+import org.springframework.lang.Nullable;
+
+/**
+ * The access controller.
+ *
+ * @author Christian Bremer
+ */
+public interface AccessController {
+
+  /**
+   * Creates an access controller from the given access control list.
+   *
+   * @param acl the access control list
+   * @return the access controller
+   */
+  static AccessController from(@Nullable AccessControlList acl) {
+<span class="pc bpc" id="L40" title="1 of 2 branches missed.">    return acl == null ? new Impl() : new Impl(AclBuilder.builder().from(acl).buildAcl());</span>
+  }
+
+  /**
+   * Creates an access controller from the given access control list.
+   *
+   * @param acl the access control list
+   * @return the access controller
+   */
+  static AccessController from(@Nullable Acl acl) {
+<span class="nc bnc" id="L50" title="All 2 branches missed.">    return acl == null ? new Impl() : new Impl(AclBuilder.builder().from(acl).buildAcl());</span>
+  }
+
+  /**
+   * Determines whether the given user with the given roles and groups has the specified
+   * permission.
+   *
+   * @param user       the user
+   * @param roles      the roles
+   * @param groups     the groups
+   * @param permission the permission
+   * @return {@code true} if the user has the permission, otherwise {@code false}
+   */
+  boolean hasPermission(
+      @Nullable String user,
+      @Nullable Collection&lt;String&gt; roles,
+      @Nullable Collection&lt;String&gt; groups,
+      @Nullable String permission);
+
+  /**
+   * Determines whether the given user with the given roles and groups has at least one of the
+   * specified permissions.
+   *
+   * @param user        the user
+   * @param roles       the roles
+   * @param groups      the groups
+   * @param permissions the permissions
+   * @return {@code true} if the user has at least one permission, otherwise {@code false}
+   */
+  default boolean hasAnyPermission(
+      @Nullable String user,
+      @Nullable Collection&lt;String&gt; roles,
+      @Nullable Collection&lt;String&gt; groups,
+      @Nullable String... permissions) {
+
+<span class="pc bpc" id="L85" title="1 of 2 branches missed.">    return hasAnyPermission(</span>
+        user,
+        roles,
+        groups,
+<span class="pc" id="L89">        permissions == null ? Collections.emptyList() : Arrays.asList(permissions));</span>
+  }
+
+  /**
+   * Determines whether the given user with the given roles and groups has at least one of the
+   * specified permissions.
+   *
+   * @param user        the user
+   * @param roles       the roles
+   * @param groups      the groups
+   * @param permissions the permissions
+   * @return {@code true} if the user has at least one permission, otherwise {@code false}
+   */
+  default boolean hasAnyPermission(
+      @Nullable String user,
+      @Nullable Collection&lt;String&gt; roles,
+      @Nullable Collection&lt;String&gt; groups,
+      @Nullable Collection&lt;String&gt; permissions) {
+
+<span class="pc bpc" id="L108" title="1 of 2 branches missed.">    return permissions != null</span>
+<span class="pc bpc" id="L109" title="1 of 2 branches missed.">        &amp;&amp; !permissions.isEmpty()</span>
+        &amp;&amp; permissions
+<span class="fc" id="L111">        .stream()</span>
+<span class="fc bfc" id="L112" title="All 2 branches covered.">        .anyMatch(permission -&gt; hasPermission(user, roles, groups, permission));</span>
+  }
+
+  /**
+   * Determines whether the given user with the given roles and groups has all specified
+   * permissions.
+   *
+   * @param user        the user
+   * @param roles       the roles
+   * @param groups      the groups
+   * @param permissions the permissions
+   * @return {@code true} if the user has all permissions, otherwise {@code false}
+   */
+  default boolean hasAllPermissions(
+      String user,
+      Collection&lt;String&gt; roles,
+      Collection&lt;String&gt; groups,
+      String... permissions) {
+
+<span class="pc bpc" id="L131" title="1 of 2 branches missed.">    return hasAllPermissions(</span>
+        user,
+        roles,
+        groups,
+<span class="pc" id="L135">        permissions == null ? Collections.emptyList() : Arrays.asList(permissions));</span>
+  }
+
+  /**
+   * Determines whether the given user with the given roles and groups has all specified
+   * permissions.
+   *
+   * @param user        the user
+   * @param roles       the roles
+   * @param groups      the groups
+   * @param permissions the permissions
+   * @return {@code true} if the user has all permissions, otherwise {@code false}
+   */
+  default boolean hasAllPermissions(
+      String user,
+      Collection&lt;String&gt; roles,
+      Collection&lt;String&gt; groups,
+      Collection&lt;String&gt; permissions) {
+
+<span class="pc bpc" id="L154" title="1 of 2 branches missed.">    return permissions != null</span>
+<span class="pc bpc" id="L155" title="1 of 2 branches missed.">        &amp;&amp; !permissions.isEmpty()</span>
+        &amp;&amp; permissions
+<span class="fc" id="L157">        .stream()</span>
+<span class="fc bfc" id="L158" title="All 2 branches covered.">        .allMatch(permission -&gt; hasPermission(user, roles, groups, permission));</span>
+  }
+
+  /**
+   * The default access controller implementation.
+   */
+  class Impl implements AccessController {
+
+    private final Acl&lt;? extends Ace&gt; acl;
+
+    /**
+     * Instantiates a new access controller.
+     */
+<span class="nc" id="L171">    Impl() {</span>
+<span class="nc" id="L172">      acl = null;</span>
+<span class="nc" id="L173">    }</span>
+
+    /**
+     * Instantiates a new access controller.
+     *
+     * @param acl the acl
+     */
+<span class="fc" id="L180">    Impl(final Acl&lt;? extends Ace&gt; acl) {</span>
+<span class="fc" id="L181">      this.acl = acl;</span>
+<span class="fc" id="L182">    }</span>
+
+    @Override
+    public boolean hasPermission(
+        final String user,
+        final Collection&lt;String&gt; roles,
+        final Collection&lt;String&gt; groups,
+        final String permission) {
+
+<span class="pc bpc" id="L191" title="1 of 2 branches missed.">      if (acl == null) {</span>
+<span class="nc" id="L192">        return false;</span>
+      }
+<span class="pc bpc" id="L194" title="1 of 2 branches missed.">      if (permission == null) {</span>
+<span class="nc" id="L195">        return false;</span>
+      }
+<span class="pc bpc" id="L197" title="1 of 4 branches missed.">      if (user != null &amp;&amp; user.equals(acl.getOwner())) {</span>
+<span class="fc" id="L198">        return true;</span>
+      }
+<span class="fc" id="L200">      final Map&lt;String, ? extends Ace&gt; map = acl.entryMap();</span>
+<span class="pc bpc" id="L201" title="1 of 2 branches missed.">      if (map == null) {</span>
+<span class="nc" id="L202">        return false;</span>
+      }
+<span class="fc" id="L204">      final Ace ace = map.get(permission.toLowerCase());</span>
+<span class="fc bfc" id="L205" title="All 2 branches covered.">      if (ace == null) {</span>
+<span class="fc" id="L206">        return false;</span>
+      }
+<span class="fc bfc" id="L208" title="All 2 branches covered.">      if (ace.isGuest()) {</span>
+<span class="fc" id="L209">        return true;</span>
+      }
+<span class="fc bfc" id="L211" title="All 2 branches covered.">      if (ace.getUsers().contains(user)) {</span>
+<span class="fc" id="L212">        return true;</span>
+      }
+<span class="pc bpc" id="L214" title="1 of 4 branches missed.">      if (roles != null &amp;&amp; roles.stream().anyMatch(role -&gt; ace.getRoles().contains(role))) {</span>
+<span class="fc" id="L215">        return true;</span>
+      }
+<span class="pc bpc" id="L217" title="1 of 4 branches missed.">      return groups != null &amp;&amp; groups.stream().anyMatch(group -&gt; ace.getGroups().contains(group));</span>
+    }
+  }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.3.201901230119</span></div></body></html>

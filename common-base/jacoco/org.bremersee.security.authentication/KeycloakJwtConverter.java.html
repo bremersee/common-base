@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>KeycloakJwtConverter.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">common-base</a> &gt; <a href="index.source.html" class="el_package">org.bremersee.security.authentication</a> &gt; <span class="el_source">KeycloakJwtConverter.java</span></div><h1>KeycloakJwtConverter.java</h1><pre class="source lang-java linenums">/*
+ * Copyright 2018 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package org.bremersee.security.authentication;
+
+import com.jayway.jsonpath.DocumentContext;
+import com.jayway.jsonpath.JsonPath;
+import com.jayway.jsonpath.Option;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+import net.minidev.json.JSONValue;
+import org.springframework.core.convert.converter.Converter;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
+import org.springframework.util.StringUtils;
+
+/**
+ * A JWT converter for the keycloak identity provider. It use the json path {@code
+ * $.realm_access.roles} to extract the roles from the token.
+ *
+ * @author Christian Bremer
+ */
+public class KeycloakJwtConverter implements Converter&lt;Jwt, JwtAuthenticationToken&gt; {
+
+  private static final String JSON_ROLES_PATH = &quot;$.realm_access.roles&quot;;
+
+<span class="nc" id="L44">  private static final com.jayway.jsonpath.Configuration jsonPathConf</span>
+<span class="nc" id="L45">      = com.jayway.jsonpath.Configuration.builder().options(Option.SUPPRESS_EXCEPTIONS).build();</span>
+
+  /**
+   * Instantiates a new keycloak jwt converter.
+   */
+  @SuppressWarnings(&quot;WeakerAccess&quot;)
+<span class="nc" id="L51">  public KeycloakJwtConverter() {</span>
+<span class="nc" id="L52">  }</span>
+
+  @Override
+  public JwtAuthenticationToken convert(final Jwt jwt) {
+<span class="nc" id="L56">    final String jsonStr = JSONValue.toJSONString(jwt.getClaims());</span>
+<span class="nc" id="L57">    final DocumentContext ctx = JsonPath.parse(jsonStr, jsonPathConf);</span>
+<span class="nc" id="L58">    final List&lt;?&gt; roles = ctx.read(JSON_ROLES_PATH, List.class);</span>
+    final Set&lt;GrantedAuthority&gt; authorities;
+<span class="nc bnc" id="L60" title="All 4 branches missed.">    if (roles == null || roles.isEmpty()) {</span>
+<span class="nc" id="L61">      authorities = Collections.emptySet();</span>
+    } else {
+<span class="nc" id="L63">      authorities = roles</span>
+<span class="nc" id="L64">          .stream()</span>
+<span class="nc" id="L65">          .map(this::buildGrantedAuthority)</span>
+<span class="nc" id="L66">          .collect(Collectors.toSet());</span>
+    }
+<span class="nc" id="L68">    return new KeycloakJwtAuthenticationToken(jwt, authorities);</span>
+  }
+
+  private GrantedAuthority buildGrantedAuthority(final Object name) {
+    final SimpleGrantedAuthority authority;
+<span class="nc bnc" id="L73" title="All 4 branches missed.">    if (name instanceof String &amp;&amp; StringUtils.hasText((String) name)) {</span>
+<span class="nc bnc" id="L74" title="All 2 branches missed.">      authority = new SimpleGrantedAuthority(((String) name).startsWith(&quot;ROLE_&quot;)</span>
+          ? (String) name : &quot;ROLE_&quot; + name);
+    } else {
+<span class="nc" id="L77">      authority = new SimpleGrantedAuthority(&quot;ROLE_NULL&quot;);</span>
+    }
+<span class="nc" id="L79">    return authority;</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.3.201901230119</span></div></body></html>

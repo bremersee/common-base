@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AclMapperImpl.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">common-base</a> &gt; <a href="index.source.html" class="el_package">org.bremersee.security.access</a> &gt; <span class="el_source">AclMapperImpl.java</span></div><h1>AclMapperImpl.java</h1><pre class="source lang-java linenums">/*
+ * Copyright 2019 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package org.bremersee.security.access;
+
+import static org.springframework.util.Assert.notNull;
+
+import javax.validation.constraints.NotNull;
+import lombok.Getter;
+import lombok.Setter;
+import org.bremersee.common.model.AccessControlList;
+import org.bremersee.security.core.AuthorityConstants;
+import org.springframework.lang.Nullable;
+
+/**
+ * The acl mapper implementation.
+ *
+ * @param &lt;T&gt; the acl type
+ * @author Christian Bremer
+ */
+@SuppressWarnings({&quot;unused&quot;, &quot;WeakerAccess&quot;})
+public class AclMapperImpl&lt;T extends Acl&lt;? extends Ace&gt;&gt; implements AclMapper&lt;T&gt; {
+
+  private final AclFactory&lt;T&gt; aclFactory;
+
+  private final String[] defaultPermissions;
+
+  private final boolean switchAdminAccess;
+
+  private final boolean returnNull;
+
+<span class="pc" id="L45">  @Getter</span>
+<span class="nc" id="L46">  @Setter</span>
+  private String adminRole = AuthorityConstants.ADMIN_ROLE_NAME;
+
+  /**
+   * Instantiates a new acl mapper.
+   *
+   * @param aclFactory the acl factory
+   */
+  public AclMapperImpl(
+      @NotNull AclFactory&lt;T&gt; aclFactory) {
+<span class="fc" id="L56">    this(aclFactory, null, false);</span>
+<span class="fc" id="L57">  }</span>
+
+  /**
+   * Instantiates a new acl mapper.
+   *
+   * @param aclFactory         the acl factory
+   * @param defaultPermissions the default permissions
+   * @param switchAdminAccess  the switch admin access
+   */
+  public AclMapperImpl(
+      @NotNull AclFactory&lt;T&gt; aclFactory,
+      @Nullable String[] defaultPermissions,
+      boolean switchAdminAccess) {
+<span class="fc" id="L70">    this(aclFactory, defaultPermissions, switchAdminAccess, false);</span>
+<span class="fc" id="L71">  }</span>
+
+  /**
+   * Instantiates a new acl mapper.
+   *
+   * @param aclFactory         the acl factory
+   * @param defaultPermissions the default permissions
+   * @param switchAdminAccess  the switch admin access
+   * @param returnNull         the return null
+   */
+  public AclMapperImpl(
+      @NotNull AclFactory&lt;T&gt; aclFactory,
+      @Nullable String[] defaultPermissions,
+      boolean switchAdminAccess,
+<span class="fc" id="L85">      boolean returnNull) {</span>
+<span class="fc" id="L86">    notNull(aclFactory, &quot;Acl factory must not be null.&quot;);</span>
+<span class="fc" id="L87">    this.aclFactory = aclFactory;</span>
+<span class="fc" id="L88">    this.defaultPermissions = defaultPermissions;</span>
+<span class="fc" id="L89">    this.switchAdminAccess = switchAdminAccess;</span>
+<span class="fc" id="L90">    this.returnNull = returnNull;</span>
+<span class="fc" id="L91">  }</span>
+
+  @Override
+  public AccessControlList defaultAccessControlList(String owner) {
+<span class="fc" id="L95">    return AclBuilder</span>
+<span class="fc" id="L96">        .builder()</span>
+<span class="fc" id="L97">        .owner(owner)</span>
+<span class="fc" id="L98">        .addUser(owner, defaultPermissions)</span>
+<span class="fc" id="L99">        .buildAccessControlList();</span>
+  }
+
+  @Override
+  public AccessControlList map(Acl acl) {
+<span class="fc bfc" id="L104" title="All 4 branches covered.">    if (acl == null &amp;&amp; returnNull) {</span>
+<span class="fc" id="L105">      return null;</span>
+    }
+    final AclBuilder aclBuilder = AclBuilder
+<span class="fc" id="L108">        .builder()</span>
+<span class="fc" id="L109">        .from(acl)</span>
+<span class="fc" id="L110">        .defaults(defaultPermissions);</span>
+<span class="fc bfc" id="L111" title="All 2 branches covered.">    if (switchAdminAccess) {</span>
+<span class="fc" id="L112">      return aclBuilder</span>
+<span class="fc" id="L113">          .removeAdminAccess(adminRole)</span>
+<span class="fc" id="L114">          .buildAccessControlList();</span>
+    }
+<span class="fc" id="L116">    return aclBuilder</span>
+<span class="fc" id="L117">        .buildAccessControlList();</span>
+  }
+
+  @Override
+  public T map(AccessControlList accessControlList) {
+<span class="fc bfc" id="L122" title="All 4 branches covered.">    if (accessControlList == null &amp;&amp; returnNull) {</span>
+<span class="fc" id="L123">      return null;</span>
+    }
+    final AclBuilder aclBuilder = AclBuilder
+<span class="fc" id="L126">        .builder()</span>
+<span class="fc" id="L127">        .from(accessControlList)</span>
+<span class="fc" id="L128">        .defaults(defaultPermissions);</span>
+<span class="fc bfc" id="L129" title="All 2 branches covered.">    if (switchAdminAccess) {</span>
+<span class="fc" id="L130">      return aclBuilder</span>
+<span class="fc" id="L131">          .ensureAdminAccess(adminRole)</span>
+<span class="fc" id="L132">          .build(aclFactory);</span>
+    }
+<span class="fc" id="L134">    return aclBuilder</span>
+<span class="fc" id="L135">        .build(aclFactory);</span>
+  }
+
+  @Override
+  public T defaultAcl(@Nullable String owner) {
+    final AclBuilder aclBuilder = AclBuilder
+<span class="fc" id="L141">        .builder()</span>
+<span class="fc" id="L142">        .owner(owner)</span>
+<span class="fc" id="L143">        .addUser(owner, defaultPermissions);</span>
+<span class="pc bpc" id="L144" title="1 of 2 branches missed.">    if (switchAdminAccess) {</span>
+<span class="fc" id="L145">      return aclBuilder</span>
+<span class="fc" id="L146">          .ensureAdminAccess(adminRole)</span>
+<span class="fc" id="L147">          .build(aclFactory);</span>
+    }
+<span class="nc" id="L149">    return aclBuilder</span>
+<span class="nc" id="L150">        .build(aclFactory);</span>
+  }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.3.201901230119</span></div></body></html>

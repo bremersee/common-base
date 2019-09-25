@@ -1,0 +1,352 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>InvocationUtils.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">common-base-reactive</a> &gt; <a href="index.source.html" class="el_package">org.bremersee.web.reactive.function.client.proxy</a> &gt; <span class="el_source">InvocationUtils.java</span></div><h1>InvocationUtils.java</h1><pre class="source lang-java linenums">/*
+ * Copyright 2019 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package org.bremersee.web.reactive.function.client.proxy;
+
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Method;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
+import org.springframework.core.annotation.AnnotationUtils;
+import org.springframework.util.MultiValueMap;
+import org.springframework.util.StringUtils;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.util.UriBuilder;
+
+/**
+ * The invocation utils.
+ *
+ * @author Christian Bremer
+ */
+abstract class InvocationUtils {
+
+  private InvocationUtils() {
+  }
+
+  /**
+   * Gets request path.
+   *
+   * @param cls    the cls
+   * @param method the method
+   * @return the request path
+   */
+  static String getRequestPath(final Class&lt;?&gt; cls, final Method method) {
+
+    // Request mapping on class
+<span class="pc bpc" id="L63" title="1 of 2 branches missed.">    String clsPath = findRequestMappingValue(cls, a -&gt; a.value().length &gt; 0, a -&gt; a.value()[0])</span>
+<span class="pc bnc" id="L64" title="All 2 branches missed.">        .orElseGet(() -&gt; findRequestMappingValue(cls, a -&gt; a.path().length &gt; 0, a -&gt; a.path()[0])</span>
+<span class="fc" id="L65">            .orElse(&quot;&quot;));</span>
+
+    // Request mapping on method
+<span class="fc bfc" id="L68" title="All 2 branches covered.">    String mPath = findRequestMappingValue(method, a -&gt; a.value().length &gt; 0, a -&gt; a.value()[0])</span>
+<span class="pc bpc" id="L69" title="1 of 2 branches missed.">        .orElseGet(() -&gt; findRequestMappingValue(method, a -&gt; a.path().length &gt; 0, a -&gt; a.path()[0])</span>
+<span class="fc" id="L70">            .orElse(&quot;&quot;));</span>
+<span class="fc bfc" id="L71" title="All 2 branches covered.">    if (StringUtils.hasText(mPath)) {</span>
+<span class="fc" id="L72">      return clsPath + mPath;</span>
+    }
+
+    // Get mapping on method
+<span class="fc bfc" id="L76" title="All 2 branches covered.">    mPath = findGetMappingValue(method, a -&gt; a.value().length &gt; 0, a -&gt; a.value()[0])</span>
+<span class="pc bpc" id="L77" title="1 of 2 branches missed.">        .orElseGet(() -&gt; findGetMappingValue(method, a -&gt; a.path().length &gt; 0, a -&gt; a.path()[0])</span>
+<span class="fc" id="L78">            .orElse(&quot;&quot;));</span>
+<span class="fc bfc" id="L79" title="All 2 branches covered.">    if (StringUtils.hasText(mPath)) {</span>
+<span class="fc" id="L80">      return clsPath + mPath;</span>
+    }
+
+    // Post mapping on method
+<span class="pc bpc" id="L84" title="1 of 2 branches missed.">    mPath = findPostMappingValue(method, a -&gt; a.value().length &gt; 0, a -&gt; a.value()[0])</span>
+<span class="pc bnc" id="L85" title="All 2 branches missed.">        .orElseGet(() -&gt; findPostMappingValue(method, a -&gt; a.path().length &gt; 0, a -&gt; a.path()[0])</span>
+<span class="fc" id="L86">            .orElse(&quot;&quot;));</span>
+<span class="fc bfc" id="L87" title="All 2 branches covered.">    if (StringUtils.hasText(mPath)) {</span>
+<span class="fc" id="L88">      return clsPath + mPath;</span>
+    }
+
+    // Put mapping on method
+<span class="pc bpc" id="L92" title="1 of 2 branches missed.">    mPath = findPutMappingValue(method, a -&gt; a.value().length &gt; 0, a -&gt; a.value()[0])</span>
+<span class="pc bnc" id="L93" title="All 2 branches missed.">        .orElseGet(() -&gt; findPutMappingValue(method, a -&gt; a.path().length &gt; 0, a -&gt; a.path()[0])</span>
+<span class="fc" id="L94">            .orElse(&quot;&quot;));</span>
+<span class="fc bfc" id="L95" title="All 2 branches covered.">    if (StringUtils.hasText(mPath)) {</span>
+<span class="fc" id="L96">      return clsPath + mPath;</span>
+    }
+
+    // Patch mapping on method
+<span class="pc bpc" id="L100" title="1 of 2 branches missed.">    mPath = findPatchMappingValue(method, a -&gt; a.value().length &gt; 0, a -&gt; a.value()[0])</span>
+<span class="pc bnc" id="L101" title="All 2 branches missed.">        .orElseGet(() -&gt; findPatchMappingValue(method, a -&gt; a.path().length &gt; 0, a -&gt; a.path()[0])</span>
+<span class="fc" id="L102">            .orElse(&quot;&quot;));</span>
+<span class="fc bfc" id="L103" title="All 2 branches covered.">    if (StringUtils.hasText(mPath)) {</span>
+<span class="fc" id="L104">      return clsPath + mPath;</span>
+    }
+
+    // Delete mapping on method
+<span class="pc bpc" id="L108" title="1 of 2 branches missed.">    mPath = findDeleteMappingValue(method, a -&gt; a.value().length &gt; 0, a -&gt; a.value()[0])</span>
+<span class="pc bnc" id="L109" title="All 2 branches missed.">        .orElseGet(() -&gt; findDeleteMappingValue(method, a -&gt; a.path().length &gt; 0, a -&gt; a.path()[0])</span>
+<span class="fc" id="L110">            .orElse(&quot;&quot;));</span>
+
+<span class="fc" id="L112">    return clsPath + mPath;</span>
+  }
+
+  /**
+   * Gets path variables.
+   *
+   * @param method the method
+   * @param args   the args
+   * @return the path variables
+   */
+  static Map&lt;String, Object&gt; getPathVariables(final Method method, final Object[] args) {
+<span class="fc" id="L123">    final Map&lt;String, Object&gt; values = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L124">    final Annotation[][] parameterAnnotations = method.getParameterAnnotations();</span>
+<span class="fc bfc" id="L125" title="All 2 branches covered.">    for (int i = 0; i &lt; parameterAnnotations.length; i++) {</span>
+<span class="fc bfc" id="L126" title="All 2 branches covered.">      for (final Annotation annotation : parameterAnnotations[i]) {</span>
+<span class="fc bfc" id="L127" title="All 2 branches covered.">        if (annotation instanceof PathVariable) {</span>
+<span class="fc" id="L128">          final PathVariable param = (PathVariable) annotation;</span>
+<span class="pc bpc" id="L129" title="1 of 2 branches missed.">          final String name = StringUtils.hasText(param.value()) ? param.value() : param.name();</span>
+<span class="fc" id="L130">          final Object value = args[i];</span>
+<span class="fc" id="L131">          values.put(name, value);</span>
+        }
+      }
+    }
+<span class="fc" id="L135">    return values;</span>
+  }
+
+  /**
+   * Gets request params.
+   *
+   * @param method the method
+   * @param args   the args
+   * @return the request params
+   */
+  @SuppressWarnings(&quot;WeakerAccess&quot;)
+  static Map&lt;String, Object[]&gt; getRequestParams(final Method method, final Object[] args) {
+<span class="fc" id="L147">    final Map&lt;String, Object[]&gt; values = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L148">    final Annotation[][] parameterAnnotations = method.getParameterAnnotations();</span>
+<span class="fc bfc" id="L149" title="All 2 branches covered.">    for (int i = 0; i &lt; parameterAnnotations.length; i++) {</span>
+<span class="fc bfc" id="L150" title="All 2 branches covered.">      for (final Annotation annotation : parameterAnnotations[i]) {</span>
+<span class="fc bfc" id="L151" title="All 2 branches covered.">        if (annotation instanceof RequestParam) {</span>
+<span class="fc" id="L152">          final RequestParam param = (RequestParam) annotation;</span>
+<span class="fc bfc" id="L153" title="All 2 branches covered.">          final String name = StringUtils.hasText(param.value()) ? param.value() : param.name();</span>
+<span class="fc" id="L154">          final Object value = args[i];</span>
+<span class="pc bpc" id="L155" title="1 of 2 branches missed.">          if (value instanceof Map) {</span>
+<span class="nc" id="L156">            final Map&lt;?, ?&gt; map = (Map) value;</span>
+<span class="nc bnc" id="L157" title="All 2 branches missed.">            for (Map.Entry&lt;?, ?&gt; entry : map.entrySet()) {</span>
+<span class="nc" id="L158">              final String key = String.valueOf(entry.getKey());</span>
+<span class="nc" id="L159">              final Object mapValue = entry.getValue();</span>
+<span class="nc bnc" id="L160" title="All 2 branches missed.">              if (mapValue instanceof Collection) {</span>
+<span class="nc" id="L161">                values.put(key, ((Collection&lt;?&gt;) mapValue).toArray(new Object[0]));</span>
+              } else {
+<span class="nc" id="L163">                values.put(key, new Object[]{mapValue});</span>
+              }
+<span class="nc" id="L165">            }</span>
+<span class="pc bpc" id="L166" title="1 of 2 branches missed.">          } else if (value instanceof Collection) {</span>
+<span class="nc" id="L167">            values.put(name, ((Collection&lt;?&gt;) value).toArray(new Object[0]));</span>
+          } else {
+<span class="fc" id="L169">            values.put(name, new Object[]{value});</span>
+          }
+        }
+      }
+    }
+<span class="fc" id="L174">    return values;</span>
+  }
+
+  /**
+   * Sets request params.
+   *
+   * @param method     the method
+   * @param args       the args
+   * @param uriBuilder the uri builder
+   * @return the request params
+   */
+  static UriBuilder setRequestParams(final Method method, final Object[] args,
+      final UriBuilder uriBuilder) {
+<span class="fc" id="L187">    UriBuilder builder = uriBuilder;</span>
+<span class="fc bfc" id="L188" title="All 2 branches covered.">    for (Map.Entry&lt;String, Object[]&gt; param : getRequestParams(method, args).entrySet()) {</span>
+<span class="fc" id="L189">      builder = builder.queryParam(param.getKey(), param.getValue());</span>
+<span class="fc" id="L190">    }</span>
+<span class="fc" id="L191">    return builder;</span>
+  }
+
+  /**
+   * Find accept header string.
+   *
+   * @param method the method
+   * @return the string
+   */
+  static String findAcceptHeader(final Method method) {
+<span class="fc" id="L201">    return findRequestMappingValue(</span>
+<span class="fc bfc" id="L202" title="All 2 branches covered.">        method, a -&gt; a.produces().length &gt; 0, a -&gt; a.produces()[0])</span>
+<span class="fc" id="L203">        .orElseGet(() -&gt; findGetMappingValue(</span>
+<span class="fc bfc" id="L204" title="All 2 branches covered.">            method, a -&gt; a.produces().length &gt; 0, a -&gt; a.produces()[0])</span>
+<span class="fc" id="L205">            .orElseGet(() -&gt; findPostMappingValue(</span>
+<span class="fc bfc" id="L206" title="All 2 branches covered.">                method, a -&gt; a.produces().length &gt; 0, a -&gt; a.produces()[0])</span>
+<span class="fc" id="L207">                .orElseGet(() -&gt; findPutMappingValue(</span>
+<span class="pc bpc" id="L208" title="1 of 2 branches missed.">                    method, a -&gt; a.produces().length &gt; 0, a -&gt; a.produces()[0])</span>
+<span class="fc" id="L209">                    .orElseGet(() -&gt; findPatchMappingValue(</span>
+<span class="pc bpc" id="L210" title="1 of 2 branches missed.">                        method, a -&gt; a.produces().length &gt; 0, a -&gt; a.produces()[0])</span>
+<span class="fc" id="L211">                        .orElseGet(() -&gt; findDeleteMappingValue(</span>
+<span class="pc bpc" id="L212" title="1 of 2 branches missed.">                            method, a -&gt; a.produces().length &gt; 0, a -&gt; a.produces()[0])</span>
+<span class="fc" id="L213">                            .orElse(null))))));</span>
+  }
+
+  /**
+   * Find content type header string.
+   *
+   * @param method the method
+   * @return the string
+   */
+  static String findContentTypeHeader(final Method method) {
+<span class="fc" id="L223">    return findRequestMappingValue(</span>
+<span class="fc bfc" id="L224" title="All 2 branches covered.">        method, a -&gt; a.consumes().length &gt; 0, a -&gt; a.consumes()[0])</span>
+<span class="fc" id="L225">        .orElseGet(() -&gt; findGetMappingValue(</span>
+<span class="pc bpc" id="L226" title="1 of 2 branches missed.">            method, a -&gt; a.consumes().length &gt; 0, a -&gt; a.consumes()[0])</span>
+<span class="fc" id="L227">            .orElseGet(() -&gt; findPostMappingValue(</span>
+<span class="fc bfc" id="L228" title="All 2 branches covered.">                method, a -&gt; a.consumes().length &gt; 0, a -&gt; a.consumes()[0])</span>
+<span class="fc" id="L229">                .orElseGet(() -&gt; findPutMappingValue(</span>
+<span class="pc bpc" id="L230" title="1 of 2 branches missed.">                    method, a -&gt; a.consumes().length &gt; 0, a -&gt; a.consumes()[0])</span>
+<span class="fc" id="L231">                    .orElseGet(() -&gt; findPatchMappingValue(</span>
+<span class="pc bpc" id="L232" title="1 of 2 branches missed.">                        method, a -&gt; a.consumes().length &gt; 0, a -&gt; a.consumes()[0])</span>
+<span class="fc" id="L233">                        .orElseGet(() -&gt; findDeleteMappingValue(</span>
+<span class="pc bpc" id="L234" title="1 of 2 branches missed.">                            method, a -&gt; a.consumes().length &gt; 0, a -&gt; a.consumes()[0])</span>
+<span class="fc" id="L235">                            .orElse(null))))));</span>
+  }
+
+  /**
+   * Find request mapping value optional.
+   *
+   * @param &lt;T&gt;       the type parameter
+   * @param obj       the obj
+   * @param condition the condition
+   * @param selector  the selector
+   * @return the optional
+   */
+  static &lt;T&gt; Optional&lt;T&gt; findRequestMappingValue(
+      Object obj, // can be method or target class
+      Predicate&lt;RequestMapping&gt; condition,
+      Function&lt;RequestMapping, T&gt; selector) {
+
+<span class="fc bfc" id="L252" title="All 2 branches covered.">    if (obj instanceof Method) {</span>
+<span class="fc" id="L253">      final Method method = (Method) obj;</span>
+<span class="fc" id="L254">      return Optional.of(method)</span>
+<span class="fc" id="L255">          .map(m -&gt; AnnotationUtils.findAnnotation(m, RequestMapping.class))</span>
+<span class="fc" id="L256">          .filter(condition)</span>
+<span class="fc" id="L257">          .map(selector);</span>
+    } else {
+<span class="pc bpc" id="L259" title="1 of 2 branches missed.">      final Class&lt;?&gt; cls = obj instanceof Class ? (Class&lt;?&gt;) obj : obj.getClass();</span>
+<span class="fc" id="L260">      return Optional.of(cls)</span>
+<span class="fc" id="L261">          .map(m -&gt; AnnotationUtils.findAnnotation(m, RequestMapping.class))</span>
+<span class="fc" id="L262">          .filter(condition)</span>
+<span class="fc" id="L263">          .map(selector);</span>
+    }
+  }
+
+  private static &lt;T&gt; Optional&lt;T&gt; findGetMappingValue(Method method, Predicate&lt;GetMapping&gt; condition,
+      Function&lt;GetMapping, T&gt; selector) {
+<span class="fc" id="L269">    return Optional.of(method)</span>
+<span class="fc" id="L270">        .map(m -&gt; AnnotationUtils.findAnnotation(m, GetMapping.class))</span>
+<span class="fc" id="L271">        .filter(condition)</span>
+<span class="fc" id="L272">        .map(selector);</span>
+  }
+
+  private static &lt;T&gt; Optional&lt;T&gt; findPostMappingValue(Method method,
+      Predicate&lt;PostMapping&gt; condition,
+      Function&lt;PostMapping, T&gt; selector) {
+<span class="fc" id="L278">    return Optional.of(method)</span>
+<span class="fc" id="L279">        .map(m -&gt; AnnotationUtils.findAnnotation(m, PostMapping.class))</span>
+<span class="fc" id="L280">        .filter(condition)</span>
+<span class="fc" id="L281">        .map(selector);</span>
+  }
+
+  private static &lt;T&gt; Optional&lt;T&gt; findPutMappingValue(Method method, Predicate&lt;PutMapping&gt; condition,
+      Function&lt;PutMapping, T&gt; selector) {
+<span class="fc" id="L286">    return Optional.of(method)</span>
+<span class="fc" id="L287">        .map(m -&gt; AnnotationUtils.findAnnotation(m, PutMapping.class))</span>
+<span class="fc" id="L288">        .filter(condition)</span>
+<span class="fc" id="L289">        .map(selector);</span>
+  }
+
+  private static &lt;T&gt; Optional&lt;T&gt; findPatchMappingValue(Method method,
+      Predicate&lt;PatchMapping&gt; condition,
+      Function&lt;PatchMapping, T&gt; selector) {
+<span class="fc" id="L295">    return Optional.of(method)</span>
+<span class="fc" id="L296">        .map(m -&gt; AnnotationUtils.findAnnotation(m, PatchMapping.class))</span>
+<span class="fc" id="L297">        .filter(condition)</span>
+<span class="fc" id="L298">        .map(selector);</span>
+  }
+
+  private static &lt;T&gt; Optional&lt;T&gt; findDeleteMappingValue(Method method,
+      Predicate&lt;DeleteMapping&gt; condition,
+      Function&lt;DeleteMapping, T&gt; selector) {
+<span class="fc" id="L304">    return Optional.of(method)</span>
+<span class="fc" id="L305">        .map(m -&gt; AnnotationUtils.findAnnotation(m, DeleteMapping.class))</span>
+<span class="fc" id="L306">        .filter(condition)</span>
+<span class="fc" id="L307">        .map(selector);</span>
+  }
+
+  /**
+   * Put to multi value map.
+   *
+   * @param name          the name
+   * @param value         the value
+   * @param multiValueMap the multi value map
+   */
+  static void putToMultiValueMap(
+      final String name,
+      final Object value,
+      final MultiValueMap&lt;String, String&gt; multiValueMap) {
+
+<span class="pc bpc" id="L322" title="1 of 2 branches missed.">    if (value instanceof Map) {</span>
+<span class="nc" id="L323">      final Map&lt;?, ?&gt; map = (Map) value;</span>
+<span class="nc bnc" id="L324" title="All 2 branches missed.">      for (Map.Entry&lt;?, ?&gt; entry : map.entrySet()) {</span>
+<span class="nc" id="L325">        final String key = String.valueOf(entry.getKey());</span>
+<span class="nc" id="L326">        final Object mapValue = entry.getValue();</span>
+<span class="nc bnc" id="L327" title="All 2 branches missed.">        if (mapValue instanceof Collection) {</span>
+<span class="nc" id="L328">          putCollectionToValueMap(key, (Collection) mapValue, multiValueMap);</span>
+<span class="nc bnc" id="L329" title="All 2 branches missed.">        } else if (mapValue != null) {</span>
+<span class="nc" id="L330">          multiValueMap.set(key, String.valueOf(mapValue));</span>
+        }
+<span class="nc" id="L332">      }</span>
+<span class="pc bpc" id="L333" title="1 of 2 branches missed.">    } else if (value instanceof Collection) {</span>
+<span class="nc" id="L334">      putCollectionToValueMap(name, (Collection) value, multiValueMap);</span>
+<span class="pc bpc" id="L335" title="1 of 2 branches missed.">    } else if (value != null) {</span>
+<span class="fc" id="L336">      multiValueMap.set(name, String.valueOf(value));</span>
+    }
+<span class="fc" id="L338">  }</span>
+
+  private static void putCollectionToValueMap(
+      final String key,
+      final Collection&lt;?&gt; collection,
+      final MultiValueMap&lt;String, String&gt; multiValueMap) {
+<span class="nc" id="L344">    final List&lt;String&gt; list = collection.stream()</span>
+<span class="nc" id="L345">        .filter(Objects::nonNull)</span>
+<span class="nc" id="L346">        .map(Object::toString)</span>
+<span class="nc" id="L347">        .collect(Collectors.toList());</span>
+<span class="nc" id="L348">    multiValueMap.put(key, list);</span>
+<span class="nc" id="L349">  }</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.3.201901230119</span></div></body></html>
