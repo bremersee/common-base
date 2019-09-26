@@ -1,5 +1,8 @@
 target/
 
+### mvn site ###
+velocity.log
+
 ### STS ###
 .apt_generated
 .classpath

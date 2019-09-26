@@ -13,6 +13,17 @@ pipeline {
         sh 'mvn test'
       }
     }
+    stage('Install') {
+      when {
+        anyOf {
+          branch 'develop'
+          branch 'master'
+        }
+      }
+      steps {
+        sh 'mvn install'
+      }
+    }
     stage('Deploy') {
       when {
         anyOf {
@@ -24,15 +35,20 @@ pipeline {
         sh 'mvn -P deploy deploy'
       }
     }
-    stage('Site') {
+    stage('Snapshot Site') {
       when {
-        anyOf {
-          branch 'develop'
-          branch 'master'
-        }
+        branch 'develop'
       }
       steps {
         sh 'mvn site-deploy'
+      }
+    }
+    stage('Release Site') {
+      when {
+        branch 'master'
+      }
+      steps {
+        sh 'mvn -P gh-pages-site site site:stage scm-publish:publish-scm'
       }
     }
   }
