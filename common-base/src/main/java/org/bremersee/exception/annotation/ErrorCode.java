@@ -26,9 +26,7 @@ import org.bremersee.exception.RestApiExceptionUtils;
 /**
  * Marks an exception class or method with an error code {@link #value()} of the application.
  *
- * <p>The error code is applied to the HTTP response by the
- * {@link org.bremersee.web.servlet.ApiExceptionResolver} or in a reactive environment by the {@link
- * org.bremersee.web.reactive.ApiExceptionHandler}.
+ * <p>The error code is applied to the HTTP response.
  *
  * @author Christian Bremer
  */

@@ -203,7 +203,7 @@ public class RestApiExceptionMapperProperties {
         .filter(exceptionMapping -> matches(
             throwable, exceptionMapping.getExceptionClassName()))
         .findFirst()
-        .orElse(getDefaultExceptionMapping());
+        .orElseGet(this::getDefaultExceptionMapping);
   }
 
   /**
@@ -221,7 +221,7 @@ public class RestApiExceptionMapperProperties {
         .filter(exceptionMappingConfig -> matches(
             throwable, exceptionMappingConfig.getExceptionClassName()))
         .findFirst()
-        .orElse(getDefaultExceptionMappingConfig());
+        .orElseGet(this::getDefaultExceptionMappingConfig);
   }
 
   private boolean matches(final Throwable throwable, final String exceptionClassName) {

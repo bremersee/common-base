@@ -43,6 +43,9 @@
         <item name="Maven" href="https://maven.apache.org"/>
     </links>
     -->
+		<menu name="Parent">
+			<item name="${project.parent.artifactId}" href="../index.html" />
+		</menu>
 		<menu ref="reports"/>
 		<footer><![CDATA[<p>&copy;${project.inceptionYear} ${project.organization.name}</p>]]></footer>
 	</body>
