@@ -74,12 +74,12 @@ public class ControllerOneImpl implements ControllerOne {
 
   @Override
   public Mono<Map<String, Object>> upload(
-      String xHeaderValue,
+      String headerValue,
       String lastValue,
       MultiValueMap<String, ?> data) {
 
     LinkedHashMap<String, Object> map = new LinkedHashMap<>();
-    map.put("x-ok-flag", xHeaderValue);
+    map.put("x-ok-flag", headerValue);
     map.put("last", lastValue);
     map.putAll(data);
     return Mono.just(map);

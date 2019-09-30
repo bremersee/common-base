@@ -65,51 +65,51 @@ abstract class InvocationUtils {
             .orElse(""));
 
     // Request mapping on method
-    String mPath = findRequestMappingValue(method, a -> a.value().length > 0, a -> a.value()[0])
+    String path = findRequestMappingValue(method, a -> a.value().length > 0, a -> a.value()[0])
         .orElseGet(() -> findRequestMappingValue(method, a -> a.path().length > 0, a -> a.path()[0])
             .orElse(""));
-    if (StringUtils.hasText(mPath)) {
-      return clsPath + mPath;
+    if (StringUtils.hasText(path)) {
+      return clsPath + path;
     }
 
     // Get mapping on method
-    mPath = findGetMappingValue(method, a -> a.value().length > 0, a -> a.value()[0])
+    path = findGetMappingValue(method, a -> a.value().length > 0, a -> a.value()[0])
         .orElseGet(() -> findGetMappingValue(method, a -> a.path().length > 0, a -> a.path()[0])
             .orElse(""));
-    if (StringUtils.hasText(mPath)) {
-      return clsPath + mPath;
+    if (StringUtils.hasText(path)) {
+      return clsPath + path;
     }
 
     // Post mapping on method
-    mPath = findPostMappingValue(method, a -> a.value().length > 0, a -> a.value()[0])
+    path = findPostMappingValue(method, a -> a.value().length > 0, a -> a.value()[0])
         .orElseGet(() -> findPostMappingValue(method, a -> a.path().length > 0, a -> a.path()[0])
             .orElse(""));
-    if (StringUtils.hasText(mPath)) {
-      return clsPath + mPath;
+    if (StringUtils.hasText(path)) {
+      return clsPath + path;
     }
 
     // Put mapping on method
-    mPath = findPutMappingValue(method, a -> a.value().length > 0, a -> a.value()[0])
+    path = findPutMappingValue(method, a -> a.value().length > 0, a -> a.value()[0])
         .orElseGet(() -> findPutMappingValue(method, a -> a.path().length > 0, a -> a.path()[0])
             .orElse(""));
-    if (StringUtils.hasText(mPath)) {
-      return clsPath + mPath;
+    if (StringUtils.hasText(path)) {
+      return clsPath + path;
     }
 
     // Patch mapping on method
-    mPath = findPatchMappingValue(method, a -> a.value().length > 0, a -> a.value()[0])
+    path = findPatchMappingValue(method, a -> a.value().length > 0, a -> a.value()[0])
         .orElseGet(() -> findPatchMappingValue(method, a -> a.path().length > 0, a -> a.path()[0])
             .orElse(""));
-    if (StringUtils.hasText(mPath)) {
-      return clsPath + mPath;
+    if (StringUtils.hasText(path)) {
+      return clsPath + path;
     }
 
     // Delete mapping on method
-    mPath = findDeleteMappingValue(method, a -> a.value().length > 0, a -> a.value()[0])
+    path = findDeleteMappingValue(method, a -> a.value().length > 0, a -> a.value()[0])
         .orElseGet(() -> findDeleteMappingValue(method, a -> a.path().length > 0, a -> a.path()[0])
             .orElse(""));
 
-    return clsPath + mPath;
+    return clsPath + path;
   }
 
   /**

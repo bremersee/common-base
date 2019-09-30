@@ -113,7 +113,7 @@ public interface ControllerOne {
   /**
    * Upload mono.
    *
-   * @param xHeaderValue the x header value
+   * @param headerValue the x header value
    * @param lastValue    the last value
    * @param data         the data
    * @return the mono
@@ -123,7 +123,7 @@ public interface ControllerOne {
       consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE,
       produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
   Mono<Map<String, Object>> upload(
-      @RequestHeader(name = "x-ok-flag") String xHeaderValue,
+      @RequestHeader(name = "x-ok-flag") String headerValue,
       @CookieValue(name = "last") String lastValue,
       @RequestBody MultiValueMap<String, ?> data);
 

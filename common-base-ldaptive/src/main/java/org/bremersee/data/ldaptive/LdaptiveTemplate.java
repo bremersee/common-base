@@ -132,16 +132,6 @@ public class LdaptiveTemplate implements LdaptiveOperations {
   }
 
   /**
-   * Execute the given delete request.
-   *
-   * @param deleteRequest the delete request
-   */
-  public void delete(@NotNull final DeleteRequest deleteRequest) {
-    execute((LdaptiveConnectionCallbackWithoutResult) connection -> new DeleteOperation(connection)
-        .execute(deleteRequest));
-  }
-
-  /**
    * Find one ldap entry.
    *
    * @param searchRequest the search request
@@ -240,6 +230,20 @@ public class LdaptiveTemplate implements LdaptiveOperations {
     });
   }
 
+  /**
+   * Save domain object.
+   *
+   * @param <T>          the type of the domain object
+   * @param domainObject the domain object
+   * @param entryMapper  the entry mapper that maps a ldap entry into the domain object
+   * @return the saved domain object
+   */
+  public <T> T save(
+      @NotNull final T domainObject,
+      @NotNull final LdaptiveEntryMapper<T> entryMapper) {
+    return execute(connection -> save(domainObject, entryMapper, connection));
+  }
+
   private <T> T save(
       final T domainObject,
       final LdaptiveEntryMapper<T> entryMapper,
@@ -272,20 +276,6 @@ public class LdaptiveTemplate implements LdaptiveOperations {
   }
 
   /**
-   * Save domain object.
-   *
-   * @param <T>          the type of the domain object
-   * @param domainObject the domain object
-   * @param entryMapper  the entry mapper that maps a ldap entry into the domain object
-   * @return the saved domain object
-   */
-  public <T> T save(
-      @NotNull final T domainObject,
-      @NotNull final LdaptiveEntryMapper<T> entryMapper) {
-    return execute(connection -> save(domainObject, entryMapper, connection));
-  }
-
-  /**
    * Save all domain objects.
    *
    * @param <T>          the type of the domain objects
@@ -305,17 +295,14 @@ public class LdaptiveTemplate implements LdaptiveOperations {
         .map(domainModel -> save(domainModel, entryMapper, connection)));
   }
 
-  private <T> void delete(
-      final T domainModel,
-      final LdaptiveEntryMapper<T> entryMapper,
-      final Connection connection) throws LdapRuntimeException {
-
-    try {
-      new DeleteOperation(connection).execute(new DeleteRequest(entryMapper.mapDn(domainModel)));
-
-    } catch (LdapException e) {
-      throw new LdapRuntimeException(e);
-    }
+  /**
+   * Execute the given delete request.
+   *
+   * @param deleteRequest the delete request
+   */
+  public void delete(@NotNull final DeleteRequest deleteRequest) {
+    execute((LdaptiveConnectionCallbackWithoutResult) connection -> new DeleteOperation(connection)
+        .execute(deleteRequest));
   }
 
   /**
@@ -331,6 +318,19 @@ public class LdaptiveTemplate implements LdaptiveOperations {
     execute(
         (LdaptiveConnectionCallbackWithoutResult) connection -> delete(
             domainObject, entryMapper, connection));
+  }
+
+  private <T> void delete(
+      final T domainModel,
+      final LdaptiveEntryMapper<T> entryMapper,
+      final Connection connection) throws LdapRuntimeException {
+
+    try {
+      new DeleteOperation(connection).execute(new DeleteRequest(entryMapper.mapDn(domainModel)));
+
+    } catch (LdapException e) {
+      throw new LdapRuntimeException(e);
+    }
   }
 
   /**
