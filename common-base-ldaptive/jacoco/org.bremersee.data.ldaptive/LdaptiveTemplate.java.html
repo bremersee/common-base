@@ -1,0 +1,374 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>LdaptiveTemplate.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">common-base-ldaptive</a> &gt; <a href="index.source.html" class="el_package">org.bremersee.data.ldaptive</a> &gt; <span class="el_source">LdaptiveTemplate.java</span></div><h1>LdaptiveTemplate.java</h1><pre class="source lang-java linenums">/*
+ * Copyright 2019 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package org.bremersee.data.ldaptive;
+
+import java.util.Collection;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.stream.Stream;
+import javax.validation.constraints.NotNull;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
+import org.bremersee.exception.ServiceException;
+import org.ldaptive.AddOperation;
+import org.ldaptive.AddRequest;
+import org.ldaptive.AttributeModification;
+import org.ldaptive.Connection;
+import org.ldaptive.ConnectionFactory;
+import org.ldaptive.DeleteOperation;
+import org.ldaptive.DeleteRequest;
+import org.ldaptive.LdapEntry;
+import org.ldaptive.LdapException;
+import org.ldaptive.ModifyOperation;
+import org.ldaptive.ModifyRequest;
+import org.ldaptive.SearchOperation;
+import org.ldaptive.SearchRequest;
+import org.springframework.http.HttpStatus;
+import org.springframework.util.Assert;
+
+/**
+ * The template for executing ldap operations.
+ *
+ * @author Christian Bremer
+ */
+<span class="nc" id="L49">@Slf4j</span>
+public class LdaptiveTemplate implements LdaptiveOperations {
+
+  private final ConnectionFactory connectionFactory;
+
+  /**
+   * Instantiates a new ldap template.
+   *
+   * @param connectionFactory the connection factory
+   */
+<span class="nc" id="L59">  public LdaptiveTemplate(final ConnectionFactory connectionFactory) {</span>
+<span class="nc" id="L60">    Assert.notNull(connectionFactory, &quot;Connection factory must not be null.&quot;);</span>
+<span class="nc" id="L61">    this.connectionFactory = connectionFactory;</span>
+<span class="nc" id="L62">  }</span>
+
+  private Connection getConnection() throws LdapException {
+<span class="nc" id="L65">    final Connection connection = this.connectionFactory.getConnection();</span>
+<span class="nc bnc" id="L66" title="All 2 branches missed.">    if (!connection.isOpen()) {</span>
+<span class="nc" id="L67">      connection.open();</span>
+    }
+<span class="nc" id="L69">    return connection;</span>
+  }
+
+  /**
+   * Close the given context and ignore any thrown exception. This is useful for typical finally
+   * blocks in manual ldap statements.
+   *
+   * @param connection the ldap connection to close
+   */
+  private void closeConnection(final Connection connection) {
+<span class="nc bnc" id="L79" title="All 4 branches missed.">    if (connection != null &amp;&amp; connection.isOpen()) {</span>
+      try {
+<span class="nc" id="L81">        connection.close();</span>
+<span class="nc" id="L82">      } catch (final Exception ex) {</span>
+<span class="nc" id="L83">        log.warn(&quot;Closing ldap connection failed.&quot;, ex);</span>
+<span class="nc" id="L84">      }</span>
+    }
+<span class="nc" id="L86">  }</span>
+
+  @Override
+  public &lt;T&gt; T execute(final LdaptiveConnectionCallback&lt;T&gt; callback) {
+<span class="nc" id="L90">    Connection connection = null;</span>
+    try {
+<span class="nc" id="L92">      connection = getConnection();</span>
+<span class="nc" id="L93">      return callback.doWithConnection(connection);</span>
+<span class="nc" id="L94">    } catch (final LdapRuntimeException e) {</span>
+<span class="nc" id="L95">      final ServiceException serviceException = new ServiceException(</span>
+          HttpStatus.INTERNAL_SERVER_ERROR,
+          &quot;org.bremersee:base-common-ldaptive:8150d733-cfb2-46a9-94f6-4f3395e7cecf&quot;,
+<span class="nc" id="L98">          e.getLdapException());</span>
+<span class="nc" id="L99">      log.error(&quot;Executing ldap operation failed.&quot;, serviceException);</span>
+<span class="nc" id="L100">      throw serviceException;</span>
+<span class="nc" id="L101">    } catch (final LdapException e) {</span>
+<span class="nc" id="L102">      final ServiceException serviceException = new ServiceException(</span>
+          HttpStatus.INTERNAL_SERVER_ERROR,
+          &quot;org.bremersee:base-common-ldaptive:af8cb1fc-f9c2-4592-8bd6-de59c6f2a8e6&quot;,
+          e);
+<span class="nc" id="L106">      log.error(&quot;Executing ldap operation failed.&quot;, serviceException);</span>
+<span class="nc" id="L107">      throw serviceException;</span>
+    } finally {
+<span class="nc" id="L109">      closeConnection(connection);</span>
+    }
+  }
+
+  /**
+   * Execute the given add request.
+   *
+   * @param addRequest the add request
+   */
+  public void add(@NotNull final AddRequest addRequest) {
+<span class="nc" id="L119">    execute(connection -&gt; new AddOperation(connection).execute(addRequest));</span>
+<span class="nc" id="L120">  }</span>
+
+  /**
+   * Execute the given modify request.
+   *
+   * @param modifyRequest the modify request
+   */
+  public void modify(@NotNull final ModifyRequest modifyRequest) {
+<span class="nc bnc" id="L128" title="All 2 branches missed.">    if (modifyRequest.getAttributeModifications() != null</span>
+<span class="nc bnc" id="L129" title="All 2 branches missed.">        &amp;&amp; modifyRequest.getAttributeModifications().length &gt; 0) {</span>
+<span class="nc" id="L130">      execute(connection -&gt; new ModifyOperation(connection).execute(modifyRequest));</span>
+    }
+<span class="nc" id="L132">  }</span>
+
+  /**
+   * Find one ldap entry.
+   *
+   * @param searchRequest the search request
+   * @return the ldap entry
+   */
+  public Optional&lt;LdapEntry&gt; findOne(
+      @NotNull final SearchRequest searchRequest) {
+
+<span class="nc" id="L143">    return Optional.ofNullable(</span>
+<span class="nc" id="L144">        execute(connection -&gt; new SearchOperation(connection)</span>
+<span class="nc" id="L145">            .execute(searchRequest)</span>
+<span class="nc" id="L146">            .getResult()</span>
+<span class="nc" id="L147">            .getEntry()));</span>
+  }
+
+  /**
+   * Find one domain object.
+   *
+   * @param &lt;T&gt;           the type of the mapped domain object
+   * @param searchRequest the search request
+   * @param entryMapper   the entry mapper that maps a ldap entry into the domain object
+   * @return the domain object
+   */
+  public &lt;T&gt; Optional&lt;T&gt; findOne(
+      @NotNull final SearchRequest searchRequest,
+      @NotNull final LdaptiveEntryMapper&lt;T&gt; entryMapper) {
+
+<span class="nc" id="L162">    return Optional.ofNullable(</span>
+<span class="nc" id="L163">        execute(connection -&gt; entryMapper</span>
+<span class="nc" id="L164">            .map(new SearchOperation(connection)</span>
+<span class="nc" id="L165">                .execute(searchRequest)</span>
+<span class="nc" id="L166">                .getResult()</span>
+<span class="nc" id="L167">                .getEntry())));</span>
+  }
+
+  /**
+   * Find all ldap entries.
+   *
+   * @param searchRequest the search request
+   * @return the ldap entries
+   */
+  public Collection&lt;LdapEntry&gt; findAll(
+      @NotNull final SearchRequest searchRequest) {
+
+<span class="nc" id="L179">    return execute(connection -&gt; new SearchOperation(connection)</span>
+<span class="nc" id="L180">        .execute(searchRequest)</span>
+<span class="nc" id="L181">        .getResult()</span>
+<span class="nc" id="L182">        .getEntries());</span>
+  }
+
+  /**
+   * Find domain objects.
+   *
+   * @param &lt;T&gt;           the type of the domain objects
+   * @param searchRequest the search request
+   * @param entryMapper   the entry mapper that maps a ldap entry into the domain object
+   * @return the stream of found domain objects
+   */
+  public &lt;T&gt; Stream&lt;T&gt; findAll(
+      @NotNull final SearchRequest searchRequest,
+      @NotNull final LdaptiveEntryMapper&lt;T&gt; entryMapper) {
+
+<span class="nc" id="L197">    return execute(connection -&gt; new SearchOperation(connection)</span>
+<span class="nc" id="L198">        .execute(searchRequest)</span>
+<span class="nc" id="L199">        .getResult()</span>
+<span class="nc" id="L200">        .getEntries()</span>
+<span class="nc" id="L201">        .stream()</span>
+<span class="nc" id="L202">        .map(entryMapper::map))</span>
+<span class="nc" id="L203">        .filter(Objects::nonNull);</span>
+  }
+
+  /**
+   * Check whether a domain object exists or not.
+   *
+   * @param &lt;T&gt;          the type of the domain object
+   * @param domainObject the domain object
+   * @param entryMapper  the entry mapper that maps a ldap entry into the domain object
+   * @return {@code true} if the domain object exists, otherwise {@code false}
+   */
+  public &lt;T&gt; boolean exists(
+      @NotNull final T domainObject,
+      @NotNull final LdaptiveEntryMapper&lt;T&gt; entryMapper) {
+<span class="nc" id="L217">    return execute(connection -&gt; {</span>
+      try {
+<span class="nc bnc" id="L219" title="All 2 branches missed.">        return entryMapper.map(new SearchOperation(connection)</span>
+<span class="nc" id="L220">            .execute(SearchRequest.newObjectScopeSearchRequest(entryMapper.mapDn(domainObject)))</span>
+<span class="nc" id="L221">            .getResult()</span>
+<span class="nc" id="L222">            .getEntry()) != null;</span>
+
+<span class="nc" id="L224">      } catch (LdapException e) {</span>
+<span class="nc bnc" id="L225" title="All 2 branches missed.">        if (e.getCause() instanceof javax.naming.NameNotFoundException) {</span>
+<span class="nc" id="L226">          return false;</span>
+        }
+<span class="nc" id="L228">        throw e;</span>
+      }
+    });
+  }
+
+  /**
+   * Save domain object.
+   *
+   * @param &lt;T&gt;          the type of the domain object
+   * @param domainObject the domain object
+   * @param entryMapper  the entry mapper that maps a ldap entry into the domain object
+   * @return the saved domain object
+   */
+  public &lt;T&gt; T save(
+      @NotNull final T domainObject,
+      @NotNull final LdaptiveEntryMapper&lt;T&gt; entryMapper) {
+<span class="nc" id="L244">    return execute(connection -&gt; save(domainObject, entryMapper, connection));</span>
+  }
+
+  private &lt;T&gt; T save(
+      final T domainObject,
+      final LdaptiveEntryMapper&lt;T&gt; entryMapper,
+      final Connection connection) throws LdapRuntimeException {
+
+    try {
+<span class="nc" id="L253">      final String dn = entryMapper.mapDn(domainObject);</span>
+<span class="nc" id="L254">      LdapEntry destination = new SearchOperation(connection)</span>
+<span class="nc" id="L255">          .execute(SearchRequest.newObjectScopeSearchRequest(dn))</span>
+<span class="nc" id="L256">          .getResult()</span>
+<span class="nc" id="L257">          .getEntry();</span>
+<span class="nc bnc" id="L258" title="All 2 branches missed.">      if (destination == null) {</span>
+<span class="nc" id="L259">        destination = new LdapEntry();</span>
+<span class="nc" id="L260">        entryMapper.map(domainObject, destination);</span>
+<span class="nc" id="L261">        new AddOperation(connection)</span>
+<span class="nc" id="L262">            .execute(new AddRequest(dn, destination.getAttributes()));</span>
+      } else {
+<span class="nc" id="L264">        final AttributeModification[] modifications = entryMapper</span>
+<span class="nc" id="L265">            .mapAndComputeModifications(domainObject, destination);</span>
+<span class="nc bnc" id="L266" title="All 4 branches missed.">        if (modifications != null &amp;&amp; modifications.length &gt; 0) {</span>
+<span class="nc" id="L267">          new ModifyOperation(connection)</span>
+<span class="nc" id="L268">              .execute(new ModifyRequest(dn, modifications));</span>
+        }
+      }
+<span class="nc" id="L271">      return entryMapper.map(destination);</span>
+
+<span class="nc" id="L273">    } catch (LdapException e) {</span>
+<span class="nc" id="L274">      throw new LdapRuntimeException(e);</span>
+    }
+  }
+
+  /**
+   * Save all domain objects.
+   *
+   * @param &lt;T&gt;          the type of the domain objects
+   * @param domainModels the domain objects
+   * @param entryMapper  the entry mapper that maps a ldap entry into the domain object
+   * @return the stream of saved domain objects
+   */
+  public &lt;T&gt; Stream&lt;T&gt; saveAll(
+      final Collection&lt;T&gt; domainModels,
+      @NotNull final LdaptiveEntryMapper&lt;T&gt; entryMapper) {
+<span class="nc bnc" id="L289" title="All 4 branches missed.">    if (domainModels == null || domainModels.isEmpty()) {</span>
+<span class="nc" id="L290">      return Stream.empty();</span>
+    }
+<span class="nc" id="L292">    return execute(connection -&gt; domainModels</span>
+<span class="nc" id="L293">        .stream()</span>
+<span class="nc" id="L294">        .filter(Objects::nonNull)</span>
+<span class="nc" id="L295">        .map(domainModel -&gt; save(domainModel, entryMapper, connection)));</span>
+  }
+
+  /**
+   * Execute the given delete request.
+   *
+   * @param deleteRequest the delete request
+   */
+  public void delete(@NotNull final DeleteRequest deleteRequest) {
+<span class="nc" id="L304">    execute((LdaptiveConnectionCallbackWithoutResult) connection -&gt; new DeleteOperation(connection)</span>
+<span class="nc" id="L305">        .execute(deleteRequest));</span>
+<span class="nc" id="L306">  }</span>
+
+  /**
+   * Delete domain object.
+   *
+   * @param &lt;T&gt;          the type of the domain object
+   * @param domainObject the domain object
+   * @param entryMapper  the entry mapper that maps a ldap entry into the domain object
+   */
+  public &lt;T&gt; void delete(
+      @NotNull final T domainObject,
+      @NotNull final LdaptiveEntryMapper&lt;T&gt; entryMapper) {
+<span class="nc" id="L318">    execute(</span>
+<span class="nc" id="L319">        (LdaptiveConnectionCallbackWithoutResult) connection -&gt; delete(</span>
+            domainObject, entryMapper, connection));
+<span class="nc" id="L321">  }</span>
+
+  private &lt;T&gt; void delete(
+      final T domainModel,
+      final LdaptiveEntryMapper&lt;T&gt; entryMapper,
+      final Connection connection) throws LdapRuntimeException {
+
+    try {
+<span class="nc" id="L329">      new DeleteOperation(connection).execute(new DeleteRequest(entryMapper.mapDn(domainModel)));</span>
+
+<span class="nc" id="L331">    } catch (LdapException e) {</span>
+<span class="nc" id="L332">      throw new LdapRuntimeException(e);</span>
+<span class="nc" id="L333">    }</span>
+<span class="nc" id="L334">  }</span>
+
+  /**
+   * Delete all domain objects.
+   *
+   * @param &lt;T&gt;           the type of the domain objects
+   * @param domainObjects the domain objects
+   * @param entryMapper   the entry mapper that maps a ldap entry into the domain object
+   */
+  public &lt;T&gt; void deleteAll(
+      final Collection&lt;T&gt; domainObjects,
+      @NotNull final LdaptiveEntryMapper&lt;T&gt; entryMapper) {
+<span class="nc bnc" id="L346" title="All 2 branches missed.">    if (domainObjects != null) {</span>
+<span class="nc" id="L347">      execute((LdaptiveConnectionCallbackWithoutResult) connection -&gt; {</span>
+<span class="nc bnc" id="L348" title="All 2 branches missed.">        for (T domainModel : domainObjects) {</span>
+<span class="nc bnc" id="L349" title="All 2 branches missed.">          if (domainModel != null) {</span>
+<span class="nc" id="L350">            delete(domainModel, entryMapper, connection);</span>
+          }
+<span class="nc" id="L352">        }</span>
+<span class="nc" id="L353">      });</span>
+    }
+<span class="nc" id="L355">  }</span>
+
+  private static class LdapRuntimeException extends RuntimeException {
+
+<span class="nc" id="L359">    @Getter(AccessLevel.PACKAGE)</span>
+    private LdapException ldapException;
+
+    /**
+     * Instantiates a new Ldap runtime exception.
+     *
+     * @param ldapException the ldap exception
+     */
+    LdapRuntimeException(LdapException ldapException) {
+<span class="nc" id="L368">      super(ldapException);</span>
+<span class="nc" id="L369">      this.ldapException = ldapException;</span>
+<span class="nc" id="L370">    }</span>
+  }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.3.201901230119</span></div></body></html>

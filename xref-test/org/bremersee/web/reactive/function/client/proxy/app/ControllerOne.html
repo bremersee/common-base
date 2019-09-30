@@ -121,7 +121,7 @@
 <a class="jxr_linenumber" name="L113" href="#L113">113</a>   <em class="jxr_javadoccomment">/**</em>
 <a class="jxr_linenumber" name="L114" href="#L114">114</a> <em class="jxr_javadoccomment">   * Upload mono.</em>
 <a class="jxr_linenumber" name="L115" href="#L115">115</a> <em class="jxr_javadoccomment">   *</em>
-<a class="jxr_linenumber" name="L116" href="#L116">116</a> <em class="jxr_javadoccomment">   * @param xHeaderValue the x header value</em>
+<a class="jxr_linenumber" name="L116" href="#L116">116</a> <em class="jxr_javadoccomment">   * @param headerValue the x header value</em>
 <a class="jxr_linenumber" name="L117" href="#L117">117</a> <em class="jxr_javadoccomment">   * @param lastValue    the last value</em>
 <a class="jxr_linenumber" name="L118" href="#L118">118</a> <em class="jxr_javadoccomment">   * @param data         the data</em>
 <a class="jxr_linenumber" name="L119" href="#L119">119</a> <em class="jxr_javadoccomment">   * @return the mono</em>
@@ -131,7 +131,7 @@
 <a class="jxr_linenumber" name="L123" href="#L123">123</a>       consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE,
 <a class="jxr_linenumber" name="L124" href="#L124">124</a>       produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 <a class="jxr_linenumber" name="L125" href="#L125">125</a>   Mono&lt;Map&lt;String, Object&gt;&gt; upload(
-<a class="jxr_linenumber" name="L126" href="#L126">126</a>       @RequestHeader(name = <span class="jxr_string">"x-ok-flag"</span>) String xHeaderValue,
+<a class="jxr_linenumber" name="L126" href="#L126">126</a>       @RequestHeader(name = <span class="jxr_string">"x-ok-flag"</span>) String headerValue,
 <a class="jxr_linenumber" name="L127" href="#L127">127</a>       @CookieValue(name = <span class="jxr_string">"last"</span>) String lastValue,
 <a class="jxr_linenumber" name="L128" href="#L128">128</a>       @RequestBody MultiValueMap&lt;String, ?&gt; data);
 <a class="jxr_linenumber" name="L129" href="#L129">129</a> 

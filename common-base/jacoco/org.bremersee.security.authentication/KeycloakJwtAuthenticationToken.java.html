@@ -53,8 +53,8 @@ public class KeycloakJwtAuthenticationToken
    */
   public KeycloakJwtAuthenticationToken(Jwt jwt,
       Collection&lt;? extends GrantedAuthority&gt; authorities) {
-<span class="nc" id="L56">    super(jwt, authorities);</span>
-<span class="nc" id="L57">  }</span>
+<span class="fc" id="L56">    super(jwt, authorities);</span>
+<span class="fc" id="L57">  }</span>
 
   /**
    * Gets preferred name.
@@ -63,8 +63,8 @@ public class KeycloakJwtAuthenticationToken
    */
   @Override
   public String getPreferredName() {
-<span class="nc bnc" id="L66" title="All 2 branches missed.">    if (getToken().containsClaim(KEYCLOAK_PREFERRED_USERNAME)) {</span>
-<span class="nc" id="L67">      return getToken().getClaimAsString(KEYCLOAK_PREFERRED_USERNAME);</span>
+<span class="pc bpc" id="L66" title="1 of 2 branches missed.">    if (getToken().containsClaim(KEYCLOAK_PREFERRED_USERNAME)) {</span>
+<span class="fc" id="L67">      return getToken().getClaimAsString(KEYCLOAK_PREFERRED_USERNAME);</span>
     }
 <span class="nc" id="L69">    return super.getName(); // returns claim sub</span>
   }

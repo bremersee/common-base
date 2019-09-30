@@ -13,10 +13,10 @@ common-base-reactive,org.bremersee.web.reactive.function.client.proxy,RequestUri
 common-base-reactive,org.bremersee.web.reactive.function.client.proxy,RequestHeadersBuilder.Default,3,60,1,7,0,12,1,5,0,2
 common-base-reactive,org.bremersee.web.reactive.function.client.proxy,RequestUriSpecBuilder,0,4,0,0,0,1,0,1,0,1
 common-base-reactive,org.bremersee.web.reactive.function.client.proxy,WebClientProxyBuilder.Default,22,40,5,1,5,8,5,3,2,3
-common-base-reactive,org.bremersee.web.reactive.function.client.proxy,RequestCookiesBuilder.Default,3,60,1,7,0,12,1,5,0,2
 common-base-reactive,org.bremersee.web.reactive.function.client.proxy,RequestUriBuilder.Default,0,31,0,0,0,8,0,2,0,2
-common-base-reactive,org.bremersee.web.reactive.function.client.proxy,InvocationFunctions.InvocationFunctionsBuilder,110,0,0,0,1,0,11,0,11,0
 common-base-reactive,org.bremersee.web.reactive.function.client.proxy,RequestHeadersBuilder,0,45,0,4,0,15,0,6,0,4
+common-base-reactive,org.bremersee.web.reactive.function.client.proxy,InvocationFunctions.InvocationFunctionsBuilder,110,0,0,0,1,0,11,0,11,0
+common-base-reactive,org.bremersee.web.reactive.function.client.proxy,RequestCookiesBuilder.Default,3,60,1,7,0,12,1,5,0,2
 common-base-reactive,org.bremersee.web.reactive.function.client.proxy,InvocationParameters,0,21,0,0,0,4,0,4,0,4
 common-base-reactive,org.bremersee.web.reactive.function.client.proxy,RequestBodyInserter,0,4,0,0,0,1,0,1,0,1
 common-base-reactive,org.bremersee.http.codec.xml,ReactiveJaxbDecoder,217,41,18,2,46,9,16,3,7,2
@@ -30,5 +30,5 @@ common-base-reactive,org.bremersee.web.reactive.function.client,WebClientExcepti
 common-base-reactive,org.bremersee.web.reactive.function.client,AbstractWebClientErrorDecoder,0,19,0,0,0,5,0,3,0,3
 common-base-reactive,org.bremersee.security.authentication,KeycloakReactiveJwtConverter,13,0,0,0,4,0,2,0,2,0
 common-base-reactive,org.bremersee.security.authentication,PasswordFlowAccessTokenReactiveRetriever,52,10,2,0,19,4,5,2,4,2
-common-base-reactive,org.bremersee.security.authentication,PasswordFlowReactiveAuthenticationManager,30,83,1,1,7,18,3,5,2,5
+common-base-reactive,org.bremersee.security.authentication,PasswordFlowReactiveAuthenticationManager,33,80,1,1,8,17,3,5,2,5
 common-base-reactive,org.bremersee.web.reactive,ApiExceptionHandler,25,196,6,10,3,44,10,7,4,5

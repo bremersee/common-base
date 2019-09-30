@@ -65,51 +65,51 @@ abstract class InvocationUtils {
 <span class="fc" id="L65">            .orElse(&quot;&quot;));</span>
 
     // Request mapping on method
-<span class="fc bfc" id="L68" title="All 2 branches covered.">    String mPath = findRequestMappingValue(method, a -&gt; a.value().length &gt; 0, a -&gt; a.value()[0])</span>
+<span class="fc bfc" id="L68" title="All 2 branches covered.">    String path = findRequestMappingValue(method, a -&gt; a.value().length &gt; 0, a -&gt; a.value()[0])</span>
 <span class="pc bpc" id="L69" title="1 of 2 branches missed.">        .orElseGet(() -&gt; findRequestMappingValue(method, a -&gt; a.path().length &gt; 0, a -&gt; a.path()[0])</span>
 <span class="fc" id="L70">            .orElse(&quot;&quot;));</span>
-<span class="fc bfc" id="L71" title="All 2 branches covered.">    if (StringUtils.hasText(mPath)) {</span>
-<span class="fc" id="L72">      return clsPath + mPath;</span>
+<span class="fc bfc" id="L71" title="All 2 branches covered.">    if (StringUtils.hasText(path)) {</span>
+<span class="fc" id="L72">      return clsPath + path;</span>
     }
 
     // Get mapping on method
-<span class="fc bfc" id="L76" title="All 2 branches covered.">    mPath = findGetMappingValue(method, a -&gt; a.value().length &gt; 0, a -&gt; a.value()[0])</span>
+<span class="fc bfc" id="L76" title="All 2 branches covered.">    path = findGetMappingValue(method, a -&gt; a.value().length &gt; 0, a -&gt; a.value()[0])</span>
 <span class="pc bpc" id="L77" title="1 of 2 branches missed.">        .orElseGet(() -&gt; findGetMappingValue(method, a -&gt; a.path().length &gt; 0, a -&gt; a.path()[0])</span>
 <span class="fc" id="L78">            .orElse(&quot;&quot;));</span>
-<span class="fc bfc" id="L79" title="All 2 branches covered.">    if (StringUtils.hasText(mPath)) {</span>
-<span class="fc" id="L80">      return clsPath + mPath;</span>
+<span class="fc bfc" id="L79" title="All 2 branches covered.">    if (StringUtils.hasText(path)) {</span>
+<span class="fc" id="L80">      return clsPath + path;</span>
     }
 
     // Post mapping on method
-<span class="pc bpc" id="L84" title="1 of 2 branches missed.">    mPath = findPostMappingValue(method, a -&gt; a.value().length &gt; 0, a -&gt; a.value()[0])</span>
+<span class="pc bpc" id="L84" title="1 of 2 branches missed.">    path = findPostMappingValue(method, a -&gt; a.value().length &gt; 0, a -&gt; a.value()[0])</span>
 <span class="pc bnc" id="L85" title="All 2 branches missed.">        .orElseGet(() -&gt; findPostMappingValue(method, a -&gt; a.path().length &gt; 0, a -&gt; a.path()[0])</span>
 <span class="fc" id="L86">            .orElse(&quot;&quot;));</span>
-<span class="fc bfc" id="L87" title="All 2 branches covered.">    if (StringUtils.hasText(mPath)) {</span>
-<span class="fc" id="L88">      return clsPath + mPath;</span>
+<span class="fc bfc" id="L87" title="All 2 branches covered.">    if (StringUtils.hasText(path)) {</span>
+<span class="fc" id="L88">      return clsPath + path;</span>
     }
 
     // Put mapping on method
-<span class="pc bpc" id="L92" title="1 of 2 branches missed.">    mPath = findPutMappingValue(method, a -&gt; a.value().length &gt; 0, a -&gt; a.value()[0])</span>
+<span class="pc bpc" id="L92" title="1 of 2 branches missed.">    path = findPutMappingValue(method, a -&gt; a.value().length &gt; 0, a -&gt; a.value()[0])</span>
 <span class="pc bnc" id="L93" title="All 2 branches missed.">        .orElseGet(() -&gt; findPutMappingValue(method, a -&gt; a.path().length &gt; 0, a -&gt; a.path()[0])</span>
 <span class="fc" id="L94">            .orElse(&quot;&quot;));</span>
-<span class="fc bfc" id="L95" title="All 2 branches covered.">    if (StringUtils.hasText(mPath)) {</span>
-<span class="fc" id="L96">      return clsPath + mPath;</span>
+<span class="fc bfc" id="L95" title="All 2 branches covered.">    if (StringUtils.hasText(path)) {</span>
+<span class="fc" id="L96">      return clsPath + path;</span>
     }
 
     // Patch mapping on method
-<span class="pc bpc" id="L100" title="1 of 2 branches missed.">    mPath = findPatchMappingValue(method, a -&gt; a.value().length &gt; 0, a -&gt; a.value()[0])</span>
+<span class="pc bpc" id="L100" title="1 of 2 branches missed.">    path = findPatchMappingValue(method, a -&gt; a.value().length &gt; 0, a -&gt; a.value()[0])</span>
 <span class="pc bnc" id="L101" title="All 2 branches missed.">        .orElseGet(() -&gt; findPatchMappingValue(method, a -&gt; a.path().length &gt; 0, a -&gt; a.path()[0])</span>
 <span class="fc" id="L102">            .orElse(&quot;&quot;));</span>
-<span class="fc bfc" id="L103" title="All 2 branches covered.">    if (StringUtils.hasText(mPath)) {</span>
-<span class="fc" id="L104">      return clsPath + mPath;</span>
+<span class="fc bfc" id="L103" title="All 2 branches covered.">    if (StringUtils.hasText(path)) {</span>
+<span class="fc" id="L104">      return clsPath + path;</span>
     }
 
     // Delete mapping on method
-<span class="pc bpc" id="L108" title="1 of 2 branches missed.">    mPath = findDeleteMappingValue(method, a -&gt; a.value().length &gt; 0, a -&gt; a.value()[0])</span>
+<span class="pc bpc" id="L108" title="1 of 2 branches missed.">    path = findDeleteMappingValue(method, a -&gt; a.value().length &gt; 0, a -&gt; a.value()[0])</span>
 <span class="pc bnc" id="L109" title="All 2 branches missed.">        .orElseGet(() -&gt; findDeleteMappingValue(method, a -&gt; a.path().length &gt; 0, a -&gt; a.path()[0])</span>
 <span class="fc" id="L110">            .orElse(&quot;&quot;));</span>
 
-<span class="fc" id="L112">    return clsPath + mPath;</span>
+<span class="fc" id="L112">    return clsPath + path;</span>
   }
 
   /**

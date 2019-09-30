@@ -82,12 +82,12 @@
 <a class="jxr_linenumber" name="L74" href="#L74">74</a>  
 <a class="jxr_linenumber" name="L75" href="#L75">75</a>    @Override
 <a class="jxr_linenumber" name="L76" href="#L76">76</a>    <strong class="jxr_keyword">public</strong> Mono&lt;Map&lt;String, Object&gt;&gt; upload(
-<a class="jxr_linenumber" name="L77" href="#L77">77</a>        String xHeaderValue,
+<a class="jxr_linenumber" name="L77" href="#L77">77</a>        String headerValue,
 <a class="jxr_linenumber" name="L78" href="#L78">78</a>        String lastValue,
 <a class="jxr_linenumber" name="L79" href="#L79">79</a>        MultiValueMap&lt;String, ?&gt; data) {
 <a class="jxr_linenumber" name="L80" href="#L80">80</a>  
 <a class="jxr_linenumber" name="L81" href="#L81">81</a>      LinkedHashMap&lt;String, Object&gt; map = <strong class="jxr_keyword">new</strong> LinkedHashMap&lt;&gt;();
-<a class="jxr_linenumber" name="L82" href="#L82">82</a>      map.put(<span class="jxr_string">"x-ok-flag"</span>, xHeaderValue);
+<a class="jxr_linenumber" name="L82" href="#L82">82</a>      map.put(<span class="jxr_string">"x-ok-flag"</span>, headerValue);
 <a class="jxr_linenumber" name="L83" href="#L83">83</a>      map.put(<span class="jxr_string">"last"</span>, lastValue);
 <a class="jxr_linenumber" name="L84" href="#L84">84</a>      map.putAll(data);
 <a class="jxr_linenumber" name="L85" href="#L85">85</a>      <strong class="jxr_keyword">return</strong> Mono.just(map);

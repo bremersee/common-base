@@ -1,4 +1,5 @@
 org.bremersee
+org.bremersee.data.ldaptive
 org.bremersee.exception
 org.bremersee.exception.feign
 org.bremersee.http

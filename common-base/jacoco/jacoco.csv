@@ -19,8 +19,8 @@ common-base,org.bremersee.security.access,AclImpl,21,67,5,5,3,15,6,6,1,6
 common-base,org.bremersee.web,ErrorDetectors,0,15,0,4,0,3,0,4,0,2
 common-base,org.bremersee.security.authentication,BremerseeAuthenticationToken,3,0,0,0,1,0,1,0,1,0
 common-base,org.bremersee.security.authentication,AbstractPasswordFlowAuthenticationManager,52,0,2,0,16,0,5,0,4,0
-common-base,org.bremersee.security.authentication,KeycloakJwtAuthenticationToken,25,0,2,0,7,0,4,0,3,0
-common-base,org.bremersee.security.authentication,KeycloakJwtConverter,88,0,10,0,18,0,9,0,4,0
+common-base,org.bremersee.security.authentication,KeycloakJwtAuthenticationToken,7,18,1,1,3,4,2,2,1,2
+common-base,org.bremersee.security.authentication,KeycloakJwtConverter,11,77,5,5,2,16,5,4,0,4
 common-base,org.bremersee.security,CorsProperties,47,97,12,10,1,13,10,12,1,10
 common-base,org.bremersee.security,OAuth2Properties.PasswordFlowProperties,282,0,48,0,10,0,41,0,17,0
 common-base,org.bremersee.security,CorsProperties.CorsConfiguration,125,254,30,26,3,30,23,23,1,17
@@ -28,8 +28,8 @@ common-base,org.bremersee.security,OAuth2Helper,33,0,2,0,9,0,2,0,1,0
 common-base,org.bremersee.security,OAuth2Properties,88,0,14,0,5,0,14,0,7,0
 common-base,org.bremersee.exception,MessageExceptionParser,5,0,0,0,2,0,2,0,2,0
 common-base,org.bremersee.exception,RestApiExceptionUtils,8,18,2,2,3,7,1,3,0,2
-common-base,org.bremersee.exception,RestApiExceptionMapperProperties.ExceptionMapping,79,157,22,14,1,20,17,16,1,14
 common-base,org.bremersee.exception,HttpClientException,60,99,17,9,0,10,14,7,1,7
+common-base,org.bremersee.exception,RestApiExceptionMapperProperties.ExceptionMapping,79,157,22,14,1,20,17,16,1,14
 common-base,org.bremersee.exception,RestApiExceptionParserImpl,17,144,5,27,5,43,6,16,1,5
 common-base,org.bremersee.exception,ServiceException,152,295,26,6,17,55,22,39,7,38
 common-base,org.bremersee.exception,RestApiExceptionMapperProperties,140,314,42,26,8,42,31,24,1,20
