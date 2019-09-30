@@ -296,6 +296,15 @@ public class LdaptiveEntryMapperTest {
     LdapEntry entry = new LdapEntry();
     entry.addAttribute(new LdapAttribute("foo", "anna", "livia"));
 
+    LdaptiveEntryMapper.removeAttribute(entry, "foo", modifications);
+    assertNull(entry.getAttribute("foo"));
+    assertEquals(1, modifications.size());
+    assertEquals(
+        AttributeModificationType.REMOVE,
+        modifications.get(0).getAttributeModificationType());
+    modifications.clear();
+
+    entry.addAttribute(new LdapAttribute("foo", "anna", "livia"));
     LdaptiveEntryMapper
         .removeAttribute(entry, "foo", "anna", STRING_TRANSCODER, modifications);
     assertFalse(entry.getAttribute("foo").getStringValues().contains("anna"));

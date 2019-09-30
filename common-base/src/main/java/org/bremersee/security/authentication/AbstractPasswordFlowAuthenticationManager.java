@@ -32,7 +32,6 @@ import org.springframework.util.MultiValueMap;
  *
  * @author Christian Bremer
  */
-@SuppressWarnings("WeakerAccess")
 @Slf4j
 public abstract class AbstractPasswordFlowAuthenticationManager {
 

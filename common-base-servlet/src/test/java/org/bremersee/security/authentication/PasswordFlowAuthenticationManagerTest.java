@@ -32,7 +32,7 @@ import org.springframework.util.MultiValueMap;
  */
 public class PasswordFlowAuthenticationManagerTest {
 
-  private static OAuth2Properties oAuth2Properties() {
+  private static OAuth2Properties oauth2Properties() {
     PasswordFlowProperties passwordFlowProperties = new PasswordFlowProperties();
     passwordFlowProperties.setClientId("abc");
     passwordFlowProperties.setClientSecret("xyz");
@@ -70,7 +70,7 @@ public class PasswordFlowAuthenticationManagerTest {
 
   private static PasswordFlowAuthenticationManager workingManager(Jwt jwt) {
     return new PasswordFlowAuthenticationManager(
-        oAuth2Properties(),
+        oauth2Properties(),
         workingJwtDecoder(jwt),
         tokenRetriever());
   }
@@ -83,7 +83,7 @@ public class PasswordFlowAuthenticationManagerTest {
 
   private static PasswordFlowAuthenticationManager notWorkingManager() {
     return new PasswordFlowAuthenticationManager(
-        oAuth2Properties(),
+        oauth2Properties(),
         notWorkingJwtDecoder(),
         tokenRetriever());
   }
