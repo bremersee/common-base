@@ -32,10 +32,12 @@ import org.ldaptive.Connection;
 import org.ldaptive.ConnectionFactory;
 import org.ldaptive.DeleteOperation;
 import org.ldaptive.DeleteRequest;
+import org.ldaptive.LdapAttribute;
 import org.ldaptive.LdapEntry;
 import org.ldaptive.LdapException;
 import org.ldaptive.ModifyOperation;
 import org.ldaptive.ModifyRequest;
+import org.ldaptive.ResultCode;
 import org.ldaptive.SearchOperation;
 import org.ldaptive.SearchRequest;
 import org.springframework.http.HttpStatus;
@@ -47,6 +49,7 @@ import org.springframework.util.Assert;
  * @author Christian Bremer
  */
 @Slf4j
+@SuppressWarnings("WeakerAccess")
 public class LdaptiveTemplate implements LdaptiveOperations {
 
   private final ConnectionFactory connectionFactory;
@@ -222,6 +225,9 @@ public class LdaptiveTemplate implements LdaptiveOperations {
             .getEntry()) != null;
 
       } catch (LdapException e) {
+        if (ResultCode.NO_SUCH_OBJECT == e.getResultCode()) {
+          return false;
+        }
         if (e.getCause() instanceof javax.naming.NameNotFoundException) {
           return false;
         }
@@ -250,23 +256,36 @@ public class LdaptiveTemplate implements LdaptiveOperations {
       final Connection connection) throws LdapRuntimeException {
 
     try {
+      final LdapEntry destination;
       final String dn = entryMapper.mapDn(domainObject);
-      LdapEntry destination = new SearchOperation(connection)
-          .execute(SearchRequest.newObjectScopeSearchRequest(dn))
-          .getResult()
-          .getEntry();
-      if (destination == null) {
-        destination = new LdapEntry();
-        entryMapper.map(domainObject, destination);
-        new AddOperation(connection)
-            .execute(new AddRequest(dn, destination.getAttributes()));
-      } else {
+      if (exists(domainObject, entryMapper)) {
+        destination = new SearchOperation(connection)
+            .execute(SearchRequest.newObjectScopeSearchRequest(dn))
+            .getResult()
+            .getEntry();
         final AttributeModification[] modifications = entryMapper
             .mapAndComputeModifications(domainObject, destination);
         if (modifications != null && modifications.length > 0) {
           new ModifyOperation(connection)
               .execute(new ModifyRequest(dn, modifications));
         }
+      } else {
+        if (entryMapper.getObjectClasses() == null || entryMapper.getObjectClasses().length == 0) {
+          final ServiceException se = ServiceException.internalServerError(
+              "Object classes must be specified to save a new ldap entry.",
+              "org.bremersee:common-base-ldaptive:d7aa5699-fd2e-45df-a863-97960e8095b8");
+          log.error("Saving domain object failed.", se);
+          throw se;
+        }
+        destination = new LdapEntry();
+        entryMapper.map(domainObject, destination);
+        destination.setDn(dn);
+        destination.addAttribute(new LdapAttribute(
+            "objectclass",
+            entryMapper.getObjectClasses()));
+        new AddOperation(connection)
+            .execute(new AddRequest(dn, destination.getAttributes()));
+
       }
       return entryMapper.map(destination);
 
@@ -289,10 +308,9 @@ public class LdaptiveTemplate implements LdaptiveOperations {
     if (domainModels == null || domainModels.isEmpty()) {
       return Stream.empty();
     }
-    return execute(connection -> domainModels
-        .stream()
+    return domainModels.stream()
         .filter(Objects::nonNull)
-        .map(domainModel -> save(domainModel, entryMapper, connection)));
+        .map(domainModel -> save(domainModel, entryMapper));
   }
 
   /**
