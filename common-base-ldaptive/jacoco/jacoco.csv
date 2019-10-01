@@ -1,6 +1,6 @@
 GROUP,PACKAGE,CLASS,INSTRUCTION_MISSED,INSTRUCTION_COVERED,BRANCH_MISSED,BRANCH_COVERED,LINE_MISSED,LINE_COVERED,COMPLEXITY_MISSED,COMPLEXITY_COVERED,METHOD_MISSED,METHOD_COVERED
 common-base-ldaptive,org.bremersee.data.ldaptive,LdaptiveProperties,786,0,94,0,25,0,94,0,47,0
-common-base-ldaptive,org.bremersee.data.ldaptive,LdaptiveEntryMapper,21,353,11,43,7,70,12,30,1,14
-common-base-ldaptive,org.bremersee.data.ldaptive,LdaptiveTemplate,419,0,30,0,109,0,47,0,32,0
-common-base-ldaptive,org.bremersee.data.ldaptive,LdaptiveConnectionCallbackWithoutResult,5,0,0,0,2,0,1,0,1,0
+common-base-ldaptive,org.bremersee.data.ldaptive,LdaptiveEntryMapper,15,359,11,43,5,72,11,31,0,15
+common-base-ldaptive,org.bremersee.data.ldaptive,LdaptiveTemplate,68,384,17,19,22,96,16,33,0,31
+common-base-ldaptive,org.bremersee.data.ldaptive,LdaptiveConnectionCallbackWithoutResult,0,5,0,0,0,2,0,1,0,1
 common-base-ldaptive,org.bremersee.data.ldaptive,LdaptiveTemplate.LdapRuntimeException,10,0,0,0,4,0,2,0,2,0

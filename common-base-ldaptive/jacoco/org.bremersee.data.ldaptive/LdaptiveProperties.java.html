@@ -42,7 +42,7 @@ public class LdaptiveProperties {
   /**
    * URL to the LDAP(s).
    */
-<span class="nc" id="L45">  private String ldapUrl = &quot;ldap://localhost:1389&quot;;</span>
+<span class="nc" id="L45">  private String ldapUrl = &quot;ldap://localhost:12389&quot;;</span>
 
   /**
    * Amount of time in milliseconds that connects will block.
@@ -89,54 +89,60 @@ public class LdaptiveProperties {
    */
 <span class="nc" id="L90">  private String bindCredential;</span>
 
-<span class="nc" id="L92">  private boolean pooled = false;</span>
+  /**
+   * Specifies whether the connection should be pooled or not. Default is {@code false}.
+   */
+<span class="nc" id="L95">  private boolean pooled = false;</span>
 
   /**
    * Minimum pool size.
    */
-<span class="nc" id="L97">  private int minPoolSize = PoolConfig.DEFAULT_MIN_POOL_SIZE;</span>
+<span class="nc" id="L100">  private int minPoolSize = PoolConfig.DEFAULT_MIN_POOL_SIZE;</span>
 
   /**
    * Maximum pool size.
    */
-<span class="nc" id="L102">  private int maxPoolSize = PoolConfig.DEFAULT_MAX_POOL_SIZE;</span>
+<span class="nc" id="L105">  private int maxPoolSize = PoolConfig.DEFAULT_MAX_POOL_SIZE;</span>
 
   /**
    * Whether the ldap object should be validated when returned to the pool.
    */
-<span class="nc" id="L107">  private boolean validateOnCheckIn = PoolConfig.DEFAULT_VALIDATE_ON_CHECKIN;</span>
+<span class="nc" id="L110">  private boolean validateOnCheckIn = PoolConfig.DEFAULT_VALIDATE_ON_CHECKIN;</span>
 
   /**
    * Whether the ldap object should be validated when given from the pool.
    */
-<span class="nc" id="L112">  private boolean validateOnCheckOut = PoolConfig.DEFAULT_VALIDATE_ON_CHECKOUT;</span>
+<span class="nc" id="L115">  private boolean validateOnCheckOut = PoolConfig.DEFAULT_VALIDATE_ON_CHECKOUT;</span>
 
   /**
    * Whether the pool should be validated periodically.
    */
-<span class="nc" id="L117">  private boolean validatePeriodically = PoolConfig.DEFAULT_VALIDATE_PERIODICALLY;</span>
+<span class="nc" id="L120">  private boolean validatePeriodically = PoolConfig.DEFAULT_VALIDATE_PERIODICALLY;</span>
 
   /**
    * Time in seconds that the validate pool should repeat.
    */
-<span class="nc" id="L122">  private long validatePeriod = PoolConfig.DEFAULT_VALIDATE_PERIOD.toMillis();</span>
+<span class="nc" id="L125">  private long validatePeriod = PoolConfig.DEFAULT_VALIDATE_PERIOD.toMillis();</span>
 
   /**
    * Prune period in seconds.
    */
-<span class="nc" id="L127">  private long prunePeriod = 300L;</span>
+<span class="nc" id="L130">  private long prunePeriod = 300L;</span>
 
   /**
    * Idle time in seconds.
    */
-<span class="nc" id="L132">  private long idleTime = 600L;</span>
+<span class="nc" id="L135">  private long idleTime = 600L;</span>
 
   /**
    * Time in milliseconds to wait for an available connection.
    */
-<span class="nc" id="L137">  private long blockWaitTime = 10000L;</span>
+<span class="nc" id="L140">  private long blockWaitTime = 10000L;</span>
 
-<span class="nc" id="L139">  private SearchValidator searchValidator = new SearchValidator();</span>
+  /**
+   * The search validator of the connection pool.
+   */
+<span class="nc" id="L145">  private SearchValidator searchValidator = new SearchValidator();</span>
 
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.3.201901230119</span></div></body></html>

@@ -32,10 +32,12 @@ import org.ldaptive.Connection;
 import org.ldaptive.ConnectionFactory;
 import org.ldaptive.DeleteOperation;
 import org.ldaptive.DeleteRequest;
+import org.ldaptive.LdapAttribute;
 import org.ldaptive.LdapEntry;
 import org.ldaptive.LdapException;
 import org.ldaptive.ModifyOperation;
 import org.ldaptive.ModifyRequest;
+import org.ldaptive.ResultCode;
 import org.ldaptive.SearchOperation;
 import org.ldaptive.SearchRequest;
 import org.springframework.http.HttpStatus;
@@ -46,7 +48,8 @@ import org.springframework.util.Assert;
  *
  * @author Christian Bremer
  */
-<span class="nc" id="L49">@Slf4j</span>
+<span class="fc" id="L51">@Slf4j</span>
+@SuppressWarnings(&quot;WeakerAccess&quot;)
 public class LdaptiveTemplate implements LdaptiveOperations {
 
   private final ConnectionFactory connectionFactory;
@@ -56,17 +59,17 @@ public class LdaptiveTemplate implements LdaptiveOperations {
    *
    * @param connectionFactory the connection factory
    */
-<span class="nc" id="L59">  public LdaptiveTemplate(final ConnectionFactory connectionFactory) {</span>
-<span class="nc" id="L60">    Assert.notNull(connectionFactory, &quot;Connection factory must not be null.&quot;);</span>
-<span class="nc" id="L61">    this.connectionFactory = connectionFactory;</span>
-<span class="nc" id="L62">  }</span>
+<span class="fc" id="L62">  public LdaptiveTemplate(final ConnectionFactory connectionFactory) {</span>
+<span class="fc" id="L63">    Assert.notNull(connectionFactory, &quot;Connection factory must not be null.&quot;);</span>
+<span class="fc" id="L64">    this.connectionFactory = connectionFactory;</span>
+<span class="fc" id="L65">  }</span>
 
   private Connection getConnection() throws LdapException {
-<span class="nc" id="L65">    final Connection connection = this.connectionFactory.getConnection();</span>
-<span class="nc bnc" id="L66" title="All 2 branches missed.">    if (!connection.isOpen()) {</span>
-<span class="nc" id="L67">      connection.open();</span>
+<span class="fc" id="L68">    final Connection connection = this.connectionFactory.getConnection();</span>
+<span class="pc bpc" id="L69" title="1 of 2 branches missed.">    if (!connection.isOpen()) {</span>
+<span class="fc" id="L70">      connection.open();</span>
     }
-<span class="nc" id="L69">    return connection;</span>
+<span class="fc" id="L72">    return connection;</span>
   }
 
   /**
@@ -76,37 +79,37 @@ public class LdaptiveTemplate implements LdaptiveOperations {
    * @param connection the ldap connection to close
    */
   private void closeConnection(final Connection connection) {
-<span class="nc bnc" id="L79" title="All 4 branches missed.">    if (connection != null &amp;&amp; connection.isOpen()) {</span>
+<span class="pc bpc" id="L82" title="2 of 4 branches missed.">    if (connection != null &amp;&amp; connection.isOpen()) {</span>
       try {
-<span class="nc" id="L81">        connection.close();</span>
-<span class="nc" id="L82">      } catch (final Exception ex) {</span>
-<span class="nc" id="L83">        log.warn(&quot;Closing ldap connection failed.&quot;, ex);</span>
-<span class="nc" id="L84">      }</span>
+<span class="fc" id="L84">        connection.close();</span>
+<span class="nc" id="L85">      } catch (final Exception ex) {</span>
+<span class="nc" id="L86">        log.warn(&quot;Closing ldap connection failed.&quot;, ex);</span>
+<span class="fc" id="L87">      }</span>
     }
-<span class="nc" id="L86">  }</span>
+<span class="fc" id="L89">  }</span>
 
   @Override
   public &lt;T&gt; T execute(final LdaptiveConnectionCallback&lt;T&gt; callback) {
-<span class="nc" id="L90">    Connection connection = null;</span>
+<span class="fc" id="L93">    Connection connection = null;</span>
     try {
-<span class="nc" id="L92">      connection = getConnection();</span>
-<span class="nc" id="L93">      return callback.doWithConnection(connection);</span>
-<span class="nc" id="L94">    } catch (final LdapRuntimeException e) {</span>
-<span class="nc" id="L95">      final ServiceException serviceException = new ServiceException(</span>
+<span class="fc" id="L95">      connection = getConnection();</span>
+<span class="fc" id="L96">      return callback.doWithConnection(connection);</span>
+<span class="nc" id="L97">    } catch (final LdapRuntimeException e) {</span>
+<span class="nc" id="L98">      final ServiceException serviceException = new ServiceException(</span>
           HttpStatus.INTERNAL_SERVER_ERROR,
           &quot;org.bremersee:base-common-ldaptive:8150d733-cfb2-46a9-94f6-4f3395e7cecf&quot;,
-<span class="nc" id="L98">          e.getLdapException());</span>
-<span class="nc" id="L99">      log.error(&quot;Executing ldap operation failed.&quot;, serviceException);</span>
-<span class="nc" id="L100">      throw serviceException;</span>
-<span class="nc" id="L101">    } catch (final LdapException e) {</span>
-<span class="nc" id="L102">      final ServiceException serviceException = new ServiceException(</span>
+<span class="nc" id="L101">          e.getLdapException());</span>
+<span class="nc" id="L102">      log.error(&quot;Executing ldap operation failed.&quot;, serviceException);</span>
+<span class="nc" id="L103">      throw serviceException;</span>
+<span class="nc" id="L104">    } catch (final LdapException e) {</span>
+<span class="nc" id="L105">      final ServiceException serviceException = new ServiceException(</span>
           HttpStatus.INTERNAL_SERVER_ERROR,
           &quot;org.bremersee:base-common-ldaptive:af8cb1fc-f9c2-4592-8bd6-de59c6f2a8e6&quot;,
           e);
-<span class="nc" id="L106">      log.error(&quot;Executing ldap operation failed.&quot;, serviceException);</span>
-<span class="nc" id="L107">      throw serviceException;</span>
+<span class="nc" id="L109">      log.error(&quot;Executing ldap operation failed.&quot;, serviceException);</span>
+<span class="nc" id="L110">      throw serviceException;</span>
     } finally {
-<span class="nc" id="L109">      closeConnection(connection);</span>
+<span class="fc" id="L112">      closeConnection(connection);</span>
     }
   }
 
@@ -116,8 +119,8 @@ public class LdaptiveTemplate implements LdaptiveOperations {
    * @param addRequest the add request
    */
   public void add(@NotNull final AddRequest addRequest) {
-<span class="nc" id="L119">    execute(connection -&gt; new AddOperation(connection).execute(addRequest));</span>
-<span class="nc" id="L120">  }</span>
+<span class="fc" id="L122">    execute(connection -&gt; new AddOperation(connection).execute(addRequest));</span>
+<span class="fc" id="L123">  }</span>
 
   /**
    * Execute the given modify request.
@@ -125,11 +128,11 @@ public class LdaptiveTemplate implements LdaptiveOperations {
    * @param modifyRequest the modify request
    */
   public void modify(@NotNull final ModifyRequest modifyRequest) {
-<span class="nc bnc" id="L128" title="All 2 branches missed.">    if (modifyRequest.getAttributeModifications() != null</span>
-<span class="nc bnc" id="L129" title="All 2 branches missed.">        &amp;&amp; modifyRequest.getAttributeModifications().length &gt; 0) {</span>
-<span class="nc" id="L130">      execute(connection -&gt; new ModifyOperation(connection).execute(modifyRequest));</span>
+<span class="pc bpc" id="L131" title="1 of 2 branches missed.">    if (modifyRequest.getAttributeModifications() != null</span>
+<span class="pc bpc" id="L132" title="1 of 2 branches missed.">        &amp;&amp; modifyRequest.getAttributeModifications().length &gt; 0) {</span>
+<span class="fc" id="L133">      execute(connection -&gt; new ModifyOperation(connection).execute(modifyRequest));</span>
     }
-<span class="nc" id="L132">  }</span>
+<span class="fc" id="L135">  }</span>
 
   /**
    * Find one ldap entry.
@@ -140,11 +143,11 @@ public class LdaptiveTemplate implements LdaptiveOperations {
   public Optional&lt;LdapEntry&gt; findOne(
       @NotNull final SearchRequest searchRequest) {
 
-<span class="nc" id="L143">    return Optional.ofNullable(</span>
-<span class="nc" id="L144">        execute(connection -&gt; new SearchOperation(connection)</span>
-<span class="nc" id="L145">            .execute(searchRequest)</span>
-<span class="nc" id="L146">            .getResult()</span>
-<span class="nc" id="L147">            .getEntry()));</span>
+<span class="fc" id="L146">    return Optional.ofNullable(</span>
+<span class="fc" id="L147">        execute(connection -&gt; new SearchOperation(connection)</span>
+<span class="fc" id="L148">            .execute(searchRequest)</span>
+<span class="fc" id="L149">            .getResult()</span>
+<span class="fc" id="L150">            .getEntry()));</span>
   }
 
   /**
@@ -159,12 +162,12 @@ public class LdaptiveTemplate implements LdaptiveOperations {
       @NotNull final SearchRequest searchRequest,
       @NotNull final LdaptiveEntryMapper&lt;T&gt; entryMapper) {
 
-<span class="nc" id="L162">    return Optional.ofNullable(</span>
-<span class="nc" id="L163">        execute(connection -&gt; entryMapper</span>
-<span class="nc" id="L164">            .map(new SearchOperation(connection)</span>
-<span class="nc" id="L165">                .execute(searchRequest)</span>
-<span class="nc" id="L166">                .getResult()</span>
-<span class="nc" id="L167">                .getEntry())));</span>
+<span class="fc" id="L165">    return Optional.ofNullable(</span>
+<span class="fc" id="L166">        execute(connection -&gt; entryMapper</span>
+<span class="fc" id="L167">            .map(new SearchOperation(connection)</span>
+<span class="fc" id="L168">                .execute(searchRequest)</span>
+<span class="fc" id="L169">                .getResult()</span>
+<span class="fc" id="L170">                .getEntry())));</span>
   }
 
   /**
@@ -176,10 +179,10 @@ public class LdaptiveTemplate implements LdaptiveOperations {
   public Collection&lt;LdapEntry&gt; findAll(
       @NotNull final SearchRequest searchRequest) {
 
-<span class="nc" id="L179">    return execute(connection -&gt; new SearchOperation(connection)</span>
-<span class="nc" id="L180">        .execute(searchRequest)</span>
-<span class="nc" id="L181">        .getResult()</span>
-<span class="nc" id="L182">        .getEntries());</span>
+<span class="fc" id="L182">    return execute(connection -&gt; new SearchOperation(connection)</span>
+<span class="fc" id="L183">        .execute(searchRequest)</span>
+<span class="fc" id="L184">        .getResult()</span>
+<span class="fc" id="L185">        .getEntries());</span>
   }
 
   /**
@@ -194,13 +197,13 @@ public class LdaptiveTemplate implements LdaptiveOperations {
       @NotNull final SearchRequest searchRequest,
       @NotNull final LdaptiveEntryMapper&lt;T&gt; entryMapper) {
 
-<span class="nc" id="L197">    return execute(connection -&gt; new SearchOperation(connection)</span>
-<span class="nc" id="L198">        .execute(searchRequest)</span>
-<span class="nc" id="L199">        .getResult()</span>
-<span class="nc" id="L200">        .getEntries()</span>
-<span class="nc" id="L201">        .stream()</span>
-<span class="nc" id="L202">        .map(entryMapper::map))</span>
-<span class="nc" id="L203">        .filter(Objects::nonNull);</span>
+<span class="fc" id="L200">    return execute(connection -&gt; new SearchOperation(connection)</span>
+<span class="fc" id="L201">        .execute(searchRequest)</span>
+<span class="fc" id="L202">        .getResult()</span>
+<span class="fc" id="L203">        .getEntries()</span>
+<span class="fc" id="L204">        .stream()</span>
+<span class="fc" id="L205">        .map(entryMapper::map))</span>
+<span class="fc" id="L206">        .filter(Objects::nonNull);</span>
   }
 
   /**
@@ -214,18 +217,21 @@ public class LdaptiveTemplate implements LdaptiveOperations {
   public &lt;T&gt; boolean exists(
       @NotNull final T domainObject,
       @NotNull final LdaptiveEntryMapper&lt;T&gt; entryMapper) {
-<span class="nc" id="L217">    return execute(connection -&gt; {</span>
+<span class="fc" id="L220">    return execute(connection -&gt; {</span>
       try {
-<span class="nc bnc" id="L219" title="All 2 branches missed.">        return entryMapper.map(new SearchOperation(connection)</span>
-<span class="nc" id="L220">            .execute(SearchRequest.newObjectScopeSearchRequest(entryMapper.mapDn(domainObject)))</span>
-<span class="nc" id="L221">            .getResult()</span>
-<span class="nc" id="L222">            .getEntry()) != null;</span>
+<span class="pc bpc" id="L222" title="1 of 2 branches missed.">        return entryMapper.map(new SearchOperation(connection)</span>
+<span class="fc" id="L223">            .execute(SearchRequest.newObjectScopeSearchRequest(entryMapper.mapDn(domainObject)))</span>
+<span class="fc" id="L224">            .getResult()</span>
+<span class="fc" id="L225">            .getEntry()) != null;</span>
 
-<span class="nc" id="L224">      } catch (LdapException e) {</span>
-<span class="nc bnc" id="L225" title="All 2 branches missed.">        if (e.getCause() instanceof javax.naming.NameNotFoundException) {</span>
-<span class="nc" id="L226">          return false;</span>
+<span class="fc" id="L227">      } catch (LdapException e) {</span>
+<span class="pc bpc" id="L228" title="1 of 2 branches missed.">        if (ResultCode.NO_SUCH_OBJECT == e.getResultCode()) {</span>
+<span class="fc" id="L229">          return false;</span>
         }
-<span class="nc" id="L228">        throw e;</span>
+<span class="nc bnc" id="L231" title="All 2 branches missed.">        if (e.getCause() instanceof javax.naming.NameNotFoundException) {</span>
+<span class="nc" id="L232">          return false;</span>
+        }
+<span class="nc" id="L234">        throw e;</span>
       }
     });
   }
@@ -241,7 +247,7 @@ public class LdaptiveTemplate implements LdaptiveOperations {
   public &lt;T&gt; T save(
       @NotNull final T domainObject,
       @NotNull final LdaptiveEntryMapper&lt;T&gt; entryMapper) {
-<span class="nc" id="L244">    return execute(connection -&gt; save(domainObject, entryMapper, connection));</span>
+<span class="fc" id="L250">    return execute(connection -&gt; save(domainObject, entryMapper, connection));</span>
   }
 
   private &lt;T&gt; T save(
@@ -250,28 +256,41 @@ public class LdaptiveTemplate implements LdaptiveOperations {
       final Connection connection) throws LdapRuntimeException {
 
     try {
-<span class="nc" id="L253">      final String dn = entryMapper.mapDn(domainObject);</span>
-<span class="nc" id="L254">      LdapEntry destination = new SearchOperation(connection)</span>
-<span class="nc" id="L255">          .execute(SearchRequest.newObjectScopeSearchRequest(dn))</span>
-<span class="nc" id="L256">          .getResult()</span>
-<span class="nc" id="L257">          .getEntry();</span>
-<span class="nc bnc" id="L258" title="All 2 branches missed.">      if (destination == null) {</span>
-<span class="nc" id="L259">        destination = new LdapEntry();</span>
-<span class="nc" id="L260">        entryMapper.map(domainObject, destination);</span>
-<span class="nc" id="L261">        new AddOperation(connection)</span>
-<span class="nc" id="L262">            .execute(new AddRequest(dn, destination.getAttributes()));</span>
-      } else {
-<span class="nc" id="L264">        final AttributeModification[] modifications = entryMapper</span>
-<span class="nc" id="L265">            .mapAndComputeModifications(domainObject, destination);</span>
-<span class="nc bnc" id="L266" title="All 4 branches missed.">        if (modifications != null &amp;&amp; modifications.length &gt; 0) {</span>
-<span class="nc" id="L267">          new ModifyOperation(connection)</span>
-<span class="nc" id="L268">              .execute(new ModifyRequest(dn, modifications));</span>
+      final LdapEntry destination;
+<span class="fc" id="L260">      final String dn = entryMapper.mapDn(domainObject);</span>
+<span class="fc bfc" id="L261" title="All 2 branches covered.">      if (exists(domainObject, entryMapper)) {</span>
+<span class="fc" id="L262">        destination = new SearchOperation(connection)</span>
+<span class="fc" id="L263">            .execute(SearchRequest.newObjectScopeSearchRequest(dn))</span>
+<span class="fc" id="L264">            .getResult()</span>
+<span class="fc" id="L265">            .getEntry();</span>
+<span class="fc" id="L266">        final AttributeModification[] modifications = entryMapper</span>
+<span class="fc" id="L267">            .mapAndComputeModifications(domainObject, destination);</span>
+<span class="pc bpc" id="L268" title="2 of 4 branches missed.">        if (modifications != null &amp;&amp; modifications.length &gt; 0) {</span>
+<span class="fc" id="L269">          new ModifyOperation(connection)</span>
+<span class="fc" id="L270">              .execute(new ModifyRequest(dn, modifications));</span>
         }
-      }
-<span class="nc" id="L271">      return entryMapper.map(destination);</span>
+<span class="fc" id="L272">      } else {</span>
+<span class="pc bpc" id="L273" title="2 of 4 branches missed.">        if (entryMapper.getObjectClasses() == null || entryMapper.getObjectClasses().length == 0) {</span>
+<span class="nc" id="L274">          final ServiceException se = ServiceException.internalServerError(</span>
+              &quot;Object classes must be specified to save a new ldap entry.&quot;,
+              &quot;org.bremersee:common-base-ldaptive:d7aa5699-fd2e-45df-a863-97960e8095b8&quot;);
+<span class="nc" id="L277">          log.error(&quot;Saving domain object failed.&quot;, se);</span>
+<span class="nc" id="L278">          throw se;</span>
+        }
+<span class="fc" id="L280">        destination = new LdapEntry();</span>
+<span class="fc" id="L281">        entryMapper.map(domainObject, destination);</span>
+<span class="fc" id="L282">        destination.setDn(dn);</span>
+<span class="fc" id="L283">        destination.addAttribute(new LdapAttribute(</span>
+            &quot;objectclass&quot;,
+<span class="fc" id="L285">            entryMapper.getObjectClasses()));</span>
+<span class="fc" id="L286">        new AddOperation(connection)</span>
+<span class="fc" id="L287">            .execute(new AddRequest(dn, destination.getAttributes()));</span>
 
-<span class="nc" id="L273">    } catch (LdapException e) {</span>
-<span class="nc" id="L274">      throw new LdapRuntimeException(e);</span>
+      }
+<span class="fc" id="L290">      return entryMapper.map(destination);</span>
+
+<span class="nc" id="L292">    } catch (LdapException e) {</span>
+<span class="nc" id="L293">      throw new LdapRuntimeException(e);</span>
     }
   }
 
@@ -286,13 +305,12 @@ public class LdaptiveTemplate implements LdaptiveOperations {
   public &lt;T&gt; Stream&lt;T&gt; saveAll(
       final Collection&lt;T&gt; domainModels,
       @NotNull final LdaptiveEntryMapper&lt;T&gt; entryMapper) {
-<span class="nc bnc" id="L289" title="All 4 branches missed.">    if (domainModels == null || domainModels.isEmpty()) {</span>
-<span class="nc" id="L290">      return Stream.empty();</span>
+<span class="pc bpc" id="L308" title="2 of 4 branches missed.">    if (domainModels == null || domainModels.isEmpty()) {</span>
+<span class="nc" id="L309">      return Stream.empty();</span>
     }
-<span class="nc" id="L292">    return execute(connection -&gt; domainModels</span>
-<span class="nc" id="L293">        .stream()</span>
-<span class="nc" id="L294">        .filter(Objects::nonNull)</span>
-<span class="nc" id="L295">        .map(domainModel -&gt; save(domainModel, entryMapper, connection)));</span>
+<span class="fc" id="L311">    return domainModels.stream()</span>
+<span class="fc" id="L312">        .filter(Objects::nonNull)</span>
+<span class="fc" id="L313">        .map(domainModel -&gt; save(domainModel, entryMapper));</span>
   }
 
   /**
@@ -301,9 +319,9 @@ public class LdaptiveTemplate implements LdaptiveOperations {
    * @param deleteRequest the delete request
    */
   public void delete(@NotNull final DeleteRequest deleteRequest) {
-<span class="nc" id="L304">    execute((LdaptiveConnectionCallbackWithoutResult) connection -&gt; new DeleteOperation(connection)</span>
-<span class="nc" id="L305">        .execute(deleteRequest));</span>
-<span class="nc" id="L306">  }</span>
+<span class="fc" id="L322">    execute((LdaptiveConnectionCallbackWithoutResult) connection -&gt; new DeleteOperation(connection)</span>
+<span class="fc" id="L323">        .execute(deleteRequest));</span>
+<span class="fc" id="L324">  }</span>
 
   /**
    * Delete domain object.
@@ -315,10 +333,10 @@ public class LdaptiveTemplate implements LdaptiveOperations {
   public &lt;T&gt; void delete(
       @NotNull final T domainObject,
       @NotNull final LdaptiveEntryMapper&lt;T&gt; entryMapper) {
-<span class="nc" id="L318">    execute(</span>
-<span class="nc" id="L319">        (LdaptiveConnectionCallbackWithoutResult) connection -&gt; delete(</span>
+<span class="fc" id="L336">    execute(</span>
+<span class="fc" id="L337">        (LdaptiveConnectionCallbackWithoutResult) connection -&gt; delete(</span>
             domainObject, entryMapper, connection));
-<span class="nc" id="L321">  }</span>
+<span class="fc" id="L339">  }</span>
 
   private &lt;T&gt; void delete(
       final T domainModel,
@@ -326,12 +344,12 @@ public class LdaptiveTemplate implements LdaptiveOperations {
       final Connection connection) throws LdapRuntimeException {
 
     try {
-<span class="nc" id="L329">      new DeleteOperation(connection).execute(new DeleteRequest(entryMapper.mapDn(domainModel)));</span>
+<span class="fc" id="L347">      new DeleteOperation(connection).execute(new DeleteRequest(entryMapper.mapDn(domainModel)));</span>
 
-<span class="nc" id="L331">    } catch (LdapException e) {</span>
-<span class="nc" id="L332">      throw new LdapRuntimeException(e);</span>
-<span class="nc" id="L333">    }</span>
-<span class="nc" id="L334">  }</span>
+<span class="nc" id="L349">    } catch (LdapException e) {</span>
+<span class="nc" id="L350">      throw new LdapRuntimeException(e);</span>
+<span class="fc" id="L351">    }</span>
+<span class="fc" id="L352">  }</span>
 
   /**
    * Delete all domain objects.
@@ -343,20 +361,20 @@ public class LdaptiveTemplate implements LdaptiveOperations {
   public &lt;T&gt; void deleteAll(
       final Collection&lt;T&gt; domainObjects,
       @NotNull final LdaptiveEntryMapper&lt;T&gt; entryMapper) {
-<span class="nc bnc" id="L346" title="All 2 branches missed.">    if (domainObjects != null) {</span>
-<span class="nc" id="L347">      execute((LdaptiveConnectionCallbackWithoutResult) connection -&gt; {</span>
-<span class="nc bnc" id="L348" title="All 2 branches missed.">        for (T domainModel : domainObjects) {</span>
-<span class="nc bnc" id="L349" title="All 2 branches missed.">          if (domainModel != null) {</span>
-<span class="nc" id="L350">            delete(domainModel, entryMapper, connection);</span>
+<span class="pc bpc" id="L364" title="1 of 2 branches missed.">    if (domainObjects != null) {</span>
+<span class="fc" id="L365">      execute((LdaptiveConnectionCallbackWithoutResult) connection -&gt; {</span>
+<span class="fc bfc" id="L366" title="All 2 branches covered.">        for (T domainModel : domainObjects) {</span>
+<span class="pc bpc" id="L367" title="1 of 2 branches missed.">          if (domainModel != null) {</span>
+<span class="fc" id="L368">            delete(domainModel, entryMapper, connection);</span>
           }
-<span class="nc" id="L352">        }</span>
-<span class="nc" id="L353">      });</span>
+<span class="fc" id="L370">        }</span>
+<span class="fc" id="L371">      });</span>
     }
-<span class="nc" id="L355">  }</span>
+<span class="fc" id="L373">  }</span>
 
   private static class LdapRuntimeException extends RuntimeException {
 
-<span class="nc" id="L359">    @Getter(AccessLevel.PACKAGE)</span>
+<span class="nc" id="L377">    @Getter(AccessLevel.PACKAGE)</span>
     private LdapException ldapException;
 
     /**
@@ -365,9 +383,9 @@ public class LdaptiveTemplate implements LdaptiveOperations {
      * @param ldapException the ldap exception
      */
     LdapRuntimeException(LdapException ldapException) {
-<span class="nc" id="L368">      super(ldapException);</span>
-<span class="nc" id="L369">      this.ldapException = ldapException;</span>
-<span class="nc" id="L370">    }</span>
+<span class="nc" id="L386">      super(ldapException);</span>
+<span class="nc" id="L387">      this.ldapException = ldapException;</span>
+<span class="nc" id="L388">    }</span>
   }
 
 }

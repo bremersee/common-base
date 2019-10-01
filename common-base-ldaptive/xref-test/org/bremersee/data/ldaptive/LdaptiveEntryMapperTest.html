@@ -459,48 +459,53 @@
 <a class="jxr_linenumber" name="L451" href="#L451">451</a>   <strong class="jxr_keyword">static</strong> <strong class="jxr_keyword">class</strong> PersonMapper <strong class="jxr_keyword">implements</strong> LdaptiveEntryMapper&lt;Person&gt; {
 <a class="jxr_linenumber" name="L452" href="#L452">452</a> 
 <a class="jxr_linenumber" name="L453" href="#L453">453</a>     @Override
-<a class="jxr_linenumber" name="L454" href="#L454">454</a>     <strong class="jxr_keyword">public</strong> String mapDn(Person person) {
-<a class="jxr_linenumber" name="L455" href="#L455">455</a>       <strong class="jxr_keyword">if</strong> (person == <strong class="jxr_keyword">null</strong> || !StringUtils.hasText(person.getName())) {
-<a class="jxr_linenumber" name="L456" href="#L456">456</a>         <strong class="jxr_keyword">return</strong> <strong class="jxr_keyword">null</strong>;
-<a class="jxr_linenumber" name="L457" href="#L457">457</a>       }
-<a class="jxr_linenumber" name="L458" href="#L458">458</a>       <strong class="jxr_keyword">return</strong> LdaptiveEntryMapper.createDn(<span class="jxr_string">"cn"</span>, person.getName(), <span class="jxr_string">"dc=example,dc=org"</span>);
-<a class="jxr_linenumber" name="L459" href="#L459">459</a>     }
-<a class="jxr_linenumber" name="L460" href="#L460">460</a> 
-<a class="jxr_linenumber" name="L461" href="#L461">461</a>     @Override
-<a class="jxr_linenumber" name="L462" href="#L462">462</a>     <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> map(LdapEntry ldapEntry, Person person) {
-<a class="jxr_linenumber" name="L463" href="#L463">463</a>       person.setMailAddresses(LdaptiveEntryMapper
-<a class="jxr_linenumber" name="L464" href="#L464">464</a>           .getAttributeValuesAsList(ldapEntry, <span class="jxr_string">"mail"</span>, STRING_TRANSCODER));
-<a class="jxr_linenumber" name="L465" href="#L465">465</a>       person.setName(LdaptiveEntryMapper
-<a class="jxr_linenumber" name="L466" href="#L466">466</a>           .getAttributeValue(ldapEntry, <span class="jxr_string">"name"</span>, STRING_TRANSCODER, <strong class="jxr_keyword">null</strong>));
-<a class="jxr_linenumber" name="L467" href="#L467">467</a>       person.setPhoto(LdaptiveEntryMapper
-<a class="jxr_linenumber" name="L468" href="#L468">468</a>           .getAttributeValue(ldapEntry, <span class="jxr_string">"photo"</span>, BYTE_TRANSCODER, <strong class="jxr_keyword">null</strong>));
-<a class="jxr_linenumber" name="L469" href="#L469">469</a>     }
-<a class="jxr_linenumber" name="L470" href="#L470">470</a> 
-<a class="jxr_linenumber" name="L471" href="#L471">471</a>     @Override
-<a class="jxr_linenumber" name="L472" href="#L472">472</a>     <strong class="jxr_keyword">public</strong> Person map(LdapEntry ldapEntry) {
-<a class="jxr_linenumber" name="L473" href="#L473">473</a>       <strong class="jxr_keyword">if</strong> (ldapEntry == <strong class="jxr_keyword">null</strong>) {
-<a class="jxr_linenumber" name="L474" href="#L474">474</a>         <strong class="jxr_keyword">return</strong> <strong class="jxr_keyword">null</strong>;
-<a class="jxr_linenumber" name="L475" href="#L475">475</a>       }
-<a class="jxr_linenumber" name="L476" href="#L476">476</a>       Person person = Person.builder().build();
-<a class="jxr_linenumber" name="L477" href="#L477">477</a>       map(ldapEntry, person);
-<a class="jxr_linenumber" name="L478" href="#L478">478</a>       <strong class="jxr_keyword">return</strong> person;
-<a class="jxr_linenumber" name="L479" href="#L479">479</a>     }
-<a class="jxr_linenumber" name="L480" href="#L480">480</a> 
-<a class="jxr_linenumber" name="L481" href="#L481">481</a>     @Override
-<a class="jxr_linenumber" name="L482" href="#L482">482</a>     <strong class="jxr_keyword">public</strong> AttributeModification[] mapAndComputeModifications(
-<a class="jxr_linenumber" name="L483" href="#L483">483</a>         @NotNull Person source,
-<a class="jxr_linenumber" name="L484" href="#L484">484</a>         @NotNull LdapEntry destination) {
-<a class="jxr_linenumber" name="L485" href="#L485">485</a>       List&lt;AttributeModification&gt; modifications = <strong class="jxr_keyword">new</strong> ArrayList&lt;&gt;();
-<a class="jxr_linenumber" name="L486" href="#L486">486</a>       LdaptiveEntryMapper.setAttribute(destination,
-<a class="jxr_linenumber" name="L487" href="#L487">487</a>           <span class="jxr_string">"name"</span>, source.getName(), false, STRING_TRANSCODER, modifications);
-<a class="jxr_linenumber" name="L488" href="#L488">488</a>       LdaptiveEntryMapper.setAttributes(destination,
-<a class="jxr_linenumber" name="L489" href="#L489">489</a>           <span class="jxr_string">"mail"</span>, source.getMailAddresses(), false, STRING_TRANSCODER, modifications);
-<a class="jxr_linenumber" name="L490" href="#L490">490</a>       LdaptiveEntryMapper.setAttribute(destination,
-<a class="jxr_linenumber" name="L491" href="#L491">491</a>           <span class="jxr_string">"photo"</span>, source.getPhoto(), <strong class="jxr_keyword">true</strong>, BYTE_TRANSCODER, modifications);
-<a class="jxr_linenumber" name="L492" href="#L492">492</a>       <strong class="jxr_keyword">return</strong> modifications.toArray(<strong class="jxr_keyword">new</strong> AttributeModification[0]);
-<a class="jxr_linenumber" name="L493" href="#L493">493</a>     }
-<a class="jxr_linenumber" name="L494" href="#L494">494</a>   }
-<a class="jxr_linenumber" name="L495" href="#L495">495</a> }
+<a class="jxr_linenumber" name="L454" href="#L454">454</a>     <strong class="jxr_keyword">public</strong> String[] getObjectClasses() {
+<a class="jxr_linenumber" name="L455" href="#L455">455</a>       <strong class="jxr_keyword">return</strong> <strong class="jxr_keyword">new</strong> String[0];
+<a class="jxr_linenumber" name="L456" href="#L456">456</a>     }
+<a class="jxr_linenumber" name="L457" href="#L457">457</a> 
+<a class="jxr_linenumber" name="L458" href="#L458">458</a>     @Override
+<a class="jxr_linenumber" name="L459" href="#L459">459</a>     <strong class="jxr_keyword">public</strong> String mapDn(Person person) {
+<a class="jxr_linenumber" name="L460" href="#L460">460</a>       <strong class="jxr_keyword">if</strong> (person == <strong class="jxr_keyword">null</strong> || !StringUtils.hasText(person.getName())) {
+<a class="jxr_linenumber" name="L461" href="#L461">461</a>         <strong class="jxr_keyword">return</strong> <strong class="jxr_keyword">null</strong>;
+<a class="jxr_linenumber" name="L462" href="#L462">462</a>       }
+<a class="jxr_linenumber" name="L463" href="#L463">463</a>       <strong class="jxr_keyword">return</strong> LdaptiveEntryMapper.createDn(<span class="jxr_string">"cn"</span>, person.getName(), <span class="jxr_string">"dc=example,dc=org"</span>);
+<a class="jxr_linenumber" name="L464" href="#L464">464</a>     }
+<a class="jxr_linenumber" name="L465" href="#L465">465</a> 
+<a class="jxr_linenumber" name="L466" href="#L466">466</a>     @Override
+<a class="jxr_linenumber" name="L467" href="#L467">467</a>     <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> map(LdapEntry ldapEntry, Person person) {
+<a class="jxr_linenumber" name="L468" href="#L468">468</a>       person.setMailAddresses(LdaptiveEntryMapper
+<a class="jxr_linenumber" name="L469" href="#L469">469</a>           .getAttributeValuesAsList(ldapEntry, <span class="jxr_string">"mail"</span>, STRING_TRANSCODER));
+<a class="jxr_linenumber" name="L470" href="#L470">470</a>       person.setName(LdaptiveEntryMapper
+<a class="jxr_linenumber" name="L471" href="#L471">471</a>           .getAttributeValue(ldapEntry, <span class="jxr_string">"name"</span>, STRING_TRANSCODER, <strong class="jxr_keyword">null</strong>));
+<a class="jxr_linenumber" name="L472" href="#L472">472</a>       person.setPhoto(LdaptiveEntryMapper
+<a class="jxr_linenumber" name="L473" href="#L473">473</a>           .getAttributeValue(ldapEntry, <span class="jxr_string">"photo"</span>, BYTE_TRANSCODER, <strong class="jxr_keyword">null</strong>));
+<a class="jxr_linenumber" name="L474" href="#L474">474</a>     }
+<a class="jxr_linenumber" name="L475" href="#L475">475</a> 
+<a class="jxr_linenumber" name="L476" href="#L476">476</a>     @Override
+<a class="jxr_linenumber" name="L477" href="#L477">477</a>     <strong class="jxr_keyword">public</strong> Person map(LdapEntry ldapEntry) {
+<a class="jxr_linenumber" name="L478" href="#L478">478</a>       <strong class="jxr_keyword">if</strong> (ldapEntry == <strong class="jxr_keyword">null</strong>) {
+<a class="jxr_linenumber" name="L479" href="#L479">479</a>         <strong class="jxr_keyword">return</strong> <strong class="jxr_keyword">null</strong>;
+<a class="jxr_linenumber" name="L480" href="#L480">480</a>       }
+<a class="jxr_linenumber" name="L481" href="#L481">481</a>       Person person = Person.builder().build();
+<a class="jxr_linenumber" name="L482" href="#L482">482</a>       map(ldapEntry, person);
+<a class="jxr_linenumber" name="L483" href="#L483">483</a>       <strong class="jxr_keyword">return</strong> person;
+<a class="jxr_linenumber" name="L484" href="#L484">484</a>     }
+<a class="jxr_linenumber" name="L485" href="#L485">485</a> 
+<a class="jxr_linenumber" name="L486" href="#L486">486</a>     @Override
+<a class="jxr_linenumber" name="L487" href="#L487">487</a>     <strong class="jxr_keyword">public</strong> AttributeModification[] mapAndComputeModifications(
+<a class="jxr_linenumber" name="L488" href="#L488">488</a>         @NotNull Person source,
+<a class="jxr_linenumber" name="L489" href="#L489">489</a>         @NotNull LdapEntry destination) {
+<a class="jxr_linenumber" name="L490" href="#L490">490</a>       List&lt;AttributeModification&gt; modifications = <strong class="jxr_keyword">new</strong> ArrayList&lt;&gt;();
+<a class="jxr_linenumber" name="L491" href="#L491">491</a>       LdaptiveEntryMapper.setAttribute(destination,
+<a class="jxr_linenumber" name="L492" href="#L492">492</a>           <span class="jxr_string">"name"</span>, source.getName(), false, STRING_TRANSCODER, modifications);
+<a class="jxr_linenumber" name="L493" href="#L493">493</a>       LdaptiveEntryMapper.setAttributes(destination,
+<a class="jxr_linenumber" name="L494" href="#L494">494</a>           <span class="jxr_string">"mail"</span>, source.getMailAddresses(), false, STRING_TRANSCODER, modifications);
+<a class="jxr_linenumber" name="L495" href="#L495">495</a>       LdaptiveEntryMapper.setAttribute(destination,
+<a class="jxr_linenumber" name="L496" href="#L496">496</a>           <span class="jxr_string">"photo"</span>, source.getPhoto(), <strong class="jxr_keyword">true</strong>, BYTE_TRANSCODER, modifications);
+<a class="jxr_linenumber" name="L497" href="#L497">497</a>       <strong class="jxr_keyword">return</strong> modifications.toArray(<strong class="jxr_keyword">new</strong> AttributeModification[0]);
+<a class="jxr_linenumber" name="L498" href="#L498">498</a>     }
+<a class="jxr_linenumber" name="L499" href="#L499">499</a>   }
+<a class="jxr_linenumber" name="L500" href="#L500">500</a> }
 </pre>
 <hr/>
 <div id="footer">Copyright &#169; 2019 <a href="http://bremersee.org">bremersee.org</a>. All rights reserved.</div>
