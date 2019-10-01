@@ -451,6 +451,11 @@ public class LdaptiveEntryMapperTest {
   static class PersonMapper implements LdaptiveEntryMapper<Person> {
 
     @Override
+    public String[] getObjectClasses() {
+      return new String[0];
+    }
+
+    @Override
     public String mapDn(Person person) {
       if (person == null || !StringUtils.hasText(person.getName())) {
         return null;

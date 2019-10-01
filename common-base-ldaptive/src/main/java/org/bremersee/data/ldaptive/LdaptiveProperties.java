@@ -42,7 +42,7 @@ public class LdaptiveProperties {
   /**
    * URL to the LDAP(s).
    */
-  private String ldapUrl = "ldap://localhost:1389";
+  private String ldapUrl = "ldap://localhost:12389";
 
   /**
    * Amount of time in milliseconds that connects will block.
@@ -89,6 +89,9 @@ public class LdaptiveProperties {
    */
   private String bindCredential;
 
+  /**
+   * Specifies whether the connection should be pooled or not. Default is {@code false}.
+   */
   private boolean pooled = false;
 
   /**
@@ -136,6 +139,9 @@ public class LdaptiveProperties {
    */
   private long blockWaitTime = 10000L;
 
+  /**
+   * The search validator of the connection pool.
+   */
   private SearchValidator searchValidator = new SearchValidator();
 
 }

@@ -43,6 +43,17 @@ import org.springframework.validation.annotation.Validated;
 public interface LdaptiveEntryMapper<T> extends LdapEntryMapper<T> {
 
   /**
+   * Get object classes of the ldap entry. The object classes are only required, if a new ldap entry
+   * should be persisted.
+   *
+   * @return the object classes of the ldap entry
+   */
+  String[] getObjectClasses();
+
+  @Override
+  String mapDn(T domainObject);
+
+  /**
    * Map a ldap entry into a domain object.
    *
    * @param ldapEntry the ldap entry
@@ -52,13 +63,16 @@ public interface LdaptiveEntryMapper<T> extends LdapEntryMapper<T> {
   T map(@Nullable LdapEntry ldapEntry);
 
   @Override
+  void map(LdapEntry source, T destination);
+
+  @Override
   default void map(T source, LdapEntry destination) {
     mapAndComputeModifications(source, destination);
   }
 
   /**
    * Map and compute attribute modifications (see {@link LdapEntry#computeModifications(LdapEntry,
-   * LdapEntry)}*).
+   * LdapEntry)}**).
    *
    * @param source      the source (domain object)
    * @param destination the destination (ldap entry)
