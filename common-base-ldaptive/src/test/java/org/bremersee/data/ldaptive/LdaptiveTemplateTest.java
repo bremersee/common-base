@@ -19,6 +19,7 @@ package org.bremersee.data.ldaptive;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.util.Arrays;
@@ -210,6 +211,15 @@ public class LdaptiveTemplateTest {
     person = ldaptiveTemplate.findOne(SearchRequest.newObjectScopeSearchRequest(dn), personMapper)
         .orElseThrow(() -> ServiceException.notFound("Person", "person"));
     assertEquals("Surname", person.getSn());
+
+    person.setSn("");
+    modifyRequest = personMapper
+        .mapAndComputeModifyRequest(person, destination);
+    ldaptiveTemplate.modify(modifyRequest);
+
+    person = ldaptiveTemplate.findOne(SearchRequest.newObjectScopeSearchRequest(dn), personMapper)
+        .orElseThrow(() -> ServiceException.notFound("Person", "person"));
+    assertNull(person.getSn());
 
     ldaptiveTemplate.delete(new DeleteRequest(dn));
     assertFalse(ldaptiveTemplate.exists(person, personMapper));
