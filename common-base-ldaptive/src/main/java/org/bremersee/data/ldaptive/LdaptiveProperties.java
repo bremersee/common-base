@@ -30,7 +30,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
  *
  * @author Christian Bremer
  */
-@SuppressWarnings("ConfigurationProperties")
+@SuppressWarnings({"ConfigurationProperties", "WeakerAccess"})
 @ConfigurationProperties(prefix = "bremersee.ldaptive")
 @Getter
 @Setter
