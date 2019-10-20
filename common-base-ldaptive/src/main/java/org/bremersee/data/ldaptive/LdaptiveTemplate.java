@@ -64,6 +64,11 @@ public class LdaptiveTemplate implements LdaptiveOperations, Cloneable {
     this.connectionFactory = connectionFactory;
   }
 
+  /**
+   * Sets error handler.
+   *
+   * @param errorHandler the error handler
+   */
   public void setErrorHandler(final ErrorHandler errorHandler) {
     if (errorHandler != null) {
       this.errorHandler = errorHandler;
@@ -82,6 +87,13 @@ public class LdaptiveTemplate implements LdaptiveOperations, Cloneable {
     return clone(errorHandler);
   }
 
+  /**
+   * Returns a new instance of this ldaptive template with the same connection factory and the given
+   * error handler.
+   *
+   * @param errorHandler the new error handler
+   * @return the new instance of the ldaptive template
+   */
   public LdaptiveTemplate clone(final ErrorHandler errorHandler) {
     final LdaptiveTemplate template = new LdaptiveTemplate(connectionFactory);
     template.setErrorHandler(errorHandler != null ? errorHandler : this.errorHandler);
