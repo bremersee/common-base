@@ -31,7 +31,6 @@ public class BaseCommonConverters {
    */
   @SuppressWarnings("WeakerAccess")
   public static final Converter<?, ?>[] CONVERTERS = new Converter<?, ?>[]{
-      new StringToHttpLanguageTagConverter(),
       new StringToJavaLocaleConverter(),
       new StringToMongoSearchLanguageConverter(),
       new StringToThreeLetterCountryCodeConverter(),
