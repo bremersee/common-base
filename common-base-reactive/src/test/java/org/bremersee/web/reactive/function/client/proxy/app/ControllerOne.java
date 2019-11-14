@@ -114,8 +114,8 @@ public interface ControllerOne {
    * Upload mono.
    *
    * @param headerValue the x header value
-   * @param lastValue    the last value
-   * @param data         the data
+   * @param lastValue   the last value
+   * @param data        the data
    * @return the mono
    */
   @RequestMapping(path = "/upload",

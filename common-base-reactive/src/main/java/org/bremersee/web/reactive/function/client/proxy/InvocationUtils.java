@@ -20,14 +20,17 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import org.springframework.core.annotation.AnnotationUtils;
+import org.springframework.http.MediaType;
 import org.springframework.util.MultiValueMap;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -214,25 +217,70 @@ abstract class InvocationUtils {
   }
 
   /**
-   * Find content type header string.
+   * Find content type header as strings string [ ].
    *
    * @param method the method
-   * @return the string
+   * @return the string [ ]
    */
-  static String findContentTypeHeader(final Method method) {
+  @SuppressWarnings("WeakerAccess")
+  static String[] findContentTypeHeaderAsStrings(final Method method) {
     return findRequestMappingValue(
-        method, a -> a.consumes().length > 0, a -> a.consumes()[0])
+        method, a -> a.consumes().length > 0, RequestMapping::consumes)
         .orElseGet(() -> findGetMappingValue(
-            method, a -> a.consumes().length > 0, a -> a.consumes()[0])
+            method, a -> a.consumes().length > 0, GetMapping::consumes)
             .orElseGet(() -> findPostMappingValue(
-                method, a -> a.consumes().length > 0, a -> a.consumes()[0])
+                method, a -> a.consumes().length > 0, PostMapping::consumes)
                 .orElseGet(() -> findPutMappingValue(
-                    method, a -> a.consumes().length > 0, a -> a.consumes()[0])
+                    method, a -> a.consumes().length > 0, PutMapping::consumes)
                     .orElseGet(() -> findPatchMappingValue(
-                        method, a -> a.consumes().length > 0, a -> a.consumes()[0])
+                        method, a -> a.consumes().length > 0, PatchMapping::consumes)
                         .orElseGet(() -> findDeleteMappingValue(
-                            method, a -> a.consumes().length > 0, a -> a.consumes()[0])
-                            .orElse(null))))));
+                            method, a -> a.consumes().length > 0, DeleteMapping::consumes)
+                            .orElse(new String[0]))))));
+  }
+
+  /**
+   * Find first content type header as string.
+   *
+   * @param method the method
+   * @return the content type or {@code null}
+   */
+  static String findFirstContentTypeHeaderAsString(final Method method) {
+    final String[] values = findContentTypeHeaderAsStrings(method);
+    return values == null || values.length == 0 ? null : values[0];
+  }
+
+  /**
+   * Find content type header.
+   *
+   * @param method the method
+   * @return the content type
+   */
+  static Set<MediaType> findContentTypeHeader(final Method method) {
+    final Set<MediaType> mediaTypes = new LinkedHashSet<>();
+    for (String mediaType : findContentTypeHeaderAsStrings(method)) {
+      try {
+        mediaTypes.add(MediaType.parseMediaType(mediaType));
+      } catch (RuntimeException ignored) {
+        // ignored
+      }
+    }
+    return mediaTypes;
+  }
+
+  /**
+   * Find first content type header.
+   *
+   * @param method the method
+   * @return the content type or {@code null}
+   */
+  @SuppressWarnings("unused")
+  static MediaType findFirstContentTypeHeader(final Method method) {
+    final Set<MediaType> values = findContentTypeHeader(method);
+    if (values.isEmpty()) {
+      return null;
+    }
+    return values.iterator().next();
   }
 
   /**
@@ -244,6 +292,7 @@ abstract class InvocationUtils {
    * @param selector  the selector
    * @return the optional
    */
+  @SuppressWarnings("WeakerAccess")
   static <T> Optional<T> findRequestMappingValue(
       Object obj, // can be method or target class
       Predicate<RequestMapping> condition,
