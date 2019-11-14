@@ -36,7 +36,6 @@ public class HttpClientException extends RuntimeException
 
   private final int status;
 
-  @Getter
   private final Map<String, ? extends Collection<String>> headers;
 
   @Getter
@@ -61,6 +60,16 @@ public class HttpClientException extends RuntimeException
     this.status = status;
     this.headers = headers != null ? headers : Collections.emptyMap();
     this.restApiException = restApiException;
+  }
+
+  @Override
+  public Map<String, String> getHeaders() {
+    return HttpResponseHeadersAware.createHeaders(getMultiValueHeaders());
+  }
+
+  @Override
+  public Map<String, ? extends Collection<String>> getMultiValueHeaders() {
+    return headers;
   }
 
   @Override

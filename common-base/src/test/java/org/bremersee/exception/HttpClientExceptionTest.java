@@ -31,7 +31,7 @@ public class HttpClientExceptionTest {
         restApiException);
     assertEquals(404, exception.status());
     assertEquals("Not found", exception.getMessage());
-    assertTrue(exception.getHeaders().containsKey("foo"));
+    assertTrue(exception.getMultiValueHeaders().containsKey("foo"));
     assertEquals(restApiException, exception.getRestApiException());
     assertNotNull(exception.toString());
     assertEquals(exception, new HttpClientException(
