@@ -21,6 +21,7 @@ import static org.bremersee.web.reactive.function.client.proxy.InvocationUtils.p
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestHeader;
 
@@ -79,9 +80,14 @@ public interface RequestHeadersBuilder {
       final HttpHeaders headers) {
 
     final Method method = parameters.getMethod();
-    final String value = InvocationUtils.findFirstContentTypeHeaderAsString(method);
-    if (StringUtils.hasText(value)) {
-      headers.set(HttpHeaders.CONTENT_TYPE, value);
+    final MediaType mediaType = InvocationUtils.findFirstContentTypeHeader(method);
+    if (mediaType != null) {
+      headers.setContentType(mediaType);
+    } else {
+      final String value = InvocationUtils.findFirstContentTypeHeaderAsString(method);
+      if (StringUtils.hasText(value)) {
+        headers.set(HttpHeaders.CONTENT_TYPE, value);
+      }
     }
   }
 
