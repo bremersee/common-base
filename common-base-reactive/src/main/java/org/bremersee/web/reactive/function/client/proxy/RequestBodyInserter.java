@@ -18,8 +18,6 @@ package org.bremersee.web.reactive.function.client.proxy;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
-import java.util.Arrays;
-import java.util.Optional;
 import org.springframework.http.MediaType;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -64,33 +62,34 @@ public interface RequestBodyInserter {
         for (final Annotation annotation : parameterAnnotations[i]) {
           if (annotation instanceof RequestBody) {
             final Object value = args[i];
-            if (isMediaType(value, method, MediaType.APPLICATION_FORM_URLENCODED_VALUE)) {
+            if (matches(value, MultiValueMap.class, method,
+                MediaType.APPLICATION_FORM_URLENCODED)) {
               //noinspection unchecked
               uriSpec.body(BodyInserters.fromFormData((MultiValueMap) value));
-            } else if (isMediaType(value, method, MediaType.MULTIPART_FORM_DATA_VALUE)) {
+            } else if (matches(value, MultiValueMap.class, method, MediaType.MULTIPART_FORM_DATA)) {
               //noinspection unchecked
               uriSpec.body(BodyInserters.fromMultipartData((MultiValueMap) value));
             } else if (value != null) {
               uriSpec.body(BodyInserters.fromObject(args[i]));
             }
+            return;
           }
         }
       }
     }
 
-    private boolean isMediaType(final Object value, final Method method, final String mediaType) {
-      return Optional.ofNullable(value)
-          .filter(v -> v instanceof MultiValueMap)
-          .flatMap(v -> InvocationUtils.findRequestMappingValue(
-              method,
-              mapping -> isMediaType(mapping.consumes(), mediaType),
-              mapping -> true))
-          .orElse(false);
+    private boolean matches(
+        final Object value,
+        @SuppressWarnings("SameParameterValue") final Class<?> valueClass,
+        final Method method,
+        final MediaType mediaType) {
+      return value != null && valueClass.isAssignableFrom(value.getClass()) && matches(method,
+          mediaType);
     }
 
-    private boolean isMediaType(final String[] consumes, final String mediaType) {
-      return Arrays.stream(consumes)
-          .anyMatch(value -> value.toLowerCase().contains(mediaType.toLowerCase()));
+    private boolean matches(final Method method, final MediaType mediaType) {
+      return InvocationUtils.findContentTypeHeader(method).stream()
+          .anyMatch(mt -> mt.isCompatibleWith(mediaType));
     }
 
   }

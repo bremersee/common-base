@@ -79,7 +79,7 @@ public interface RequestHeadersBuilder {
       final HttpHeaders headers) {
 
     final Method method = parameters.getMethod();
-    final String value = InvocationUtils.findContentTypeHeader(method);
+    final String value = InvocationUtils.findFirstContentTypeHeaderAsString(method);
     if (StringUtils.hasText(value)) {
       headers.set(HttpHeaders.CONTENT_TYPE, value);
     }
