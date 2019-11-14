@@ -89,7 +89,7 @@ public interface RequestBodyInserter {
 
     private boolean matches(final Method method, final MediaType mediaType) {
       return InvocationUtils.findContentTypeHeader(method).stream()
-          .anyMatch(mt -> mt.isCompatibleWith(mediaType));
+          .anyMatch(mediaType::isCompatibleWith);
     }
 
   }
