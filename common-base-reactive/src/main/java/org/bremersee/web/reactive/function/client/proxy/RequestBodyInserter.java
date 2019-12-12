@@ -70,7 +70,7 @@ public interface RequestBodyInserter {
               //noinspection unchecked
               uriSpec.body(BodyInserters.fromMultipartData((MultiValueMap) value));
             } else if (value != null) {
-              uriSpec.body(BodyInserters.fromObject(args[i]));
+              uriSpec.body(BodyInserters.fromValue(args[i]));
             }
             return;
           }
