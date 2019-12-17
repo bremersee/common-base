@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>LdaptiveConnectionConfigFactory.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">common-base-ldaptive</a> &gt; <a href="index.source.html" class="el_package">org.bremersee.data.ldaptive</a> &gt; <span class="el_source">LdaptiveConnectionConfigFactory.java</span></div><h1>LdaptiveConnectionConfigFactory.java</h1><pre class="source lang-java linenums">/*
+ * Copyright 2019 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package org.bremersee.data.ldaptive;
+
+import java.time.Duration;
+import org.ldaptive.BindConnectionInitializer;
+import org.ldaptive.ConnectionConfig;
+import org.ldaptive.ConnectionInitializer;
+import org.ldaptive.Credential;
+import org.ldaptive.ssl.CredentialConfig;
+import org.ldaptive.ssl.SslConfig;
+import org.ldaptive.ssl.X509CredentialConfig;
+import org.springframework.util.Assert;
+import org.springframework.util.StringUtils;
+
+/**
+ * The connection config factory.
+ *
+ * @author Christian Bremer
+ */
+@SuppressWarnings(&quot;unused&quot;)
+public interface LdaptiveConnectionConfigFactory {
+
+  /**
+   * Create connection config.
+   *
+   * @param properties the properties
+   * @return the connection config
+   */
+  default ConnectionConfig createConnectionConfig(LdaptiveProperties properties) {
+<span class="nc" id="L45">    Assert.notNull(properties, &quot;Ldaptive properties must not be null.&quot;);</span>
+<span class="nc" id="L46">    return createConnectionConfig(</span>
+        properties,
+<span class="nc" id="L48">        properties.getBindDn(),</span>
+<span class="nc" id="L49">        properties.getBindCredential());</span>
+  }
+
+  /**
+   * Create connection config.
+   *
+   * @param properties     the properties
+   * @param bindDn         the bind dn
+   * @param bindCredential the bind credential
+   * @return the connection config
+   */
+  ConnectionConfig createConnectionConfig(LdaptiveProperties properties, String bindDn,
+      String bindCredential);
+
+  /**
+   * Get default factory.
+   *
+   * @return the default connection config factory
+   */
+  static LdaptiveConnectionConfigFactory defaultFactory() {
+<span class="nc" id="L69">    return new Default();</span>
+  }
+
+  /**
+   * The default connection config implementation.
+   */
+<span class="nc" id="L75">  class Default implements LdaptiveConnectionConfigFactory {</span>
+
+    @Override
+    public ConnectionConfig createConnectionConfig(
+        final LdaptiveProperties properties,
+        final String bindDn,
+        final String bindCredential) {
+
+<span class="nc" id="L83">      Assert.notNull(properties, &quot;Ldaptive properties must not be null.&quot;);</span>
+<span class="nc bnc" id="L84" title="All 2 branches missed.">      final String username = bindDn != null ? bindDn : properties.getBindDn();</span>
+<span class="nc bnc" id="L85" title="All 2 branches missed.">      final String password = bindCredential != null</span>
+          ? bindCredential
+<span class="nc" id="L87">          : properties.getBindCredential();</span>
+<span class="nc" id="L88">      final ConnectionConfig cc = new ConnectionConfig();</span>
+<span class="nc" id="L89">      cc.setLdapUrl(properties.getLdapUrl());</span>
+
+<span class="nc bnc" id="L91" title="All 2 branches missed.">      if (properties.getConnectTimeout() &gt; 0L) {</span>
+<span class="nc" id="L92">        cc.setConnectTimeout(Duration.ofMillis(properties.getConnectTimeout()));</span>
+      }
+<span class="nc bnc" id="L94" title="All 2 branches missed.">      if (properties.getResponseTimeout() &gt; 0L) {</span>
+<span class="nc" id="L95">        cc.setResponseTimeout(Duration.ofMillis(properties.getResponseTimeout()));</span>
+      }
+
+<span class="nc" id="L98">      cc.setUseSSL(properties.isUseSsl());</span>
+<span class="nc" id="L99">      cc.setUseStartTLS(properties.isUseStartTls());</span>
+
+<span class="nc bnc" id="L101" title="All 6 branches missed.">      if ((properties.isUseSsl() || properties.isUseStartTls()) &amp;&amp; hasSslConfig(properties)) {</span>
+<span class="nc" id="L102">        cc.setSslConfig(sslConfig(properties));</span>
+      }
+
+      // binds all operations to a dn
+<span class="nc bnc" id="L106" title="All 2 branches missed.">      if (StringUtils.hasText(properties.getBindDn())) {</span>
+<span class="nc" id="L107">        cc.setConnectionInitializer(connectionInitializer(username, password));</span>
+      }
+
+<span class="nc" id="L110">      return cc;</span>
+    }
+
+    private boolean hasSslConfig(final LdaptiveProperties properties) {
+<span class="nc bnc" id="L114" title="All 2 branches missed.">      return StringUtils.hasText(properties.getTrustCertificates())</span>
+<span class="nc bnc" id="L115" title="All 2 branches missed.">          || StringUtils.hasText(properties.getAuthenticationCertificate())</span>
+<span class="nc bnc" id="L116" title="All 2 branches missed.">          || StringUtils.hasText(properties.getAuthenticationKey());</span>
+    }
+
+    private SslConfig sslConfig(final LdaptiveProperties properties) {
+<span class="nc" id="L120">      final SslConfig sc = new SslConfig();</span>
+<span class="nc" id="L121">      sc.setCredentialConfig(sslCredentialConfig(properties));</span>
+<span class="nc" id="L122">      return sc;</span>
+    }
+
+    private CredentialConfig sslCredentialConfig(final LdaptiveProperties properties) {
+<span class="nc" id="L126">      final X509CredentialConfig x509 = new X509CredentialConfig();</span>
+<span class="nc bnc" id="L127" title="All 2 branches missed.">      if (StringUtils.hasText(properties.getAuthenticationCertificate())) {</span>
+<span class="nc" id="L128">        x509.setAuthenticationCertificate(properties.getAuthenticationCertificate());</span>
+      }
+<span class="nc bnc" id="L130" title="All 2 branches missed.">      if (StringUtils.hasText(properties.getAuthenticationKey())) {</span>
+<span class="nc" id="L131">        x509.setAuthenticationKey(properties.getAuthenticationKey());</span>
+      }
+<span class="nc bnc" id="L133" title="All 2 branches missed.">      if (StringUtils.hasText(properties.getTrustCertificates())) {</span>
+<span class="nc" id="L134">        x509.setTrustCertificates(properties.getTrustCertificates());</span>
+      }
+<span class="nc" id="L136">      return x509;</span>
+    }
+
+    private ConnectionInitializer connectionInitializer(String bindDn, String bindCredential) {
+      // sasl is not supported at the moment
+<span class="nc" id="L141">      final BindConnectionInitializer bci = new BindConnectionInitializer();</span>
+<span class="nc" id="L142">      bci.setBindDn(bindDn);</span>
+<span class="nc" id="L143">      bci.setBindCredential(new Credential(bindCredential));</span>
+<span class="nc" id="L144">      return bci;</span>
+    }
+
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.3.201901230119</span></div></body></html>

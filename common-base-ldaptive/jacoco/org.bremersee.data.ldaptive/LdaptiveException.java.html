@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>LdaptiveException.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">common-base-ldaptive</a> &gt; <a href="index.source.html" class="el_package">org.bremersee.data.ldaptive</a> &gt; <span class="el_source">LdaptiveException.java</span></div><h1>LdaptiveException.java</h1><pre class="source lang-java linenums">/*
+ * Copyright 2019 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package org.bremersee.data.ldaptive;
+
+import lombok.EqualsAndHashCode;
+import org.bremersee.exception.ServiceException;
+import org.ldaptive.LdapException;
+import org.ldaptive.ResultCode;
+import org.springframework.http.HttpStatus;
+
+/**
+ * The ldaptive exception.
+ *
+ * @author Christian Bremer
+ */
+<span class="nc bnc" id="L30" title="All 8 branches missed.">@EqualsAndHashCode(callSuper = true)</span>
+@SuppressWarnings({&quot;WeakerAccess&quot;, &quot;unused&quot;})
+public class LdaptiveException extends ServiceException {
+
+  /**
+   * Instantiates a new ldaptive exception.
+   */
+  public LdaptiveException() {
+<span class="nc" id="L38">    super(HttpStatus.INTERNAL_SERVER_ERROR);</span>
+<span class="nc" id="L39">  }</span>
+
+  /**
+   * Instantiates a new ldaptive exception.
+   *
+   * @param cause the cause
+   */
+  public LdaptiveException(Throwable cause) {
+<span class="nc" id="L47">    this(HttpStatus.INTERNAL_SERVER_ERROR, cause);</span>
+<span class="nc" id="L48">  }</span>
+
+  /**
+   * Instantiates a new ldaptive exception.
+   *
+   * @param httpStatus the http status
+   * @param cause      the cause
+   */
+  public LdaptiveException(HttpStatus httpStatus, Throwable cause) {
+<span class="nc bnc" id="L57" title="All 2 branches missed.">    super(httpStatus != null ? httpStatus : HttpStatus.INTERNAL_SERVER_ERROR, cause);</span>
+<span class="nc" id="L58">  }</span>
+
+  /**
+   * Instantiates a new ldaptive exception.
+   *
+   * @param httpStatus the http status
+   * @param errorCode  the error code
+   * @param cause      the cause
+   */
+  public LdaptiveException(HttpStatus httpStatus, String errorCode, Throwable cause) {
+<span class="nc bnc" id="L68" title="All 2 branches missed.">    super(httpStatus != null ? httpStatus : HttpStatus.INTERNAL_SERVER_ERROR, errorCode, cause);</span>
+<span class="nc" id="L69">  }</span>
+
+  /**
+   * Gets ldap exception (can be {@code null}).
+   *
+   * @return the ldap exception
+   */
+  public LdapException getLdapException() {
+<span class="nc bnc" id="L77" title="All 2 branches missed.">    return getCause() instanceof LdapException ? (LdapException) getCause() : null;</span>
+  }
+
+  /**
+   * Gets result code (can be {@code null}).
+   *
+   * @return the result code
+   */
+  public ResultCode getResultCode() {
+<span class="nc" id="L86">    final LdapException ldapException = getLdapException();</span>
+<span class="nc bnc" id="L87" title="All 2 branches missed.">    return ldapException != null ? ldapException.getResultCode() : null;</span>
+  }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.3.201901230119</span></div></body></html>

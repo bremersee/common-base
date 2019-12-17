@@ -104,35 +104,36 @@ public class FeignClientExceptionErrorDecoder implements ErrorDecoder {
 <span class="nc" id="L104">          feignClientException.getMessage(),</span>
 <span class="nc" id="L105">          findHttpMethod(response),</span>
           feignClientException,
-          retryAfter);
+          retryAfter,
+<span class="nc" id="L108">          response.request());</span>
     }
-<span class="fc" id="L109">    return feignClientException;</span>
+<span class="fc" id="L110">    return feignClientException;</span>
   }
 
   private String readBody(final Response response) {
-<span class="pc bpc" id="L113" title="1 of 2 branches missed.">    if (response.body() == null) {</span>
-<span class="nc" id="L114">      return null;</span>
+<span class="pc bpc" id="L114" title="1 of 2 branches missed.">    if (response.body() == null) {</span>
+<span class="nc" id="L115">      return null;</span>
     }
     try {
-<span class="fc" id="L117">      return Util.toString(response.body().asReader());</span>
-<span class="nc" id="L118">    } catch (Exception ignored) {</span>
-<span class="nc" id="L119">      return null;</span>
+<span class="fc" id="L118">      return Util.toString(response.body().asReader());</span>
+<span class="nc" id="L119">    } catch (Exception ignored) {</span>
+<span class="nc" id="L120">      return null;</span>
     }
   }
 
   private Date determineRetryAfter(final String retryAfter) {
-<span class="pc bpc" id="L124" title="1 of 2 branches missed.">    if (retryAfter == null) {</span>
-<span class="fc" id="L125">      return null;</span>
+<span class="pc bpc" id="L125" title="1 of 2 branches missed.">    if (retryAfter == null) {</span>
+<span class="fc" id="L126">      return null;</span>
     }
-<span class="nc bnc" id="L127" title="All 2 branches missed.">    if (retryAfter.matches(&quot;^[0-9]+$&quot;)) {</span>
-<span class="nc" id="L128">      long deltaMillis = SECONDS.toMillis(Long.parseLong(retryAfter));</span>
-<span class="nc" id="L129">      return new Date(System.currentTimeMillis() + deltaMillis);</span>
+<span class="nc bnc" id="L128" title="All 2 branches missed.">    if (retryAfter.matches(&quot;^[0-9]+$&quot;)) {</span>
+<span class="nc" id="L129">      long deltaMillis = SECONDS.toMillis(Long.parseLong(retryAfter));</span>
+<span class="nc" id="L130">      return new Date(System.currentTimeMillis() + deltaMillis);</span>
     }
     try {
-<span class="nc" id="L132">      return Date.from(OffsetDateTime.parse(retryAfter,</span>
-<span class="nc" id="L133">          DateTimeFormatter.RFC_1123_DATE_TIME).toInstant());</span>
-<span class="nc" id="L134">    } catch (Exception ignored) {</span>
-<span class="nc" id="L135">      return null;</span>
+<span class="nc" id="L133">      return Date.from(OffsetDateTime.parse(retryAfter,</span>
+<span class="nc" id="L134">          DateTimeFormatter.RFC_1123_DATE_TIME).toInstant());</span>
+<span class="nc" id="L135">    } catch (Exception ignored) {</span>
+<span class="nc" id="L136">      return null;</span>
     }
   }
 }

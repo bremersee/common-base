@@ -1,3 +1,5 @@
+org.bremersee.context
+org.bremersee.converter
 org.bremersee.data.ldaptive
 org.bremersee.exception
 org.bremersee.exception.annotation
@@ -10,6 +12,7 @@ org.bremersee.security.access
 org.bremersee.security.authentication
 org.bremersee.security.core
 org.bremersee.test.security.authentication
+org.bremersee.thymeleaf
 org.bremersee.web
 org.bremersee.web.reactive
 org.bremersee.web.reactive.function.client

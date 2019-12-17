@@ -39,7 +39,7 @@
 <a class="jxr_linenumber" name="L31" href="#L31">31</a>          restApiException);
 <a class="jxr_linenumber" name="L32" href="#L32">32</a>      assertEquals(404, exception.status());
 <a class="jxr_linenumber" name="L33" href="#L33">33</a>      assertEquals(<span class="jxr_string">"Not found"</span>, exception.getMessage());
-<a class="jxr_linenumber" name="L34" href="#L34">34</a>      assertTrue(exception.getHeaders().containsKey(<span class="jxr_string">"foo"</span>));
+<a class="jxr_linenumber" name="L34" href="#L34">34</a>      assertTrue(exception.getMultiValueHeaders().containsKey(<span class="jxr_string">"foo"</span>));
 <a class="jxr_linenumber" name="L35" href="#L35">35</a>      assertEquals(restApiException, exception.getRestApiException());
 <a class="jxr_linenumber" name="L36" href="#L36">36</a>      assertNotNull(exception.toString());
 <a class="jxr_linenumber" name="L37" href="#L37">37</a>      assertEquals(exception, <strong class="jxr_keyword">new</strong> HttpClientException(

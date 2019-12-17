@@ -37,10 +37,9 @@ public class WebClientException
     extends ResponseStatusException
     implements RestApiExceptionAware, ErrorCodeAware, HttpResponseHeadersAware {
 
-<span class="fc" id="L40">  @Getter</span>
   private final Map&lt;String, ? extends Collection&lt;String&gt;&gt; headers;
 
-<span class="fc" id="L43">  @Getter</span>
+<span class="fc" id="L42">  @Getter</span>
   @Nullable
   private final RestApiException restApiException;
 
@@ -56,14 +55,24 @@ public class WebClientException
       final Map&lt;String, ? extends Collection&lt;String&gt;&gt; headers,
       final RestApiException restApiException) {
 
-<span class="fc" id="L59">    super(status);</span>
-<span class="pc bpc" id="L60" title="1 of 2 branches missed.">    this.headers = headers != null ? headers : Collections.emptyMap();</span>
-<span class="fc" id="L61">    this.restApiException = restApiException;</span>
-<span class="fc" id="L62">  }</span>
+<span class="fc" id="L58">    super(status);</span>
+<span class="pc bpc" id="L59" title="1 of 2 branches missed.">    this.headers = headers != null ? headers : Collections.emptyMap();</span>
+<span class="fc" id="L60">    this.restApiException = restApiException;</span>
+<span class="fc" id="L61">  }</span>
+
+  @Override
+  public Map&lt;String, String&gt; getHeaders() {
+<span class="fc" id="L65">    return HttpResponseHeadersAware.createHeaders(getMultiValueHeaders());</span>
+  }
+
+  @Override
+  public Map&lt;String, ? extends Collection&lt;String&gt;&gt; getMultiValueHeaders() {
+<span class="fc" id="L70">    return headers;</span>
+  }
 
   @Override
   public String getErrorCode() {
-<span class="pc bpc" id="L66" title="1 of 2 branches missed.">    return getRestApiException() != null ? getRestApiException().getErrorCode() : null;</span>
+<span class="pc bpc" id="L75" title="1 of 2 branches missed.">    return getRestApiException() != null ? getRestApiException().getErrorCode() : null;</span>
   }
 
 }

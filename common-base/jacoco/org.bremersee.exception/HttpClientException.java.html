@@ -36,10 +36,9 @@ public class HttpClientException extends RuntimeException
 
   private final int status;
 
-<span class="fc" id="L39">  @Getter</span>
   private final Map&lt;String, ? extends Collection&lt;String&gt;&gt; headers;
 
-<span class="fc" id="L42">  @Getter</span>
+<span class="fc" id="L41">  @Getter</span>
   private final RestApiException restApiException;
 
   /**
@@ -57,15 +56,25 @@ public class HttpClientException extends RuntimeException
       final Map&lt;String, ? extends Collection&lt;String&gt;&gt; headers,
       final RestApiException restApiException) {
 
-<span class="fc" id="L60">    super(message);</span>
-<span class="fc" id="L61">    this.status = status;</span>
-<span class="pc bpc" id="L62" title="1 of 2 branches missed.">    this.headers = headers != null ? headers : Collections.emptyMap();</span>
-<span class="fc" id="L63">    this.restApiException = restApiException;</span>
-<span class="fc" id="L64">  }</span>
+<span class="fc" id="L59">    super(message);</span>
+<span class="fc" id="L60">    this.status = status;</span>
+<span class="pc bpc" id="L61" title="1 of 2 branches missed.">    this.headers = headers != null ? headers : Collections.emptyMap();</span>
+<span class="fc" id="L62">    this.restApiException = restApiException;</span>
+<span class="fc" id="L63">  }</span>
+
+  @Override
+  public Map&lt;String, String&gt; getHeaders() {
+<span class="fc" id="L67">    return HttpResponseHeadersAware.createHeaders(getMultiValueHeaders());</span>
+  }
+
+  @Override
+  public Map&lt;String, ? extends Collection&lt;String&gt;&gt; getMultiValueHeaders() {
+<span class="fc" id="L72">    return headers;</span>
+  }
 
   @Override
   public int status() {
-<span class="fc" id="L68">    return status;</span>
+<span class="fc" id="L77">    return status;</span>
   }
 
 }

@@ -21,6 +21,7 @@ import static org.bremersee.web.reactive.function.client.proxy.InvocationUtils.p
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestHeader;
 
@@ -46,10 +47,10 @@ public interface RequestHeadersBuilder {
    * @param headers    the headers
    */
   default void build(InvocationParameters parameters, HttpHeaders headers) {
-<span class="fc" id="L49">    setAcceptHeader(parameters, headers);</span>
-<span class="fc" id="L50">    setContentTypeHeader(parameters, headers);</span>
-<span class="fc" id="L51">    setHeaders(parameters, headers);</span>
-<span class="fc" id="L52">  }</span>
+<span class="fc" id="L50">    setAcceptHeader(parameters, headers);</span>
+<span class="fc" id="L51">    setContentTypeHeader(parameters, headers);</span>
+<span class="fc" id="L52">    setHeaders(parameters, headers);</span>
+<span class="fc" id="L53">  }</span>
 
   /**
    * Sets accept header.
@@ -61,12 +62,12 @@ public interface RequestHeadersBuilder {
       final InvocationParameters parameters,
       final HttpHeaders headers) {
 
-<span class="fc" id="L64">    final Method method = parameters.getMethod();</span>
-<span class="fc" id="L65">    final String value = InvocationUtils.findAcceptHeader(method);</span>
-<span class="fc bfc" id="L66" title="All 2 branches covered.">    if (StringUtils.hasText(value)) {</span>
-<span class="fc" id="L67">      headers.set(HttpHeaders.ACCEPT, value);</span>
+<span class="fc" id="L65">    final Method method = parameters.getMethod();</span>
+<span class="fc" id="L66">    final String value = InvocationUtils.findAcceptHeader(method);</span>
+<span class="fc bfc" id="L67" title="All 2 branches covered.">    if (StringUtils.hasText(value)) {</span>
+<span class="fc" id="L68">      headers.set(HttpHeaders.ACCEPT, value);</span>
     }
-<span class="fc" id="L69">  }</span>
+<span class="fc" id="L70">  }</span>
 
   /**
    * Sets content type header.
@@ -78,12 +79,17 @@ public interface RequestHeadersBuilder {
       final InvocationParameters parameters,
       final HttpHeaders headers) {
 
-<span class="fc" id="L81">    final Method method = parameters.getMethod();</span>
-<span class="fc" id="L82">    final String value = InvocationUtils.findContentTypeHeader(method);</span>
-<span class="fc bfc" id="L83" title="All 2 branches covered.">    if (StringUtils.hasText(value)) {</span>
-<span class="fc" id="L84">      headers.set(HttpHeaders.CONTENT_TYPE, value);</span>
+<span class="fc" id="L82">    final Method method = parameters.getMethod();</span>
+<span class="fc" id="L83">    final MediaType mediaType = InvocationUtils.findFirstContentTypeHeader(method);</span>
+<span class="fc bfc" id="L84" title="All 2 branches covered.">    if (mediaType != null) {</span>
+<span class="fc" id="L85">      headers.setContentType(mediaType);</span>
+    } else {
+<span class="fc" id="L87">      final String value = InvocationUtils.findFirstContentTypeHeaderAsString(method);</span>
+<span class="pc bpc" id="L88" title="1 of 2 branches missed.">      if (StringUtils.hasText(value)) {</span>
+<span class="nc" id="L89">        headers.set(HttpHeaders.CONTENT_TYPE, value);</span>
+      }
     }
-<span class="fc" id="L86">  }</span>
+<span class="fc" id="L92">  }</span>
 
   /**
    * Default request headers builder.
@@ -91,30 +97,30 @@ public interface RequestHeadersBuilder {
    * @return the request headers builder
    */
   static RequestHeadersBuilder defaultBuilder() {
-<span class="fc" id="L94">    return new Default();</span>
+<span class="fc" id="L100">    return new Default();</span>
   }
 
   /**
    * The default request headers builder.
    */
-<span class="fc" id="L100">  class Default implements RequestHeadersBuilder {</span>
+<span class="fc" id="L106">  class Default implements RequestHeadersBuilder {</span>
 
     @Override
     public void setHeaders(final InvocationParameters parameters, final HttpHeaders headers) {
-<span class="fc" id="L104">      final Method method = parameters.getMethod();</span>
-<span class="fc" id="L105">      final Object[] args = parameters.getArgs();</span>
-<span class="fc" id="L106">      final Annotation[][] parameterAnnotations = method.getParameterAnnotations();</span>
-<span class="fc bfc" id="L107" title="All 2 branches covered.">      for (int i = 0; i &lt; parameterAnnotations.length; i++) {</span>
-<span class="fc bfc" id="L108" title="All 2 branches covered.">        for (final Annotation annotation : parameterAnnotations[i]) {</span>
-<span class="fc bfc" id="L109" title="All 2 branches covered.">          if (annotation instanceof RequestHeader) {</span>
-<span class="fc" id="L110">            final RequestHeader param = (RequestHeader) annotation;</span>
-<span class="pc bpc" id="L111" title="1 of 2 branches missed.">            final String name = StringUtils.hasText(param.value()) ? param.value() : param.name();</span>
-<span class="fc" id="L112">            final Object value = args[i];</span>
-<span class="fc" id="L113">            putToMultiValueMap(name, value, headers);</span>
+<span class="fc" id="L110">      final Method method = parameters.getMethod();</span>
+<span class="fc" id="L111">      final Object[] args = parameters.getArgs();</span>
+<span class="fc" id="L112">      final Annotation[][] parameterAnnotations = method.getParameterAnnotations();</span>
+<span class="fc bfc" id="L113" title="All 2 branches covered.">      for (int i = 0; i &lt; parameterAnnotations.length; i++) {</span>
+<span class="fc bfc" id="L114" title="All 2 branches covered.">        for (final Annotation annotation : parameterAnnotations[i]) {</span>
+<span class="fc bfc" id="L115" title="All 2 branches covered.">          if (annotation instanceof RequestHeader) {</span>
+<span class="fc" id="L116">            final RequestHeader param = (RequestHeader) annotation;</span>
+<span class="pc bpc" id="L117" title="1 of 2 branches missed.">            final String name = StringUtils.hasText(param.value()) ? param.value() : param.name();</span>
+<span class="fc" id="L118">            final Object value = args[i];</span>
+<span class="fc" id="L119">            putToMultiValueMap(name, value, headers);</span>
           }
         }
       }
-<span class="fc" id="L117">    }</span>
+<span class="fc" id="L123">    }</span>
   }
 
 }

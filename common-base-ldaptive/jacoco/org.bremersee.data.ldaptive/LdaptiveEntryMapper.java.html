@@ -22,6 +22,7 @@ import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 import javax.validation.constraints.NotNull;
 import org.ldaptive.AttributeModification;
 import org.ldaptive.AttributeModificationType;
@@ -67,8 +68,8 @@ public interface LdaptiveEntryMapper&lt;T&gt; extends LdapEntryMapper&lt;T&gt; {
 
   @Override
   default void map(T source, LdapEntry destination) {
-<span class="fc" id="L70">    mapAndComputeModifications(source, destination);</span>
-<span class="fc" id="L71">  }</span>
+<span class="fc" id="L71">    mapAndComputeModifications(source, destination);</span>
+<span class="fc" id="L72">  }</span>
 
   /**
    * Map and compute attribute modifications (see {@link LdapEntry#computeModifications(LdapEntry,
@@ -92,7 +93,7 @@ public interface LdaptiveEntryMapper&lt;T&gt; extends LdapEntryMapper&lt;T&gt; {
   default ModifyRequest mapAndComputeModifyRequest(
       @NotNull T source,
       @NotNull LdapEntry destination) {
-<span class="fc" id="L95">    return new ModifyRequest(destination.getDn(), mapAndComputeModifications(source, destination));</span>
+<span class="fc" id="L96">    return new ModifyRequest(destination.getDn(), mapAndComputeModifications(source, destination));</span>
   }
 
   /**
@@ -110,9 +111,9 @@ public interface LdaptiveEntryMapper&lt;T&gt; extends LdapEntryMapper&lt;T&gt; {
       @NotNull final String name,
       final ValueTranscoder&lt;T&gt; valueTranscoder,
       final T defaultValue) {
-<span class="fc bfc" id="L113" title="All 2 branches covered.">    final LdapAttribute attr = ldapEntry == null ? null : ldapEntry.getAttribute(name);</span>
-<span class="fc bfc" id="L114" title="All 2 branches covered.">    final T value = attr != null ? attr.getValue(valueTranscoder) : null;</span>
-<span class="fc bfc" id="L115" title="All 2 branches covered.">    return value != null ? value : defaultValue;</span>
+<span class="fc bfc" id="L114" title="All 2 branches covered.">    final LdapAttribute attr = ldapEntry == null ? null : ldapEntry.getAttribute(name);</span>
+<span class="fc bfc" id="L115" title="All 2 branches covered.">    final T value = attr != null ? attr.getValue(valueTranscoder) : null;</span>
+<span class="fc bfc" id="L116" title="All 2 branches covered.">    return value != null ? value : defaultValue;</span>
   }
 
   /**
@@ -128,9 +129,9 @@ public interface LdaptiveEntryMapper&lt;T&gt; extends LdapEntryMapper&lt;T&gt; {
       @Nullable final LdapEntry ldapEntry,
       @NotNull final String name,
       final ValueTranscoder&lt;T&gt; valueTranscoder) {
-<span class="fc bfc" id="L131" title="All 2 branches covered.">    final LdapAttribute attr = ldapEntry == null ? null : ldapEntry.getAttribute(name);</span>
-<span class="fc bfc" id="L132" title="All 2 branches covered.">    final Collection&lt;T&gt; values = attr != null ? attr.getValues(valueTranscoder) : null;</span>
-<span class="fc bfc" id="L133" title="All 2 branches covered.">    return values != null ? values : new ArrayList&lt;&gt;();</span>
+<span class="fc bfc" id="L132" title="All 2 branches covered.">    final LdapAttribute attr = ldapEntry == null ? null : ldapEntry.getAttribute(name);</span>
+<span class="fc bfc" id="L133" title="All 2 branches covered.">    final Collection&lt;T&gt; values = attr != null ? attr.getValues(valueTranscoder) : null;</span>
+<span class="fc bfc" id="L134" title="All 2 branches covered.">    return values != null ? values : new ArrayList&lt;&gt;();</span>
   }
 
   /**
@@ -146,7 +147,7 @@ public interface LdaptiveEntryMapper&lt;T&gt; extends LdapEntryMapper&lt;T&gt; {
       @Nullable final LdapEntry ldapEntry,
       @NotNull final String name,
       final ValueTranscoder&lt;T&gt; valueTranscoder) {
-<span class="fc" id="L149">    return new LinkedHashSet&lt;&gt;(getAttributeValues(ldapEntry, name, valueTranscoder));</span>
+<span class="fc" id="L150">    return new LinkedHashSet&lt;&gt;(getAttributeValues(ldapEntry, name, valueTranscoder));</span>
   }
 
   /**
@@ -162,7 +163,7 @@ public interface LdaptiveEntryMapper&lt;T&gt; extends LdapEntryMapper&lt;T&gt; {
       @Nullable final LdapEntry ldapEntry,
       @NotNull final String name,
       final ValueTranscoder&lt;T&gt; valueTranscoder) {
-<span class="fc" id="L165">    return new ArrayList&lt;&gt;(getAttributeValues(ldapEntry, name, valueTranscoder));</span>
+<span class="fc" id="L166">    return new ArrayList&lt;&gt;(getAttributeValues(ldapEntry, name, valueTranscoder));</span>
   }
 
   /**
@@ -184,14 +185,14 @@ public interface LdaptiveEntryMapper&lt;T&gt; extends LdapEntryMapper&lt;T&gt; {
       final ValueTranscoder&lt;T&gt; valueTranscoder,
       @NotNull final List&lt;AttributeModification&gt; modifications) {
 
-<span class="fc bfc" id="L187" title="All 2 branches covered.">    setAttributes(</span>
+<span class="fc bfc" id="L188" title="All 2 branches covered.">    setAttributes(</span>
         ldapEntry,
         name,
-<span class="fc" id="L190">        value != null ? Collections.singleton(value) : null,</span>
+<span class="fc" id="L191">        value != null ? Collections.singleton(value) : null,</span>
         isBinary,
         valueTranscoder,
         modifications);
-<span class="fc" id="L194">  }</span>
+<span class="fc" id="L195">  }</span>
 
   /**
    * Replaces the values of the attribute with the specified values.
@@ -212,29 +213,37 @@ public interface LdaptiveEntryMapper&lt;T&gt; extends LdapEntryMapper&lt;T&gt; {
       final ValueTranscoder&lt;T&gt; valueTranscoder,
       @NotNull final List&lt;AttributeModification&gt; modifications) {
 
-<span class="fc" id="L215">    LdapAttribute attr = ldapEntry.getAttribute(name);</span>
-<span class="pc bpc" id="L216" title="2 of 6 branches missed.">    if (attr == null &amp;&amp; values != null &amp;&amp; !values.isEmpty()) {</span>
-<span class="fc" id="L217">      addAttributes(ldapEntry, name, values, isBinary, valueTranscoder, modifications);</span>
-<span class="pc bpc" id="L218" title="1 of 2 branches missed.">    } else if (attr != null) {</span>
-<span class="fc bfc" id="L219" title="All 4 branches covered.">      if (values == null || values.isEmpty()) {</span>
-<span class="fc" id="L220">        ldapEntry.removeAttribute(name);</span>
-<span class="fc" id="L221">        modifications.add(</span>
+<span class="fc bfc" id="L216" title="All 2 branches covered.">    final Collection&lt;T&gt; realValues = values == null ? null : values.stream()</span>
+<span class="fc" id="L217">        .filter(value -&gt; {</span>
+<span class="fc bfc" id="L218" title="All 2 branches covered.">          if (value instanceof CharSequence) {</span>
+<span class="fc bfc" id="L219" title="All 2 branches covered.">            return ((CharSequence) value).length() &gt; 0;</span>
+          }
+<span class="pc bpc" id="L221" title="1 of 2 branches missed.">          return value != null;</span>
+        })
+<span class="fc" id="L223">        .collect(Collectors.toList());</span>
+<span class="fc" id="L224">    LdapAttribute attr = ldapEntry.getAttribute(name);</span>
+<span class="pc bpc" id="L225" title="2 of 6 branches missed.">    if (attr == null &amp;&amp; realValues != null &amp;&amp; !realValues.isEmpty()) {</span>
+<span class="fc" id="L226">      addAttributes(ldapEntry, name, realValues, isBinary, valueTranscoder, modifications);</span>
+<span class="pc bpc" id="L227" title="1 of 2 branches missed.">    } else if (attr != null) {</span>
+<span class="fc bfc" id="L228" title="All 4 branches covered.">      if (realValues == null || realValues.isEmpty()) {</span>
+<span class="fc" id="L229">        ldapEntry.removeAttribute(name);</span>
+<span class="fc" id="L230">        modifications.add(</span>
             new AttributeModification(
                 AttributeModificationType.REMOVE,
                 attr));
-<span class="fc" id="L225">      } else if (!new ArrayList&lt;&gt;(values)</span>
-<span class="fc bfc" id="L226" title="All 2 branches covered.">          .equals(new ArrayList&lt;&gt;(attr.getValues(valueTranscoder)))) {</span>
-<span class="fc" id="L227">        final LdapAttribute newAttr = new LdapAttribute(attr.isBinary());</span>
-<span class="fc" id="L228">        newAttr.setName(name);</span>
-<span class="fc" id="L229">        newAttr.addValues(valueTranscoder, values);</span>
-<span class="fc" id="L230">        ldapEntry.addAttribute(newAttr);</span>
-<span class="fc" id="L231">        modifications.add(</span>
+<span class="fc" id="L234">      } else if (!new ArrayList&lt;&gt;(realValues)</span>
+<span class="fc bfc" id="L235" title="All 2 branches covered.">          .equals(new ArrayList&lt;&gt;(attr.getValues(valueTranscoder)))) {</span>
+<span class="fc" id="L236">        final LdapAttribute newAttr = new LdapAttribute(attr.isBinary());</span>
+<span class="fc" id="L237">        newAttr.setName(name);</span>
+<span class="fc" id="L238">        newAttr.addValues(valueTranscoder, realValues);</span>
+<span class="fc" id="L239">        ldapEntry.addAttribute(newAttr);</span>
+<span class="fc" id="L240">        modifications.add(</span>
             new AttributeModification(
                 AttributeModificationType.REPLACE,
                 newAttr));
       }
     }
-<span class="fc" id="L237">  }</span>
+<span class="fc" id="L246">  }</span>
 
   /**
    * Adds the specified value to the attribute with the specified name.
@@ -254,14 +263,14 @@ public interface LdaptiveEntryMapper&lt;T&gt; extends LdapEntryMapper&lt;T&gt; {
       final boolean isBinary,
       @NotNull final ValueTranscoder&lt;T&gt; valueTranscoder,
       @NotNull final List&lt;AttributeModification&gt; modifications) {
-<span class="fc bfc" id="L257" title="All 2 branches covered.">    addAttributes(</span>
+<span class="fc bfc" id="L266" title="All 2 branches covered.">    addAttributes(</span>
         ldapEntry,
         name,
-<span class="fc" id="L260">        value != null ? Collections.singleton(value) : null,</span>
+<span class="fc" id="L269">        value != null ? Collections.singleton(value) : null,</span>
         isBinary,
         valueTranscoder,
         modifications);
-<span class="fc" id="L264">  }</span>
+<span class="fc" id="L273">  }</span>
 
   /**
    * Adds the specified values to the attribute with the specified name.
@@ -281,26 +290,34 @@ public interface LdaptiveEntryMapper&lt;T&gt; extends LdapEntryMapper&lt;T&gt; {
       final boolean isBinary,
       @NotNull final ValueTranscoder&lt;T&gt; valueTranscoder,
       @NotNull final List&lt;AttributeModification&gt; modifications) {
-<span class="pc bpc" id="L284" title="1 of 4 branches missed.">    if (values == null || values.isEmpty()) {</span>
-<span class="fc" id="L285">      return;</span>
+<span class="fc bfc" id="L293" title="All 2 branches covered.">    final Collection&lt;T&gt; realValues = values == null ? null : values.stream()</span>
+<span class="fc" id="L294">        .filter(value -&gt; {</span>
+<span class="fc bfc" id="L295" title="All 2 branches covered.">          if (value instanceof CharSequence) {</span>
+<span class="pc bpc" id="L296" title="1 of 2 branches missed.">            return ((CharSequence) value).length() &gt; 0;</span>
+          }
+<span class="pc bpc" id="L298" title="1 of 2 branches missed.">          return value != null;</span>
+        })
+<span class="fc" id="L300">        .collect(Collectors.toList());</span>
+<span class="pc bpc" id="L301" title="1 of 4 branches missed.">    if (realValues == null || realValues.isEmpty()) {</span>
+<span class="fc" id="L302">      return;</span>
     }
-<span class="fc" id="L287">    final LdapAttribute attr = ldapEntry.getAttribute(name);</span>
-<span class="fc bfc" id="L288" title="All 2 branches covered.">    if (attr == null) {</span>
-<span class="fc" id="L289">      final LdapAttribute newAttr = new LdapAttribute(isBinary);</span>
-<span class="fc" id="L290">      newAttr.setName(name);</span>
-<span class="fc" id="L291">      newAttr.addValues(valueTranscoder, values);</span>
-<span class="fc" id="L292">      ldapEntry.addAttribute(newAttr);</span>
-<span class="fc" id="L293">      modifications.add(</span>
+<span class="fc" id="L304">    final LdapAttribute attr = ldapEntry.getAttribute(name);</span>
+<span class="fc bfc" id="L305" title="All 2 branches covered.">    if (attr == null) {</span>
+<span class="fc" id="L306">      final LdapAttribute newAttr = new LdapAttribute(isBinary);</span>
+<span class="fc" id="L307">      newAttr.setName(name);</span>
+<span class="fc" id="L308">      newAttr.addValues(valueTranscoder, realValues);</span>
+<span class="fc" id="L309">      ldapEntry.addAttribute(newAttr);</span>
+<span class="fc" id="L310">      modifications.add(</span>
           new AttributeModification(
               AttributeModificationType.ADD,
               newAttr));
-<span class="fc" id="L297">    } else {</span>
-<span class="fc" id="L298">      final List&lt;T&gt; newValues = new ArrayList&lt;&gt;(</span>
-<span class="fc" id="L299">          getAttributeValues(ldapEntry, name, valueTranscoder));</span>
-<span class="fc" id="L300">      newValues.addAll(values);</span>
-<span class="fc" id="L301">      setAttributes(ldapEntry, name, newValues, attr.isBinary(), valueTranscoder, modifications);</span>
+<span class="fc" id="L314">    } else {</span>
+<span class="fc" id="L315">      final List&lt;T&gt; newValues = new ArrayList&lt;&gt;(</span>
+<span class="fc" id="L316">          getAttributeValues(ldapEntry, name, valueTranscoder));</span>
+<span class="fc" id="L317">      newValues.addAll(realValues);</span>
+<span class="fc" id="L318">      setAttributes(ldapEntry, name, newValues, attr.isBinary(), valueTranscoder, modifications);</span>
     }
-<span class="fc" id="L303">  }</span>
+<span class="fc" id="L320">  }</span>
 
   /**
    * Removes an attribute with the specified name.
@@ -313,16 +330,16 @@ public interface LdaptiveEntryMapper&lt;T&gt; extends LdapEntryMapper&lt;T&gt; {
       @NotNull final LdapEntry ldapEntry,
       @NotNull final String name,
       @NotNull final List&lt;AttributeModification&gt; modifications) {
-<span class="fc" id="L316">    final LdapAttribute attr = ldapEntry.getAttribute(name);</span>
-<span class="pc bpc" id="L317" title="1 of 2 branches missed.">    if (attr == null) {</span>
-<span class="nc" id="L318">      return;</span>
+<span class="fc" id="L333">    final LdapAttribute attr = ldapEntry.getAttribute(name);</span>
+<span class="pc bpc" id="L334" title="1 of 2 branches missed.">    if (attr == null) {</span>
+<span class="nc" id="L335">      return;</span>
     }
-<span class="fc" id="L320">    ldapEntry.removeAttribute(attr);</span>
-<span class="fc" id="L321">    modifications.add(</span>
+<span class="fc" id="L337">    ldapEntry.removeAttribute(attr);</span>
+<span class="fc" id="L338">    modifications.add(</span>
         new AttributeModification(
             AttributeModificationType.REMOVE,
             attr));
-<span class="fc" id="L325">  }</span>
+<span class="fc" id="L342">  }</span>
 
   /**
    * Removes an attribute with the specified value. If the value is {@code null}, the whole
@@ -341,17 +358,17 @@ public interface LdaptiveEntryMapper&lt;T&gt; extends LdapEntryMapper&lt;T&gt; {
       @Nullable final T value,
       final ValueTranscoder&lt;T&gt; valueTranscoder,
       @NotNull final List&lt;AttributeModification&gt; modifications) {
-<span class="fc" id="L344">    LdapAttribute attr = ldapEntry.getAttribute(name);</span>
-<span class="pc bpc" id="L345" title="1 of 2 branches missed.">    if (attr == null) {</span>
-<span class="nc" id="L346">      return;</span>
+<span class="fc" id="L361">    LdapAttribute attr = ldapEntry.getAttribute(name);</span>
+<span class="pc bpc" id="L362" title="1 of 2 branches missed.">    if (attr == null) {</span>
+<span class="nc" id="L363">      return;</span>
     }
-<span class="pc bpc" id="L348" title="1 of 2 branches missed.">    if (value == null) {</span>
-<span class="nc" id="L349">      removeAttribute(ldapEntry, name, modifications);</span>
+<span class="pc bpc" id="L365" title="1 of 2 branches missed.">    if (value == null) {</span>
+<span class="nc" id="L366">      removeAttribute(ldapEntry, name, modifications);</span>
     } else {
-<span class="fc" id="L351">      removeAttributes(ldapEntry, name, Collections.singleton(value), valueTranscoder,</span>
+<span class="fc" id="L368">      removeAttributes(ldapEntry, name, Collections.singleton(value), valueTranscoder,</span>
           modifications);
     }
-<span class="fc" id="L354">  }</span>
+<span class="fc" id="L371">  }</span>
 
   /**
    * Remove attributes with the specified values. If values are empty or {@code null}, no attributes
@@ -371,14 +388,14 @@ public interface LdaptiveEntryMapper&lt;T&gt; extends LdapEntryMapper&lt;T&gt; {
       final ValueTranscoder&lt;T&gt; valueTranscoder,
       @NotNull final List&lt;AttributeModification&gt; modifications) {
 
-<span class="fc" id="L374">    final LdapAttribute attr = ldapEntry.getAttribute(name);</span>
-<span class="pc bpc" id="L375" title="3 of 6 branches missed.">    if (attr == null || values == null || values.isEmpty()) {</span>
-<span class="nc" id="L376">      return;</span>
+<span class="fc" id="L391">    final LdapAttribute attr = ldapEntry.getAttribute(name);</span>
+<span class="pc bpc" id="L392" title="3 of 6 branches missed.">    if (attr == null || values == null || values.isEmpty()) {</span>
+<span class="nc" id="L393">      return;</span>
     }
-<span class="fc" id="L378">    final List&lt;T&gt; newValues = new ArrayList&lt;&gt;(getAttributeValues(ldapEntry, name, valueTranscoder));</span>
-<span class="fc" id="L379">    newValues.removeAll(values);</span>
-<span class="fc" id="L380">    setAttributes(ldapEntry, name, newValues, attr.isBinary(), valueTranscoder, modifications);</span>
-<span class="fc" id="L381">  }</span>
+<span class="fc" id="L395">    final List&lt;T&gt; newValues = new ArrayList&lt;&gt;(getAttributeValues(ldapEntry, name, valueTranscoder));</span>
+<span class="fc" id="L396">    newValues.removeAll(values);</span>
+<span class="fc" id="L397">    setAttributes(ldapEntry, name, newValues, attr.isBinary(), valueTranscoder, modifications);</span>
+<span class="fc" id="L398">  }</span>
 
   /**
    * Create dn string.
@@ -392,7 +409,7 @@ public interface LdaptiveEntryMapper&lt;T&gt; extends LdapEntryMapper&lt;T&gt; {
       @NotNull final String rdn,
       @NotNull final String rdnValue,
       @NotNull final String baseDn) {
-<span class="fc" id="L395">    return rdn + &quot;=&quot; + rdnValue + &quot;,&quot; + baseDn;</span>
+<span class="fc" id="L412">    return rdn + &quot;=&quot; + rdnValue + &quot;,&quot; + baseDn;</span>
   }
 
   /**
@@ -402,18 +419,18 @@ public interface LdaptiveEntryMapper&lt;T&gt; extends LdapEntryMapper&lt;T&gt; {
    * @return the rdn
    */
   static String getRdn(final String dn) {
-<span class="fc bfc" id="L405" title="All 2 branches covered.">    if (dn == null) {</span>
-<span class="fc" id="L406">      return null;</span>
+<span class="fc bfc" id="L422" title="All 2 branches covered.">    if (dn == null) {</span>
+<span class="fc" id="L423">      return null;</span>
     }
-<span class="fc" id="L408">    int start = dn.indexOf('=');</span>
-<span class="fc bfc" id="L409" title="All 2 branches covered.">    if (start &lt; 0) {</span>
-<span class="fc" id="L410">      return dn;</span>
+<span class="fc" id="L425">    int start = dn.indexOf('=');</span>
+<span class="fc bfc" id="L426" title="All 2 branches covered.">    if (start &lt; 0) {</span>
+<span class="fc" id="L427">      return dn;</span>
     }
-<span class="fc" id="L412">    int end = dn.indexOf(',', start);</span>
-<span class="pc bpc" id="L413" title="1 of 2 branches missed.">    if (end &lt; 0) {</span>
-<span class="nc" id="L414">      return dn.substring(start + 1).trim();</span>
+<span class="fc" id="L429">    int end = dn.indexOf(',', start);</span>
+<span class="pc bpc" id="L430" title="1 of 2 branches missed.">    if (end &lt; 0) {</span>
+<span class="nc" id="L431">      return dn.substring(start + 1).trim();</span>
     }
-<span class="fc" id="L416">    return dn.substring(start + 1, end).trim();</span>
+<span class="fc" id="L433">    return dn.substring(start + 1, end).trim();</span>
   }
 
 }

@@ -53,7 +53,7 @@
 <a class="jxr_linenumber" name="L45" href="#L45">45</a>    <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> testWithNoUsefulValues() {
 <a class="jxr_linenumber" name="L46" href="#L46">46</a>      <strong class="jxr_keyword">final</strong> FeignClientException exception = <strong class="jxr_keyword">new</strong> FeignClientException(<strong class="jxr_keyword">null</strong>, <strong class="jxr_keyword">null</strong>, 0, <strong class="jxr_keyword">null</strong>, <strong class="jxr_keyword">null</strong>);
 <a class="jxr_linenumber" name="L47" href="#L47">47</a>      assertNull(exception.getRequest());
-<a class="jxr_linenumber" name="L48" href="#L48">48</a>      assertNotNull(exception.getHeaders());
+<a class="jxr_linenumber" name="L48" href="#L48">48</a>      assertNotNull(exception.getMultiValueHeaders());
 <a class="jxr_linenumber" name="L49" href="#L49">49</a>      assertEquals(exception.status(), HttpStatus.INTERNAL_SERVER_ERROR.value());
 <a class="jxr_linenumber" name="L50" href="#L50">50</a>      assertEquals(exception.getMessage(), RestApiExceptionUtils.NO_MESSAGE_VALUE);
 <a class="jxr_linenumber" name="L51" href="#L51">51</a>      assertNull(exception.getRestApiException());
@@ -76,9 +76,9 @@
 <a class="jxr_linenumber" name="L68" href="#L68">68</a>          <span class="jxr_string">"Fatal"</span>,
 <a class="jxr_linenumber" name="L69" href="#L69">69</a>          restApiException);
 <a class="jxr_linenumber" name="L70" href="#L70">70</a>      assertNull(exception.getRequest());
-<a class="jxr_linenumber" name="L71" href="#L71">71</a>      assertNotNull(exception.getHeaders());
-<a class="jxr_linenumber" name="L72" href="#L72">72</a>      assertTrue(exception.getHeaders().containsKey(HttpHeaders.CONTENT_TYPE));
-<a class="jxr_linenumber" name="L73" href="#L73">73</a>      assertTrue(exception.getHeaders().get(HttpHeaders.CONTENT_TYPE)
+<a class="jxr_linenumber" name="L71" href="#L71">71</a>      assertNotNull(exception.getMultiValueHeaders());
+<a class="jxr_linenumber" name="L72" href="#L72">72</a>      assertTrue(exception.getMultiValueHeaders().containsKey(HttpHeaders.CONTENT_TYPE));
+<a class="jxr_linenumber" name="L73" href="#L73">73</a>      assertTrue(exception.getMultiValueHeaders().get(HttpHeaders.CONTENT_TYPE)
 <a class="jxr_linenumber" name="L74" href="#L74">74</a>          .contains(MediaType.APPLICATION_JSON_VALUE));
 <a class="jxr_linenumber" name="L75" href="#L75">75</a>      assertEquals(exception.status(), HttpStatus.NOT_FOUND.value());
 <a class="jxr_linenumber" name="L76" href="#L76">76</a>      assertEquals(<span class="jxr_string">"Fatal"</span>, exception.getMessage());

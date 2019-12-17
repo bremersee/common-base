@@ -18,8 +18,6 @@ package org.bremersee.web.reactive.function.client.proxy;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
-import java.util.Arrays;
-import java.util.Optional;
 import org.springframework.http.MediaType;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -47,50 +45,51 @@ public interface RequestBodyInserter {
    * @return the request body inserter
    */
   static RequestBodyInserter defaultInserter() {
-<span class="fc" id="L50">    return new Default();</span>
+<span class="fc" id="L48">    return new Default();</span>
   }
 
   /**
    * The default request body inserter.
    */
-<span class="fc" id="L56">  class Default implements RequestBodyInserter {</span>
+<span class="fc" id="L54">  class Default implements RequestBodyInserter {</span>
 
     @Override
     public void insert(final InvocationParameters parameters, final RequestBodyUriSpec uriSpec) {
-<span class="fc" id="L60">      final Method method = parameters.getMethod();</span>
-<span class="fc" id="L61">      final Object[] args = parameters.getArgs();</span>
-<span class="fc" id="L62">      final Annotation[][] parameterAnnotations = method.getParameterAnnotations();</span>
-<span class="fc bfc" id="L63" title="All 2 branches covered.">      for (int i = 0; i &lt; parameterAnnotations.length; i++) {</span>
-<span class="fc bfc" id="L64" title="All 2 branches covered.">        for (final Annotation annotation : parameterAnnotations[i]) {</span>
-<span class="fc bfc" id="L65" title="All 2 branches covered.">          if (annotation instanceof RequestBody) {</span>
-<span class="fc" id="L66">            final Object value = args[i];</span>
-<span class="fc bfc" id="L67" title="All 2 branches covered.">            if (isMediaType(value, method, MediaType.APPLICATION_FORM_URLENCODED_VALUE)) {</span>
+<span class="fc" id="L58">      final Method method = parameters.getMethod();</span>
+<span class="fc" id="L59">      final Object[] args = parameters.getArgs();</span>
+<span class="fc" id="L60">      final Annotation[][] parameterAnnotations = method.getParameterAnnotations();</span>
+<span class="fc bfc" id="L61" title="All 2 branches covered.">      for (int i = 0; i &lt; parameterAnnotations.length; i++) {</span>
+<span class="fc bfc" id="L62" title="All 2 branches covered.">        for (final Annotation annotation : parameterAnnotations[i]) {</span>
+<span class="fc bfc" id="L63" title="All 2 branches covered.">          if (annotation instanceof RequestBody) {</span>
+<span class="fc" id="L64">            final Object value = args[i];</span>
+<span class="fc bfc" id="L65" title="All 2 branches covered.">            if (matches(value, MultiValueMap.class, method,</span>
+                MediaType.APPLICATION_FORM_URLENCODED)) {
               //noinspection unchecked
-<span class="fc" id="L69">              uriSpec.body(BodyInserters.fromFormData((MultiValueMap) value));</span>
-<span class="pc bpc" id="L70" title="1 of 2 branches missed.">            } else if (isMediaType(value, method, MediaType.MULTIPART_FORM_DATA_VALUE)) {</span>
+<span class="fc" id="L68">              uriSpec.body(BodyInserters.fromFormData((MultiValueMap) value));</span>
+<span class="pc bpc" id="L69" title="1 of 2 branches missed.">            } else if (matches(value, MultiValueMap.class, method, MediaType.MULTIPART_FORM_DATA)) {</span>
               //noinspection unchecked
-<span class="nc" id="L72">              uriSpec.body(BodyInserters.fromMultipartData((MultiValueMap) value));</span>
-<span class="fc bfc" id="L73" title="All 2 branches covered.">            } else if (value != null) {</span>
-<span class="fc" id="L74">              uriSpec.body(BodyInserters.fromObject(args[i]));</span>
+<span class="nc" id="L71">              uriSpec.body(BodyInserters.fromMultipartData((MultiValueMap) value));</span>
+<span class="fc bfc" id="L72" title="All 2 branches covered.">            } else if (value != null) {</span>
+<span class="fc" id="L73">              uriSpec.body(BodyInserters.fromObject(args[i]));</span>
             }
+<span class="fc" id="L75">            return;</span>
           }
         }
       }
 <span class="fc" id="L79">    }</span>
 
-    private boolean isMediaType(final Object value, final Method method, final String mediaType) {
-<span class="fc" id="L82">      return Optional.ofNullable(value)</span>
-<span class="fc" id="L83">          .filter(v -&gt; v instanceof MultiValueMap)</span>
-<span class="fc" id="L84">          .flatMap(v -&gt; InvocationUtils.findRequestMappingValue(</span>
-              method,
-<span class="fc" id="L86">              mapping -&gt; isMediaType(mapping.consumes(), mediaType),</span>
-<span class="fc" id="L87">              mapping -&gt; true))</span>
-<span class="fc" id="L88">          .orElse(false);</span>
+    private boolean matches(
+        final Object value,
+        @SuppressWarnings(&quot;SameParameterValue&quot;) final Class&lt;?&gt; valueClass,
+        final Method method,
+        final MediaType mediaType) {
+<span class="pc bpc" id="L86" title="1 of 6 branches missed.">      return value != null &amp;&amp; valueClass.isAssignableFrom(value.getClass()) &amp;&amp; matches(method,</span>
+          mediaType);
     }
 
-    private boolean isMediaType(final String[] consumes, final String mediaType) {
-<span class="fc" id="L92">      return Arrays.stream(consumes)</span>
-<span class="fc" id="L93">          .anyMatch(value -&gt; value.toLowerCase().contains(mediaType.toLowerCase()));</span>
+    private boolean matches(final Method method, final MediaType mediaType) {
+<span class="fc" id="L91">      return InvocationUtils.findContentTypeHeader(method).stream()</span>
+<span class="fc" id="L92">          .anyMatch(mediaType::isCompatibleWith);</span>
     }
 
   }
