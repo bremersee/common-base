@@ -104,7 +104,8 @@ public class FeignClientExceptionErrorDecoder implements ErrorDecoder {
           feignClientException.getMessage(),
           findHttpMethod(response),
           feignClientException,
-          retryAfter);
+          retryAfter,
+          response.request());
     }
     return feignClientException;
   }
