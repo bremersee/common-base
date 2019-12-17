@@ -45,7 +45,7 @@ public class FeignClientExceptionTest {
   public void testWithNoUsefulValues() {
     final FeignClientException exception = new FeignClientException(null, null, 0, null, null);
     assertNull(exception.getRequest());
-    assertNotNull(exception.getHeaders());
+    assertNotNull(exception.getMultiValueHeaders());
     assertEquals(exception.status(), HttpStatus.INTERNAL_SERVER_ERROR.value());
     assertEquals(exception.getMessage(), RestApiExceptionUtils.NO_MESSAGE_VALUE);
     assertNull(exception.getRestApiException());
@@ -68,9 +68,9 @@ public class FeignClientExceptionTest {
         "Fatal",
         restApiException);
     assertNull(exception.getRequest());
-    assertNotNull(exception.getHeaders());
-    assertTrue(exception.getHeaders().containsKey(HttpHeaders.CONTENT_TYPE));
-    assertTrue(exception.getHeaders().get(HttpHeaders.CONTENT_TYPE)
+    assertNotNull(exception.getMultiValueHeaders());
+    assertTrue(exception.getMultiValueHeaders().containsKey(HttpHeaders.CONTENT_TYPE));
+    assertTrue(exception.getMultiValueHeaders().get(HttpHeaders.CONTENT_TYPE)
         .contains(MediaType.APPLICATION_JSON_VALUE));
     assertEquals(exception.status(), HttpStatus.NOT_FOUND.value());
     assertEquals("Fatal", exception.getMessage());

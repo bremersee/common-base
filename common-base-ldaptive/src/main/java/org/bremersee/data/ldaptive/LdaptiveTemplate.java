@@ -21,8 +21,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Stream;
 import javax.validation.constraints.NotNull;
-import lombok.AccessLevel;
-import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.bremersee.exception.ServiceException;
 import org.ldaptive.AddOperation;
@@ -40,8 +38,8 @@ import org.ldaptive.ModifyRequest;
 import org.ldaptive.ResultCode;
 import org.ldaptive.SearchOperation;
 import org.ldaptive.SearchRequest;
-import org.springframework.http.HttpStatus;
 import org.springframework.util.Assert;
+import org.springframework.util.ErrorHandler;
 
 /**
  * The template for executing ldap operations.
@@ -50,9 +48,11 @@ import org.springframework.util.Assert;
  */
 @Slf4j
 @SuppressWarnings("WeakerAccess")
-public class LdaptiveTemplate implements LdaptiveOperations {
+public class LdaptiveTemplate implements LdaptiveOperations, Cloneable {
 
   private final ConnectionFactory connectionFactory;
+
+  private ErrorHandler errorHandler = new DefaultLdaptiveErrorHandler();
 
   /**
    * Instantiates a new ldap template.
@@ -62,6 +62,42 @@ public class LdaptiveTemplate implements LdaptiveOperations {
   public LdaptiveTemplate(final ConnectionFactory connectionFactory) {
     Assert.notNull(connectionFactory, "Connection factory must not be null.");
     this.connectionFactory = connectionFactory;
+  }
+
+  /**
+   * Sets error handler.
+   *
+   * @param errorHandler the error handler
+   */
+  public void setErrorHandler(final ErrorHandler errorHandler) {
+    if (errorHandler != null) {
+      this.errorHandler = errorHandler;
+    }
+  }
+
+  /**
+   * Returns a new instance of this ldaptive template with the same connection factory and error
+   * handler.
+   *
+   * @return a new instance of this ldaptive template
+   */
+  @SuppressWarnings("MethodDoesntCallSuperMethod")
+  @Override
+  public LdaptiveTemplate clone() {
+    return clone(errorHandler);
+  }
+
+  /**
+   * Returns a new instance of this ldaptive template with the same connection factory and the given
+   * error handler.
+   *
+   * @param errorHandler the new error handler
+   * @return the new instance of the ldaptive template
+   */
+  public LdaptiveTemplate clone(final ErrorHandler errorHandler) {
+    final LdaptiveTemplate template = new LdaptiveTemplate(connectionFactory);
+    template.setErrorHandler(errorHandler != null ? errorHandler : this.errorHandler);
+    return template;
   }
 
   private Connection getConnection() throws LdapException {
@@ -94,20 +130,9 @@ public class LdaptiveTemplate implements LdaptiveOperations {
     try {
       connection = getConnection();
       return callback.doWithConnection(connection);
-    } catch (final LdapRuntimeException e) {
-      final ServiceException serviceException = new ServiceException(
-          HttpStatus.INTERNAL_SERVER_ERROR,
-          "org.bremersee:base-common-ldaptive:8150d733-cfb2-46a9-94f6-4f3395e7cecf",
-          e.getLdapException());
-      log.error("Executing ldap operation failed.", serviceException);
-      throw serviceException;
-    } catch (final LdapException e) {
-      final ServiceException serviceException = new ServiceException(
-          HttpStatus.INTERNAL_SERVER_ERROR,
-          "org.bremersee:base-common-ldaptive:af8cb1fc-f9c2-4592-8bd6-de59c6f2a8e6",
-          e);
-      log.error("Executing ldap operation failed.", serviceException);
-      throw serviceException;
+    } catch (final LdapException | LdaptiveException e) {
+      errorHandler.handleError(e);
+      return null;
     } finally {
       closeConnection(connection);
     }
@@ -253,7 +278,7 @@ public class LdaptiveTemplate implements LdaptiveOperations {
   private <T> T save(
       final T domainObject,
       final LdaptiveEntryMapper<T> entryMapper,
-      final Connection connection) throws LdapRuntimeException {
+      final Connection connection) throws LdaptiveException {
 
     try {
       final LdapEntry destination;
@@ -290,7 +315,7 @@ public class LdaptiveTemplate implements LdaptiveOperations {
       return entryMapper.map(destination);
 
     } catch (LdapException e) {
-      throw new LdapRuntimeException(e);
+      throw new LdaptiveException(e);
     }
   }
 
@@ -341,13 +366,13 @@ public class LdaptiveTemplate implements LdaptiveOperations {
   private <T> void delete(
       final T domainModel,
       final LdaptiveEntryMapper<T> entryMapper,
-      final Connection connection) throws LdapRuntimeException {
+      final Connection connection) throws LdaptiveException {
 
     try {
       new DeleteOperation(connection).execute(new DeleteRequest(entryMapper.mapDn(domainModel)));
 
     } catch (LdapException e) {
-      throw new LdapRuntimeException(e);
+      throw new LdaptiveException(e);
     }
   }
 
@@ -369,22 +394,6 @@ public class LdaptiveTemplate implements LdaptiveOperations {
           }
         }
       });
-    }
-  }
-
-  private static class LdapRuntimeException extends RuntimeException {
-
-    @Getter(AccessLevel.PACKAGE)
-    private LdapException ldapException;
-
-    /**
-     * Instantiates a new Ldap runtime exception.
-     *
-     * @param ldapException the ldap exception
-     */
-    LdapRuntimeException(LdapException ldapException) {
-      super(ldapException);
-      this.ldapException = ldapException;
     }
   }
 

@@ -37,7 +37,6 @@ public class WebClientException
     extends ResponseStatusException
     implements RestApiExceptionAware, ErrorCodeAware, HttpResponseHeadersAware {
 
-  @Getter
   private final Map<String, ? extends Collection<String>> headers;
 
   @Getter
@@ -59,6 +58,16 @@ public class WebClientException
     super(status);
     this.headers = headers != null ? headers : Collections.emptyMap();
     this.restApiException = restApiException;
+  }
+
+  @Override
+  public Map<String, String> getHeaders() {
+    return HttpResponseHeadersAware.createHeaders(getMultiValueHeaders());
+  }
+
+  @Override
+  public Map<String, ? extends Collection<String>> getMultiValueHeaders() {
+    return headers;
   }
 
   @Override

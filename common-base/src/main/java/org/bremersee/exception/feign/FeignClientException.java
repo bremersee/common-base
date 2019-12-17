@@ -47,7 +47,6 @@ public class FeignClientException extends FeignException implements HttpStatusAw
   @Nullable
   private final Request request;
 
-  @Getter
   @NotNull
   private final Map<String, ? extends Collection<String>> headers;
 
@@ -83,6 +82,16 @@ public class FeignClientException extends FeignException implements HttpStatusAw
     this.request = request;
     this.headers = headers != null ? headers : Collections.emptyMap();
     this.restApiException = restApiException;
+  }
+
+  @Override
+  public Map<String, String> getHeaders() {
+    return HttpResponseHeadersAware.createHeaders(getMultiValueHeaders());
+  }
+
+  @Override
+  public Map<String, ? extends Collection<String>> getMultiValueHeaders() {
+    return headers;
   }
 
   @Override

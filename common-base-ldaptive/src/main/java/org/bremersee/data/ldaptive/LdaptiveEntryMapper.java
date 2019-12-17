@@ -22,6 +22,7 @@ import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 import javax.validation.constraints.NotNull;
 import org.ldaptive.AttributeModification;
 import org.ldaptive.AttributeModificationType;
@@ -212,21 +213,29 @@ public interface LdaptiveEntryMapper<T> extends LdapEntryMapper<T> {
       final ValueTranscoder<T> valueTranscoder,
       @NotNull final List<AttributeModification> modifications) {
 
+    final Collection<T> realValues = values == null ? null : values.stream()
+        .filter(value -> {
+          if (value instanceof CharSequence) {
+            return ((CharSequence) value).length() > 0;
+          }
+          return value != null;
+        })
+        .collect(Collectors.toList());
     LdapAttribute attr = ldapEntry.getAttribute(name);
-    if (attr == null && values != null && !values.isEmpty()) {
-      addAttributes(ldapEntry, name, values, isBinary, valueTranscoder, modifications);
+    if (attr == null && realValues != null && !realValues.isEmpty()) {
+      addAttributes(ldapEntry, name, realValues, isBinary, valueTranscoder, modifications);
     } else if (attr != null) {
-      if (values == null || values.isEmpty()) {
+      if (realValues == null || realValues.isEmpty()) {
         ldapEntry.removeAttribute(name);
         modifications.add(
             new AttributeModification(
                 AttributeModificationType.REMOVE,
                 attr));
-      } else if (!new ArrayList<>(values)
+      } else if (!new ArrayList<>(realValues)
           .equals(new ArrayList<>(attr.getValues(valueTranscoder)))) {
         final LdapAttribute newAttr = new LdapAttribute(attr.isBinary());
         newAttr.setName(name);
-        newAttr.addValues(valueTranscoder, values);
+        newAttr.addValues(valueTranscoder, realValues);
         ldapEntry.addAttribute(newAttr);
         modifications.add(
             new AttributeModification(
@@ -281,14 +290,22 @@ public interface LdaptiveEntryMapper<T> extends LdapEntryMapper<T> {
       final boolean isBinary,
       @NotNull final ValueTranscoder<T> valueTranscoder,
       @NotNull final List<AttributeModification> modifications) {
-    if (values == null || values.isEmpty()) {
+    final Collection<T> realValues = values == null ? null : values.stream()
+        .filter(value -> {
+          if (value instanceof CharSequence) {
+            return ((CharSequence) value).length() > 0;
+          }
+          return value != null;
+        })
+        .collect(Collectors.toList());
+    if (realValues == null || realValues.isEmpty()) {
       return;
     }
     final LdapAttribute attr = ldapEntry.getAttribute(name);
     if (attr == null) {
       final LdapAttribute newAttr = new LdapAttribute(isBinary);
       newAttr.setName(name);
-      newAttr.addValues(valueTranscoder, values);
+      newAttr.addValues(valueTranscoder, realValues);
       ldapEntry.addAttribute(newAttr);
       modifications.add(
           new AttributeModification(
@@ -297,7 +314,7 @@ public interface LdaptiveEntryMapper<T> extends LdapEntryMapper<T> {
     } else {
       final List<T> newValues = new ArrayList<>(
           getAttributeValues(ldapEntry, name, valueTranscoder));
-      newValues.addAll(values);
+      newValues.addAll(realValues);
       setAttributes(ldapEntry, name, newValues, attr.isBinary(), valueTranscoder, modifications);
     }
   }
