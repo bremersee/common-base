@@ -30,18 +30,18 @@ import reactor.core.publisher.Mono;
 @SuppressWarnings(&quot;unused&quot;)
 public class KeycloakReactiveJwtConverter implements Converter&lt;Jwt, Mono&lt;JwtAuthenticationToken&gt;&gt; {
 
-  private final KeycloakReactiveJwtConverter converter;
+  private final KeycloakJwtConverter converter;
 
   /**
    * Instantiates a new keycloak reactive jwt converter.
    */
 <span class="nc" id="L38">  public KeycloakReactiveJwtConverter() {</span>
-<span class="nc" id="L39">    this.converter = new KeycloakReactiveJwtConverter();</span>
+<span class="nc" id="L39">    this.converter = new KeycloakJwtConverter();</span>
 <span class="nc" id="L40">  }</span>
 
   @Override
   public Mono&lt;JwtAuthenticationToken&gt; convert(final Jwt jwt) {
-<span class="nc" id="L44">    return this.converter.convert(jwt);</span>
+<span class="nc" id="L44">    return Mono.just(jwt).map(this.converter::convert);</span>
   }
 
 }
