@@ -12,4 +12,4 @@ This library contains
 
 - [Release](https://bremersee.github.io/common-base/index.html)
 
-- [Snapshot](https://nexus.bremersee.org/repository/maven-sites/common-base/1.3.3-SNAPSHOT/index.html)
+- [Snapshot](https://nexus.bremersee.org/repository/maven-sites/common-base/1.3.4-SNAPSHOT/index.html)
