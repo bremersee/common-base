@@ -13,17 +13,6 @@ pipeline {
         sh 'mvn test'
       }
     }
-    stage('Install') {
-      when {
-        anyOf {
-          branch 'develop'
-          branch 'master'
-        }
-      }
-      steps {
-        sh 'mvn install'
-      }
-    }
     stage('Deploy') {
       when {
         anyOf {
