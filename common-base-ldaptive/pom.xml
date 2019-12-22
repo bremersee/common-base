@@ -5,9 +5,9 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <artifactId>common-base-parent</artifactId>
     <groupId>org.bremersee</groupId>
-    <version>2.0.0-SNAPSOT</version>
+    <artifactId>common-base-parent</artifactId>
+    <version>2.0.0-SNAPSHOT</version>
   </parent>
 
   <artifactId>common-base-ldaptive</artifactId>
