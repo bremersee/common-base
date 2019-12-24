@@ -40,6 +40,11 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 public class LdaptiveProperties {
 
   /**
+   * Specifies whether to use the UnboundId provider or not.
+   */
+  private boolean useUnboundIdProvider = true;
+
+  /**
    * URL to the LDAP(s).
    */
   private String ldapUrl = "ldap://localhost:12389";
