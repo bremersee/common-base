@@ -34,10 +34,8 @@ public abstract class AbstractLdaptiveErrorHandler implements LdaptiveErrorHandl
       ldaptiveException = (LdaptiveException) t;
     } else if (t instanceof LdapException) {
       ldaptiveException = map((LdapException) t);
-    } else if (t != null) {
-      ldaptiveException = new LdaptiveException(t);
     } else {
-      ldaptiveException = new LdaptiveException();
+      ldaptiveException = new LdaptiveException(t);
     }
     log.error("LDAP operation failed.", ldaptiveException);
     throw ldaptiveException;

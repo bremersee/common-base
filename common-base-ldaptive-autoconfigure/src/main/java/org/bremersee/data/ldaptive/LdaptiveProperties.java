@@ -30,7 +30,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
  *
  * @author Christian Bremer
  */
-@SuppressWarnings({"ConfigurationProperties", "WeakerAccess"})
+@SuppressWarnings({"WeakerAccess"})
 @ConfigurationProperties(prefix = "bremersee.ldaptive")
 @Getter
 @Setter
@@ -38,6 +38,11 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @EqualsAndHashCode(exclude = {"bindCredential"})
 @NoArgsConstructor
 public class LdaptiveProperties {
+
+  /**
+   * Specifies whether ldap connection should be configured or not.
+   */
+  private boolean enabled = true;
 
   /**
    * Specifies whether to use the UnboundId provider or not.

@@ -17,10 +17,12 @@
 package org.bremersee.data.ldaptive;
 
 import lombok.EqualsAndHashCode;
-import org.bremersee.exception.ServiceException;
+import lombok.Getter;
+import org.bremersee.exception.ErrorCodeAware;
+import org.bremersee.exception.HttpStatusAware;
 import org.ldaptive.LdapException;
 import org.ldaptive.ResultCode;
-import org.springframework.http.HttpStatus;
+// import org.springframework.http.HttpStatus;
 
 /**
  * The ldaptive exception.
@@ -28,14 +30,21 @@ import org.springframework.http.HttpStatus;
  * @author Christian Bremer
  */
 @EqualsAndHashCode(callSuper = true)
-@SuppressWarnings({"WeakerAccess", "unused"})
-public class LdaptiveException extends ServiceException {
+public class LdaptiveException extends RuntimeException implements HttpStatusAware, ErrorCodeAware {
+
+  @Getter
+  private final Integer httpStatusCode;
+
+  @Getter
+  private final String errorCode;
 
   /**
    * Instantiates a new ldaptive exception.
    */
   public LdaptiveException() {
-    super(HttpStatus.INTERNAL_SERVER_ERROR);
+    super();
+    this.httpStatusCode = 500;
+    this.errorCode = null;
   }
 
   /**
@@ -44,28 +53,45 @@ public class LdaptiveException extends ServiceException {
    * @param cause the cause
    */
   public LdaptiveException(Throwable cause) {
-    this(HttpStatus.INTERNAL_SERVER_ERROR, cause);
+    super(cause);
+    this.httpStatusCode = 500;
+    this.errorCode = null;
   }
 
-  /**
-   * Instantiates a new ldaptive exception.
-   *
-   * @param httpStatus the http status
-   * @param cause      the cause
-   */
-  public LdaptiveException(HttpStatus httpStatus, Throwable cause) {
-    super(httpStatus != null ? httpStatus : HttpStatus.INTERNAL_SERVER_ERROR, cause);
+  public LdaptiveException(String errorCode, Throwable cause) {
+    super(cause);
+    this.httpStatusCode = 500;
+    this.errorCode = errorCode;
   }
 
-  /**
-   * Instantiates a new ldaptive exception.
-   *
-   * @param httpStatus the http status
-   * @param errorCode  the error code
-   * @param cause      the cause
-   */
-  public LdaptiveException(HttpStatus httpStatus, String errorCode, Throwable cause) {
-    super(httpStatus != null ? httpStatus : HttpStatus.INTERNAL_SERVER_ERROR, errorCode, cause);
+  public LdaptiveException(Integer httpStatus) {
+    super();
+    this.httpStatusCode = httpStatus;
+    this.errorCode = null;
+  }
+
+  public LdaptiveException(String errorCode) {
+    super();
+    this.httpStatusCode = 500;
+    this.errorCode = errorCode;
+  }
+
+  public LdaptiveException(Integer httpStatus, String errorCode) {
+    super();
+    this.httpStatusCode = httpStatus;
+    this.errorCode = errorCode;
+  }
+
+  public LdaptiveException(Integer httpStatus, Throwable cause) {
+    super(cause);
+    this.httpStatusCode = httpStatus;
+    this.errorCode = null;
+  }
+
+  public LdaptiveException(Integer httpStatus, String errorCode, Throwable cause) {
+    super(cause);
+    this.httpStatusCode = httpStatus;
+    this.errorCode = errorCode;
   }
 
   /**
@@ -87,4 +113,8 @@ public class LdaptiveException extends ServiceException {
     return ldapException != null ? ldapException.getResultCode() : null;
   }
 
+  @Override
+  public int status() {
+    return httpStatusCode != null ? httpStatusCode : 500;
+  }
 }

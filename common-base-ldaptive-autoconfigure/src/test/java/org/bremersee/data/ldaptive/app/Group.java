@@ -14,27 +14,25 @@
  * limitations under the License.
  */
 
-package org.bremersee.data.ldaptive;
+package org.bremersee.data.ldaptive.app;
 
-import org.ldaptive.LdapException;
-import org.ldaptive.ResultCode;
+import java.util.Set;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
- * The default ldaptive error handler.
+ * The test group.
  *
  * @author Christian Bremer
  */
-public class DefaultLdaptiveErrorHandler extends AbstractLdaptiveErrorHandler {
+@Data
+@NoArgsConstructor
+public class Group {
 
-  @Override
-  public LdaptiveException map(final LdapException ldapException) {
-    if (ldapException == null) {
-      return new LdaptiveException();
-    }
-    if (ldapException.getResultCode() == ResultCode.NO_SUCH_OBJECT) {
-      return new LdaptiveException(404, ldapException);
-    }
-    return new LdaptiveException(ldapException);
-  }
+  private String cn;
+
+  private String ou;
+
+  private Set<String> members;
 
 }

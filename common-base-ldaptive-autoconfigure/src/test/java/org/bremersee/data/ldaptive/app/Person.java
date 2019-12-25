@@ -16,19 +16,21 @@
 
 package org.bremersee.data.ldaptive.app;
 
-import org.springframework.boot.SpringBootConfiguration;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
-import org.springframework.context.annotation.ComponentScan;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
- * The test configuration to test the ldaptive template.
+ * The test person.
  *
  * @author Christian Bremer
  */
-@SpringBootConfiguration
-@EnableAutoConfiguration(exclude = {SecurityAutoConfiguration.class})
-@ComponentScan(basePackageClasses = {LdaptiveTestConfiguration.class})
-public class LdapTemplateTestConfiguration {
+@Data
+@NoArgsConstructor
+public class Person {
 
+  private String uid;
+
+  private String cn;
+
+  private String sn;
 }

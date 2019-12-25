@@ -16,7 +16,6 @@
 
 package org.bremersee.data.ldaptive.app;
 
-import lombok.extern.slf4j.Slf4j;
 import org.bremersee.data.ldaptive.LdaptiveTemplate;
 import org.ldaptive.BindConnectionInitializer;
 import org.ldaptive.ConnectionConfig;
@@ -25,20 +24,20 @@ import org.ldaptive.Credential;
 import org.ldaptive.DefaultConnectionFactory;
 import org.ldaptive.provider.unboundid.UnboundIDProvider;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.SpringBootConfiguration;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.ComponentScan;
 
 /**
- * The ldaptive test configuration.
+ * The test configuration to test the ldaptive template.
  *
  * @author Christian Bremer
  */
-@Configuration
-@Slf4j
-public class LdaptiveTestConfiguration {
-
-  @Value("${spring.ldap.embedded.base-dn}")
-  private String baseDn;
+@SpringBootConfiguration
+@EnableAutoConfiguration
+@ComponentScan(basePackageClasses = {TestConfiguration.class})
+public class TestConfiguration {
 
   @Value("${spring.ldap.embedded.credential.username}")
   private String username;

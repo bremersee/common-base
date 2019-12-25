@@ -24,6 +24,8 @@
     <module>common-base-servlet</module>
     <module>common-base-reactive</module>
     <module>common-base-ldaptive</module>
+    <module>common-base-ldaptive-autoconfigure</module>
+    <module>common-base-ldaptive-starter</module>
   </modules>
 
   <properties>

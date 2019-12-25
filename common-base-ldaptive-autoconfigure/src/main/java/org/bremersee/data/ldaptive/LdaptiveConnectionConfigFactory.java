@@ -57,7 +57,9 @@ public interface LdaptiveConnectionConfigFactory {
    * @param bindCredential the bind credential
    * @return the connection config
    */
-  ConnectionConfig createConnectionConfig(LdaptiveProperties properties, String bindDn,
+  ConnectionConfig createConnectionConfig(
+      LdaptiveProperties properties,
+      String bindDn,
       String bindCredential);
 
   /**

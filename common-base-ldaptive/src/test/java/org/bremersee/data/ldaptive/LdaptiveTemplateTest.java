@@ -30,7 +30,7 @@ import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
 import org.bremersee.data.ldaptive.app.Group;
 import org.bremersee.data.ldaptive.app.GroupMapper;
-import org.bremersee.data.ldaptive.app.LdapTemplateTestConfiguration;
+import org.bremersee.data.ldaptive.app.TestConfiguration;
 import org.bremersee.data.ldaptive.app.Person;
 import org.bremersee.data.ldaptive.app.PersonMapper;
 import org.bremersee.exception.ServiceException;
@@ -46,7 +46,6 @@ import org.ldaptive.SearchRequest;
 import org.ldaptive.SearchScope;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -58,7 +57,7 @@ import org.springframework.test.context.junit4.SpringRunner;
  */
 @RunWith(SpringRunner.class)
 @SpringBootTest(
-    classes = {LdapTemplateTestConfiguration.class},
+    classes = {TestConfiguration.class},
     webEnvironment = WebEnvironment.NONE,
     properties = {
         "security.basic.enabled=false",
@@ -69,7 +68,6 @@ import org.springframework.test.context.junit4.SpringRunner;
         "spring.ldap.embedded.port=12389",
         "spring.ldap.embedded.validation.enabled=false"
     })
-@AutoConfigureWebTestClient
 @Slf4j
 public class LdaptiveTemplateTest {
 
