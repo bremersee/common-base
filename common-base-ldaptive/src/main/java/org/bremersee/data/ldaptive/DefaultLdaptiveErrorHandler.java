@@ -32,9 +32,9 @@ public class DefaultLdaptiveErrorHandler extends AbstractLdaptiveErrorHandler {
       return new LdaptiveException();
     }
     if (ldapException.getResultCode() == ResultCode.NO_SUCH_OBJECT) {
-      return new LdaptiveException(404, ldapException);
+      return LdaptiveException.builder().httpStatus(404).cause(ldapException).build();
     }
-    return new LdaptiveException(ldapException);
+    return LdaptiveException.builder().cause(ldapException).build();
   }
 
 }

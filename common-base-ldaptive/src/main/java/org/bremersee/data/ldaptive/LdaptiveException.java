@@ -17,12 +17,13 @@
 package org.bremersee.data.ldaptive;
 
 import lombok.EqualsAndHashCode;
-import lombok.Getter;
+import org.bremersee.exception.AbstractServiceExceptionBuilder;
 import org.bremersee.exception.ErrorCodeAware;
 import org.bremersee.exception.HttpStatusAware;
+import org.bremersee.exception.ServiceException;
+import org.bremersee.exception.ServiceExceptionBuilder;
 import org.ldaptive.LdapException;
 import org.ldaptive.ResultCode;
-// import org.springframework.http.HttpStatus;
 
 /**
  * The ldaptive exception.
@@ -30,69 +31,63 @@ import org.ldaptive.ResultCode;
  * @author Christian Bremer
  */
 @EqualsAndHashCode(callSuper = true)
-public class LdaptiveException extends RuntimeException implements HttpStatusAware, ErrorCodeAware {
-
-  @Getter
-  private final Integer httpStatusCode;
-
-  @Getter
-  private final String errorCode;
+public class LdaptiveException extends ServiceException implements HttpStatusAware, ErrorCodeAware {
 
   /**
    * Instantiates a new ldaptive exception.
    */
-  public LdaptiveException() {
+  protected LdaptiveException() {
     super();
-    this.httpStatusCode = 500;
-    this.errorCode = null;
   }
 
   /**
    * Instantiates a new ldaptive exception.
    *
-   * @param cause the cause
+   * @param httpStatus the http status
+   * @param errorCode  the error code
    */
-  public LdaptiveException(Throwable cause) {
-    super(cause);
-    this.httpStatusCode = 500;
-    this.errorCode = null;
+  protected LdaptiveException(final int httpStatus, final String errorCode) {
+    super(httpStatus, errorCode);
   }
 
-  public LdaptiveException(String errorCode, Throwable cause) {
-    super(cause);
-    this.httpStatusCode = 500;
-    this.errorCode = errorCode;
+  /**
+   * Instantiates a new ldaptive exception.
+   *
+   * @param httpStatus the http status
+   * @param errorCode  the error code
+   * @param reason     the reason
+   */
+  protected LdaptiveException(final int httpStatus, final String errorCode, final String reason) {
+    super(httpStatus, errorCode, reason);
   }
 
-  public LdaptiveException(Integer httpStatus) {
-    super();
-    this.httpStatusCode = httpStatus;
-    this.errorCode = null;
+  /**
+   * Instantiates a new ldaptive exception.
+   *
+   * @param httpStatus the http status
+   * @param errorCode  the error code
+   * @param cause      the cause
+   */
+  protected LdaptiveException(final int httpStatus, final String errorCode, final Throwable cause) {
+    super(httpStatus, errorCode, cause);
   }
 
-  public LdaptiveException(String errorCode) {
-    super();
-    this.httpStatusCode = 500;
-    this.errorCode = errorCode;
+  /**
+   * Instantiates a new ldaptive exception.
+   *
+   * @param httpStatus the http status
+   * @param errorCode  the error code
+   * @param reason     the reason
+   * @param cause      the cause
+   */
+  protected LdaptiveException(
+      final int httpStatus,
+      final String errorCode,
+      final String reason,
+      final Throwable cause) {
+    super(httpStatus, errorCode, reason, cause);
   }
 
-  public LdaptiveException(Integer httpStatus, String errorCode) {
-    super();
-    this.httpStatusCode = httpStatus;
-    this.errorCode = errorCode;
-  }
-
-  public LdaptiveException(Integer httpStatus, Throwable cause) {
-    super(cause);
-    this.httpStatusCode = httpStatus;
-    this.errorCode = null;
-  }
-
-  public LdaptiveException(Integer httpStatus, String errorCode, Throwable cause) {
-    super(cause);
-    this.httpStatusCode = httpStatus;
-    this.errorCode = errorCode;
-  }
 
   /**
    * Gets ldap exception (can be {@code null}).
@@ -113,8 +108,32 @@ public class LdaptiveException extends RuntimeException implements HttpStatusAwa
     return ldapException != null ? ldapException.getResultCode() : null;
   }
 
-  @Override
-  public int status() {
-    return httpStatusCode != null ? httpStatusCode : 500;
+  public static ServiceExceptionBuilder<LdaptiveException> builder() {
+    return new AbstractServiceExceptionBuilder<>() {
+
+      private static final long serialVersionUID = 2L;
+
+      @Override
+      protected LdaptiveException buildWith(int httpStatus, String errorCode) {
+        return new LdaptiveException(httpStatus, errorCode);
+      }
+
+      @Override
+      protected LdaptiveException buildWith(int httpStatus, String errorCode, String reason) {
+        return new LdaptiveException(httpStatus, errorCode, reason);
+      }
+
+      @Override
+      protected LdaptiveException buildWith(int httpStatus, String errorCode, Throwable cause) {
+        return new LdaptiveException(httpStatus, errorCode, cause);
+      }
+
+      @Override
+      protected LdaptiveException buildWith(int httpStatus, String errorCode, String reason,
+          Throwable cause) {
+        return new LdaptiveException(httpStatus, errorCode, reason, cause);
+      }
+    };
   }
+
 }

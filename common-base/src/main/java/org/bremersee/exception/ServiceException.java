@@ -117,15 +117,6 @@ public class ServiceException extends RuntimeException
   }
 
   /**
-   * Creates new exception builder.
-   *
-   * @return the builder
-   */
-  public static ServiceExceptionBuilder<ServiceException> builder() {
-    return new Builder();
-  }
-
-  /**
    * Internal server error service exception.
    *
    * @return the service exception
@@ -438,33 +429,40 @@ public class ServiceException extends RuntimeException
         "Access to [" + entityType + "] with identifier [" + entityName + "] is forbidden.");
   }
 
-  public static class Builder extends AbstractServiceExceptionBuilder<ServiceException> {
+  /**
+   * Creates new exception builder.
+   *
+   * @return the builder
+   */
+  public static ServiceExceptionBuilder<? extends ServiceException> builder() {
+    return new AbstractServiceExceptionBuilder<>() {
 
-    private static final long serialVersionUID = 2L;
+      private static final long serialVersionUID = 2L;
 
-    @Override
-    protected ServiceException buildWith(int httpStatus, String errorCode) {
-      return new ServiceException(httpStatus, errorCode);
-    }
+      @Override
+      protected ServiceException buildWith(int httpStatus, String errorCode) {
+        return new ServiceException(httpStatus, errorCode);
+      }
 
-    @Override
-    protected ServiceException buildWith(int httpStatus, String errorCode, String reason) {
-      return new ServiceException(httpStatus, errorCode, reason);
-    }
+      @Override
+      protected ServiceException buildWith(int httpStatus, String errorCode, String reason) {
+        return new ServiceException(httpStatus, errorCode, reason);
+      }
 
-    @Override
-    protected ServiceException buildWith(int httpStatus, String errorCode, Throwable cause) {
-      return new ServiceException(httpStatus, errorCode, cause);
-    }
+      @Override
+      protected ServiceException buildWith(int httpStatus, String errorCode, Throwable cause) {
+        return new ServiceException(httpStatus, errorCode, cause);
+      }
 
-    @Override
-    protected ServiceException buildWith(
-        int httpStatus,
-        String errorCode,
-        String reason,
-        Throwable cause) {
-      return new ServiceException(httpStatus, errorCode, reason, cause);
-    }
+      @Override
+      protected ServiceException buildWith(
+          int httpStatus,
+          String errorCode,
+          String reason,
+          Throwable cause) {
+        return new ServiceException(httpStatus, errorCode, reason, cause);
+      }
+    };
   }
 
 }
