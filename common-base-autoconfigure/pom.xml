@@ -10,10 +10,10 @@
     <version>2.0.0-SNAPSHOT</version>
   </parent>
 
-  <artifactId>common-base-ldaptive-autoconfigure</artifactId>
+  <artifactId>common-base-autoconfigure</artifactId>
 
-  <name>common-base-ldaptive-autoconfigure</name>
-  <description>Common Base Ldaptive Auto-Configuration</description>
+  <name>common-base-autoconfigure</name>
+  <description>Common Base Auto-Configuration</description>
 
   <dependencies>
     <dependency>
@@ -47,11 +47,6 @@
       <artifactId>slf4j-api</artifactId>
       <optional>true</optional>
     </dependency>
-    <dependency>
-      <groupId>org.ldaptive</groupId>
-      <artifactId>ldaptive-unboundid</artifactId>
-      <optional>true</optional>
-    </dependency>
 
     <dependency>
       <groupId>org.springframework.boot</groupId>
@@ -61,16 +56,6 @@
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter-data-ldap</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>com.unboundid</groupId>
-      <artifactId>unboundid-ldapsdk</artifactId>
       <scope>test</scope>
     </dependency>
   </dependencies>
