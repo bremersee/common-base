@@ -16,7 +16,6 @@
 
 package org.bremersee.exception;
 
-import java.util.function.Supplier;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
@@ -31,7 +30,7 @@ import org.springframework.util.StringUtils;
 @EqualsAndHashCode(callSuper = true)
 public class ServiceException
     extends RuntimeException
-    implements ErrorCodeAware, Supplier<ServiceException> {
+    implements ErrorCodeAware {
 
   /**
    * Default error code for an 'already exists exception'.
@@ -153,11 +152,6 @@ public class ServiceException
     super(reason, cause);
     this.httpStatusCode = resolveHttpStatusCode(httpStatusCode);
     this.errorCode = errorCode;
-  }
-
-  @Override
-  public ServiceException get() {
-    return this;
   }
 
   /**

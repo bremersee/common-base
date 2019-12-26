@@ -15,15 +15,6 @@ import org.springframework.http.HttpStatus;
 public class ServiceExceptionTest {
 
   /**
-   * Tests supplier method.
-   */
-  @Test
-  public void get() {
-    ServiceException serviceException = new ServiceException();
-    assertEquals(serviceException, serviceException.get());
-  }
-
-  /**
    * Tests status method.
    */
   @Test
