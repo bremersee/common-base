@@ -77,15 +77,16 @@ public class ApiExceptionResolverTest {
   @Test
   public void testResolveExceptionWithJsonContent() throws Exception {
 
-    ServiceException cause = new ServiceException(
-        HttpStatus.UNAUTHORIZED.value(),
-        "You are not authorized",
-        "TEST:4711");
-    ServiceException exception = new ServiceException(
-        cause.status(),
-        "Authorization failed.",
-        null,
-        cause);
+    ServiceException cause = ServiceException.builder()
+        .httpStatus(401)
+        .reason("You are not authorized")
+        .errorCode("TEST:4711")
+        .build();
+    ServiceException exception = ServiceException.builder()
+        .httpStatus(cause.status())
+        .reason("Authorization failed.")
+        .cause(cause)
+        .build();
 
     HttpServletRequest request = mock(HttpServletRequest.class);
     when(request.getRequestURI()).thenReturn("/api/resource");

@@ -103,7 +103,7 @@ public class RestApiExceptionMapperImpl implements RestApiExceptionMapper {
         }
       }
     }
-    if (httpStatus == null) {
+    if (httpStatus == null && !(exception instanceof HttpStatusAware)) {
       final Object result = getMethodValue(exception, "status");
       if (result instanceof Integer) {
         httpStatus = fromStatus((Integer) result);

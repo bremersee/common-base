@@ -30,7 +30,6 @@ import org.bremersee.exception.RestApiExceptionMapperImpl;
 import org.bremersee.exception.RestApiExceptionMapperProperties;
 import org.bremersee.exception.RestApiExceptionUtils;
 import org.bremersee.exception.ServiceException;
-import org.bremersee.web.reactive.ApiExceptionHandler;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.springframework.boot.autoconfigure.web.ResourceProperties;
@@ -67,7 +66,11 @@ public class ApiExceptionHandlerTest {
     final RestApiExceptionMapper mapper = new RestApiExceptionMapperImpl(
         properties, "testapp");
 
-    exception = new ServiceException(500, "Oops, a conflict", "TEST:4711");
+    exception = ServiceException.builder()
+        .httpStatus(500)
+        .reason("Oops, a conflict")
+        .errorCode("TEST:4711")
+        .build();
     ErrorAttributes errorAttributes = mock(ErrorAttributes.class);
     when(errorAttributes.getError(any(ServerRequest.class))).thenReturn(exception);
 
