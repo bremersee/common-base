@@ -110,7 +110,7 @@ public class LdaptiveException extends ServiceException implements HttpStatusAwa
   }
 
   public static ServiceExceptionBuilder<LdaptiveException> builder() {
-    return new AbstractServiceExceptionBuilder<>() {
+    return new AbstractServiceExceptionBuilder<LdaptiveException>() {
 
       private static final long serialVersionUID = 2L;
 

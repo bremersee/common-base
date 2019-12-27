@@ -18,7 +18,9 @@ package org.bremersee.exception;
 
 import static org.junit.Assert.assertEquals;
 
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -37,9 +39,9 @@ public class HttpResponseHeadersAwareTest {
   @Test
   public void createHeaders() {
     Map<String, List<String>> source = new LinkedHashMap<>();
-    source.put("A", List.of("ValueA"));
-    source.put("B", List.of("ValueB1", "ValueB2"));
-    source.put("C", List.of());
+    source.put("A", Collections.singletonList("ValueA"));
+    source.put("B", Arrays.asList("ValueB1", "ValueB2"));
+    source.put("C", Collections.emptyList());
     Map<String, String> destination = HttpResponseHeadersAware.createHeaders(source);
     assertEquals("ValueA", destination.get("A"));
     assertEquals("ValueB1", destination.get("B"));

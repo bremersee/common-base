@@ -17,7 +17,6 @@
 package org.bremersee.thymeleaf;
 
 import java.util.Map;
-import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.ResourceLoader;
@@ -49,7 +48,7 @@ public class TemplateResolver extends AbstractConfigurableTemplateResolver {
    * @param resourceLoader the resource loader
    */
   public TemplateResolver(ResourceLoader resourceLoader) {
-    this.resourceLoader = Objects.requireNonNullElseGet(resourceLoader, DefaultResourceLoader::new);
+    this.resourceLoader = resourceLoader != null ? resourceLoader : new DefaultResourceLoader();
     log.info("TemplateResolver (prefix={})", getPrefix());
   }
 

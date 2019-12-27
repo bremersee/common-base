@@ -3,7 +3,7 @@ pipeline {
     label 'maven'
   }
   tools {
-    jdk 'jdk11'
+    jdk 'jdk8'
     maven 'm3'
   }
   stages {
@@ -21,28 +21,23 @@ pipeline {
     stage('Deploy') {
       when {
         anyOf {
-          branch 'develop'
-          branch 'master'
+          branch '1.4.develop'
+          branch '1.4.master'
         }
       }
       steps {
         sh 'mvn -B -P deploy clean deploy'
       }
     }
-    stage('Snapshot Site') {
+    stage('Site') {
       when {
-        branch 'develop'
+        anyOf {
+          branch '1.4.develop'
+          branch '1.4.master'
+        }
       }
       steps {
         sh 'mvn -B site-deploy'
-      }
-    }
-    stage('Release Site') {
-      when {
-        branch 'master'
-      }
-      steps {
-        sh 'mvn -B -P gh-pages-site site site:stage scm-publish:publish-scm'
       }
     }
   }

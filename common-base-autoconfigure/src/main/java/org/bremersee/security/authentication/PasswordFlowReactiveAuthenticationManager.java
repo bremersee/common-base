@@ -1,6 +1,5 @@
 package org.bremersee.security.authentication;
 
-import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.http.HttpStatus;
@@ -37,12 +36,10 @@ public class PasswordFlowReactiveAuthenticationManager implements ReactiveAuthen
       @Nullable AccessTokenRetriever<Mono<String>> retriever) {
     this.properties = properties;
     this.jwtDecoder = jwtDecoder;
-    this.jwtConverter = Objects.requireNonNullElseGet(
-        jwtConverter,
-        () -> new ReactiveJwtAuthenticationConverterAdapter(new JwtAuthenticationConverter()));
-    this.retriever = Objects.requireNonNullElseGet(
-        retriever,
-        WebClientAccessTokenRetriever::new);
+    this.jwtConverter = jwtConverter != null
+        ? jwtConverter
+        : new ReactiveJwtAuthenticationConverterAdapter(new JwtAuthenticationConverter());
+    this.retriever = retriever != null ? retriever : new WebClientAccessTokenRetriever();
   }
 
   @SuppressWarnings("unused")

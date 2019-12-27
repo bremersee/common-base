@@ -1,6 +1,5 @@
 package org.bremersee.security.authentication;
 
-import java.util.Objects;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.http.HttpStatus;
 import org.springframework.lang.Nullable;
@@ -40,9 +39,9 @@ public class PasswordFlowAuthenticationManager
       AccessTokenRetriever<String> accessTokenRetriever) {
     this.properties = properties;
     this.jwtDecoder = jwtDecoder;
-    this.jwtAuthenticationConverter = Objects.requireNonNullElseGet(
-        jwtAuthenticationConverter,
-        JwtAuthenticationConverter::new);
+    this.jwtAuthenticationConverter = jwtAuthenticationConverter != null
+        ? jwtAuthenticationConverter
+        : new JwtAuthenticationConverter();
     this.accessTokenRetriever = accessTokenRetriever;
   }
 

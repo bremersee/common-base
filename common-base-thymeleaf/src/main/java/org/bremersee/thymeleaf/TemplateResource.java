@@ -22,11 +22,11 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.nio.charset.StandardCharsets;
-import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.util.Assert;
+import org.springframework.util.StringUtils;
 import org.thymeleaf.templateresource.ITemplateResource;
 
 /**
@@ -91,10 +91,10 @@ public class TemplateResource implements ITemplateResource {
       String characterEncoding,
       ResourceLoader resourceLoader) {
     this.path = path;
-    this.characterEncoding = Objects.requireNonNullElse(
-        characterEncoding, StandardCharsets.UTF_8.name());
-    this.resourceLoader = Objects.requireNonNullElseGet(
-        resourceLoader, DefaultResourceLoader::new);
+    this.characterEncoding = StringUtils.hasText(characterEncoding)
+        ? characterEncoding
+        : StandardCharsets.UTF_8.name();
+    this.resourceLoader = resourceLoader != null ? resourceLoader : new DefaultResourceLoader();
     log.info("TemplateResource (path={}, characterEncoding={})",
         this.path, this.characterEncoding);
   }

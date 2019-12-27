@@ -47,7 +47,7 @@ public class LdaptiveProperties {
   /**
    * Specifies whether to use the UnboundId provider or not.
    */
-  private boolean useUnboundIdProvider = true;
+  private boolean useUnboundIdProvider = false;
 
   /**
    * URL to the LDAP(s).
