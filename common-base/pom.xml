@@ -20,6 +20,18 @@
       <groupId>org.bremersee</groupId>
       <artifactId>common-model</artifactId>
     </dependency>
+
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-context</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-web</artifactId>
+    </dependency>
+
+
+
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
@@ -28,22 +40,15 @@
       <groupId>javax.validation</groupId>
       <artifactId>validation-api</artifactId>
     </dependency>
+
+    <!--
     <dependency>
       <groupId>javax.annotation</groupId>
       <artifactId>javax.annotation-api</artifactId>
     </dependency>
+    -->
 
 
-    <dependency>
-      <groupId>org.springframework</groupId>
-      <artifactId>spring-context</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>org.springframework</groupId>
-      <artifactId>spring-web</artifactId>
-      <optional>true</optional>
-    </dependency>
     <dependency>
       <groupId>io.github.openfeign</groupId>
       <artifactId>feign-core</artifactId>
@@ -65,11 +70,14 @@
       <artifactId>spring-security-oauth2-jose</artifactId>
       <optional>true</optional>
     </dependency>
+
+    <!--
     <dependency>
       <groupId>org.springframework.security</groupId>
       <artifactId>spring-security-oauth2-resource-server</artifactId>
       <optional>true</optional>
     </dependency>
+    -->
     <dependency>
       <groupId>com.jayway.jsonpath</groupId>
       <artifactId>json-path</artifactId>
