@@ -16,19 +16,24 @@
 
 package org.bremersee.security.authentication;
 
+import javax.validation.constraints.NotNull;
+import org.springframework.validation.annotation.Validated;
+
 /**
  * Retrieve the access token from the identity provider.
  *
  * @author Christian Bremer
  */
-public interface AccessTokenRetriever<I, R> {
+@Validated
+public interface AccessTokenRetriever<T> {
 
   /**
    * Retrieve the access token from the identity provider.
    *
-   * @param input the input values
+   * @param properties the request properties
    * @return the access token
    */
-  R retrieveAccessToken(I input);
+  @NotNull
+  T retrieveAccessToken(@NotNull AccessTokenRetrieverProperties properties);
 
 }

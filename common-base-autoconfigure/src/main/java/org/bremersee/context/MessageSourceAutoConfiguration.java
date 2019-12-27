@@ -21,10 +21,12 @@ import java.util.List;
 import java.util.Properties;
 import lombok.extern.slf4j.Slf4j;
 import org.bremersee.common.model.JavaLocale;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.event.EventListener;
 import org.springframework.context.support.AbstractResourceBasedMessageSource;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
 import org.springframework.context.support.ResourceBundleMessageSource;
@@ -53,6 +55,18 @@ public class MessageSourceAutoConfiguration {
    */
   public MessageSourceAutoConfiguration(MessageSourceProperties properties) {
     this.properties = properties;
+  }
+
+  @EventListener(ApplicationReadyEvent.class)
+  public void init() {
+    log.info("\n"
+            + "*********************************************************************************\n"
+            + "* {}\n"
+            + "*********************************************************************************\n"
+            + "* baseNames = {}\n"
+            + "*********************************************************************************",
+        getClass().getSimpleName(),
+        properties.getBaseNames());
   }
 
   /**

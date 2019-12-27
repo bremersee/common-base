@@ -1,0 +1,4 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+org.bremersee.web.reactive.ApiExceptionHandlerAutoConfiguration,\
+org.bremersee.web.reactive.CorsAutoConfiguration,\
+org.bremersee.security.authentication.ReactiveAuthenticationSupportAutoConfiguration

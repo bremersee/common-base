@@ -3,9 +3,12 @@ package org.bremersee.security.authentication;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.JWTClaimsSet.Builder;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -13,7 +16,9 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.UUID;
 import org.junit.Test;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 
 /**
  * The keycloak jwt converter test.
@@ -71,4 +76,33 @@ public class KeycloakJwtConverterTest {
         .anyMatch(grantedAuthority -> grantedAuthority.getAuthority()
             .equalsIgnoreCase("ROLE_LOCAL_USER")));
   }
+
+  /**
+   * Test convert roles.
+   */
+  @Test
+  public void testConvertRoles() {
+
+    final Map<String, Object> roles = new LinkedHashMap<>();
+    roles.put("roles", Arrays.asList("ADMIN", "ROLE_USER"));
+    final Map<String, Object> claims = new LinkedHashMap<>();
+    claims.put("realm_access", roles);
+
+    Jwt jwt = mock(Jwt.class);
+    when(jwt.getClaims()).thenReturn(claims);
+
+    final KeycloakJwtConverter converter = new KeycloakJwtConverter();
+    final JwtAuthenticationToken authToken = converter.convert(jwt);
+    assertNotNull(authToken);
+    assertNotNull(authToken.getAuthorities());
+    assertTrue(
+        authToken
+            .getAuthorities()
+            .contains(new SimpleGrantedAuthority("ROLE_ADMIN")));
+    assertTrue(
+        authToken
+            .getAuthorities()
+            .contains(new SimpleGrantedAuthority("ROLE_USER")));
+  }
+
 }

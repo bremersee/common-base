@@ -81,13 +81,16 @@ public class LdaptiveAutoConfiguration {
   public void init() {
     log.info("\n"
             + "*********************************************************************************\n"
+            + "* {}\n"
+            + "*********************************************************************************\n"
             + "* connectionConfigFactory = {}\n"
             + "* connectionPoolFactory = {}\n"
             + "* ldaptiveProvider = {}\n"
             + "*********************************************************************************",
-        this.connectionConfigFactory.getClass().getSimpleName(),
-        this.connectionConfigFactory.getClass().getSimpleName(),
-        this.ldaptiveProvider != null ? this.ldaptiveProvider.getClass().getSimpleName() : "null");
+        getClass().getSimpleName(),
+        connectionConfigFactory.getClass().getSimpleName(),
+        connectionConfigFactory.getClass().getSimpleName(),
+        ldaptiveProvider != null ? this.ldaptiveProvider.getClass().getSimpleName() : "null");
 
     if (properties.isPooled()) {
       LdaptiveTemplate template = new LdaptiveTemplate(connectionFactory());

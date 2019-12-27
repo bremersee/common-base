@@ -47,7 +47,7 @@ public abstract class HttpHeadersHelper {
       return (HttpHeaders) headers;
     }
     if (headers instanceof MultiValueMap) {
-      //noinspection unchecked
+      //noinspection unchecked,rawtypes
       return new HttpHeaders((MultiValueMap) headers);
     }
     final HttpHeaders httpHeaders = new HttpHeaders();

@@ -65,7 +65,8 @@ public abstract class AbstractAdditionalThymeleafConfiguration {
   /**
    * Register template resolver.
    */
-  @PostConstruct
+  // TODO
+  // @PostConstruct
   public void registerTemplateResolver() {
     if (applicationContext instanceof ConfigurableApplicationContext) {
       final ConfigurableApplicationContext ctx = (ConfigurableApplicationContext) applicationContext;

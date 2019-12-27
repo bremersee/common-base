@@ -23,11 +23,12 @@
     <module>common-base-test</module>
     <module>common-base-autoconfigure</module>
     <module>common-base-starter</module>
-    <module>common-base-servlet</module>
-    <module>common-base-reactive</module>
     <module>common-base-ldaptive</module>
     <module>common-base-ldaptive-autoconfigure</module>
     <module>common-base-ldaptive-starter</module>
+    <module>common-base-reactive</module>
+    <module>common-base-reactive-autoconfigure</module>
+    <module>common-base-servlet-autoconfigure</module>
   </modules>
 
   <properties>
