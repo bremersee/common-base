@@ -1,0 +1,1 @@
+# Common Base Thymeleaf Starter

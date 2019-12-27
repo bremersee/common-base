@@ -2,7 +2,7 @@
 <project xmlns="http://maven.apache.org/DECORATION/1.8.0"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/DECORATION/1.8.0 http://maven.apache.org/xsd/decoration-1.8.0.xsd"
-	name="Common Base Web MVC"
+	name="Common Base Thymeleaf Starter"
 	combine.self="override">
 	<skin>
 		<groupId>org.apache.maven.skins</groupId>
