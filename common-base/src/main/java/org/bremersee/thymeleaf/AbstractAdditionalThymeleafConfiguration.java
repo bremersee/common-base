@@ -16,7 +16,6 @@
 
 package org.bremersee.thymeleaf;
 
-import javax.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.bremersee.thymeleaf.AdditionalThymeleafProperties.ResolverProperties;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
