@@ -2,7 +2,7 @@ package org.bremersee.security.authentication;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.ObjectProvider;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication.Type;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
@@ -15,9 +15,10 @@ import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.util.Assert;
 
 @ConditionalOnWebApplication(type = Type.SERVLET)
-@ConditionalOnBean({
-    RestTemplateBuilder.class,
-    JwtDecoder.class
+@ConditionalOnClass({
+    org.springframework.boot.web.client.RestTemplateBuilder.class,
+    org.bremersee.security.authentication.KeycloakJwtConverter.class,
+    org.bremersee.security.authentication.RestTemplateAccessTokenRetriever.class
 })
 @EnableConfigurationProperties(AuthenticationProperties.class)
 @Configuration
@@ -60,6 +61,11 @@ public class AuthenticationSupportAutoConfiguration {
       ObjectProvider<JwtDecoder> jwtDecoder,
       KeycloakJwtConverter jwtConverter,
       RestTemplateAccessTokenRetriever tokenRetriever) {
+
+    Assert.notNull(
+        jwtDecoder.getIfAvailable(),
+        "Jwt decoder must be present.");
+
     return new PasswordFlowAuthenticationManager(
         properties,
         jwtDecoder.getIfAvailable(),
