@@ -19,22 +19,25 @@ package org.bremersee.web.servlet;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.bremersee.exception.RestApiExceptionMapper;
 import org.bremersee.exception.ServiceException;
+import org.bremersee.exception.model.Handler;
 import org.bremersee.exception.model.RestApiException;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
-import org.mockito.Mockito;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -50,6 +53,37 @@ import org.springframework.web.util.WebUtils;
  */
 public class ApiExceptionResolverTest {
 
+  private static ServiceException cause = ServiceException.builder()
+      .httpStatus(401)
+      .reason("You are not authorized")
+      .errorCode("TEST:4711")
+      .build();
+
+  private static ServiceException exception = ServiceException.builder()
+      .httpStatus(cause.status())
+      .reason("Authorization failed.")
+      .cause(cause)
+      .build();
+
+  private static RestApiException expectedCause = RestApiException.builder()
+      .message(cause.getMessage())
+      .errorCode(cause.getErrorCode())
+      .build();
+
+  private static RestApiException expected = RestApiException.builder()
+      .cause(expectedCause)
+      .errorCodeInherited(true)
+      .errorCode(expectedCause.getErrorCode())
+      .handler(Handler.builder()
+          .className(TestHandler.class.getName())
+          .methodName("testMethod")
+          .methodParameterTypes(Arrays.asList(
+              UUID.class.getName(),
+              String.class.getName(),
+              int.class.getName()))
+          .build())
+      .build();
+
   private static ApiExceptionResolver exceptionResolver;
 
   /**
@@ -57,8 +91,14 @@ public class ApiExceptionResolverTest {
    */
   @BeforeClass
   public static void setup() {
-    final RestApiExceptionMapper mapper = Mockito.mock(RestApiExceptionMapper.class);
-    // TODO
+
+    final RestApiExceptionMapper mapper = mock(RestApiExceptionMapper.class);
+    when(mapper.getApiPaths())
+        .thenReturn(Collections.singletonList("/api/resource"));
+    when(mapper.detectHttpStatus(any(), any()))
+        .thenReturn(HttpStatus.UNAUTHORIZED);
+    when(mapper.build(any(Throwable.class), anyString(), any(HandlerMethod.class)))
+        .thenReturn(expected);
 
     exceptionResolver = new ApiExceptionResolver(mapper);
   }
@@ -68,20 +108,8 @@ public class ApiExceptionResolverTest {
    *
    * @throws Exception the exception
    */
-  @Ignore // TODO
   @Test
   public void testResolveExceptionWithJsonContent() throws Exception {
-
-    ServiceException cause = ServiceException.builder()
-        .httpStatus(401)
-        .reason("You are not authorized")
-        .errorCode("TEST:4711")
-        .build();
-    ServiceException exception = ServiceException.builder()
-        .httpStatus(cause.status())
-        .reason("Authorization failed.")
-        .cause(cause)
-        .build();
 
     HttpServletRequest request = mock(HttpServletRequest.class);
     when(request.getRequestURI()).thenReturn("/api/resource");
@@ -106,6 +134,7 @@ public class ApiExceptionResolverTest {
 
     assertNotNull(mv);
     assertEquals(HttpStatus.UNAUTHORIZED, mv.getStatus());
+
     assertNotNull(mv.getView());
     assertTrue(mv.getView() instanceof MappingJackson2JsonView);
     assertNotNull(mv.getModel());

@@ -70,7 +70,7 @@ public abstract class RestApiExceptionUtils {
   /**
    * The default value of the 'code' attribute.
    */
-  public static final String NO_ERROR_CODE_VALUE = "UNSPECIFIED"; // TODO from ErrorCodeAware
+  public static final String NO_ERROR_CODE_VALUE = ErrorCodeAware.NO_ERROR_CODE_VALUE;
 
   /**
    * The default value of the 'message' attribute.

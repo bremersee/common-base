@@ -34,9 +34,6 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @EqualsAndHashCode
 public class AuthenticationProperties {
 
-  // TODO do we want a switch?
-  //private boolean usePasswordFlowAuthenticationManager = true;
-
   /**
    * The properties for the oauth2 password flow.
    */
@@ -61,6 +58,7 @@ public class AuthenticationProperties {
 
     private String systemPassword;
 
+    @SuppressWarnings("unused")
     public PasswordFlowProperties toProperties() {
       return this.toProperties(systemUsername, systemPassword);
     }
