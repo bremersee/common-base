@@ -17,6 +17,7 @@
 package org.bremersee.converter;
 
 import java.util.Locale;
+import lombok.ToString;
 import org.bremersee.common.model.JavaLocale;
 import org.springframework.core.convert.converter.Converter;
 
@@ -25,6 +26,7 @@ import org.springframework.core.convert.converter.Converter;
  *
  * @author Christian Bremer
  */
+@ToString
 public class StringToLocaleConverter implements Converter<String, Locale> {
 
   @Override

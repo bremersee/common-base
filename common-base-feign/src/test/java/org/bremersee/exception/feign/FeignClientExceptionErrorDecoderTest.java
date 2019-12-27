@@ -61,8 +61,7 @@ public class FeignClientExceptionErrorDecoderTest {
     final MultiValueMap<String, String> headers = new LinkedMultiValueMap<>();
     headers.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
     final RestApiException expected = restApiException();
-    //noinspection unchecked
-    final Response response = Response
+    @SuppressWarnings({"unchecked", "rawtypes"}) final Response response = Response
         .builder()
         .request(Request
             .create(
@@ -93,8 +92,7 @@ public class FeignClientExceptionErrorDecoderTest {
     final MultiValueMap<String, String> headers = new LinkedMultiValueMap<>();
     headers.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_XML_VALUE);
     final RestApiException expected = restApiException();
-    //noinspection unchecked
-    final Response response = Response
+    @SuppressWarnings({"unchecked", "rawtypes"}) final Response response = Response
         .builder()
         .request(Request
             .create(
@@ -125,8 +123,7 @@ public class FeignClientExceptionErrorDecoderTest {
     final MultiValueMap<String, String> headers = new LinkedMultiValueMap<>();
     headers.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_XML_VALUE);
     final String body = getXmlMapper().writeValueAsString(otherResponse());
-    //noinspection unchecked
-    final Response response = Response
+    @SuppressWarnings({"unchecked", "rawtypes"}) final Response response = Response
         .builder()
         .request(Request
             .create(
@@ -157,8 +154,7 @@ public class FeignClientExceptionErrorDecoderTest {
     final MultiValueMap<String, String> headers = new LinkedMultiValueMap<>();
     headers.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_XML_VALUE);
     final String body = "";
-    //noinspection unchecked
-    final Response response = Response
+    @SuppressWarnings({"unchecked", "rawtypes"}) final Response response = Response
         .builder()
         .request(Request
             .create(
@@ -178,10 +174,20 @@ public class FeignClientExceptionErrorDecoderTest {
     assertEquals(500, ((FeignClientException) actual).status());
   }
 
+  /**
+   * Returns json mapper.
+   *
+   * @return the json mapper
+   */
   private static ObjectMapper getJsonMapper() {
     return Jackson2ObjectMapperBuilder.json().build();
   }
 
+  /**
+   * Returns xml mapper.
+   *
+   * @return the xml mapper
+   */
   private static XmlMapper getXmlMapper() {
     return Jackson2ObjectMapperBuilder.xml().createXmlMapper(true).build();
   }

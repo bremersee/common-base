@@ -28,8 +28,10 @@ public class CorsAutoConfiguration implements WebFluxConfigurer {
     log.info("\n"
             + "*********************************************************************************\n"
             + "* {}\n"
+            + "*********************************************************************************\n"
+            + "* corsProperties = {}\n"
             + "*********************************************************************************",
-        getClass().getSimpleName());
+        getClass().getSimpleName(), properties);
   }
 
   @Override

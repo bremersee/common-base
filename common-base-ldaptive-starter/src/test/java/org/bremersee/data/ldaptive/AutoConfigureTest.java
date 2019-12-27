@@ -19,6 +19,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.test.context.junit4.SpringRunner;
 
+/**
+ * The auto configure test.
+ */
 @RunWith(SpringRunner.class)
 @SpringBootTest(
     classes = TestConfiguration.class,
@@ -91,10 +94,10 @@ public class AutoConfigureTest {
             .equalsIgnoreCase(entry.getCn())));
   }
 
-    /**
-     * Find existing groups.
-     */
-    @Test
+  /**
+   * Find existing groups.
+   */
+  @Test
     public void findExistingGroups() {
         SearchFilter searchFilter = new SearchFilter("(objectclass=groupOfUniqueNames)");
         SearchRequest searchRequest = new SearchRequest(

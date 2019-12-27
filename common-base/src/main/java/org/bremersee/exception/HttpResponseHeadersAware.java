@@ -45,6 +45,8 @@ public interface HttpResponseHeadersAware {
     for (Entry<String, ? extends Collection<String>> entry : headers.entrySet()) {
       if (entry.getValue() != null && !entry.getValue().isEmpty()) {
         map.put(entry.getKey(), entry.getValue().iterator().next());
+      } else {
+        map.put(entry.getKey(), "");
       }
     }
     return map;

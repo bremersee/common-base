@@ -42,7 +42,7 @@ public class ServiceException extends RuntimeException
   private final String errorCode;
 
   /**
-   * Instantiates a new Service exception.
+   * Instantiates a new service exception.
    */
   protected ServiceException() {
     super();
@@ -51,7 +51,7 @@ public class ServiceException extends RuntimeException
   }
 
   /**
-   * Instantiates a new Service exception.
+   * Instantiates a new service exception.
    *
    * @param httpStatus the http status
    * @param errorCode  the error code
@@ -63,7 +63,7 @@ public class ServiceException extends RuntimeException
   }
 
   /**
-   * Instantiates a new Service exception.
+   * Instantiates a new service exception.
    *
    * @param httpStatus the http status
    * @param errorCode  the error code
@@ -76,7 +76,7 @@ public class ServiceException extends RuntimeException
   }
 
   /**
-   * Instantiates a new Service exception.
+   * Instantiates a new service exception.
    *
    * @param httpStatus the http status
    * @param errorCode  the error code
@@ -89,7 +89,7 @@ public class ServiceException extends RuntimeException
   }
 
   /**
-   * Instantiates a new Service exception.
+   * Instantiates a new service exception.
    *
    * @param httpStatus the http status
    * @param errorCode  the error code

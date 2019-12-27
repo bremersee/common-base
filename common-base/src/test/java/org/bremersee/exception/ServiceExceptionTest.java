@@ -221,6 +221,11 @@ public class ServiceExceptionTest {
     assertNull(serviceException.getErrorCode());
 
     final String errorCode = "NF:5678";
+    serviceException = ServiceException.forbiddenWithErrorCode(errorCode);
+    assertNull(serviceException.getMessage());
+    assertEquals(errorCode, serviceException.getErrorCode());
+    assertEquals(403, serviceException.status());
+
     serviceException = ServiceException.forbiddenWithErrorCode(entityName, errorCode);
     assertEquals(
         String.format("Access to entity with identifier [%s] is forbidden.", entityName),

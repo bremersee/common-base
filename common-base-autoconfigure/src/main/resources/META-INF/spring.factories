@@ -4,10 +4,12 @@ org.bremersee.context.MessageSourceAutoConfiguration,\
 org.bremersee.exception.RestApiExceptionMapperAutoConfiguration,\
 \
 org.bremersee.web.servlet.ApiExceptionResolverAutoConfiguration,\
+org.bremersee.web.servlet.BaseCommonConvertersAutoConfiguration,\
 org.bremersee.web.servlet.CorsAutoConfiguration,\
 org.bremersee.security.authentication.AuthenticationSupportAutoConfiguration,\
 \
 org.bremersee.web.reactive.ApiExceptionHandlerAutoConfiguration,\
+org.bremersee.web.reactive.BaseCommonConvertersAutoConfiguration,\
 org.bremersee.web.reactive.CorsAutoConfiguration,\
 org.bremersee.security.authentication.ReactiveAuthenticationSupportAutoConfiguration,\
 \
