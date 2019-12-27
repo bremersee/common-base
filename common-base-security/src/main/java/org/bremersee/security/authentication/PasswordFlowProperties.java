@@ -1,3 +1,19 @@
+/*
+ * Copyright 2019 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.bremersee.security.authentication;
 
 import java.util.Arrays;
@@ -12,6 +28,8 @@ import org.springframework.util.StringUtils;
 
 /**
  * The password flow properties.
+ *
+ * @author Christian Bremer
  */
 public interface PasswordFlowProperties extends AccessTokenRetrieverProperties {
 
@@ -69,7 +87,7 @@ public interface PasswordFlowProperties extends AccessTokenRetrieverProperties {
   }
 
   /**
-   * Builder builder.
+   * Returns a builder for password flow properties.
    *
    * @return the builder
    */
@@ -78,7 +96,7 @@ public interface PasswordFlowProperties extends AccessTokenRetrieverProperties {
   }
 
   /**
-   * The type Builder.
+   * The builder implementation.
    */
   @ToString(exclude = {"clientSecret", "password"})
   @EqualsAndHashCode(exclude = {"clientSecret", "password"})
@@ -97,7 +115,7 @@ public interface PasswordFlowProperties extends AccessTokenRetrieverProperties {
     private MultiValueMap<String, String> additionalProperties = new LinkedMultiValueMap<>();
 
     /**
-     * Token endpoint builder.
+     * Sets token endpoint on builder.
      *
      * @param tokenEndpoint the token endpoint
      * @return the builder
@@ -108,7 +126,7 @@ public interface PasswordFlowProperties extends AccessTokenRetrieverProperties {
     }
 
     /**
-     * Client id builder.
+     * Sets client id on builder.
      *
      * @param clientId the client id
      * @return the builder
@@ -119,7 +137,7 @@ public interface PasswordFlowProperties extends AccessTokenRetrieverProperties {
     }
 
     /**
-     * Client secret builder.
+     * Sets client secret on builder.
      *
      * @param clientSecret the client secret
      * @return the builder
@@ -130,7 +148,7 @@ public interface PasswordFlowProperties extends AccessTokenRetrieverProperties {
     }
 
     /**
-     * Username builder.
+     * Sets username on builder.
      *
      * @param username the username
      * @return the builder
@@ -141,7 +159,7 @@ public interface PasswordFlowProperties extends AccessTokenRetrieverProperties {
     }
 
     /**
-     * Password builder.
+     * Sets password on builder.
      *
      * @param password the password
      * @return the builder
@@ -152,7 +170,7 @@ public interface PasswordFlowProperties extends AccessTokenRetrieverProperties {
     }
 
     /**
-     * Add builder.
+     * Adds an additional property on builder.
      *
      * @param key    the key
      * @param values the values
@@ -166,7 +184,7 @@ public interface PasswordFlowProperties extends AccessTokenRetrieverProperties {
     }
 
     /**
-     * From builder.
+     * Gets the values from the given password flow properties.
      *
      * @param passwordFlowProperties the password flow properties
      * @return the builder

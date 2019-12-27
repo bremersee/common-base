@@ -15,8 +15,8 @@ import org.springframework.context.annotation.Configuration;
 @AutoConfigureBefore({
     LdaptiveAutoConfiguration.class
 })
-@ConditionalOnClass(name = {
-    "org.ldaptive.provider.unboundid.UnboundIDProvider"
+@ConditionalOnClass({
+    org.ldaptive.provider.unboundid.UnboundIDProvider.class
 })
 @ConditionalOnProperty(
     prefix = "bremersee.ldaptive",

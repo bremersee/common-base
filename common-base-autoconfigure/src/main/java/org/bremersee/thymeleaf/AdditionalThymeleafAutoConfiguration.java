@@ -19,62 +19,83 @@ package org.bremersee.thymeleaf;
 import lombok.extern.slf4j.Slf4j;
 import org.bremersee.thymeleaf.AdditionalThymeleafProperties.ResolverProperties;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.event.EventListener;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.util.StringUtils;
 import org.thymeleaf.templateresolver.ITemplateResolver;
 
 /**
- * The abstract additional thymeleaf configuration.
+ * The additional thymeleaf auto configuration.
  *
  * @author Christian Bremer
  */
+@ConditionalOnClass({
+    org.bremersee.thymeleaf.TemplateResolver.class
+})
+@Configuration
+@EnableConfigurationProperties({
+    AdditionalThymeleafProperties.class
+})
 @Slf4j
-public abstract class AbstractAdditionalThymeleafConfiguration {
+public class AdditionalThymeleafAutoConfiguration {
 
-  private ApplicationContext applicationContext;
+  private ResourceLoader resourceLoader = new DefaultResourceLoader();
 
-  private AdditionalThymeleafProperties properties;
+  private final ApplicationContext applicationContext;
+
+  private final AdditionalThymeleafProperties properties;
 
   /**
-   * Instantiates a new additional thymeleaf configuration.
+   * Instantiates a new additional thymeleaf auto configuration.
    *
    * @param applicationContext the application context
    * @param properties         the properties
    */
-  public AbstractAdditionalThymeleafConfiguration(
-      final ApplicationContext applicationContext,
-      final AdditionalThymeleafProperties properties) {
+  public AdditionalThymeleafAutoConfiguration(
+      ApplicationContext applicationContext,
+      AdditionalThymeleafProperties properties) {
     this.applicationContext = applicationContext;
     this.properties = properties;
   }
 
   /**
-   * The resource loader.
+   * Sets resource loader.
    *
-   * @return the resource loader
+   * @param resourceLoader the resource loader
    */
-  @SuppressWarnings("WeakerAccess")
-  protected ResourceLoader resourceLoader() {
-    return new DefaultResourceLoader();
+  @SuppressWarnings("unused")
+  public void setResourceLoader(ResourceLoader resourceLoader) {
+    if (resourceLoader != null) {
+      this.resourceLoader = resourceLoader;
+    }
   }
 
   /**
    * Register template resolver.
    */
-  // TODO
-  // @PostConstruct
+  @EventListener(ApplicationReadyEvent.class)
   public void registerTemplateResolver() {
+    log.info("\n"
+            + "*********************************************************************************\n"
+            + "* {}\n"
+            + "*********************************************************************************",
+        getClass().getSimpleName());
+
     if (applicationContext instanceof ConfigurableApplicationContext) {
-      final ConfigurableApplicationContext ctx = (ConfigurableApplicationContext) applicationContext;
-      final ConfigurableListableBeanFactory beanFactory = ctx.getBeanFactory();
+      ConfigurableApplicationContext ctx = (ConfigurableApplicationContext) applicationContext;
+      ConfigurableListableBeanFactory beanFactory = ctx.getBeanFactory();
       int index = properties.getResolverStartIndex() != null
           ? properties.getResolverStartIndex()
           : 2;
-      for (final ResolverProperties resolverProperties : properties.getResolvers()) {
-        final ITemplateResolver resolver = buildTemplateResolver(resolverProperties, index);
+      for (ResolverProperties resolverProperties : properties.getResolvers()) {
+        ITemplateResolver resolver = buildTemplateResolver(resolverProperties, index);
         beanFactory.registerSingleton("additionalTemplateResolver" + index, resolver);
         index++;
       }
@@ -91,12 +112,11 @@ public abstract class AbstractAdditionalThymeleafConfiguration {
    * @param index              the index
    * @return the template resolver
    */
-  @SuppressWarnings("WeakerAccess")
   protected ITemplateResolver buildTemplateResolver(
       final ResolverProperties resolverProperties,
       final int index) {
 
-    final TemplateResolver templateResolver = new TemplateResolver(resourceLoader());
+    final TemplateResolver templateResolver = new TemplateResolver(resourceLoader);
     templateResolver.setCacheable(resolverProperties.isCacheable());
     if (!resolverProperties.getCacheablePatterns().isEmpty()) {
       templateResolver.setCacheablePatterns(resolverProperties.getCacheablePatterns());

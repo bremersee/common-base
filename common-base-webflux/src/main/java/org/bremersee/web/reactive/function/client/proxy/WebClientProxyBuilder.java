@@ -48,6 +48,7 @@ public interface WebClientProxyBuilder {
    * @param functions the functions
    * @return the web client proxy builder
    */
+  @SuppressWarnings("unused")
   WebClientProxyBuilder commonFunctions(InvocationFunctions functions);
 
   /**
@@ -57,6 +58,7 @@ public interface WebClientProxyBuilder {
    * @param functions the functions
    * @return the web client proxy builder
    */
+  @SuppressWarnings("unused")
   WebClientProxyBuilder methodFunctions(Method method, InvocationFunctions functions);
 
   /**

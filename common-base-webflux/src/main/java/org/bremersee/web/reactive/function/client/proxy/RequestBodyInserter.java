@@ -64,10 +64,10 @@ public interface RequestBodyInserter {
             final Object value = args[i];
             if (matches(value, MultiValueMap.class, method,
                 MediaType.APPLICATION_FORM_URLENCODED)) {
-              //noinspection unchecked
+              //noinspection unchecked,rawtypes
               uriSpec.body(BodyInserters.fromFormData((MultiValueMap) value));
             } else if (matches(value, MultiValueMap.class, method, MediaType.MULTIPART_FORM_DATA)) {
-              //noinspection unchecked
+              //noinspection unchecked,rawtypes
               uriSpec.body(BodyInserters.fromMultipartData((MultiValueMap) value));
             } else if (value != null) {
               uriSpec.body(BodyInserters.fromValue(args[i]));

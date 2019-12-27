@@ -4,6 +4,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.util.StringUtils;
 
+/**
+ * The access token retriever authentication exception.
+ *
+ * @author Christian Bremer
+ */
 public class AccessTokenRetrieverAuthenticationException extends AuthenticationException
     implements HttpStatusAware {
 

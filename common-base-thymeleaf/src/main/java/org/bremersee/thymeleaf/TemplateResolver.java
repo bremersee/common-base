@@ -17,6 +17,7 @@
 package org.bremersee.thymeleaf;
 
 import java.util.Map;
+import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.ResourceLoader;
@@ -32,13 +33,14 @@ import org.thymeleaf.templateresource.ITemplateResource;
 @Slf4j
 public class TemplateResolver extends AbstractConfigurableTemplateResolver {
 
-  private ResourceLoader resourceLoader = new DefaultResourceLoader();
+  private final ResourceLoader resourceLoader;
 
   /**
    * Instantiates a new template resolver.
    */
   @SuppressWarnings("unused")
   public TemplateResolver() {
+    this(null);
   }
 
   /**
@@ -46,12 +48,9 @@ public class TemplateResolver extends AbstractConfigurableTemplateResolver {
    *
    * @param resourceLoader the resource loader
    */
-  @SuppressWarnings("WeakerAccess")
   public TemplateResolver(ResourceLoader resourceLoader) {
-    if (resourceLoader != null) {
-      this.resourceLoader = resourceLoader;
-    }
-    log.info("MailTemplateResolver (prefix={})", getPrefix());
+    this.resourceLoader = Objects.requireNonNullElseGet(resourceLoader, DefaultResourceLoader::new);
+    log.info("TemplateResolver (prefix={})", getPrefix());
   }
 
   @Override

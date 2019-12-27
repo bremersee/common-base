@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 the original author or authors.
+ * Copyright 2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,13 +36,13 @@ public class MediaTypeHelperTest {
   @Test
   public void testMediaTypeHelper() {
     assertTrue(MediaTypeHelper.canContentTypeBeJson(MediaTypeHelper.toString(Arrays.asList(
-        MediaType.IMAGE_JPEG, MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON_UTF8))));
+        MediaType.IMAGE_JPEG, MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON))));
     assertFalse(MediaTypeHelper.canContentTypeBeJson(MediaTypeHelper.toString(Arrays.asList(
         MediaType.IMAGE_JPEG, MediaType.APPLICATION_XML))));
     assertTrue(MediaTypeHelper.canContentTypeBeXml(MediaTypeHelper.toString(Arrays.asList(
         MediaType.IMAGE_JPEG, MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML))));
     assertFalse(MediaTypeHelper.canContentTypeBeXml(MediaTypeHelper.toString(Arrays.asList(
-        MediaType.IMAGE_JPEG, MediaType.APPLICATION_JSON_UTF8))));
+        MediaType.IMAGE_JPEG, MediaType.APPLICATION_JSON))));
   }
 
 }

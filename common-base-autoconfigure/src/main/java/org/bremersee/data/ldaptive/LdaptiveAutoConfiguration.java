@@ -39,9 +39,9 @@ import org.springframework.context.event.EventListener;
  * @author Christian Bremer
  */
 @Configuration
-@ConditionalOnClass(name = {
-    "org.ldaptive.DefaultConnectionFactory",
-    "org.bremersee.data.ldaptive.LdaptiveTemplate"
+@ConditionalOnClass({
+    org.ldaptive.DefaultConnectionFactory.class,
+    org.bremersee.data.ldaptive.LdaptiveTemplate.class
 })
 @ConditionalOnProperty(prefix = "bremersee.ldaptive", name = "enabled", havingValue = "true")
 @EnableConfigurationProperties(LdaptiveProperties.class)

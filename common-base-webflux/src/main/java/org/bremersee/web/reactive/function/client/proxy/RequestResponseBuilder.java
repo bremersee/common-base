@@ -60,15 +60,17 @@ public interface RequestResponseBuilder {
       final Class<?> responseClass = method.getReturnType();
       if (Mono.class.isAssignableFrom(responseClass)) {
         final Class<?> typeClass = resolveReturnTypeArgument(method, Mono.class);
+        //noinspection ConstantConditions
         return responseSpec.bodyToMono(typeClass);
       }
       if (Flux.class.isAssignableFrom(responseClass)) {
         final Class<?> typeClass = resolveReturnTypeArgument(method, Flux.class);
+        //noinspection ConstantConditions
         return responseSpec.bodyToFlux(typeClass);
       }
       throw ServiceException.internalServerError(
           "Response class must be Mono or Flux.",
-          "org.bremersee:common-base-reactive:e3716a97-f1c9-4c70-9eac-d966284d528c");
+          "org.bremersee:common-base-webflux:e3716a97-f1c9-4c70-9eac-d966284d528c");
     }
   }
 

@@ -102,7 +102,7 @@ public interface RequestUriSpecBuilder {
       }
       throw ServiceException.internalServerError("Cannot find request method on method '"
               + method.getName() + "'.",
-          "org.bremersee:common-base-reactive:5222f2b4-1810-41bf-acfc-37988571304b");
+          "org.bremersee:common-base-webflux:5222f2b4-1810-41bf-acfc-37988571304b");
     }
   }
 

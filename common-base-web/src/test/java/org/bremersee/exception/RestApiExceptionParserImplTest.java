@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 the original author or authors.
+ * Copyright 2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -66,7 +66,7 @@ public class RestApiExceptionParserImplTest {
     final RestApiException actual = new RestApiExceptionParserImpl()
         .parseException(
             getJsonMapper().writeValueAsString(expected),
-            buildHttpHeaders(MediaType.APPLICATION_JSON_UTF8, null));
+            buildHttpHeaders(MediaType.APPLICATION_JSON, null));
     log.info("Actual:   {}", actual);
     assertNotNull(actual);
     assertEquals(expected, actual);
@@ -172,10 +172,20 @@ public class RestApiExceptionParserImplTest {
     return httpHeaders;
   }
 
+  /**
+   * Returns json mapper.
+   *
+   * @return the json mapper
+   */
   private static ObjectMapper getJsonMapper() {
     return Jackson2ObjectMapperBuilder.json().build();
   }
 
+  /**
+   * Returns xml mapper.
+   *
+   * @return the xml mapper
+   */
   private static XmlMapper getXmlMapper() {
     return Jackson2ObjectMapperBuilder.xml().createXmlMapper(true).build();
   }

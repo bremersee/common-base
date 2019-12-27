@@ -22,11 +22,11 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.nio.charset.StandardCharsets;
+import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.util.Assert;
-import org.springframework.util.StringUtils;
 import org.thymeleaf.templateresource.ITemplateResource;
 
 /**
@@ -37,11 +37,11 @@ import org.thymeleaf.templateresource.ITemplateResource;
 @Slf4j
 public class TemplateResource implements ITemplateResource {
 
-  private ResourceLoader resourceLoader = new DefaultResourceLoader();
+  private final ResourceLoader resourceLoader;
 
-  private String path;
+  private final String path;
 
-  private String characterEncoding = StandardCharsets.UTF_8.name();
+  private final String characterEncoding;
 
   /**
    * Instantiates a new template resource.
@@ -86,40 +86,17 @@ public class TemplateResource implements ITemplateResource {
    * @param characterEncoding the character encoding
    * @param resourceLoader    the resource loader
    */
-  @SuppressWarnings("WeakerAccess")
   public TemplateResource(
       String path,
       String characterEncoding,
       ResourceLoader resourceLoader) {
     this.path = path;
-    setCharacterEncoding(characterEncoding);
-    setResourceLoader(resourceLoader);
-    log.info("MailTemplateResource (path={}, characterEncoding={})",
+    this.characterEncoding = Objects.requireNonNullElse(
+        characterEncoding, StandardCharsets.UTF_8.name());
+    this.resourceLoader = Objects.requireNonNullElseGet(
+        resourceLoader, DefaultResourceLoader::new);
+    log.info("TemplateResource (path={}, characterEncoding={})",
         this.path, this.characterEncoding);
-  }
-
-  /**
-   * Sets resource loader.
-   *
-   * @param resourceLoader the resource loader
-   */
-  @SuppressWarnings("WeakerAccess")
-  public void setResourceLoader(ResourceLoader resourceLoader) {
-    if (resourceLoader != null) {
-      this.resourceLoader = resourceLoader;
-    }
-  }
-
-  /**
-   * Sets character encoding.
-   *
-   * @param characterEncoding the character encoding
-   */
-  @SuppressWarnings("WeakerAccess")
-  public void setCharacterEncoding(String characterEncoding) {
-    if (StringUtils.hasText(characterEncoding)) {
-      this.characterEncoding = characterEncoding;
-    }
   }
 
   @Override

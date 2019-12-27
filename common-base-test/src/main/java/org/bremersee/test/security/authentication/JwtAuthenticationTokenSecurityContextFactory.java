@@ -25,6 +25,7 @@ import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.TreeMap;
+import lombok.extern.slf4j.Slf4j;
 import org.bremersee.security.authentication.KeycloakJwtConverter;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
@@ -40,6 +41,7 @@ import org.springframework.util.StringUtils;
  *
  * @author Christian Bremer
  */
+@Slf4j
 public class JwtAuthenticationTokenSecurityContextFactory
     implements WithSecurityContextFactory<WithJwtAuthenticationToken> {
 
@@ -57,8 +59,10 @@ public class JwtAuthenticationTokenSecurityContextFactory
   private Converter<Jwt, ? extends AbstractAuthenticationToken> createJwtConverter(
       WithJwtAuthenticationToken withJwtAuthenticationToken) {
     try {
-      return withJwtAuthenticationToken.jwtConverterFactory().newInstance().createJwtConverter();
+      return withJwtAuthenticationToken.jwtConverterFactory()
+          .getDeclaredConstructor().newInstance().createJwtConverter();
     } catch (Exception e) {
+      log.warn("Getting jwt converter from factory failed. Returning 'KeycloakJwtConverter'.", e);
       return new KeycloakJwtConverter();
     }
   }

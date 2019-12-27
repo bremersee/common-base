@@ -28,6 +28,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.thymeleaf.templatemode.TemplateMode;
 
 /**
@@ -35,7 +36,7 @@ import org.thymeleaf.templatemode.TemplateMode;
  *
  * @author Christian Bremer
  */
-// @ConfigurationProperties("bremersee.thymeleaf") // TODO
+@ConfigurationProperties("bremersee.thymeleaf")
 @Getter
 @Setter
 @ToString

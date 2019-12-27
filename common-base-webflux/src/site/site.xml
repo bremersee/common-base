@@ -2,7 +2,7 @@
 <project xmlns="http://maven.apache.org/DECORATION/1.8.0"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/DECORATION/1.8.0 http://maven.apache.org/xsd/decoration-1.8.0.xsd"
-	name="Common Base Reactive"
+	name="Common Base Webflux"
 	combine.self="override">
 	<skin>
 		<groupId>org.apache.maven.skins</groupId>
@@ -28,6 +28,7 @@
       <href>${project.organization.url}</href>
   </bannerRight>
   -->
+	<!--suppress XmlDefaultAttributeValue -->
 	<version position="left"/>
 	<publishDate position="right" format="dd.MM.yyyy HH:mm:SS"/>
 	<poweredBy>

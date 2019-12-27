@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 the original author or authors.
+ * Copyright 2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,17 +43,18 @@ public class WebClientAccessTokenRetriever
   private final WebClient webClient;
 
   /**
-   * Instantiates a new password flow access token retriever.
+   * Instantiates a new access token retriever that uses spring's web client.
    */
   public WebClientAccessTokenRetriever() {
     this.webClient = WebClient.builder().build();
   }
 
   /**
-   * Instantiates a new password flow access token retriever.
+   * Instantiates a new access token retriever that uses spring's web client.
    *
    * @param webClient the web client
    */
+  @SuppressWarnings("unused")
   public WebClientAccessTokenRetriever(
       final WebClient webClient) {
     this.webClient = webClient;
