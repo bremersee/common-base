@@ -1,3 +1,15 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+\
 org.bremersee.context.MessageSourceAutoConfiguration,\
-org.bremersee.exception.RestApiExceptionMapperAutoConfiguration
+org.bremersee.exception.RestApiExceptionMapperAutoConfiguration,\
+\
+org.bremersee.web.servlet.ApiExceptionResolverAutoConfiguration,\
+org.bremersee.web.servlet.CorsAutoConfiguration,\
+org.bremersee.security.authentication.AuthenticationSupportAutoConfiguration,\
+\
+org.bremersee.web.reactive.ApiExceptionHandlerAutoConfiguration,\
+org.bremersee.web.reactive.CorsAutoConfiguration,\
+org.bremersee.security.authentication.ReactiveAuthenticationSupportAutoConfiguration,\
+\
+org.bremersee.data.ldaptive.UnboundIdProviderAutoConfiguration,\
+org.bremersee.data.ldaptive.LdaptiveAutoConfiguration

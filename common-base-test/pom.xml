@@ -19,7 +19,7 @@
   <dependencies>
     <dependency>
       <groupId>org.bremersee</groupId>
-      <artifactId>common-base</artifactId>
+      <artifactId>common-base-security</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>

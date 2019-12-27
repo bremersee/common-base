@@ -1,3 +1,0 @@
-org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-org.bremersee.data.ldaptive.UnboundIdProviderAutoConfiguration,\
-org.bremersee.data.ldaptive.LdaptiveAutoConfiguration

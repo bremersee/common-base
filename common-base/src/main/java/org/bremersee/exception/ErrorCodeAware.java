@@ -26,6 +26,11 @@ import org.springframework.lang.Nullable;
 public interface ErrorCodeAware {
 
   /**
+   * The default value of the 'code' attribute.
+   */
+  String NO_ERROR_CODE_VALUE = "UNSPECIFIED";
+
+  /**
    * Gets the error code.
    *
    * @return the error code

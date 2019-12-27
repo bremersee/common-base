@@ -1,4 +1,0 @@
-org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-org.bremersee.web.servlet.ApiExceptionResolverAutoConfiguration,\
-org.bremersee.web.servlet.CorsAutoConfiguration,\
-org.bremersee.security.authentication.AuthenticationSupportAutoConfiguration

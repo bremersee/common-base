@@ -103,6 +103,7 @@ public class LdaptiveException extends ServiceException implements HttpStatusAwa
    *
    * @return the result code
    */
+  @SuppressWarnings("unused")
   public ResultCode getResultCode() {
     final LdapException ldapException = getLdapException();
     return ldapException != null ? ldapException.getResultCode() : null;

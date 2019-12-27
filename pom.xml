@@ -20,15 +20,16 @@
 
   <modules>
     <module>common-base</module>
+    <module>common-base-web</module>
+    <module>common-base-webmvc</module>
+    <module>common-base-security</module>
     <module>common-base-test</module>
-    <module>common-base-autoconfigure</module>
-    <module>common-base-starter</module>
+    <module>common-base-webflux</module>
+    <module>common-base-feign</module>
     <module>common-base-ldaptive</module>
-    <module>common-base-ldaptive-autoconfigure</module>
+    <module>common-base-thymeleaf</module>
+    <module>common-base-autoconfigure</module>
     <module>common-base-ldaptive-starter</module>
-    <module>common-base-reactive</module>
-    <module>common-base-reactive-autoconfigure</module>
-    <module>common-base-servlet-autoconfigure</module>
   </modules>
 
   <properties>
