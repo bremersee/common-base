@@ -23,18 +23,19 @@ import lombok.ToString;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**
- * OAuth2 configuration properties.
+ * Authentication properties.
  *
  * @author Christian Bremer
  */
-@ConfigurationProperties(prefix = "bremersee.security.authentication") // TODO changed from bremersee.security.oauth2
+@ConfigurationProperties(prefix = "bremersee.security.authentication")
 @Getter
 @Setter
 @ToString
 @EqualsAndHashCode
 public class AuthenticationProperties {
 
-  private boolean usePasswordFlowAuthenticationManager = true; // TODO
+  // TODO do we want a switch?
+  //private boolean usePasswordFlowAuthenticationManager = true;
 
   /**
    * The properties for the oauth2 password flow.
