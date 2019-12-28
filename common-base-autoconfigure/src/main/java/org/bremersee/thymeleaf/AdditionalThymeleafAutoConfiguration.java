@@ -18,17 +18,20 @@ package org.bremersee.thymeleaf;
 
 import lombok.extern.slf4j.Slf4j;
 import org.bremersee.thymeleaf.AdditionalThymeleafProperties.ResolverProperties;
-import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
+import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.boot.autoconfigure.AutoConfigureAfter;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
+import org.springframework.boot.autoconfigure.thymeleaf.ThymeleafAutoConfiguration;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.event.EventListener;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.ResourceLoader;
+import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
+import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.templateresolver.ITemplateResolver;
 
 /**
@@ -37,8 +40,13 @@ import org.thymeleaf.templateresolver.ITemplateResolver;
  * @author Christian Bremer
  */
 @ConditionalOnClass({
-    org.bremersee.thymeleaf.TemplateResolver.class
+    org.bremersee.thymeleaf.TemplateResolver.class,
+    org.thymeleaf.TemplateEngine.class
 })
+@ConditionalOnBean({
+    TemplateEngine.class
+})
+@AutoConfigureAfter(ThymeleafAutoConfiguration.class)
 @Configuration
 @EnableConfigurationProperties({
     AdditionalThymeleafProperties.class
@@ -48,21 +56,21 @@ public class AdditionalThymeleafAutoConfiguration {
 
   private ResourceLoader resourceLoader = new DefaultResourceLoader();
 
-  private final ApplicationContext applicationContext;
-
   private final AdditionalThymeleafProperties properties;
+
+  private TemplateEngine templateEngine;
 
   /**
    * Instantiates a new additional thymeleaf auto configuration.
    *
-   * @param applicationContext the application context
-   * @param properties         the properties
+   * @param properties     the properties
+   * @param templateEngine the template engine
    */
   public AdditionalThymeleafAutoConfiguration(
-      ApplicationContext applicationContext,
-      AdditionalThymeleafProperties properties) {
-    this.applicationContext = applicationContext;
+      AdditionalThymeleafProperties properties,
+      ObjectProvider<TemplateEngine> templateEngine) {
     this.properties = properties;
+    this.templateEngine = templateEngine.getIfAvailable();
   }
 
   /**
@@ -85,23 +93,20 @@ public class AdditionalThymeleafAutoConfiguration {
     log.info("\n"
             + "*********************************************************************************\n"
             + "* {}\n"
+            + "*********************************************************************************\n"
+            + "* resolvers size = {}\n"
             + "*********************************************************************************",
-        getClass().getSimpleName());
+        getClass().getSimpleName(),
+        properties.getResolvers().size());
 
-    if (applicationContext instanceof ConfigurableApplicationContext) {
-      ConfigurableApplicationContext ctx = (ConfigurableApplicationContext) applicationContext;
-      ConfigurableListableBeanFactory beanFactory = ctx.getBeanFactory();
-      int index = properties.getResolverStartIndex() != null
-          ? properties.getResolverStartIndex()
-          : 2;
-      for (ResolverProperties resolverProperties : properties.getResolvers()) {
-        ITemplateResolver resolver = buildTemplateResolver(resolverProperties, index);
-        beanFactory.registerSingleton("additionalTemplateResolver" + index, resolver);
-        index++;
-      }
-    } else {
-      log.warn("Application context is not an instance of 'ConfigurableApplicationContext', "
-          + "no additional thymeleaf template resolver beans will be added to the context.");
+    Assert.notNull(templateEngine, "Template engine must be present.");
+    int index = templateEngine.getTemplateResolvers() != null
+        ? templateEngine.getTemplateResolvers().size()
+        : 0;
+    for (ResolverProperties resolverProperties : properties.getResolvers()) {
+      ITemplateResolver resolver = buildTemplateResolver(resolverProperties, index);
+      templateEngine.addTemplateResolver(resolver);
+      index++;
     }
   }
 
@@ -116,6 +121,8 @@ public class AdditionalThymeleafAutoConfiguration {
       final ResolverProperties resolverProperties,
       final int index) {
 
+    log.info("Building thymeleaf resolver template with index {} and properties {}",
+        index, properties);
     final TemplateResolver templateResolver = new TemplateResolver(resourceLoader);
     templateResolver.setCacheable(resolverProperties.isCacheable());
     if (!resolverProperties.getCacheablePatterns().isEmpty()) {
@@ -141,15 +148,13 @@ public class AdditionalThymeleafAutoConfiguration {
     }
     if (StringUtils.hasText(resolverProperties.getName())) {
       templateResolver.setName(resolverProperties.getName());
+    } else {
+      templateResolver.setName("AdditionalThymeleafTemplateResolverNo" + index);
     }
     if (!resolverProperties.getNonCacheablePatterns().isEmpty()) {
       templateResolver.setNonCacheablePatterns(resolverProperties.getNonCacheablePatterns());
     }
-    if (resolverProperties.getOrder() != null) {
-      templateResolver.setOrder(resolverProperties.getOrder());
-    } else {
-      templateResolver.setOrder(index);
-    }
+    templateResolver.setOrder(index);
     if (StringUtils.hasText(resolverProperties.getPrefix())) {
       templateResolver.setPrefix(resolverProperties.getPrefix());
     }

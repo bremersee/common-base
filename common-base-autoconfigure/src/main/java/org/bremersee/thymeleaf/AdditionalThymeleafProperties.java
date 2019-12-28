@@ -43,8 +43,6 @@ import org.thymeleaf.templatemode.TemplateMode;
 @EqualsAndHashCode
 public class AdditionalThymeleafProperties {
 
-  private Integer resolverStartIndex = 2;
-
   private List<ResolverProperties> resolvers = new ArrayList<>();
 
   /**
@@ -79,8 +77,6 @@ public class AdditionalThymeleafProperties {
     private String name;
 
     private Set<String> nonCacheablePatterns = new LinkedHashSet<>();
-
-    private Integer order;
 
     private String prefix = "classpath:"; // important
 

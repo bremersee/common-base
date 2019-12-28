@@ -49,7 +49,6 @@ public class TemplateResolver extends AbstractConfigurableTemplateResolver {
    */
   public TemplateResolver(ResourceLoader resourceLoader) {
     this.resourceLoader = resourceLoader != null ? resourceLoader : new DefaultResourceLoader();
-    log.info("TemplateResolver (prefix={})", getPrefix());
   }
 
   @Override
