@@ -21,6 +21,7 @@
       <groupId>org.bremersee</groupId>
       <artifactId>common-base-security</artifactId>
       <version>${project.version}</version>
+      <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>org.springframework.boot</groupId>
