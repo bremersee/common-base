@@ -19,11 +19,11 @@ import org.springframework.util.Assert;
 @ConditionalOnWebApplication(type = Type.SERVLET)
 @ConditionalOnProperty(
     prefix = "bremersee.security.authentication",
-    name = "enable-keycloak-support",
+    name = "enable-jwt-support",
     havingValue = "true")
 @ConditionalOnClass({
     org.springframework.boot.web.client.RestTemplateBuilder.class,
-    org.bremersee.security.authentication.KeycloakJwtConverter.class,
+    org.bremersee.security.authentication.JsonPathJwtConverter.class,
     org.bremersee.security.authentication.RestTemplateAccessTokenRetriever.class
 })
 @EnableConfigurationProperties(AuthenticationProperties.class)
@@ -43,15 +43,32 @@ public class AuthenticationSupportAutoConfiguration {
     log.info("\n"
             + "*********************************************************************************\n"
             + "* {}\n"
+            + "*********************************************************************************\n"
+            + "* rolesJsonPath = {}\n"
+            + "* rolesValueList = {}\n"
+            + "* rolesValueSeparator = {}\n"
+            + "* rolePrefix = {}\n"
+            + "* nameJsonPath = {}\n"
             + "*********************************************************************************",
-        getClass().getSimpleName());
+        getClass().getSimpleName(),
+        properties.getRolesJsonPath(),
+        properties.isRolesValueList(),
+        properties.getRolesValueSeparator(),
+        properties.getRolePrefix(),
+        properties.getNameJsonPath());
   }
 
   @ConditionalOnMissingBean
   @Bean
-  public KeycloakJwtConverter keycloakJwtConverter() {
-    log.info("Creating {} ...", KeycloakJwtConverter.class.getSimpleName());
-    return new KeycloakJwtConverter();
+  public JsonPathJwtConverter jsonPathJwtConverter() {
+    log.info("Creating {} ...", JsonPathJwtConverter.class.getSimpleName());
+    JsonPathJwtConverter converter = new JsonPathJwtConverter();
+    converter.setNameJsonPath(properties.getNameJsonPath());
+    converter.setRolePrefix(properties.getRolePrefix());
+    converter.setRolesJsonPath(properties.getRolesJsonPath());
+    converter.setRolesValueList(properties.isRolesValueList());
+    converter.setRolesValueSeparator(properties.getRolesValueSeparator());
+    return converter;
   }
 
   @ConditionalOnMissingBean
@@ -70,7 +87,7 @@ public class AuthenticationSupportAutoConfiguration {
   @Bean
   public PasswordFlowAuthenticationManager passwordFlowAuthenticationManager(
       ObjectProvider<JwtDecoder> jwtDecoder,
-      KeycloakJwtConverter jwtConverter,
+      JsonPathJwtConverter jwtConverter,
       RestTemplateAccessTokenRetriever tokenRetriever) {
 
     Assert.notNull(

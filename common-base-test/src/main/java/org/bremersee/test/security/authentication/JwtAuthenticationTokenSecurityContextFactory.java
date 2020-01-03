@@ -26,7 +26,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.TreeMap;
 import lombok.extern.slf4j.Slf4j;
-import org.bremersee.security.authentication.KeycloakJwtConverter;
+import org.bremersee.security.authentication.JsonPathJwtConverter;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -57,14 +57,14 @@ public class JwtAuthenticationTokenSecurityContextFactory
   }
 
   private Converter<Jwt, ? extends AbstractAuthenticationToken> createJwtConverter(
-      WithJwtAuthenticationToken withJwtAuthenticationToken) {
-    try {
-      return withJwtAuthenticationToken.jwtConverterFactory()
-          .getDeclaredConstructor().newInstance().createJwtConverter();
-    } catch (Exception e) {
-      log.warn("Getting jwt converter from factory failed. Returning 'KeycloakJwtConverter'.", e);
-      return new KeycloakJwtConverter();
-    }
+      WithJwtAuthenticationToken contextConfig) {
+    JsonPathJwtConverter converter = new JsonPathJwtConverter();
+    converter.setRolesValueSeparator(contextConfig.jwtConverter().rolesValueSeparator());
+    converter.setRolePrefix(contextConfig.jwtConverter().rolePrefix());
+    converter.setNameJsonPath(contextConfig.jwtConverter().nameJsonPath());
+    converter.setRolesJsonPath(contextConfig.jwtConverter().rolesJsonPath());
+    converter.setRolesValueList(contextConfig.jwtConverter().rolesValueList());
+    return converter;
   }
 
   private JWT createJwt(WithJwtAuthenticationToken tokenValues) {

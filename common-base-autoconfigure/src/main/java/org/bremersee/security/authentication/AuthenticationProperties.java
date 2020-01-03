@@ -47,12 +47,37 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 public class AuthenticationProperties {
 
   /**
-   * Specifies whether Keycloak JWT beans should be created or not. Default is {@code false}.
+   * Specifies whether JWT beans should be created or not. Default is {@code false}.
    *
    * @see AuthenticationSupportAutoConfiguration
    * @see ReactiveAuthenticationSupportAutoConfiguration
    */
-  private boolean enableKeycloakSupport = false;
+  private boolean enableJwtSupport = false;
+
+  /**
+   * The json path in the JWT to the roles.
+   */
+  private String rolesJsonPath = "$.realm_access.roles";
+
+  /**
+   * Specifies whether the roles value is a list (json array) or a simple string.
+   */
+  private boolean rolesValueList = true;
+
+  /**
+   * The role value separator to use if the role value is a simple string.
+   */
+  private String rolesValueSeparator = " ";
+
+  /**
+   * The role prefix to add.
+   */
+  private String rolePrefix = "ROLE_";
+
+  /**
+   * The json path in the JWT to the user name.
+   */
+  private String nameJsonPath = "$.preferred_username";
 
   /**
    * Properties for actuator endpoints.

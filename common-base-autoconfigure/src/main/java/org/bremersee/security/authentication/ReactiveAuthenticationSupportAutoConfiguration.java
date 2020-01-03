@@ -18,10 +18,10 @@ import org.springframework.util.Assert;
 @ConditionalOnWebApplication(type = Type.REACTIVE)
 @ConditionalOnProperty(
     prefix = "bremersee.security.authentication",
-    name = "enable-keycloak-support",
+    name = "enable-jwt-support",
     havingValue = "true")
 @ConditionalOnClass({
-    org.bremersee.security.authentication.KeycloakReactiveJwtConverter.class,
+    org.bremersee.security.authentication.JsonPathReactiveJwtConverter.class,
     org.bremersee.security.authentication.WebClientAccessTokenRetriever.class
 })
 @EnableConfigurationProperties(AuthenticationProperties.class)
@@ -41,15 +41,32 @@ public class ReactiveAuthenticationSupportAutoConfiguration {
     log.info("\n"
             + "*********************************************************************************\n"
             + "* {}\n"
+            + "*********************************************************************************\n"
+            + "* rolesJsonPath = {}\n"
+            + "* rolesValueList = {}\n"
+            + "* rolesValueSeparator = {}\n"
+            + "* rolePrefix = {}\n"
+            + "* nameJsonPath = {}\n"
             + "*********************************************************************************",
-        getClass().getSimpleName());
+        getClass().getSimpleName(),
+        properties.getRolesJsonPath(),
+        properties.isRolesValueList(),
+        properties.getRolesValueSeparator(),
+        properties.getRolePrefix(),
+        properties.getNameJsonPath());
   }
 
   @ConditionalOnMissingBean
   @Bean
-  public KeycloakReactiveJwtConverter keycloakReactiveJwtConverter() {
-    log.info("Creating {} ...", KeycloakReactiveJwtConverter.class.getSimpleName());
-    return new KeycloakReactiveJwtConverter();
+  public JsonPathReactiveJwtConverter jsonPathReactiveJwtConverter() {
+    log.info("Creating {} ...", JsonPathReactiveJwtConverter.class.getSimpleName());
+    JsonPathJwtConverter converter = new JsonPathJwtConverter();
+    converter.setNameJsonPath(properties.getNameJsonPath());
+    converter.setRolePrefix(properties.getRolePrefix());
+    converter.setRolesJsonPath(properties.getRolesJsonPath());
+    converter.setRolesValueList(properties.isRolesValueList());
+    converter.setRolesValueSeparator(properties.getRolesValueSeparator());
+    return new JsonPathReactiveJwtConverter(converter);
   }
 
   @ConditionalOnMissingBean
@@ -63,7 +80,7 @@ public class ReactiveAuthenticationSupportAutoConfiguration {
   @Bean
   public PasswordFlowReactiveAuthenticationManager passwordFlowReactiveAuthenticationManager(
       ObjectProvider<ReactiveJwtDecoder> jwtDecoder,
-      KeycloakReactiveJwtConverter jwtConverter,
+      JsonPathReactiveJwtConverter jwtConverter,
       WebClientAccessTokenRetriever tokenRetriever) {
 
     Assert.notNull(jwtDecoder.getIfAvailable(), "Jwt decoder must be present.");
