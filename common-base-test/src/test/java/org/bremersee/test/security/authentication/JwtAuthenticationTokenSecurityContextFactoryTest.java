@@ -7,12 +7,12 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.util.List;
-import org.bremersee.security.authentication.KeycloakJwtAuthenticationToken;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -40,8 +40,8 @@ public class JwtAuthenticationTokenSecurityContextFactoryTest {
   public void createSecurityContext() {
     Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
     assertNotNull(authentication);
-    assertTrue(authentication instanceof KeycloakJwtAuthenticationToken);
-    KeycloakJwtAuthenticationToken authToken = (KeycloakJwtAuthenticationToken) authentication;
+    assertTrue(authentication instanceof JwtAuthenticationToken);
+    JwtAuthenticationToken authToken = (JwtAuthenticationToken) authentication;
     assertEquals("account", authToken.getToken().getClaimAsString("aud"));
     assertEquals(
         "https://openid.dev.bremersee.org/auth/realms/omnia",
@@ -57,7 +57,7 @@ public class JwtAuthenticationTokenSecurityContextFactoryTest {
         authToken.getToken().getClaimAsString("name"));
     assertEquals(
         "anna",
-        authToken.getPreferredName());
+        authToken.getName());
     assertEquals(
         "Anna Livia",
         authToken.getToken().getClaimAsString("given_name"));

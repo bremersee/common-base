@@ -37,11 +37,11 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 
 /**
- * The keycloak jwt converter test.
+ * The json path jwt converter test.
  *
  * @author Christian Bremer
  */
-public class KeycloakJwtConverterTest {
+public class JsonPathJwtConverterTest {
 
   /**
    * Convert jwt.
@@ -65,7 +65,8 @@ public class KeycloakJwtConverterTest {
     builder.notBeforeTime(iat);
     builder.subject(sub);
 
-    builder.claim("scopes", "email profile");
+    builder.claim("sub", "livia");
+    builder.claim("scope", "email profile");
     builder.claim("email_verified", false);
     builder.claim("name", "Anna Livia Plurabelle");
     builder.claim("preferred_username", "anna");
@@ -84,13 +85,33 @@ public class KeycloakJwtConverterTest {
         exp.toInstant(),
         headers,
         claimsSet.getClaims());
-    KeycloakJwtConverter converter = new KeycloakJwtConverter();
-    KeycloakJwtAuthenticationToken auth = (KeycloakJwtAuthenticationToken) converter.convert(jwt);
+
+    JsonPathJwtConverter converter = new JsonPathJwtConverter();
+    converter.setRolesValueList(true);
+    converter.setRolesJsonPath("$.realm_access.roles");
+    converter.setNameJsonPath("$.preferred_username");
+    converter.setRolePrefix("ROLE_");
+    JwtAuthenticationToken auth = converter.convert(jwt);
     assertNotNull(auth);
-    assertEquals("anna", auth.getPreferredName());
+    assertEquals("anna", auth.getName());
     assertTrue(auth.getAuthorities().stream()
         .anyMatch(grantedAuthority -> grantedAuthority.getAuthority()
             .equalsIgnoreCase("ROLE_LOCAL_USER")));
+
+    converter.setRolesValueList(false);
+    converter.setRolesJsonPath("$.scope");
+    converter.setNameJsonPath("$.sub");
+    converter.setRolePrefix("SCOPE_");
+    converter.setRolesValueSeparator(" ");
+    auth = converter.convert(jwt);
+    assertNotNull(auth);
+    assertEquals("livia", auth.getName());
+    assertTrue(auth.getAuthorities().stream()
+        .anyMatch(grantedAuthority -> grantedAuthority.getAuthority()
+            .equalsIgnoreCase("SCOPE_EMAIL")));
+    assertTrue(auth.getAuthorities().stream()
+        .anyMatch(grantedAuthority -> grantedAuthority.getAuthority()
+            .equalsIgnoreCase("SCOPE_PROFILE")));
   }
 
   /**
@@ -107,7 +128,10 @@ public class KeycloakJwtConverterTest {
     Jwt jwt = mock(Jwt.class);
     when(jwt.getClaims()).thenReturn(claims);
 
-    final KeycloakJwtConverter converter = new KeycloakJwtConverter();
+    JsonPathJwtConverter converter = new JsonPathJwtConverter();
+    converter.setRolesValueList(true);
+    converter.setRolesJsonPath("$.realm_access.roles");
+    converter.setRolePrefix("ROLE_");
     final JwtAuthenticationToken authToken = converter.convert(jwt);
     assertNotNull(authToken);
     assertNotNull(authToken.getAuthorities());

@@ -22,20 +22,29 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtAut
 import reactor.core.publisher.Mono;
 
 /**
- * A reactive JWT converter for the keycloak identity provider. It use the json path {@code
- * $.realm_access.roles} to extract the roles from the token.
+ * The json path reactive jwt converter.
  *
  * @author Christian Bremer
  */
-public class KeycloakReactiveJwtConverter implements Converter<Jwt, Mono<JwtAuthenticationToken>> {
+public class JsonPathReactiveJwtConverter implements Converter<Jwt, Mono<JwtAuthenticationToken>> {
 
-  private final KeycloakJwtConverter converter;
+  private final JsonPathJwtConverter converter;
 
   /**
-   * Instantiates a new keycloak reactive jwt converter.
+   * Instantiates a new json path reactive jwt converter.
    */
-  public KeycloakReactiveJwtConverter() {
-    this.converter = new KeycloakJwtConverter();
+  @SuppressWarnings("unused")
+  public JsonPathReactiveJwtConverter() {
+    this(null);
+  }
+
+  /**
+   * Instantiates a new json path reactive jwt converter.
+   *
+   * @param converter the converter
+   */
+  public JsonPathReactiveJwtConverter(JsonPathJwtConverter converter) {
+    this.converter = converter != null ? converter : new JsonPathJwtConverter();
   }
 
   @Override
