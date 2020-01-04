@@ -113,14 +113,13 @@ public class TemplateResource implements ITemplateResource {
         ? path.substring(0, path.length() - 1)
         : path);
     final int slashPos = basePath.lastIndexOf('/');
+    final int dotPos = basePath.lastIndexOf('.');
     if (slashPos != -1) {
-      final int dotPos = basePath.lastIndexOf('.');
       if (dotPos != -1 && dotPos > slashPos + 1) {
         return basePath.substring(slashPos + 1, dotPos);
       }
       return basePath.substring(slashPos + 1);
     } else {
-      final int dotPos = basePath.lastIndexOf('.');
       if (dotPos != -1) {
         return basePath.substring(0, dotPos);
       }
