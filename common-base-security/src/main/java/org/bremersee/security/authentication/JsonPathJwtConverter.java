@@ -121,7 +121,6 @@ public class JsonPathJwtConverter implements Converter<Jwt, JwtAuthenticationTok
     }
     final Set<GrantedAuthority> authorities = roleValues.stream()
         .filter(roleName -> roleName.trim().length() > 0)
-        .map(String::toUpperCase)
         .map(roleName -> roleName.startsWith(rolePrefix) ? roleName : rolePrefix + roleName)
         .map(SimpleGrantedAuthority::new)
         .collect(Collectors.toSet());
