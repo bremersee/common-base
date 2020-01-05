@@ -14,8 +14,21 @@ pipeline {
       }
     }
     stage('Test') {
+      when {
+        not {
+          branch 'feature/*'
+        }
+      }
       steps {
         sh 'mvn -B clean test'
+      }
+    }
+    stage('Deploy Feature') {
+      when {
+        branch 'feature/*'
+      }
+      steps {
+        sh 'mvn -B -P feature,allow-features clean deploy'
       }
     }
     stage('Deploy') {
