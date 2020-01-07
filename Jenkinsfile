@@ -2,6 +2,9 @@ pipeline {
   agent {
     label 'maven'
   }
+  environment {
+    CODECOV_TOKEN = credentials('common-base-codecov-token')
+  }
   tools {
     jdk 'jdk11'
     maven 'm3'
@@ -49,6 +52,11 @@ pipeline {
       steps {
         sh 'mvn -B -P gh-pages-site clean site site:stage scm-publish:publish-scm'
       }
+      post {
+        always {
+          sh 'curl -s https://codecov.io/bash | bash -s - -t ${CODECOV_TOKEN}'
+        }
+      }
     }
     stage('Deploy Feature') {
       when {
@@ -61,7 +69,7 @@ pipeline {
         always {
           junit 'target/surefire-reports/*.xml'
           jacoco(
-              execPattern: '**/coverage-reports/*.exec'
+              execPattern: '**/target/coverage-reports/*.exec'
           )
         }
       }
