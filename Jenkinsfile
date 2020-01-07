@@ -65,14 +65,6 @@ pipeline {
       steps {
         sh 'mvn -B -P feature,allow-features clean deploy'
       }
-      post {
-        always {
-          junit 'target/surefire-reports/*.xml'
-          jacoco(
-              execPattern: '**/target/coverage-reports/*.exec'
-          )
-        }
-      }
     }
   }
 }
