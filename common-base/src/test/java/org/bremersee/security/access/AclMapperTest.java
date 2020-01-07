@@ -16,11 +16,11 @@
 
 package org.bremersee.security.access;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -28,14 +28,14 @@ import java.util.Collections;
 import org.bremersee.common.model.AccessControlEntry;
 import org.bremersee.common.model.AccessControlList;
 import org.bremersee.security.core.AuthorityConstants;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * The acl mapper test.
  *
  * @author Christian Bremer
  */
-public class AclMapperTest {
+class AclMapperTest {
 
   private static AclMapper<AclImpl> mapper = accessControlList -> new AclMapperImpl<>(AclImpl::new)
       .map(accessControlList);
@@ -44,17 +44,27 @@ public class AclMapperTest {
    * Tests default access control list.
    */
   @Test
-  public void defaultAccessControlList() {
+  void defaultAccessControlList() {
     AccessControlList acl = mapper.defaultAccessControlList("owner");
     assertNotNull(acl);
     assertEquals("owner", acl.getOwner());
   }
 
   /**
+   * Tests map acl.
+   */
+  @Test
+  void mapAcl() {
+    AccessControlList accessControlList = mapper.map(new AclImpl("owner", null));
+    assertEquals("owner", accessControlList.getOwner());
+  }
+
+
+  /**
    * Tests map.
    */
   @Test
-  public void map() {
+  void mapAccessControlList() {
     AccessControlList source = AccessControlList
         .builder()
         .owner("owner")
@@ -95,7 +105,7 @@ public class AclMapperTest {
    * Tests map with factory.
    */
   @Test
-  public void mapWithFactory() {
+  void mapWithFactory() {
     AccessControlList source = AccessControlList
         .builder()
         .owner("owner")
@@ -136,7 +146,7 @@ public class AclMapperTest {
    * Tests default acl.
    */
   @Test
-  public void defaultAcl() {
+  void defaultAcl() {
     AclImpl acl = mapper.defaultAcl("owner");
     assertNotNull(acl);
     assertEquals("owner", acl.getOwner());

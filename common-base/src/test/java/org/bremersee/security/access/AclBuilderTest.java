@@ -16,11 +16,7 @@
 
 package org.bremersee.security.access;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -30,14 +26,14 @@ import java.util.Map;
 import org.bremersee.common.model.AccessControlEntry;
 import org.bremersee.common.model.AccessControlList;
 import org.bremersee.security.core.AuthorityConstants;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * The acl builder test.
  *
  * @author Christian Bremer
  */
-public class AclBuilderTest {
+class AclBuilderTest {
 
   private static final AclBuilder aclBuilder = AclBuilder.builder();
 
@@ -45,7 +41,7 @@ public class AclBuilderTest {
    * Reset.
    */
   @Test
-  public void reset() {
+  void reset() {
     Acl<? extends Ace> acl = aclBuilder
         .owner("test")
         .addGroup("group", "read")
@@ -62,7 +58,7 @@ public class AclBuilderTest {
    * Defaults.
    */
   @Test
-  public void defaults() {
+  void defaults() {
     Acl<? extends Ace> acl = aclBuilder
         .reset()
         .defaults(PermissionConstants.ADMINISTRATION, PermissionConstants.CREATE)
@@ -83,7 +79,7 @@ public class AclBuilderTest {
    * From access control list.
    */
   @Test
-  public void fromAccessControlList() {
+  void fromAccessControlList() {
     AccessControlList expected = AccessControlList
         .builder()
         .owner("test")
@@ -123,7 +119,7 @@ public class AclBuilderTest {
    * From acl.
    */
   @Test
-  public void fromAcl() {
+  void fromAcl() {
     AceImpl ace0 = new AceImpl();
     ace0.setGuest(true);
     AceImpl ace1 = new AceImpl();
@@ -149,7 +145,7 @@ public class AclBuilderTest {
    * Owner.
    */
   @Test
-  public void owner() {
+  void owner() {
     assertEquals(
         "test",
         aclBuilder
@@ -168,7 +164,7 @@ public class AclBuilderTest {
    * Guest.
    */
   @Test
-  public void guest() {
+  void guest() {
     assertTrue(aclBuilder
         .reset()
         .guest(true, "read")
@@ -188,7 +184,7 @@ public class AclBuilderTest {
    * Add and remove user.
    */
   @Test
-  public void addAndRemoveUser() {
+  void addAndRemoveUser() {
     assertTrue(aclBuilder
         .reset()
         .addUser("test", "write")
@@ -210,7 +206,7 @@ public class AclBuilderTest {
    * Add and remove role.
    */
   @Test
-  public void addAndRemoveRole() {
+  void addAndRemoveRole() {
     assertTrue(aclBuilder
         .reset()
         .addRole("test", "write")
@@ -232,7 +228,7 @@ public class AclBuilderTest {
    * Add and remove group.
    */
   @Test
-  public void addAndRemoveGroup() {
+  void addAndRemoveGroup() {
     assertTrue(aclBuilder
         .reset()
         .addGroup("test", "write")
@@ -254,7 +250,7 @@ public class AclBuilderTest {
    * Admin access.
    */
   @Test
-  public void adminAccess() {
+  void adminAccess() {
     assertTrue(aclBuilder
         .reset()
         .defaults(PermissionConstants.CREATE)

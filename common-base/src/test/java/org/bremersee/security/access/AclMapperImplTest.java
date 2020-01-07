@@ -16,11 +16,7 @@
 
 package org.bremersee.security.access;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -28,20 +24,20 @@ import java.util.Collections;
 import org.bremersee.common.model.AccessControlEntry;
 import org.bremersee.common.model.AccessControlList;
 import org.bremersee.security.core.AuthorityConstants;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * The acl mapper impl test.
  *
  * @author Christian Bremer
  */
-public class AclMapperImplTest {
+class AclMapperImplTest {
 
   /**
    * Map with defaults and admin switch.
    */
   @Test
-  public void mapWithDefaultsAndAdminSwitch() {
+  void mapWithDefaultsAndAdminSwitch() {
     AclMapper<Acl<? extends Ace>> mapper = new AclMapperImpl<>(
         AclImpl::new,
         PermissionConstants.ALL,
@@ -120,7 +116,7 @@ public class AclMapperImplTest {
    * Map.
    */
   @Test
-  public void map() {
+  void map() {
     AclMapper<Acl<? extends Ace>> mapper = new AclMapperImpl<>(
         AclImpl::new,
         null,

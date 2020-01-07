@@ -16,26 +16,26 @@
 
 package org.bremersee.exception;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * The http response headers aware test.
  *
  * @author Christian Bremer
  */
-public class HttpResponseHeadersAwareTest {
+class HttpResponseHeadersAwareTest {
 
   /**
    * Create headers.
    */
   @Test
-  public void createHeaders() {
+  void createHeaders() {
     Map<String, List<String>> source = new LinkedHashMap<>();
     source.put("A", List.of("ValueA"));
     source.put("B", List.of("ValueB1", "ValueB2"));
@@ -50,7 +50,7 @@ public class HttpResponseHeadersAwareTest {
    * Create multi value headers.
    */
   @Test
-  public void createMultiValueHeaders() {
+  void createMultiValueHeaders() {
     Map<String, String> source = new LinkedHashMap<>();
     source.put("A", "ValueA");
     source.put("B", "ValueB1");
