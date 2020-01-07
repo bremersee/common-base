@@ -23,14 +23,6 @@ pipeline {
         sh 'mvn -B clean test'
       }
     }
-    stage('Deploy Feature') {
-      when {
-        branch 'feature/*'
-      }
-      steps {
-        sh 'mvn -B -P feature,allow-features clean deploy'
-      }
-    }
     stage('Deploy') {
       when {
         anyOf {
@@ -51,6 +43,22 @@ pipeline {
       }
       steps {
         sh 'mvn -B site-deploy'
+      }
+    }
+    stage('Deploy Feature') {
+      when {
+        branch 'feature/*'
+      }
+      steps {
+        sh 'mvn -B -P feature,allow-features clean deploy'
+      }
+      post {
+        always {
+          junit 'target/surefire-reports/*.xml'
+          jacoco(
+              execPattern: '**/coverage-reports/*.exec'
+          )
+        }
       }
     }
   }
