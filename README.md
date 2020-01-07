@@ -1,12 +1,6 @@
 # Common Base
 
-This library contains
-
-- Exception handling for Spring REST Services
-- Extensions to the Spring Security Framework
-- An Access Control List (Acl) definition
-- A web client proxy builder for webflux (like the FeignClient)
-
+[![codecov](https://codecov.io/gh/bremersee/common-base/branch/develop/graph/badge.svg)](https://codecov.io/gh/bremersee/common-base)
 
 #### Maven Site
 
