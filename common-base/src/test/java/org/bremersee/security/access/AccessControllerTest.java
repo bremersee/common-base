@@ -16,28 +16,49 @@
 
 package org.bremersee.security.access;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import org.bremersee.common.model.AccessControlEntry;
 import org.bremersee.common.model.AccessControlList;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * The access controller test.
  *
  * @author Christian Bremer
  */
-public class AccessControllerTest {
+class AccessControllerTest {
+
+  @Test
+  void from() {
+    assertNotNull(AccessController.from((Acl<?>)null));
+    assertNotNull(AccessController.from(new AclImpl("owner", null)));
+
+    assertNotNull(AccessController.from((AccessControlList)null));
+    assertNotNull(AccessController.from(AccessControlList.builder().build()));
+  }
 
   /**
    * Has any permission.
    */
   @Test
-  public void hasAnyPermission() {
+  void hasAnyPermission() {
+    assertFalse(AccessController
+        .from(new AclImpl("owner", new HashMap<>()))
+        .hasAnyPermission("user", Collections.emptySet(), Collections.emptySet()));
+
+    assertFalse(AccessController
+        .from(new AclImpl("owner", new HashMap<>()))
+        .hasAnyPermission("user", null, null));
+
+    assertFalse(AccessController
+        .from(new AclImpl("owner", new HashMap<>()))
+        .hasAnyPermission("user", Collections.emptySet(), null));
+
     AccessControlList acl = AccessControlList
         .builder()
         .owner("owner")
@@ -121,7 +142,19 @@ public class AccessControllerTest {
    * Has all permissions.
    */
   @Test
-  public void hasAllPermissions() {
+  void hasAllPermissions() {
+    assertFalse(AccessController
+        .from(new AclImpl("owner", new HashMap<>()))
+        .hasAllPermissions("user", Collections.emptySet(), Collections.emptySet()));
+
+    assertFalse(AccessController
+        .from(new AclImpl("owner", new HashMap<>()))
+        .hasAllPermissions("user", null, null));
+
+    assertFalse(AccessController
+        .from(new AclImpl("owner", new HashMap<>()))
+        .hasAllPermissions("user", Collections.emptySet(), null));
+
     AccessControlList acl = AccessControlList
         .builder()
         .owner("owner")

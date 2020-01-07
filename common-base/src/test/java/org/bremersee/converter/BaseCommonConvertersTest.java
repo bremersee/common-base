@@ -21,7 +21,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.format.FormatterRegistry;
 
@@ -30,13 +30,13 @@ import org.springframework.format.FormatterRegistry;
  *
  * @author Christian Bremer
  */
-public class BaseCommonConvertersTest {
+class BaseCommonConvertersTest {
 
   /**
    * Register all.
    */
   @Test
-  public void registerAll() {
+  void registerAll() {
     FormatterRegistry registry = mock(FormatterRegistry.class);
     BaseCommonConverters.registerAll(registry);
     verify(registry, times(BaseCommonConverters.CONVERTERS.length))
