@@ -14,67 +14,67 @@
  * limitations under the License.
  */
 
-package org.bremersee.model.xml1;
+package org.bremersee.http.codec.xml.model.xml4;
 
 import java.util.Objects;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
 /**
- * The type Person.
+ * The type Address.
  *
  * @author Christian Bremer
  */
-@XmlRootElement(name = "person")
-@XmlType(name = "personType")
+@XmlRootElement(name = "address")
+@XmlType(name = "addressType")
 @SuppressWarnings("unused")
-public class Person {
+public class Address {
 
-  private String firstName;
+  private String street;
 
-  private String lastName;
+  private String streetNumber;
 
   /**
-   * Gets first name.
+   * Gets street.
    *
-   * @return the first name
+   * @return the street
    */
-  public String getFirstName() {
-    return firstName;
+  public String getStreet() {
+    return street;
   }
 
   /**
-   * Sets first name.
+   * Sets street.
    *
-   * @param firstName the first name
+   * @param street the street
    */
-  public void setFirstName(String firstName) {
-    this.firstName = firstName;
+  public void setStreet(String street) {
+    this.street = street;
   }
 
   /**
-   * Gets last name.
+   * Gets street number.
    *
-   * @return the last name
+   * @return the street number
    */
-  public String getLastName() {
-    return lastName;
+  public String getStreetNumber() {
+    return streetNumber;
   }
 
   /**
-   * Sets last name.
+   * Sets street number.
    *
-   * @param lastName the last name
+   * @param streetNumber the street number
    */
-  public void setLastName(String lastName) {
-    this.lastName = lastName;
+  public void setStreetNumber(String streetNumber) {
+    this.streetNumber = streetNumber;
   }
 
   @Override
   public String toString() {
-    return "Person{"
-        + "firstName='" + firstName + '\''
-        + ", lastName='" + lastName + '\''
+    return "Address{"
+        + "street='" + street + '\''
+        + ", streetNumber='" + streetNumber + '\''
         + '}';
   }
 
@@ -83,16 +83,16 @@ public class Person {
     if (this == o) {
       return true;
     }
-    if (!(o instanceof Person)) {
+    if (!(o instanceof Address)) {
       return false;
     }
-    Person person = (Person) o;
-    return Objects.equals(firstName, person.firstName)
-        && Objects.equals(lastName, person.lastName);
+    Address address = (Address) o;
+    return Objects.equals(street, address.street)
+        && Objects.equals(streetNumber, address.streetNumber);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(firstName, lastName);
+    return Objects.hash(street, streetNumber);
   }
 }

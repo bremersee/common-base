@@ -15,11 +15,8 @@
  */
 
 /**
- * Test model 2 package.
+ * Test model 3 package.
  *
  * @author Christian Bremer
  */
-@javax.xml.bind.annotation.XmlSchema(
-    namespace = "http://bremersee.org/xmlschemas/common-xml-test-model-2",
-    elementFormDefault = javax.xml.bind.annotation.XmlNsForm.QUALIFIED)
-package org.bremersee.model.xml2;
+package org.bremersee.http.codec.xml.model.xml3;

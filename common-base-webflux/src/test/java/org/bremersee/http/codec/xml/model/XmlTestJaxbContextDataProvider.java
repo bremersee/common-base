@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package org.bremersee.model;
+package org.bremersee.http.codec.xml.model;
 
 import java.util.Arrays;
 import java.util.Collection;
-import org.bremersee.model.xml1.ObjectFactory;
+import org.bremersee.http.codec.xml.model.xml1.ObjectFactory;
 import org.bremersee.xml.JaxbContextData;
 import org.bremersee.xml.JaxbContextDataProvider;
 
@@ -34,13 +34,13 @@ public class XmlTestJaxbContextDataProvider implements JaxbContextDataProvider {
     return Arrays.asList(
         new JaxbContextData(ObjectFactory.class.getPackage()),
         new JaxbContextData(
-            org.bremersee.model.xml2.ObjectFactory.class.getPackage(),
+            org.bremersee.http.codec.xml.model.xml2.ObjectFactory.class.getPackage(),
             "http://bremersee.github.io/xmlschemas/common-xml-test-model-2.xsd"),
         new JaxbContextData(
-            org.bremersee.model.xml3.ObjectFactory.class.getPackage().getName(),
+            org.bremersee.http.codec.xml.model.xml3.ObjectFactory.class.getPackage().getName(),
             null,
             null),
-        new JaxbContextData(org.bremersee.model.xml4.ObjectFactory.class.getPackage())
+        new JaxbContextData(org.bremersee.http.codec.xml.model.xml4.ObjectFactory.class.getPackage())
     );
   }
 }

@@ -16,7 +16,7 @@
 
 package org.bremersee.web.reactive.function.client;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -30,14 +30,12 @@ import java.util.Date;
 import java.util.UUID;
 import org.bremersee.security.authentication.AccessTokenRetriever;
 import org.bremersee.security.authentication.PasswordFlowProperties;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
 import org.mockito.stubbing.Answer;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import org.springframework.web.reactive.function.client.ClientRequest;
 import org.springframework.web.reactive.function.client.ClientResponse;
 import org.springframework.web.reactive.function.client.ExchangeFunction;
@@ -49,9 +47,8 @@ import reactor.test.StepVerifier;
  *
  * @author Christian Bremer
  */
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration
-public class AccessTokenAppenderWithRetrieverTest {
+@SpringJUnitConfig
+class AccessTokenAppenderWithRetrieverTest {
 
   private static ClientRequest request = ClientRequest
       .create(HttpMethod.GET, URI.create("http://localhost/resource"))
@@ -62,7 +59,7 @@ public class AccessTokenAppenderWithRetrieverTest {
    * Tests filter.
    */
   @Test
-  public void filter() {
+  void filter() {
     //noinspection unchecked
     AccessTokenRetriever<Mono<String>> tokenRetriever = mock(
         AccessTokenRetriever.class);
@@ -91,7 +88,7 @@ public class AccessTokenAppenderWithRetrieverTest {
    * Tests filter failure.
    */
   @Test
-  public void filterFails() {
+  void filterFails() {
     //noinspection unchecked
     AccessTokenRetriever<Mono<String>> tokenRetriever = mock(
         AccessTokenRetriever.class);

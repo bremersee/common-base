@@ -14,26 +14,12 @@
  * limitations under the License.
  */
 
-package org.bremersee.model.xml4;
-
-import javax.xml.bind.annotation.XmlRegistry;
-
 /**
- * The xml object factory.
+ * Test model 2 package.
  *
  * @author Christian Bremer
  */
-@XmlRegistry
-@SuppressWarnings("unused")
-public class ObjectFactory {
-
-  /**
-   * Create address.
-   *
-   * @return the address
-   */
-  public Address createAddress() {
-    return new Address();
-  }
-
-}
+@javax.xml.bind.annotation.XmlSchema(
+    namespace = "http://bremersee.org/xmlschemas/common-xml-test-model-2",
+    elementFormDefault = javax.xml.bind.annotation.XmlNsForm.QUALIFIED)
+package org.bremersee.http.codec.xml.model.xml2;

@@ -16,18 +16,18 @@
 
 package org.bremersee.http.codec.xml;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ServiceLoader;
-import org.bremersee.model.XmlTestJaxbContextDataProvider;
-import org.bremersee.model.xml1.Person;
-import org.bremersee.model.xml2.Vehicle;
-import org.bremersee.model.xml3.Company;
-import org.bremersee.model.xml4.Address;
+import org.bremersee.http.codec.xml.model.XmlTestJaxbContextDataProvider;
+import org.bremersee.http.codec.xml.model.xml1.Person;
+import org.bremersee.http.codec.xml.model.xml2.Vehicle;
+import org.bremersee.http.codec.xml.model.xml3.Company;
+import org.bremersee.http.codec.xml.model.xml4.Address;
 import org.bremersee.xml.JaxbContextBuilder;
 import org.bremersee.xml.JaxbContextDataProvider;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.core.ResolvableType;
 import org.springframework.util.MimeTypeUtils;
 
@@ -36,13 +36,13 @@ import org.springframework.util.MimeTypeUtils;
  *
  * @author Christian Bremer
  */
-public class ReactiveJaxbEncoderTest {
+class ReactiveJaxbEncoderTest {
 
   /**
    * Test can encode.
    */
   @Test
-  public void testCanEncode() {
+  void testCanEncode() {
     JaxbContextBuilder jaxbContextBuilder = JaxbContextBuilder
         .builder()
         .processAll(ServiceLoader.load(JaxbContextDataProvider.class));

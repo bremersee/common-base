@@ -14,67 +14,72 @@
  * limitations under the License.
  */
 
-package org.bremersee.model.xml4;
+package org.bremersee.http.codec.xml.model.xml2;
 
 import java.util.Objects;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
 /**
- * The type Address.
+ * The type Vehicle.
  *
  * @author Christian Bremer
  */
-@XmlRootElement(name = "address")
-@XmlType(name = "addressType")
+@XmlRootElement(name = "vehicle")
+@XmlType(name = "vehicleType")
+@XmlAccessorType(XmlAccessType.FIELD)
 @SuppressWarnings("unused")
-public class Address {
+public class Vehicle {
 
-  private String street;
+  @XmlAttribute
+  private String brand;
 
-  private String streetNumber;
+  private String model;
 
   /**
-   * Gets street.
+   * Gets brand.
    *
-   * @return the street
+   * @return the brand
    */
-  public String getStreet() {
-    return street;
+  public String getBrand() {
+    return brand;
   }
 
   /**
-   * Sets street.
+   * Sets brand.
    *
-   * @param street the street
+   * @param brand the brand
    */
-  public void setStreet(String street) {
-    this.street = street;
+  public void setBrand(String brand) {
+    this.brand = brand;
   }
 
   /**
-   * Gets street number.
+   * Gets model.
    *
-   * @return the street number
+   * @return the model
    */
-  public String getStreetNumber() {
-    return streetNumber;
+  public String getModel() {
+    return model;
   }
 
   /**
-   * Sets street number.
+   * Sets model.
    *
-   * @param streetNumber the street number
+   * @param model the model
    */
-  public void setStreetNumber(String streetNumber) {
-    this.streetNumber = streetNumber;
+  public void setModel(String model) {
+    this.model = model;
   }
 
   @Override
   public String toString() {
-    return "Address{"
-        + "street='" + street + '\''
-        + ", streetNumber='" + streetNumber + '\''
+    return "Vehicle{"
+        + "brand='" + brand + '\''
+        + ", model='" + model + '\''
         + '}';
   }
 
@@ -83,16 +88,16 @@ public class Address {
     if (this == o) {
       return true;
     }
-    if (!(o instanceof Address)) {
+    if (!(o instanceof Vehicle)) {
       return false;
     }
-    Address address = (Address) o;
-    return Objects.equals(street, address.street)
-        && Objects.equals(streetNumber, address.streetNumber);
+    Vehicle vehicle = (Vehicle) o;
+    return Objects.equals(brand, vehicle.brand)
+        && Objects.equals(model, vehicle.model);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(street, streetNumber);
+    return Objects.hash(brand, model);
   }
 }

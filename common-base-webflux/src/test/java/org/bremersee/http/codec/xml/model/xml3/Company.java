@@ -14,9 +14,12 @@
  * limitations under the License.
  */
 
-package org.bremersee.model.xml3;
+package org.bremersee.http.codec.xml.model.xml3;
 
 import java.util.Objects;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
@@ -27,9 +30,11 @@ import javax.xml.bind.annotation.XmlType;
  */
 @XmlRootElement(name = "company")
 @XmlType(name = "companyType")
+@XmlAccessorType(XmlAccessType.FIELD)
 @SuppressWarnings("unused")
 public class Company {
 
+  @XmlAttribute
   private String name;
 
   /**

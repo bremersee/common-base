@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.bremersee.model.xml1;
+package org.bremersee.http.codec.xml.model.xml2;
 
 import javax.xml.bind.annotation.XmlRegistry;
 
@@ -28,12 +28,21 @@ import javax.xml.bind.annotation.XmlRegistry;
 public class ObjectFactory {
 
   /**
-   * Create person.
+   * Create vehicle.
    *
-   * @return the person
+   * @return the vehicle
    */
-  public Person createPerson() {
-    return new Person();
+  public Vehicle createVehicle() {
+    return new Vehicle();
+  }
+
+  /**
+   * Create vehicles vehicles.
+   *
+   * @return the vehicles
+   */
+  public Vehicles createVehicles() {
+    return new Vehicles();
   }
 
 }

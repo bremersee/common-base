@@ -19,12 +19,9 @@ package org.bremersee.security.authentication;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.JWTClaimsSet.Builder;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -32,80 +29,46 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.jwt.Jwt;
-import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
+import reactor.test.StepVerifier;
 
 /**
- * The json path jwt converter test.
+ * The type Json path reactive jwt converter test.
  *
  * @author Christian Bremer
  */
-class JsonPathJwtConverterTest {
+class JsonPathReactiveJwtConverterTest {
 
   /**
-   * Convert jwt.
+   * Convert.
    */
   @Test
   void convert() {
+    JsonPathJwtConverter delegate = new JsonPathJwtConverter();
+    delegate.setRolesValueList(true);
+    delegate.setRolesJsonPath("$.realm_access.roles");
+    delegate.setNameJsonPath("$.preferred_username");
+    delegate.setRolePrefix("ROLE_");
+    JsonPathReactiveJwtConverter converter = new JsonPathReactiveJwtConverter(delegate);
     Jwt jwt = createJwt();
-    JsonPathJwtConverter converter = new JsonPathJwtConverter();
-    converter.setRolesValueList(true);
-    converter.setRolesJsonPath("$.realm_access.roles");
-    converter.setNameJsonPath("$.preferred_username");
-    converter.setRolePrefix("ROLE_");
-    JwtAuthenticationToken auth = converter.convert(jwt);
-    assertNotNull(auth);
-    assertEquals("anna", auth.getName());
-    assertTrue(auth.getAuthorities().stream()
-        .anyMatch(grantedAuthority -> grantedAuthority.getAuthority()
-            .equalsIgnoreCase("ROLE_LOCAL_USER")));
+    //noinspection ConstantConditions
+    StepVerifier.create(converter.convert(jwt))
+        .assertNext(jwtAuthenticationToken -> {
+          assertNotNull(jwtAuthenticationToken);
+          assertEquals("anna", jwtAuthenticationToken.getName());
+          assertTrue(jwtAuthenticationToken.getAuthorities().stream()
+              .anyMatch(grantedAuthority -> grantedAuthority.getAuthority()
+                  .equalsIgnoreCase("ROLE_LOCAL_USER")));
+        })
+        .verifyComplete();
 
-    converter.setRolesValueList(false);
-    converter.setRolesJsonPath("$.scope");
-    converter.setNameJsonPath("$.sub");
-    converter.setRolePrefix("SCOPE_");
-    converter.setRolesValueSeparator(" ");
-    auth = converter.convert(jwt);
-    assertNotNull(auth);
-    assertEquals("livia", auth.getName());
-    assertTrue(auth.getAuthorities().stream()
-        .anyMatch(grantedAuthority -> grantedAuthority.getAuthority()
-            .equalsIgnoreCase("SCOPE_EMAIL")));
-    assertTrue(auth.getAuthorities().stream()
-        .anyMatch(grantedAuthority -> grantedAuthority.getAuthority()
-            .equalsIgnoreCase("SCOPE_PROFILE")));
-  }
-
-  /**
-   * Test convert roles.
-   */
-  @Test
-  void testConvertRoles() {
-
-    final Map<String, Object> roles = new LinkedHashMap<>();
-    roles.put("roles", Arrays.asList("ADMIN", "ROLE_USER"));
-    final Map<String, Object> claims = new LinkedHashMap<>();
-    claims.put("realm_access", roles);
-
-    Jwt jwt = mock(Jwt.class);
-    when(jwt.getClaims()).thenReturn(claims);
-
-    JsonPathJwtConverter converter = new JsonPathJwtConverter();
-    converter.setRolesValueList(true);
-    converter.setRolesJsonPath("$.realm_access.roles");
-    converter.setRolePrefix("ROLE_");
-    final JwtAuthenticationToken authToken = converter.convert(jwt);
-    assertNotNull(authToken);
-    assertNotNull(authToken.getAuthorities());
-    assertTrue(
-        authToken
-            .getAuthorities()
-            .contains(new SimpleGrantedAuthority("ROLE_ADMIN")));
-    assertTrue(
-        authToken
-            .getAuthorities()
-            .contains(new SimpleGrantedAuthority("ROLE_USER")));
+    //noinspection ConstantConditions
+    StepVerifier.create(new JsonPathReactiveJwtConverter().convert(jwt))
+        .assertNext(jwtAuthenticationToken -> {
+          assertNotNull(jwtAuthenticationToken);
+          assertEquals("livia", jwtAuthenticationToken.getName());
+        })
+        .verifyComplete();
   }
 
   private static Jwt createJwt() {
