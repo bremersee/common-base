@@ -14,13 +14,26 @@
  * limitations under the License.
  */
 
+package org.bremersee.http.codec.xml.model.xml1;
+
+import javax.xml.bind.annotation.XmlRegistry;
+
 /**
- * Test xml model 1 package.
+ * The xml object factory.
  *
  * @author Christian Bremer
  */
-@javax.xml.bind.annotation.XmlSchema(
-    namespace = "http://bremersee.org/xmlschemas/common-xml-test-model-1",
-    location = "http://bremersee.github.io/xmlschemas/common-xml-test-model-1.xsd",
-    elementFormDefault = javax.xml.bind.annotation.XmlNsForm.QUALIFIED)
-package org.bremersee.model.xml1;
+@XmlRegistry
+@SuppressWarnings("unused")
+public class ObjectFactory {
+
+  /**
+   * Create person.
+   *
+   * @return the person
+   */
+  public Person createPerson() {
+    return new Person();
+  }
+
+}

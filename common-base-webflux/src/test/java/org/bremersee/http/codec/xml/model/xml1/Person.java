@@ -14,67 +14,67 @@
  * limitations under the License.
  */
 
-package org.bremersee.model.xml2;
+package org.bremersee.http.codec.xml.model.xml1;
 
 import java.util.Objects;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
 /**
- * The type Vehicle.
+ * The type Person.
  *
  * @author Christian Bremer
  */
-@XmlRootElement(name = "vehicle")
-@XmlType(name = "vehicleType")
+@XmlRootElement(name = "person")
+@XmlType(name = "personType")
 @SuppressWarnings("unused")
-public class Vehicle {
+public class Person {
 
-  private String brand;
+  private String firstName;
 
-  private String model;
+  private String lastName;
 
   /**
-   * Gets brand.
+   * Gets first name.
    *
-   * @return the brand
+   * @return the first name
    */
-  public String getBrand() {
-    return brand;
+  public String getFirstName() {
+    return firstName;
   }
 
   /**
-   * Sets brand.
+   * Sets first name.
    *
-   * @param brand the brand
+   * @param firstName the first name
    */
-  public void setBrand(String brand) {
-    this.brand = brand;
+  public void setFirstName(String firstName) {
+    this.firstName = firstName;
   }
 
   /**
-   * Gets model.
+   * Gets last name.
    *
-   * @return the model
+   * @return the last name
    */
-  public String getModel() {
-    return model;
+  public String getLastName() {
+    return lastName;
   }
 
   /**
-   * Sets model.
+   * Sets last name.
    *
-   * @param model the model
+   * @param lastName the last name
    */
-  public void setModel(String model) {
-    this.model = model;
+  public void setLastName(String lastName) {
+    this.lastName = lastName;
   }
 
   @Override
   public String toString() {
-    return "Vehicle{"
-        + "brand='" + brand + '\''
-        + ", model='" + model + '\''
+    return "Person{"
+        + "firstName='" + firstName + '\''
+        + ", lastName='" + lastName + '\''
         + '}';
   }
 
@@ -83,16 +83,16 @@ public class Vehicle {
     if (this == o) {
       return true;
     }
-    if (!(o instanceof Vehicle)) {
+    if (!(o instanceof Person)) {
       return false;
     }
-    Vehicle vehicle = (Vehicle) o;
-    return Objects.equals(brand, vehicle.brand)
-        && Objects.equals(model, vehicle.model);
+    Person person = (Person) o;
+    return Objects.equals(firstName, person.firstName)
+        && Objects.equals(lastName, person.lastName);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(brand, model);
+    return Objects.hash(firstName, lastName);
   }
 }

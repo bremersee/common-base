@@ -16,7 +16,7 @@
 
 package org.bremersee.web.reactive.function.client;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -25,14 +25,12 @@ import static org.mockito.Mockito.when;
 
 import java.net.URI;
 import org.bremersee.test.security.authentication.WithJwtAuthenticationToken;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
 import org.mockito.stubbing.Answer;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import org.springframework.web.reactive.function.client.ClientRequest;
 import org.springframework.web.reactive.function.client.ClientResponse;
 import org.springframework.web.reactive.function.client.ExchangeFunction;
@@ -44,9 +42,8 @@ import reactor.test.StepVerifier;
  *
  * @author Christian Bremer
  */
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration
-public class AccessTokenAppenderFromAuthenticationTest {
+@SpringJUnitConfig
+class AccessTokenAppenderFromAuthenticationTest {
 
   private static AccessTokenAppender appender = AccessTokenAppender.fromAuthentication();
 
@@ -60,7 +57,7 @@ public class AccessTokenAppenderFromAuthenticationTest {
    */
   @Test
   @WithJwtAuthenticationToken
-  public void filter() {
+  void filter() {
 
     ExchangeFunction exchangeFunction = createExchangeFunction();
     StepVerifier.create(appender.filter(request, exchangeFunction))
@@ -80,7 +77,7 @@ public class AccessTokenAppenderFromAuthenticationTest {
    * Tests filter failure.
    */
   @Test
-  public void filterFails() {
+  void filterFails() {
 
     ExchangeFunction exchangeFunction = createExchangeFunction();
     StepVerifier.create(appender.filter(request, exchangeFunction))

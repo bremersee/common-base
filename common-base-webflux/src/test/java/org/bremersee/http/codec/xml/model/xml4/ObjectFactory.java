@@ -14,9 +14,26 @@
  * limitations under the License.
  */
 
+package org.bremersee.http.codec.xml.model.xml4;
+
+import javax.xml.bind.annotation.XmlRegistry;
+
 /**
- * Test model 3 package.
+ * The xml object factory.
  *
  * @author Christian Bremer
  */
-package org.bremersee.model.xml3;
+@XmlRegistry
+@SuppressWarnings("unused")
+public class ObjectFactory {
+
+  /**
+   * Create address.
+   *
+   * @return the address
+   */
+  public Address createAddress() {
+    return new Address();
+  }
+
+}

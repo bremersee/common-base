@@ -1,6 +1,7 @@
 package org.bremersee.web.reactive.function.client.proxy;
 
 import static org.bremersee.web.reactive.function.client.proxy.app.ControllerOne.OK_RESPONSE;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.LinkedHashMap;
 import lombok.extern.slf4j.Slf4j;
@@ -8,37 +9,34 @@ import org.bremersee.web.reactive.function.client.WebClientException;
 import org.bremersee.web.reactive.function.client.proxy.app.ControllerOne;
 import org.bremersee.web.reactive.function.client.proxy.app.ControllerTwo;
 import org.bremersee.web.reactive.function.client.proxy.app.ProxyTestConfiguration;
-import org.junit.Assert;
-import org.junit.Ignore;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
-import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.test.StepVerifier;
 
-
 /**
  * The web client proxy builder test.
  *
  * @author Christian Bremer
  */
-@RunWith(SpringRunner.class)
 @SpringBootTest(
     classes = {ProxyTestConfiguration.class},
     webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
     properties = {"security.basic.enabled=false"})
 @AutoConfigureWebTestClient
 @Slf4j
-public class WebClientProxyBuilderTest {
+class WebClientProxyBuilderTest {
 
   @LocalServerPort
+  @SuppressWarnings("unused")
   private int port;
 
   @Autowired
@@ -70,7 +68,7 @@ public class WebClientProxyBuilderTest {
    * Call with web test client.
    */
   @Test
-  public void callWithWebTestClient() {
+  void callWithWebTestClient() {
     webClient.get().uri("/").exchange().expectStatus().isOk().expectBody(String.class)
         .isEqualTo(OK_RESPONSE);
   }
@@ -79,10 +77,10 @@ public class WebClientProxyBuilderTest {
    * Call with web client.
    */
   @Test
-  public void callWithWebClient() {
+  void callWithWebClient() {
     StepVerifier
         .create(newWebClient().get().uri(b -> b.build()).retrieve().bodyToMono(String.class))
-        .assertNext(response -> Assert.assertEquals(OK_RESPONSE, response))
+        .assertNext(response -> assertEquals(OK_RESPONSE, response))
         .expectNextCount(0)
         .verifyComplete();
   }
@@ -91,9 +89,9 @@ public class WebClientProxyBuilderTest {
    * Simple get.
    */
   @Test
-  public void simpleGet() {
+  void simpleGet() {
     StepVerifier.create(newControllerOneClient().simpleGet())
-        .assertNext(response -> Assert.assertEquals(OK_RESPONSE, response))
+        .assertNext(response -> assertEquals(OK_RESPONSE, response))
         .expectNextCount(0)
         .verifyComplete();
   }
@@ -102,11 +100,11 @@ public class WebClientProxyBuilderTest {
    * Do get.
    */
   @Test
-  public void doGet() {
+  void doGet() {
     StepVerifier.create(newControllerOneClient().getOks())
-        .assertNext(ok -> Assert.assertEquals("OK_0", ok.get("value")))
-        .assertNext(ok -> Assert.assertEquals("OK_1", ok.get("value")))
-        .assertNext(ok -> Assert.assertEquals("OK_2", ok.get("value")))
+        .assertNext(ok -> assertEquals("OK_0", ok.get("value")))
+        .assertNext(ok -> assertEquals("OK_1", ok.get("value")))
+        .assertNext(ok -> assertEquals("OK_2", ok.get("value")))
         .expectNextCount(0)
         .verifyComplete();
   }
@@ -114,13 +112,13 @@ public class WebClientProxyBuilderTest {
   /**
    * Do post.
    */
-  @Ignore
+  @Disabled
   @Test
-  public void doPost() {
+  void doPost() {
     MultiValueMap<String, String> form = new LinkedMultiValueMap<>();
     form.add("value", "ok");
     StepVerifier.create(newControllerOneClient().addOk(form))
-        .assertNext(response -> Assert.assertEquals(OK_RESPONSE, response))
+        .assertNext(response -> assertEquals(OK_RESPONSE, response))
         .expectNextCount(0)
         .verifyComplete();
   }
@@ -129,9 +127,9 @@ public class WebClientProxyBuilderTest {
    * Do put.
    */
   @Test
-  public void doPut() {
+  void doPut() {
     StepVerifier.create(newControllerOneClient().updateOk("value", "ok"))
-        .assertNext(response -> Assert.assertEquals("value=ok", response))
+        .assertNext(response -> assertEquals("value=ok", response))
         .expectNextCount(0)
         .verifyComplete();
   }
@@ -140,7 +138,7 @@ public class WebClientProxyBuilderTest {
    * Do patch.
    */
   @Test
-  public void doPatch() {
+  void doPatch() {
     StepVerifier.create(newControllerOneClient().patchOk("name", "suffix", "payload"))
         .expectNextCount(0)
         .verifyComplete();
@@ -154,9 +152,9 @@ public class WebClientProxyBuilderTest {
    * Do delete.
    */
   @Test
-  public void doDelete() {
+  void doDelete() {
     StepVerifier.create(newControllerOneClient().deleteOk("value"))
-        .assertNext(Assert::assertTrue)
+        .assertNext(Assertions::assertTrue)
         .expectNextCount(0)
         .verifyComplete();
   }
@@ -164,9 +162,9 @@ public class WebClientProxyBuilderTest {
   /**
    * Upload.
    */
-  @Ignore
+  @Disabled
   @Test
-  public void upload() {
+  void upload() {
     MultiValueMap<String, String> data = new LinkedMultiValueMap<>();
     data.add("k0", "v0");
     data.add("k1", "v1");
@@ -177,7 +175,7 @@ public class WebClientProxyBuilderTest {
     map.putAll(data);
 
     StepVerifier.create(newControllerOneClient().upload("a-flag", "a-value", data))
-        .assertNext(response -> Assert.assertEquals(map, response))
+        .assertNext(response -> assertEquals(map, response))
         .expectNextCount(0)
         .verifyComplete();
   }
@@ -186,9 +184,9 @@ public class WebClientProxyBuilderTest {
    * Say hello with name.
    */
   @Test
-  public void sayHelloWithName() {
+  void sayHelloWithName() {
     StepVerifier.create(newControllerTwoClient().sayHello("Anna"))
-        .assertNext(response -> Assert.assertEquals("Hello Anna", response))
+        .assertNext(response -> assertEquals("Hello Anna", response))
         .expectNextCount(0)
         .verifyComplete();
   }
@@ -197,9 +195,9 @@ public class WebClientProxyBuilderTest {
    * Say hello without name.
    */
   @Test
-  public void sayHelloWithoutName() {
+  void sayHelloWithoutName() {
     StepVerifier.create(newControllerTwoClient().sayHello(null))
-        .assertNext(response -> Assert.assertEquals("Hello Tom", response))
+        .assertNext(response -> assertEquals("Hello Tom", response))
         .expectNextCount(0)
         .verifyComplete();
   }
@@ -208,9 +206,9 @@ public class WebClientProxyBuilderTest {
    * Say hello to.
    */
   @Test
-  public void sayHelloTo() {
+  void sayHelloTo() {
     StepVerifier.create(newControllerTwoClient().sayHelloTo("Anna Livia"))
-        .assertNext(response -> Assert.assertEquals("Hello Anna Livia", response))
+        .assertNext(response -> assertEquals("Hello Anna Livia", response))
         .expectNextCount(0)
         .verifyComplete();
   }
@@ -219,9 +217,9 @@ public class WebClientProxyBuilderTest {
    * Sets name.
    */
   @Test
-  public void setName() {
+  void setName() {
     StepVerifier.create(newControllerTwoClient().setName("Anna Livia"))
-        .assertNext(response -> Assert.assertEquals("Anna Livia", response))
+        .assertNext(response -> assertEquals("Anna Livia", response))
         .expectNextCount(0)
         .verifyComplete();
   }
@@ -230,9 +228,9 @@ public class WebClientProxyBuilderTest {
    * Sets no name.
    */
   @Test
-  public void setNoName() {
+  void setNoName() {
     StepVerifier.create(newControllerTwoClient().setName(null))
-        .assertNext(response -> Assert.assertEquals("null", response))
+        .assertNext(response -> assertEquals("null", response))
         .expectNextCount(0)
         .verifyComplete();
   }
