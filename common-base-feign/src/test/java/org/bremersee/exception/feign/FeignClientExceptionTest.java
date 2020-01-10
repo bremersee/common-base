@@ -16,15 +16,16 @@
 
 package org.bremersee.exception.feign;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Collections;
+import java.util.Map;
 import org.bremersee.exception.RestApiExceptionUtils;
 import org.bremersee.exception.model.RestApiException;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -36,13 +37,13 @@ import org.springframework.util.MultiValueMap;
  *
  * @author Christian Bremer
  */
-public class FeignClientExceptionTest {
+class FeignClientExceptionTest {
 
   /**
    * Test with no useful values.
    */
   @Test
-  public void testWithNoUsefulValues() {
+  void testWithNoUsefulValues() {
     final FeignClientException exception = new FeignClientException(null, null, 0, null, null);
     assertNull(exception.getRequest());
     assertNotNull(exception.getMultiValueHeaders());
@@ -56,7 +57,7 @@ public class FeignClientExceptionTest {
    * Test with some useful values.
    */
   @Test
-  public void testWithSomeUsefulValues() {
+  void testWithSomeUsefulValues() {
     final RestApiException restApiException = new RestApiException();
     restApiException.setErrorCode("TEST:0001");
     final MultiValueMap<String, String> headers = new LinkedMultiValueMap<>();
@@ -76,6 +77,10 @@ public class FeignClientExceptionTest {
     assertEquals("Fatal", exception.getMessage());
     assertEquals(restApiException, exception.getRestApiException());
     assertEquals("TEST:0001", exception.getErrorCode());
+
+    final Map<String, String> actualHeaders = exception.getHeaders();
+    assertNotNull(actualHeaders);
+    assertEquals(MediaType.APPLICATION_JSON_VALUE, actualHeaders.get(HttpHeaders.CONTENT_TYPE));
   }
 
 }
