@@ -33,6 +33,8 @@ import org.ldaptive.ResultCode;
 @EqualsAndHashCode(callSuper = true)
 public class LdaptiveException extends ServiceException implements HttpStatusAware, ErrorCodeAware {
 
+  private static final long serialVersionUID = 1L;
+
   /**
    * Instantiates a new ldaptive exception.
    */
