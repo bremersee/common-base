@@ -1,9 +1,30 @@
+/*
+ * Copyright 2019 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.bremersee.test.web;
 
-import org.junit.Test;
+import static org.bremersee.test.web.RestApiAnnotationTester.assertSameApiAnnotations;
+
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 /**
- * The rst api annotation tester test.
+ * The rest api annotation tester test.
+ *
+ * @author Christian Bremer
  */
 public class RestApiAnnotationTesterTest {
 
@@ -12,39 +33,47 @@ public class RestApiAnnotationTesterTest {
    */
   @Test
   public void compareGoodApis() {
-    RestApiAnnotationTester.assertSameApiAnnotations(GoodRestApiOne.class, GoodRestApiTwo.class);
+    assertSameApiAnnotations(GoodRestApiOne.class, GoodRestApiTwo.class);
   }
 
   /**
    * Compare bad apis and expect wrong class annotations.
    */
-  @Test(expected = AssertionError.class)
+  @Test
   public void compareBadApisAndExpectWrongClassAnnotations() {
-    RestApiAnnotationTester.assertSameApiAnnotations(BadApis.One.class, BadApis.Two.class);
+    Assertions.assertThrows(
+        AssertionError.class,
+        () -> assertSameApiAnnotations(BadApis.One.class, BadApis.Two.class));
   }
 
   /**
    * Compare bad apis and expect wrong size of methods.
    */
-  @Test(expected = AssertionError.class)
+  @Test
   public void compareBadApisAndExpectWrongSizeOfMethods() {
-    RestApiAnnotationTester.assertSameApiAnnotations(BadApis.Three.class, BadApis.Four.class);
+    Assertions.assertThrows(
+        AssertionError.class,
+        () -> assertSameApiAnnotations(BadApis.Three.class, BadApis.Four.class));
   }
 
   /**
    * Compare bad apis and expect wrong methods.
    */
-  @Test(expected = AssertionError.class)
+  @Test
   public void compareBadApisAndExpectWrongMethods() {
-    RestApiAnnotationTester.assertSameApiAnnotations(BadApis.Five.class, BadApis.Six.class);
+    Assertions.assertThrows(
+        AssertionError.class,
+        () -> assertSameApiAnnotations(BadApis.Five.class, BadApis.Six.class));
   }
 
   /**
    * Compare bad apis and expect wrong method parameters.
    */
-  @Test(expected = AssertionError.class)
+  @Test
   public void compareBadApisAndExpectWrongMethodParameters() {
-    RestApiAnnotationTester.assertSameApiAnnotations(BadApis.Seven.class, BadApis.Eight.class);
+    Assertions.assertThrows(
+        AssertionError.class,
+        () -> assertSameApiAnnotations(BadApis.Seven.class, BadApis.Eight.class));
   }
 
 }
