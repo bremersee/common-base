@@ -16,9 +16,9 @@
 
 package org.bremersee.security.authentication;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -31,7 +31,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.UUID;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
@@ -41,13 +41,13 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtAut
  *
  * @author Christian Bremer
  */
-public class JsonPathJwtConverterTest {
+class JsonPathJwtConverterTest {
 
   /**
    * Convert jwt.
    */
   @Test
-  public void convert() {
+  void convert() {
     Map<String, Object> headers = new HashMap<>();
     headers.put("alg", "RS256");
     headers.put("kid", "-V5Nzr9xllRiyURYK-t6pB7C-5E8IKm8-eAPFLVvCt4");
@@ -118,7 +118,7 @@ public class JsonPathJwtConverterTest {
    * Test convert roles.
    */
   @Test
-  public void testConvertRoles() {
+  void testConvertRoles() {
 
     final Map<String, Object> roles = new LinkedHashMap<>();
     roles.put("roles", Arrays.asList("ADMIN", "ROLE_USER"));
