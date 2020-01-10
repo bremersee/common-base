@@ -64,7 +64,6 @@ public class ApiExceptionResolver implements HandlerExceptionResolver {
   /**
    * The constant MODEL_KEY.
    */
-  @SuppressWarnings("WeakerAccess")
   protected static final String MODEL_KEY = "error";
 
   @Getter(AccessLevel.PROTECTED)
@@ -100,7 +99,6 @@ public class ApiExceptionResolver implements HandlerExceptionResolver {
     this.xmlMapper = objectMapperBuilder.createXmlMapper(true).build();
   }
 
-  @SuppressWarnings("unused")
   public ApiExceptionResolver(
       final RestApiExceptionMapper exceptionMapper,
       ObjectMapper objectMapper,
