@@ -95,7 +95,7 @@ class AceImpl implements Ace {
     return Objects.hash(guest, treeSet(users), treeSet(roles), treeSet(groups));
   }
 
-  private TreeSet<String> treeSet(Collection<String> collection) {
+  static TreeSet<String> treeSet(Collection<String> collection) {
     if (collection == null) {
       return new TreeSet<>();
     }
