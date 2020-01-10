@@ -16,8 +16,8 @@
 
 package org.bremersee.exception;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
@@ -28,7 +28,7 @@ import java.util.Map;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.bremersee.exception.model.RestApiException;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
@@ -41,13 +41,13 @@ import org.springframework.util.MultiValueMap;
  * @author Christian Bremer
  */
 @Slf4j
-public class RestApiExceptionParserImplTest {
+class RestApiExceptionParserImplTest {
 
   /**
    * Test response is null.
    */
   @Test
-  public void testResponseIsNull() {
+  void testResponseIsNull() {
     final RestApiException actual = new RestApiExceptionParserImpl()
         .parseException(null, null);
     assertNotNull(actual);
@@ -60,7 +60,7 @@ public class RestApiExceptionParserImplTest {
    * @throws Exception the exception
    */
   @Test
-  public void testResponseIsJson() throws Exception {
+  void testResponseIsJson() throws Exception {
     final RestApiException expected = restApiException();
     log.info("Expected: {}", expected);
     final RestApiException actual = new RestApiExceptionParserImpl()
@@ -78,7 +78,7 @@ public class RestApiExceptionParserImplTest {
    * @throws Exception the exception
    */
   @Test
-  public void testResponseIsXml() throws Exception {
+  void testResponseIsXml() throws Exception {
     final RestApiException expected = restApiException();
     log.info("Expected: {}", expected);
     final RestApiException actual = new RestApiExceptionParserImpl()
@@ -96,7 +96,7 @@ public class RestApiExceptionParserImplTest {
    * @throws Exception the exception
    */
   @Test
-  public void testResponseIsSomethingElse() throws Exception {
+  void testResponseIsSomethingElse() throws Exception {
     final String response = getJsonMapper()
         .writeValueAsString(otherResponse());
     final RestApiException expected = new RestApiException();
@@ -116,7 +116,7 @@ public class RestApiExceptionParserImplTest {
    * Test response is empty.
    */
   @Test
-  public void testResponseIsEmpty() {
+  void testResponseIsEmpty() {
     final String response = "";
     final RestApiException expected = new RestApiException();
     expected.setMessage(RestApiExceptionUtils.NO_MESSAGE_VALUE);
@@ -135,7 +135,7 @@ public class RestApiExceptionParserImplTest {
    * Test response is empty but headers are present.
    */
   @Test
-  public void testResponseIsEmptyButHeadersArePresent() {
+  void testResponseIsEmptyButHeadersArePresent() {
     final OffsetDateTime now = OffsetDateTime.now(ZoneId.of("UTC"));
     final String nowStr = now.format(RestApiExceptionUtils.TIMESTAMP_FORMATTER);
     final String response = "";
