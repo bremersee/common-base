@@ -23,11 +23,3 @@ comment:
   layout: "reach,diff,flags,tree"
   behavior: default
   require_changes: no
-
-ignore:
-  - "common-base-ldaptive-starter"
-  - "common-base-security-starter"
-  - "common-base-thymeleaf-starter"
-  - "common-base-web-starter"
-  - "common-base-webflux-starter"
-  - "common-base-webmvc-starter"
