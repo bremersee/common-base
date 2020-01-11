@@ -61,7 +61,7 @@ public class RestApiExceptionMapperImpl implements RestApiExceptionMapper {
   /**
    * Instantiates a new rest api exception mapper.
    *
-   * @param properties      the properties
+   * @param properties the properties
    * @param applicationName the application name
    */
   public RestApiExceptionMapperImpl(
@@ -241,8 +241,8 @@ public class RestApiExceptionMapperImpl implements RestApiExceptionMapper {
    * Detect message exception message.
    *
    * @param exception the exception
-   * @param handler   the handler
-   * @param config    the config
+   * @param handler the handler
+   * @param config the config
    * @return the exception message
    */
   @SuppressWarnings("WeakerAccess")
@@ -277,8 +277,8 @@ public class RestApiExceptionMapperImpl implements RestApiExceptionMapper {
    * Detect the error code.
    *
    * @param exception the exception
-   * @param handler   the handler
-   * @param config    the config
+   * @param handler the handler
+   * @param config the config
    * @return the string
    */
   @SuppressWarnings("WeakerAccess")
@@ -340,7 +340,7 @@ public class RestApiExceptionMapperImpl implements RestApiExceptionMapper {
    * Add stack trace items.
    *
    * @param restApiException the rest api exception
-   * @param stackTrace       the stack trace
+   * @param stackTrace the stack trace
    */
   @SuppressWarnings("WeakerAccess")
   protected void addStackTraceItems(
@@ -365,7 +365,7 @@ public class RestApiExceptionMapperImpl implements RestApiExceptionMapper {
   /**
    * Build the cause of a rest api exception.
    *
-   * @param cause  the cause
+   * @param cause the cause
    * @param config the config
    * @return the rest api exception
    */

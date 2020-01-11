@@ -1,14 +1,14 @@
 package org.bremersee.exception;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ArrayList;
 import java.util.List;
 import org.bremersee.exception.RestApiExceptionMapperProperties.ExceptionMapping;
 import org.bremersee.exception.RestApiExceptionMapperProperties.ExceptionMappingConfig;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 
 /**
@@ -16,13 +16,13 @@ import org.springframework.http.HttpStatus;
  *
  * @author Christian Bremer
  */
-public class RestApiExceptionMapperPropertiesTest {
+class RestApiExceptionMapperPropertiesTest {
 
   /**
    * Tests find exception mapping.
    */
   @Test
-  public void findExceptionMapping() {
+  void findExceptionMapping() {
     RestApiExceptionMapperProperties properties = new RestApiExceptionMapperProperties();
     ExceptionMapping mapping = properties.findExceptionMapping(new Exception());
     assertEquals(properties.getDefaultExceptionMapping(), mapping);
@@ -48,7 +48,7 @@ public class RestApiExceptionMapperPropertiesTest {
    * Tests find exception mapping config.
    */
   @Test
-  public void findExceptionMappingConfig() {
+  void findExceptionMappingConfig() {
     RestApiExceptionMapperProperties properties = new RestApiExceptionMapperProperties();
     ExceptionMappingConfig config = properties.findExceptionMappingConfig(new Exception());
     assertEquals(properties.getDefaultExceptionMappingConfig(), config);
@@ -89,7 +89,7 @@ public class RestApiExceptionMapperPropertiesTest {
    * Tests get api paths.
    */
   @Test
-  public void getApiPaths() {
+  void getApiPaths() {
     List<String> paths = new ArrayList<>();
     paths.add("/foo/**");
     paths.add("/bar/**");
@@ -102,7 +102,7 @@ public class RestApiExceptionMapperPropertiesTest {
    * Tests get default exception mapping.
    */
   @Test
-  public void getDefaultExceptionMapping() {
+  void getDefaultExceptionMapping() {
     ExceptionMapping newMapping = new ExceptionMapping();
     newMapping.setExceptionClassName(IllegalAccessException.class.getName());
     newMapping.setCode("ILLEGAL_ACCESS");
@@ -117,7 +117,7 @@ public class RestApiExceptionMapperPropertiesTest {
    * Tests get exception mappings.
    */
   @Test
-  public void getExceptionMappings() {
+  void getExceptionMappings() {
     RestApiExceptionMapperProperties properties = new RestApiExceptionMapperProperties();
     List<ExceptionMapping> mappings = properties.getExceptionMappings();
     assertTrue(
@@ -152,7 +152,7 @@ public class RestApiExceptionMapperPropertiesTest {
    * Tests get default exception mapping config.
    */
   @Test
-  public void getDefaultExceptionMappingConfig() {
+  void getDefaultExceptionMappingConfig() {
     ExceptionMappingConfig newConfig = new ExceptionMappingConfig();
     newConfig.setEvaluateAnnotationFirst(true);
     newConfig.setExceptionClassName(IllegalAccessException.class.getName());
@@ -171,7 +171,7 @@ public class RestApiExceptionMapperPropertiesTest {
    * Tests get exception mapping configs.
    */
   @Test
-  public void getExceptionMappingConfigs() {
+  void getExceptionMappingConfigs() {
     RestApiExceptionMapperProperties properties = new RestApiExceptionMapperProperties();
     List<ExceptionMappingConfig> configs = properties.getExceptionMappingConfigs();
     assertNotNull(configs);
