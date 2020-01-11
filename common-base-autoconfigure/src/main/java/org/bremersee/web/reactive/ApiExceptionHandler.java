@@ -67,10 +67,10 @@ public class ApiExceptionHandler extends AbstractErrorWebExceptionHandler {
   /**
    * Instantiates a new api exception handler.
    *
-   * @param errorAttributes        the error attributes
-   * @param resourceProperties     the resource properties
-   * @param applicationContext     the application context
-   * @param serverCodecConfigurer  the server codec configurer
+   * @param errorAttributes the error attributes
+   * @param resourceProperties the resource properties
+   * @param applicationContext the application context
+   * @param serverCodecConfigurer the server codec configurer
    * @param restApiExceptionMapper the rest api exception mapper
    */
   public ApiExceptionHandler(

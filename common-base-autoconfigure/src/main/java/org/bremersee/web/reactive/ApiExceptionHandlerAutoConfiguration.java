@@ -45,10 +45,10 @@ public class ApiExceptionHandlerAutoConfiguration {
   /**
    * Builds api exception handler bean.
    *
-   * @param errorAttributes        the error attributes
-   * @param resourceProperties     the resource properties
-   * @param applicationContext     the application context
-   * @param serverCodecConfigurer  the server codec configurer
+   * @param errorAttributes the error attributes
+   * @param resourceProperties the resource properties
+   * @param applicationContext the application context
+   * @param serverCodecConfigurer the server codec configurer
    * @param restApiExceptionMapper the rest api exception mapper
    * @return the api exception handler bean
    */

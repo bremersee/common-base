@@ -63,7 +63,7 @@ public class AdditionalThymeleafAutoConfiguration {
   /**
    * Instantiates a new additional thymeleaf auto configuration.
    *
-   * @param properties     the properties
+   * @param properties the properties
    * @param templateEngine the template engine
    */
   public AdditionalThymeleafAutoConfiguration(
@@ -114,7 +114,7 @@ public class AdditionalThymeleafAutoConfiguration {
    * Build template resolver.
    *
    * @param resolverProperties the resolver properties
-   * @param index              the index
+   * @param index the index
    * @return the template resolver
    */
   protected ITemplateResolver buildTemplateResolver(

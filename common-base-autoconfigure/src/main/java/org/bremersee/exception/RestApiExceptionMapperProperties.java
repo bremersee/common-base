@@ -273,8 +273,8 @@ public class RestApiExceptionMapperProperties {
      * Instantiates a new exception mapping.
      *
      * @param exceptionClassName the exception class name
-     * @param httpStatus         the http status
-     * @param code               the code
+     * @param httpStatus the http status
+     * @param code the code
      */
     @SuppressWarnings("WeakerAccess")
     public ExceptionMapping(String exceptionClassName, HttpStatus httpStatus, String code) {
