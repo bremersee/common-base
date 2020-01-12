@@ -38,6 +38,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
  */
 @ConditionalOnWebApplication(type = Type.SERVLET)
 @ConditionalOnBean({
+    ApiExceptionResolver.class,
     RestApiExceptionMapper.class,
     Jackson2ObjectMapperBuilder.class
 })
