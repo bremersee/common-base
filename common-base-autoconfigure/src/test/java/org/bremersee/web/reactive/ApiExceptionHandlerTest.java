@@ -16,10 +16,10 @@
 
 package org.bremersee.web.reactive;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -30,8 +30,8 @@ import org.bremersee.exception.RestApiExceptionMapperImpl;
 import org.bremersee.exception.RestApiExceptionMapperProperties;
 import org.bremersee.exception.RestApiExceptionUtils;
 import org.bremersee.exception.ServiceException;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 import org.springframework.boot.autoconfigure.web.ResourceProperties;
 import org.springframework.boot.web.reactive.error.ErrorAttributes;
 import org.springframework.context.ApplicationContext;
@@ -39,6 +39,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.codec.support.DefaultServerCodecConfigurer;
+import org.springframework.util.AntPathMatcher;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import reactor.test.StepVerifier;
 
@@ -47,7 +48,7 @@ import reactor.test.StepVerifier;
  *
  * @author Christian Bremer
  */
-public class ApiExceptionHandlerTest {
+class ApiExceptionHandlerTest {
 
   private static ServiceException exception;
 
@@ -56,8 +57,8 @@ public class ApiExceptionHandlerTest {
   /**
    * Setup test.
    */
-  @BeforeClass
-  public static void setup() {
+  @BeforeAll
+  static void setup() {
     final RestApiExceptionMapperProperties properties = new RestApiExceptionMapperProperties();
     properties.setApiPaths(Collections.singletonList("/api/**"));
     properties.getDefaultExceptionMappingConfig().setIncludeHandler(true);
@@ -88,13 +89,19 @@ public class ApiExceptionHandlerTest {
         applicationContext,
         codecConfigurer,
         mapper);
+    exceptionHandler.setPathMatcher(new AntPathMatcher());
+  }
+
+  @Test
+  void testGetRouterFunction() {
+    assertNotNull(exceptionHandler.getRoutingFunction(mock(ErrorAttributes.class)));
   }
 
   /**
    * Test responsible exception handler.
    */
   @Test
-  public void testResponsibleExceptionHandler() {
+  void testResponsibleExceptionHandler() {
     ServerRequest serverRequest = mock(ServerRequest.class);
     when(serverRequest.path()).thenReturn("/api/resource");
     assertTrue(exceptionHandler.isResponsibleExceptionHandler(serverRequest));
@@ -104,7 +111,7 @@ public class ApiExceptionHandlerTest {
    * Test render error response as json.
    */
   @Test
-  public void testRenderErrorResponseAsJson() {
+  void testRenderErrorResponseAsJson() {
     doTestingRenderErrorResponse(MediaType.APPLICATION_JSON);
   }
 
@@ -112,7 +119,7 @@ public class ApiExceptionHandlerTest {
    * Test render error response as xml.
    */
   @Test
-  public void testRenderErrorResponseAsXml() {
+  void testRenderErrorResponseAsXml() {
     doTestingRenderErrorResponse(MediaType.APPLICATION_XML);
   }
 
@@ -120,7 +127,7 @@ public class ApiExceptionHandlerTest {
    * Test render error response as something else.
    */
   @Test
-  public void testRenderErrorResponseAsSomethingElse() {
+  void testRenderErrorResponseAsSomethingElse() {
     doTestingRenderErrorResponse(MediaType.IMAGE_JPEG);
   }
 
