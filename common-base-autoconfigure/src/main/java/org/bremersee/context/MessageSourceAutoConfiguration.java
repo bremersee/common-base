@@ -48,7 +48,7 @@ import org.springframework.util.StringUtils;
 @Slf4j
 public class MessageSourceAutoConfiguration {
 
-  private static final String DEFAULT_MESSAGES_BASE_NAME = "classpath:messages";
+  private static final String DEFAULT_MESSAGES_BASE_NAME = "messages";
 
   private final MessageSourceProperties properties;
 
@@ -73,7 +73,7 @@ public class MessageSourceAutoConfiguration {
             + "* defaultEncoding = {}\n"
             + "*********************************************************************************",
         getClass().getSimpleName(),
-        properties.getBaseNames(),
+        getBaseNames(),
         properties.getDefaultLocale(),
         properties.isFallbackToSystemLocale(),
         properties.getDefaultEncoding());
@@ -115,13 +115,18 @@ public class MessageSourceAutoConfiguration {
     }
     messageSource.setFallbackToSystemLocale(properties.isFallbackToSystemLocale());
     messageSource.setDefaultEncoding(properties.getDefaultEncoding());
-    final List<String> baseNames = new ArrayList<>(properties.getBaseNames());
-    if (!baseNames.isEmpty()) {
-      baseNames.add(DEFAULT_MESSAGES_BASE_NAME);
-    }
+    final List<String> baseNames = getBaseNames();
     messageSource.setBasenames(baseNames.toArray(new String[0]));
     messageSource.setCacheSeconds(properties.getCacheSeconds());
     messageSource.setAlwaysUseMessageFormat(properties.isAlwaysUseMessageFormat());
     messageSource.setUseCodeAsDefaultMessage(properties.isUseCodeAsDefaultMessage());
+  }
+
+  private List<String> getBaseNames() {
+    final List<String> baseNames = new ArrayList<>(properties.getBaseNames());
+    if (baseNames.isEmpty()) {
+      baseNames.add(DEFAULT_MESSAGES_BASE_NAME);
+    }
+    return baseNames;
   }
 }
