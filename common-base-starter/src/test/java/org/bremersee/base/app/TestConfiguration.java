@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.bremersee.data.ldaptive.app;
+package org.bremersee.base.app;
 
 import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;

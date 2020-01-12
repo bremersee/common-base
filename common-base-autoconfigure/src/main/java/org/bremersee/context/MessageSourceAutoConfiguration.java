@@ -68,9 +68,15 @@ public class MessageSourceAutoConfiguration {
             + "* {}\n"
             + "*********************************************************************************\n"
             + "* baseNames = {}\n"
+            + "* defaultLocale = {}\n"
+            + "* fallbackToSystemLocale = {}\n"
+            + "* defaultEncoding = {}\n"
             + "*********************************************************************************",
         getClass().getSimpleName(),
-        properties.getBaseNames());
+        properties.getBaseNames(),
+        properties.getDefaultLocale(),
+        properties.isFallbackToSystemLocale(),
+        properties.getDefaultEncoding());
   }
 
   /**
