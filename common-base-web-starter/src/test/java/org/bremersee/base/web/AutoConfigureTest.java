@@ -39,7 +39,6 @@ import org.bremersee.converter.StringToTimeZoneIdConverter;
 import org.bremersee.exception.RestApiExceptionMapper;
 import org.bremersee.exception.ServiceException;
 import org.bremersee.exception.model.RestApiException;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -274,7 +273,6 @@ public class AutoConfigureTest {
    *
    * @throws UnsupportedEncodingException the unsupported encoding exception
    */
-  @Disabled
   @Test
   void testTimeZone() throws UnsupportedEncodingException {
     TimeZoneId expected = TimeZoneId.EUROPE_BERLIN;
