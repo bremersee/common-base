@@ -31,7 +31,7 @@ import org.springframework.lang.Nullable;
  * @param <T> the acl type
  * @author Christian Bremer
  */
-@SuppressWarnings({"unused", "WeakerAccess"})
+@SuppressWarnings({"WeakerAccess"})
 public class AclMapperImpl<T extends Acl<? extends Ace>> implements AclMapper<T> {
 
   private final AclFactory<T> aclFactory;
@@ -59,9 +59,9 @@ public class AclMapperImpl<T extends Acl<? extends Ace>> implements AclMapper<T>
   /**
    * Instantiates a new acl mapper.
    *
-   * @param aclFactory         the acl factory
+   * @param aclFactory the acl factory
    * @param defaultPermissions the default permissions
-   * @param switchAdminAccess  the switch admin access
+   * @param switchAdminAccess the switch admin access
    */
   public AclMapperImpl(
       @NotNull AclFactory<T> aclFactory,
@@ -73,10 +73,10 @@ public class AclMapperImpl<T extends Acl<? extends Ace>> implements AclMapper<T>
   /**
    * Instantiates a new acl mapper.
    *
-   * @param aclFactory         the acl factory
+   * @param aclFactory the acl factory
    * @param defaultPermissions the default permissions
-   * @param switchAdminAccess  the switch admin access
-   * @param returnNull         the return null
+   * @param switchAdminAccess the switch admin access
+   * @param returnNull the return null
    */
   public AclMapperImpl(
       @NotNull AclFactory<T> aclFactory,
@@ -100,7 +100,7 @@ public class AclMapperImpl<T extends Acl<? extends Ace>> implements AclMapper<T>
   }
 
   @Override
-  public AccessControlList map(Acl acl) {
+  public AccessControlList map(@SuppressWarnings("rawtypes") Acl acl) {
     if (acl == null && returnNull) {
       return null;
     }

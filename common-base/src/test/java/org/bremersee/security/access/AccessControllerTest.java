@@ -16,7 +16,9 @@
 
 package org.bremersee.security.access;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -33,12 +35,15 @@ import org.junit.jupiter.api.Test;
  */
 class AccessControllerTest {
 
+  /**
+   * From.
+   */
   @Test
   void from() {
-    assertNotNull(AccessController.from((Acl<?>)null));
+    assertNotNull(AccessController.from((Acl<?>) null));
     assertNotNull(AccessController.from(new AclImpl("owner", null)));
 
-    assertNotNull(AccessController.from((AccessControlList)null));
+    assertNotNull(AccessController.from((AccessControlList) null));
     assertNotNull(AccessController.from(AccessControlList.builder().build()));
   }
 
@@ -80,6 +85,22 @@ class AccessControllerTest {
                 .build()
         ))
         .build();
+    assertFalse(
+        AccessController
+            .from(acl)
+            .hasPermission(
+                "test",
+                null,
+                null,
+                null));
+    assertFalse(
+        AccessController
+            .from((AccessControlList) null)
+            .hasPermission(
+                "test",
+                null,
+                null,
+                "read"));
     assertTrue(
         AccessController
             .from(acl)

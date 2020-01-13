@@ -16,7 +16,11 @@
 
 package org.bremersee.security.access;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -32,6 +36,53 @@ import org.junit.jupiter.api.Test;
  * @author Christian Bremer
  */
 class AclMapperImplTest {
+
+  /**
+   * Admin role.
+   */
+  @Test
+  void adminRole() {
+    AclMapperImpl<Acl<? extends Ace>> mapper = new AclMapperImpl<>(
+        AclImpl::new,
+        PermissionConstants.ALL,
+        true,
+        false
+    );
+    mapper.setAdminRole("ROLE_SUPER_USER");
+    assertEquals("ROLE_SUPER_USER", mapper.getAdminRole());
+  }
+
+  /**
+   * Switch admin access.
+   */
+  @Test
+  void switchAdminAccess() {
+    AclMapperImpl<Acl<? extends Ace>> mapper = new AclMapperImpl<>(
+        AclImpl::new,
+        PermissionConstants.ALL,
+        true,
+        false
+    );
+    mapper.setAdminRole("ROLE_ADMINISTRATOR");
+    Acl<? extends Ace> acl = mapper.defaultAcl("someone");
+    assertEquals("someone", acl.getOwner());
+    for (String permission : PermissionConstants.ALL) {
+      assertTrue(acl.entryMap().get(permission).getRoles().contains("ROLE_ADMINISTRATOR"));
+    }
+
+    mapper = new AclMapperImpl<>(
+        AclImpl::new,
+        PermissionConstants.ALL,
+        false,
+        false
+    );
+    mapper.setAdminRole("ROLE_ADMIN");
+    acl = mapper.defaultAcl("somebody");
+    assertEquals("somebody", acl.getOwner());
+    for (String permission : PermissionConstants.ALL) {
+      assertFalse(acl.entryMap().get(permission).getRoles().contains("ROLE_ADMIN"));
+    }
+  }
 
   /**
    * Map with defaults and admin switch.
