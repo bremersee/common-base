@@ -16,20 +16,26 @@
 
 package org.bremersee.base.webmvc;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import lombok.extern.slf4j.Slf4j;
 import org.bremersee.base.webmvc.app.TestConfiguration;
+import org.bremersee.security.core.AuthorityConstants;
 import org.bremersee.test.security.authentication.WithJwtAuthenticationToken;
-import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.TestInstance.Lifecycle;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
-import org.springframework.boot.test.web.client.TestRestTemplate;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.context.WebApplicationContext;
 
 /**
  * The auto configure test.
@@ -45,26 +51,102 @@ import org.springframework.security.test.context.support.WithMockUser;
         "bremersee.exception-mapping.api-paths=/api/**",
         "bremersee.security.authentication.enable-jwt-support=true"
     })
+@TestInstance(Lifecycle.PER_CLASS)
 @Slf4j
 public class AutoConfigureTest {
 
-  /**
-   * The Rest template.
-   */
   @Autowired
-  TestRestTemplate restTemplate;
+  WebApplicationContext context;
+
+  MockMvc mvc;
+
+  @BeforeAll
+  void setup() {
+    mvc = MockMvcBuilders
+        .webAppContextSetup(context)
+        .apply(springSecurity())
+        .build();
+  }
 
   /**
    * Current user name.
    */
-  //@WithJwtAuthenticationToken(preferredUsername = "leopold")
-  @WithMockUser(username = "leopold")
+  @WithJwtAuthenticationToken(preferredUsername = "leopold")
   @Test
-  void currentUserName() {
-    ResponseEntity<String> actual = restTemplate.getForEntity("/api/name", String.class);
-    System.out.println("==========> " + actual.getStatusCode());
-    // assertNotNull(actual);
-    // assertEquals("leopold", actual);
+  void currentUserName() throws Exception {
+    mvc.perform(get("/api/name"))
+        .andExpect(status().is2xxSuccessful())
+        .andExpect(content().string("leopold"));
+  }
+
+  /**
+   * Current admin name.
+   */
+  @WithJwtAuthenticationToken(
+      preferredUsername = "leopold",
+      roles = {AuthorityConstants.ADMIN_ROLE_NAME})
+  @Test
+  void currentAdminName() throws Exception {
+    mvc.perform(get("/api/admin/name"))
+        .andExpect(status().is2xxSuccessful())
+        .andExpect(content().string("leopold"));
+  }
+
+  @WithJwtAuthenticationToken(preferredUsername = "leopold")
+  @Test
+  void currentAdminNameAndExpectForbidden() throws Exception {
+    mvc.perform(get("/api/admin/name"))
+        .andExpect(status().is4xxClientError());
+  }
+
+  /*
+  @WithJwtAuthenticationToken(preferredUsername = "leopold")
+  @Test
+  void exception() throws Exception {
+    mvc.perform(get("/api/exception"))
+        .andExpect(status().is4xxClientError())
+        .andExpect(MockMvcResultMatchers.content().string(new BaseMatcher<String>() {
+          @Override
+          public boolean matches(Object o) {
+            System.out.println("========> " + o);
+            return o != null && o.toString().contains("TEST:4711");
+          }
+
+          @Override
+          public void describeTo(Description description) {
+
+          }
+        }));
+  }
+  */
+
+  /**
+   * Health.
+   */
+  @Test
+  void health() throws Exception {
+    mvc.perform(get("/actuator/health"))
+        .andExpect(status().is2xxSuccessful())
+        .andExpect(content().string("{\"status\":\"UP\"}"));
+  }
+
+  /**
+   * Info.
+   */
+  @WithMockUser(username = "actuator", authorities = {AuthorityConstants.ACTUATOR_ROLE_NAME})
+  @Test
+  void info() throws Exception {
+    mvc.perform(get("/actuator/info"))
+        .andExpect(status().is2xxSuccessful());
+  }
+
+  /**
+   * Info and expect client error.
+   */
+  @Test
+  void infoAndExpectClientError() throws Exception {
+    mvc.perform(get("/actuator/info"))
+        .andExpect(status().is4xxClientError());
   }
 
 }

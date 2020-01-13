@@ -19,6 +19,7 @@ package org.bremersee.base.webflux.app;
 import java.security.Principal;
 import org.bremersee.exception.ServiceException;
 import org.springframework.http.MediaType;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.ReactiveSecurityContextHolder;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -50,6 +51,7 @@ public class TestController {
    *
    * @return the name of the admin user
    */
+  @PreAuthorize("hasAuthority('ROLE_ADMIN')")
   @GetMapping(path = "/api/admin/name", produces = MediaType.TEXT_PLAIN_VALUE)
   public Mono<String> currentAdminName() {
     return ReactiveSecurityContextHolder.getContext()
