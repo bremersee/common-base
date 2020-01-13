@@ -87,6 +87,7 @@ public class TestConfiguration {
           .csrf().disable()
           .authorizeRequests()
           .antMatchers(HttpMethod.OPTIONS).permitAll()
+          .antMatchers("/api/exception").permitAll()
           .antMatchers("/api/admin/**").hasAuthority(AuthorityConstants.ADMIN_ROLE_NAME)
           .anyRequest()
           .authenticated();

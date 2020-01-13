@@ -23,6 +23,7 @@ import org.bremersee.exception.RestApiExceptionMapperAutoConfiguration;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication.Type;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
@@ -37,8 +38,10 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
  * The api exception resolver auto configuration.
  */
 @ConditionalOnWebApplication(type = Type.SERVLET)
+@ConditionalOnClass({
+    ApiExceptionResolver.class
+})
 @ConditionalOnBean({
-    ApiExceptionResolver.class,
     RestApiExceptionMapper.class,
     Jackson2ObjectMapperBuilder.class
 })
