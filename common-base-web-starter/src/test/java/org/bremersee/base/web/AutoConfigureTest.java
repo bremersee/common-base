@@ -277,7 +277,7 @@ public class AutoConfigureTest {
   void testTimeZone() throws UnsupportedEncodingException {
     TimeZoneId expected = TimeZoneId.EUROPE_BERLIN;
     assertEquals(expected, new StringToTimeZoneIdConverter().convert(expected.toString()));
-    String value = URLEncoder.encode(expected.toString(), StandardCharsets.UTF_8.toString());
+    String value = URLEncoder.encode(expected.toString(), StandardCharsets.UTF_8.name());
     String actual = restTemplate.getForEntity("/timezone/{value}", String.class, value)
         .getBody();
     assertNotNull(actual);
