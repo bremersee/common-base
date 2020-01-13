@@ -40,7 +40,7 @@ public interface RequestUriSpecBuilder {
    * Build request headers uri spec.
    *
    * @param parameters the parameters
-   * @param webClient  the web client
+   * @param webClient the web client
    * @return the request headers uri spec
    */
   RequestHeadersUriSpec<?> build(InvocationParameters parameters, WebClient webClient);

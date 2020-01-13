@@ -8,9 +8,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.bremersee.web.reactive.function.client.WebClientException;
 import org.bremersee.web.reactive.function.client.proxy.app.ControllerOne;
 import org.bremersee.web.reactive.function.client.proxy.app.ControllerTwo;
+import org.bremersee.web.reactive.function.client.proxy.app.FormDataController;
 import org.bremersee.web.reactive.function.client.proxy.app.ProxyTestConfiguration;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
@@ -64,6 +64,13 @@ class WebClientProxyBuilderTest {
         .build(ControllerTwo.class);
   }
 
+  private FormDataController newFormDataController() {
+    return WebClientProxyBuilder.defaultBuilder()
+        .webClient(newWebClient())
+        .commonFunctions(InvocationFunctions.builder().build())
+        .build(FormDataController.class);
+  }
+
   /**
    * Call with web test client.
    */
@@ -112,12 +119,12 @@ class WebClientProxyBuilderTest {
   /**
    * Do post.
    */
-  @Disabled
+  // @Disabled
   @Test
   void doPost() {
     MultiValueMap<String, String> form = new LinkedMultiValueMap<>();
     form.add("value", "ok");
-    StepVerifier.create(newControllerOneClient().addOk(form))
+    StepVerifier.create(newFormDataController().addOk(form))
         .assertNext(response -> assertEquals(OK_RESPONSE, response))
         .expectNextCount(0)
         .verifyComplete();
@@ -162,7 +169,6 @@ class WebClientProxyBuilderTest {
   /**
    * Upload.
    */
-  @Disabled
   @Test
   void upload() {
     MultiValueMap<String, String> data = new LinkedMultiValueMap<>();
@@ -174,7 +180,7 @@ class WebClientProxyBuilderTest {
     map.put("last", "a-value");
     map.putAll(data);
 
-    StepVerifier.create(newControllerOneClient().upload("a-flag", "a-value", data))
+    StepVerifier.create(newFormDataController().upload("a-flag", "a-value", data))
         .assertNext(response -> assertEquals(map, response))
         .expectNextCount(0)
         .verifyComplete();

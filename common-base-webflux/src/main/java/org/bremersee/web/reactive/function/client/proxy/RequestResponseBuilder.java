@@ -34,7 +34,7 @@ public interface RequestResponseBuilder {
   /**
    * Build object.
    *
-   * @param parameters   the parameters
+   * @param parameters the parameters
    * @param responseSpec the response spec
    * @return the object
    */

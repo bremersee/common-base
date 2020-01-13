@@ -39,9 +39,8 @@ public class DefaultWebClientErrorDecoder
   /**
    * Instantiates a new web client error decoder.
    */
-  @SuppressWarnings("WeakerAccess")
   public DefaultWebClientErrorDecoder() {
-    this.parser = new RestApiExceptionParserImpl();
+    this(null);
   }
 
   /**
@@ -49,7 +48,6 @@ public class DefaultWebClientErrorDecoder
    *
    * @param parser the parser
    */
-  @SuppressWarnings("unused")
   public DefaultWebClientErrorDecoder(
       RestApiExceptionParser parser) {
     this.parser = parser != null ? parser : new RestApiExceptionParserImpl();
