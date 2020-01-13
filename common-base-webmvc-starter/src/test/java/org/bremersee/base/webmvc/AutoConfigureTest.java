@@ -16,6 +16,9 @@
 
 package org.bremersee.base.webmvc;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -32,6 +35,9 @@ import org.junit.jupiter.api.TestInstance.Lifecycle;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
+import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -55,11 +61,26 @@ import org.springframework.web.context.WebApplicationContext;
 @Slf4j
 public class AutoConfigureTest {
 
+  /**
+   * The Context.
+   */
   @Autowired
   WebApplicationContext context;
 
+  /**
+   * The Rest template.
+   */
+  @Autowired
+  TestRestTemplate restTemplate;
+
+  /**
+   * The Mvc.
+   */
   MockMvc mvc;
 
+  /**
+   * Sets .
+   */
   @BeforeAll
   void setup() {
     mvc = MockMvcBuilders
@@ -70,6 +91,8 @@ public class AutoConfigureTest {
 
   /**
    * Current user name.
+   *
+   * @throws Exception the exception
    */
   @WithJwtAuthenticationToken(preferredUsername = "leopold")
   @Test
@@ -81,6 +104,8 @@ public class AutoConfigureTest {
 
   /**
    * Current admin name.
+   *
+   * @throws Exception the exception
    */
   @WithJwtAuthenticationToken(
       preferredUsername = "leopold",
@@ -92,6 +117,11 @@ public class AutoConfigureTest {
         .andExpect(content().string("leopold"));
   }
 
+  /**
+   * Current admin name and expect forbidden.
+   *
+   * @throws Exception the exception
+   */
   @WithJwtAuthenticationToken(preferredUsername = "leopold")
   @Test
   void currentAdminNameAndExpectForbidden() throws Exception {
@@ -99,29 +129,21 @@ public class AutoConfigureTest {
         .andExpect(status().is4xxClientError());
   }
 
-  /*
-  @WithJwtAuthenticationToken(preferredUsername = "leopold")
+  /**
+   * Exception.
+   */
   @Test
-  void exception() throws Exception {
-    mvc.perform(get("/api/exception"))
-        .andExpect(status().is4xxClientError())
-        .andExpect(MockMvcResultMatchers.content().string(new BaseMatcher<String>() {
-          @Override
-          public boolean matches(Object o) {
-            System.out.println("========> " + o);
-            return o != null && o.toString().contains("TEST:4711");
-          }
-
-          @Override
-          public void describeTo(Description description) {
-
-          }
-        }));
+  void exception() {
+    ResponseEntity<String> response = restTemplate.getForEntity("/api/exception", String.class);
+    assertEquals(HttpStatus.BAD_REQUEST.value(), response.getStatusCodeValue());
+    assertNotNull(response.getBody());
+    assertTrue(response.getBody().contains("TEST:4711"));
   }
-  */
 
   /**
    * Health.
+   *
+   * @throws Exception the exception
    */
   @Test
   void health() throws Exception {
@@ -132,6 +154,8 @@ public class AutoConfigureTest {
 
   /**
    * Info.
+   *
+   * @throws Exception the exception
    */
   @WithMockUser(username = "actuator", authorities = {AuthorityConstants.ACTUATOR_ROLE_NAME})
   @Test
@@ -142,6 +166,8 @@ public class AutoConfigureTest {
 
   /**
    * Info and expect client error.
+   *
+   * @throws Exception the exception
    */
   @Test
   void infoAndExpectClientError() throws Exception {
