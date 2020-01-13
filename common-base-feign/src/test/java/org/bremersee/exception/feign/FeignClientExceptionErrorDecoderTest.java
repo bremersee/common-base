@@ -26,8 +26,10 @@ import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import feign.Request;
 import feign.Request.HttpMethod;
 import feign.Response;
+import feign.Response.Body;
 import feign.RetryableException;
 import feign.Util;
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
@@ -42,6 +44,7 @@ import org.bremersee.exception.RestApiExceptionParserImpl;
 import org.bremersee.exception.ServiceException;
 import org.bremersee.exception.model.RestApiException;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
@@ -255,6 +258,35 @@ class FeignClientExceptionErrorDecoderTest {
   }
 
   /**
+   * Read body failed.
+   *
+   * @throws IOException the io exception
+   */
+  @Test
+  void readBodyFailed() throws IOException {
+    assertNull(FeignClientExceptionErrorDecoder.readBody(null));
+    final MultiValueMap<String, String> headers = new LinkedMultiValueMap<>();
+    headers.add(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_PLAIN_VALUE);
+    final Body body = Mockito.mock(Body.class);
+    Mockito.when(body.asReader()).thenThrow(new IOException("Can happen"));
+    @SuppressWarnings({"unchecked", "rawtypes"}) final Response response = Response
+        .builder()
+        .request(Request
+            .create(
+                HttpMethod.GET,
+                "http://example.org",
+                new HashMap<>(),
+                null,
+                StandardCharsets.UTF_8))
+        .body(body)
+        .headers((Map) headers)
+        .reason("Nothing found")
+        .status(404)
+        .build();
+    assertNull(FeignClientExceptionErrorDecoder.readBody(response));
+  }
+
+  /**
    * Determine retry after.
    */
   @Test
@@ -269,6 +301,22 @@ class FeignClientExceptionErrorDecoderTest {
     actual = FeignClientExceptionErrorDecoder.determineRetryAfter(value);
     assertNotNull(actual);
     assertEquals(expected.getTime(), actual.getTime());
+  }
+
+  /**
+   * Determine retry after failed.
+   */
+  @Test
+  void determineRetryAfterFailed() {
+    assertNull(FeignClientExceptionErrorDecoder.determineRetryAfter(null));
+    Date actual = FeignClientExceptionErrorDecoder.determineRetryAfter("30");
+    assertNotNull(actual);
+    assertTrue(actual.before(new Date(System.currentTimeMillis() + 30001)));
+    Date expected = Date.from(OffsetDateTime.parse("2007-12-24T18:21Z").toInstant());
+    String value = OffsetDateTime.ofInstant(expected.toInstant(), ZoneOffset.UTC)
+        .format(DateTimeFormatter.ISO_DATE_TIME);
+    actual = FeignClientExceptionErrorDecoder.determineRetryAfter(value);
+    assertNull(actual);
   }
 
   /**
