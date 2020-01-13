@@ -21,12 +21,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.bremersee.security.authentication.AuthenticationProperties;
 import org.bremersee.security.authentication.JsonPathJwtConverter;
 import org.bremersee.security.authentication.PasswordFlowAuthenticationManager;
+import org.bremersee.security.core.AuthorityConstants;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.boot.actuate.autoconfigure.security.servlet.EndpointRequest;
 import org.springframework.boot.actuate.health.HealthEndpoint;
-import org.springframework.boot.actuate.info.InfoEndpoint;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.ComponentScan;
@@ -35,7 +35,6 @@ import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.util.matcher.NegatedRequestMatcher;
@@ -47,7 +46,7 @@ import org.springframework.security.web.util.matcher.NegatedRequestMatcher;
  */
 @SpringBootConfiguration
 @EnableAutoConfiguration
-//@EnableGlobalMethodSecurity(prePostEnabled = true)
+@EnableGlobalMethodSecurity(prePostEnabled = true)
 @ComponentScan(basePackageClasses = {TestConfiguration.class})
 public class TestConfiguration {
 
@@ -88,7 +87,7 @@ public class TestConfiguration {
           .csrf().disable()
           .authorizeRequests()
           .antMatchers(HttpMethod.OPTIONS).permitAll()
-          // .antMatchers("/public-api/**").permitAll()
+          .antMatchers("/api/admin/**").hasAuthority(AuthorityConstants.ADMIN_ROLE_NAME)
           .anyRequest()
           .authenticated();
       http
