@@ -20,7 +20,6 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.stream.Stream;
 import org.bremersee.exception.ServiceException;
-import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -50,11 +49,6 @@ public class ControllerOneImpl implements ControllerOne {
   }
 
   @Override
-  public Mono<String> addOk(MultiValueMap<String, String> form) {
-    return form != null && !form.isEmpty() ? Mono.just(OK_RESPONSE) : Mono.just("FAILED");
-  }
-
-  @Override
   public Mono<String> updateOk(String name, String payload) {
     return Mono.just(name + "=" + payload);
   }
@@ -72,16 +66,4 @@ public class ControllerOneImpl implements ControllerOne {
     return Mono.just(true);
   }
 
-  @Override
-  public Mono<Map<String, Object>> upload(
-      String headerValue,
-      String lastValue,
-      MultiValueMap<String, ?> data) {
-
-    LinkedHashMap<String, Object> map = new LinkedHashMap<>();
-    map.put("x-ok-flag", headerValue);
-    map.put("last", lastValue);
-    map.putAll(data);
-    return Mono.just(map);
-  }
 }

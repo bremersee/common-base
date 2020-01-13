@@ -66,13 +66,13 @@ public class InvocationFunctions {
   /**
    * Instantiates new invocation functions.
    *
-   * @param uriSpecBuilder  the uri spec builder
-   * @param uriBuilder      the uri builder
-   * @param headersBuilder  the headers builder
-   * @param cookiesBuilder  the cookies builder
-   * @param bodyInserter    the body inserter
-   * @param errorDetector   the error detector
-   * @param errorDecoder    the error decoder
+   * @param uriSpecBuilder the uri spec builder
+   * @param uriBuilder the uri builder
+   * @param headersBuilder the headers builder
+   * @param cookiesBuilder the cookies builder
+   * @param bodyInserter the body inserter
+   * @param errorDetector the error detector
+   * @param errorDecoder the error decoder
    * @param responseBuilder the response builder
    */
   @Builder

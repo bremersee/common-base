@@ -95,7 +95,7 @@ public class AccessTokenAppender implements ExchangeFilterFunction {
   /**
    * With access token retriever access token appender.
    *
-   * @param retriever  the retriever
+   * @param retriever the retriever
    * @param properties the properties
    * @return the access token appender
    */

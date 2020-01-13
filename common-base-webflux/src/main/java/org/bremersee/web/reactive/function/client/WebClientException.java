@@ -46,8 +46,8 @@ public class WebClientException
   /**
    * Instantiates a new web client exception.
    *
-   * @param status           the status
-   * @param headers          the headers
+   * @param status the status
+   * @param headers the headers
    * @param restApiException the rest api exception
    */
   public WebClientException(

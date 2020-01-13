@@ -28,6 +28,7 @@ import java.time.ZoneId;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.UUID;
+import org.bremersee.exception.RestApiExceptionParserImpl;
 import org.bremersee.exception.ServiceException;
 import org.bremersee.exception.model.RestApiException;
 import org.bremersee.http.MediaTypeHelper;
@@ -46,8 +47,6 @@ import reactor.test.StepVerifier;
  * @author Christian Bremer
  */
 class DefaultWebClientErrorDecoderTest {
-
-  private static final DefaultWebClientErrorDecoder decoder = new DefaultWebClientErrorDecoder();
 
   /**
    * Test decode json.
@@ -96,6 +95,7 @@ class DefaultWebClientErrorDecoderTest {
       throw new Exception("Content type is not supported in this test.");
     }
 
+    DefaultWebClientErrorDecoder decoder = new DefaultWebClientErrorDecoder();
     StepVerifier
         .create(decoder.apply(clientResponse))
         .assertNext(throwable -> {
@@ -132,6 +132,8 @@ class DefaultWebClientErrorDecoderTest {
         clientResponse.bodyToMono(String.class))
         .thenReturn(Mono.just(expected));
 
+    DefaultWebClientErrorDecoder decoder = new DefaultWebClientErrorDecoder(
+        new RestApiExceptionParserImpl());
     StepVerifier
         .create(decoder.apply(clientResponse))
         .assertNext(throwable -> {
@@ -164,6 +166,8 @@ class DefaultWebClientErrorDecoderTest {
         clientResponse.bodyToMono(String.class))
         .thenReturn(Mono.empty());
 
+    DefaultWebClientErrorDecoder decoder = new DefaultWebClientErrorDecoder(
+        new RestApiExceptionParserImpl());
     StepVerifier
         .create(decoder.apply(clientResponse))
         .assertNext(throwable -> {

@@ -73,7 +73,7 @@ public class MessageAwareWebClientErrorDecoder
   /**
    * Instantiates a new message aware web client error decoder.
    *
-   * @param parser    the parser
+   * @param parser the parser
    * @param errorCode the error code
    */
   public MessageAwareWebClientErrorDecoder(

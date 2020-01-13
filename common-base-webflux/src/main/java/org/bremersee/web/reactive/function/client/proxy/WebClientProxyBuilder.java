@@ -54,7 +54,7 @@ public interface WebClientProxyBuilder {
   /**
    * Sets method functions.
    *
-   * @param method    the method
+   * @param method the method
    * @param functions the functions
    * @return the web client proxy builder
    */
@@ -64,7 +64,7 @@ public interface WebClientProxyBuilder {
   /**
    * Build the proxy.
    *
-   * @param <T>    the type of the target
+   * @param <T> the type of the target
    * @param target the target
    * @return the proxy
    */

@@ -33,7 +33,7 @@ public interface WebClientErrorDecoder<E extends Throwable>
    * Build exception.
    *
    * @param clientResponse the client response
-   * @param response       the response
+   * @param response the response
    * @return the exception
    */
   E buildException(ClientResponse clientResponse, String response);

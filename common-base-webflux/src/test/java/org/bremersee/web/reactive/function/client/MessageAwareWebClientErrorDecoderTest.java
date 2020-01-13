@@ -43,6 +43,10 @@ class MessageAwareWebClientErrorDecoderTest {
     assertTrue(decoder.getParser() instanceof MessageExceptionParser);
     assertNull(decoder.getErrorCode());
 
+    decoder = new MessageAwareWebClientErrorDecoder(new MessageExceptionParser());
+    assertTrue(decoder.getParser() instanceof MessageExceptionParser);
+    assertNull(decoder.getErrorCode());
+
     decoder = new MessageAwareWebClientErrorDecoder("FOO");
     assertTrue(decoder.getParser() instanceof MessageExceptionParser);
     assertEquals("FOO", decoder.getErrorCode());

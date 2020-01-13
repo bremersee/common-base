@@ -35,7 +35,7 @@ public interface RequestBodyInserter {
    * Insert.
    *
    * @param parameters the parameters
-   * @param uriSpec    the uri spec
+   * @param uriSpec the uri spec
    */
   void insert(InvocationParameters parameters, RequestBodyUriSpec uriSpec);
 
