@@ -17,11 +17,18 @@
 package org.bremersee.test.web;
 
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import java.util.List;
 import org.bremersee.geojson.model.Geometry;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -65,6 +72,45 @@ public class BadApis {
         method = RequestMethod.GET)
     ResponseEntity<List<Geometry>> getGeometries(
         @ApiParam(value = "The query.") @RequestParam(name = "q", required = false) String query);
+
+    /**
+     * Update geometry response entity.
+     *
+     * @param id the id
+     * @param geometry the geometry
+     * @return the response entity
+     */
+    @PutMapping(path = "/api/geometries/{id}")
+    ResponseEntity<Void> updateGeometry(
+        @PathVariable("id") String id,
+        @RequestBody Geometry geometry);
+
+    /**
+     * Add geometry response entity.
+     *
+     * @param geometry the geometry
+     * @return the response entity
+     */
+    @PostMapping(path = "/api/geometries")
+    ResponseEntity<Void> addGeometry(
+        @RequestBody Geometry geometry);
+
+    /**
+     * Gets geometry.
+     *
+     * @param id the id
+     * @return the geometry
+     */
+    @ApiOperation(
+        value = "Get geometry by ID.",
+        nickname = "getGeometry",
+        response = Geometry.class,
+        tags = {"geometry-controller"})
+    @ApiResponses(value = {
+        @ApiResponse(code = 200, message = "OK", response = Geometry.class)
+    })
+    @GetMapping(path = "/api/geometries/{id}")
+    ResponseEntity<Geometry> getGeometry(@PathVariable("id") String id);
   }
 
   /**
@@ -72,6 +118,44 @@ public class BadApis {
    */
   @Api(value = "BadApiController")
   public interface Four {
+
+    /**
+     * Update geometry response entity.
+     *
+     * @param geometry the geometry
+     * @return the response entity
+     */
+    @SuppressWarnings("MVCPathVariableInspection")
+    @PutMapping(path = "/api/geometries/{id}")
+    ResponseEntity<Void> updateGeometry(
+        @RequestBody Geometry geometry);
+
+    /**
+     * Add geometry response entity.
+     *
+     * @param geometry the geometry
+     * @return the response entity
+     */
+    @SuppressWarnings("unused")
+    ResponseEntity<Void> addGeometry(
+        @RequestBody Geometry geometry);
+
+    /**
+     * Gets geometry.
+     *
+     * @param id the id
+     * @return the geometry
+     */
+    @ApiOperation(
+        value = "Get geometry by ID.",
+        nickname = "getGeometry",
+        response = String.class,
+        tags = {"geometry-controller"})
+    @ApiResponses(value = {
+        @ApiResponse(code = 200, message = "OK", response = String.class)
+    })
+    @GetMapping(path = "/api/geometries/{id}")
+    ResponseEntity<String> getGeometry(@PathVariable("id") String id);
   }
 
 
