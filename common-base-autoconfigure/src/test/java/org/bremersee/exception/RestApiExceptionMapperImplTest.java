@@ -16,11 +16,11 @@
 
 package org.bremersee.exception;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
@@ -29,8 +29,8 @@ import org.bremersee.exception.RestApiExceptionMapperProperties.ExceptionMapping
 import org.bremersee.exception.RestApiExceptionMapperProperties.ExceptionMappingConfig;
 import org.bremersee.exception.model.RestApiException;
 import org.bremersee.web.reactive.function.client.WebClientException;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -42,15 +42,15 @@ import org.springframework.util.MultiValueMap;
  *
  * @author Christian Bremer
  */
-public class RestApiExceptionMapperImplTest {
+class RestApiExceptionMapperImplTest {
 
   private static RestApiExceptionMapper mapper;
 
   /**
    * Setup test.
    */
-  @BeforeClass
-  public static void setup() {
+  @BeforeAll
+  static void setup() {
     final RestApiExceptionMapperProperties properties = new RestApiExceptionMapperProperties();
     properties.setApiPaths(Collections.singletonList("/api/**"));
     mapper = new RestApiExceptionMapperImpl(properties, "test");
@@ -60,7 +60,7 @@ public class RestApiExceptionMapperImplTest {
    * Test get api paths.
    */
   @Test
-  public void testGetApiPaths() {
+  void testGetApiPaths() {
     assertTrue(mapper.getApiPaths().contains("/api/**"));
   }
 
@@ -68,7 +68,7 @@ public class RestApiExceptionMapperImplTest {
    * Test build 409.
    */
   @Test
-  public void testBuild409() {
+  void testBuild409() {
     final ServiceException exception = new ServiceException(409, "Either a or b", "TEST:4711");
     final RestApiException model = mapper.build(exception, "/api/something", null);
     assertNotNull(model);
@@ -83,7 +83,7 @@ public class RestApiExceptionMapperImplTest {
    * Test build 500.
    */
   @Test
-  public void testBuild500() {
+  void testBuild500() {
     final ServiceException exception = new ServiceException(500, "Something failed.", "TEST:4711");
     final RestApiException model = mapper.build(exception, "/api/something", null);
     assertNotNull(model);
@@ -98,7 +98,7 @@ public class RestApiExceptionMapperImplTest {
    * Test build with default exception mapping.
    */
   @Test
-  public void testBuildWithDefaultExceptionMapping() {
+  void testBuildWithDefaultExceptionMapping() {
     final RuntimeException exception = new RuntimeException("Something went wrong");
     final RestApiException model = mapper.build(
         exception, "/api/something", null);
@@ -114,7 +114,7 @@ public class RestApiExceptionMapperImplTest {
    * Test build with default exception mapping and illegal argument exception.
    */
   @Test
-  public void testBuildWithDefaultExceptionMappingAndIllegalArgumentException() {
+  void testBuildWithDefaultExceptionMappingAndIllegalArgumentException() {
     final IllegalArgumentException exception = new IllegalArgumentException();
     final RestApiException model = mapper.build(exception, "/api/illegal", null);
     assertNotNull(model);
@@ -130,7 +130,7 @@ public class RestApiExceptionMapperImplTest {
    * Test build with configured exception mapping.
    */
   @Test
-  public void testBuildWithConfiguredExceptionMapping() {
+  void testBuildWithConfiguredExceptionMapping() {
     final RestApiExceptionMapperProperties properties = new RestApiExceptionMapperProperties();
     properties.setApiPaths(Collections.singletonList("/null-api/**"));
     properties.getExceptionMappings().add(new ExceptionMapping(
@@ -166,7 +166,7 @@ public class RestApiExceptionMapperImplTest {
    * Test build with cause.
    */
   @Test
-  public void testBuildWithCause() {
+  void testBuildWithCause() {
     final MultiValueMap<String, String> headers = new LinkedMultiValueMap<>();
     headers.add(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE);
 

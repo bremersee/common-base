@@ -16,6 +16,8 @@
 
 package org.bremersee.data.ldaptive;
 
+import static org.springframework.util.Assert.notNull;
+
 import java.time.Duration;
 import org.ldaptive.BindConnectionInitializer;
 import org.ldaptive.ConnectionConfig;
@@ -24,7 +26,6 @@ import org.ldaptive.Credential;
 import org.ldaptive.ssl.CredentialConfig;
 import org.ldaptive.ssl.SslConfig;
 import org.ldaptive.ssl.X509CredentialConfig;
-import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
 /**
@@ -42,7 +43,7 @@ public interface LdaptiveConnectionConfigFactory {
    * @return the connection config
    */
   default ConnectionConfig createConnectionConfig(LdaptiveProperties properties) {
-    Assert.notNull(properties, "Ldaptive properties must not be null.");
+    notNull(properties, "Ldaptive properties must not be null.");
     return createConnectionConfig(
         properties,
         properties.getBindDn(),
@@ -52,8 +53,8 @@ public interface LdaptiveConnectionConfigFactory {
   /**
    * Create connection config.
    *
-   * @param properties     the properties
-   * @param bindDn         the bind dn
+   * @param properties the properties
+   * @param bindDn the bind dn
    * @param bindCredential the bind credential
    * @return the connection config
    */
@@ -82,7 +83,7 @@ public interface LdaptiveConnectionConfigFactory {
         final String bindDn,
         final String bindCredential) {
 
-      Assert.notNull(properties, "Ldaptive properties must not be null.");
+      notNull(properties, "Ldaptive properties must not be null.");
       final String username = bindDn != null ? bindDn : properties.getBindDn();
       final String password = bindCredential != null
           ? bindCredential

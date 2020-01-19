@@ -16,15 +16,16 @@
 
 package org.bremersee.security.authentication;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import org.bremersee.exception.AccessTokenRetrieverAuthenticationException;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
@@ -35,13 +36,13 @@ import org.springframework.web.client.RestTemplate;
  *
  * @author Christian Bremer
  */
-public class RestTemplateAccessTokenRetrieverTest {
+class RestTemplateAccessTokenRetrieverTest {
 
   /**
    * Retrieve access token.
    */
   @Test
-  public void retrieveAccessToken() {
+  void retrieveAccessToken() {
     RestTemplate restTemplate = mock(RestTemplate.class);
     //noinspection unchecked
     when(restTemplate.exchange(
@@ -65,8 +66,8 @@ public class RestTemplateAccessTokenRetrieverTest {
   /**
    * Retrieve access token fails.
    */
-  @Test(expected = AccessTokenRetrieverAuthenticationException.class)
-  public void retrieveAccessTokenFails() {
+  @Test
+  void retrieveAccessTokenFails() {
     RestTemplate restTemplate = mock(RestTemplate.class);
     //noinspection unchecked
     when(restTemplate.exchange(
@@ -82,7 +83,10 @@ public class RestTemplateAccessTokenRetrieverTest {
         .username("789")
         .password("012")
         .build();
-    tokenRetriever.retrieveAccessToken(properties);
+
+    assertThrows(
+        AccessTokenRetrieverAuthenticationException.class,
+        () -> tokenRetriever.retrieveAccessToken(properties));
   }
 
 }

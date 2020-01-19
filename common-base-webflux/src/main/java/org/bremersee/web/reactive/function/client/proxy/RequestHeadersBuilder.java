@@ -36,7 +36,7 @@ public interface RequestHeadersBuilder {
    * Sets headers.
    *
    * @param parameters the parameters
-   * @param headers    the headers
+   * @param headers the headers
    */
   void setHeaders(InvocationParameters parameters, HttpHeaders headers);
 
@@ -44,7 +44,7 @@ public interface RequestHeadersBuilder {
    * Build.
    *
    * @param parameters the parameters
-   * @param headers    the headers
+   * @param headers the headers
    */
   default void build(InvocationParameters parameters, HttpHeaders headers) {
     setAcceptHeader(parameters, headers);
@@ -56,7 +56,7 @@ public interface RequestHeadersBuilder {
    * Sets accept header.
    *
    * @param parameters the parameters
-   * @param headers    the headers
+   * @param headers the headers
    */
   default void setAcceptHeader(
       final InvocationParameters parameters,
@@ -73,7 +73,7 @@ public interface RequestHeadersBuilder {
    * Sets content type header.
    *
    * @param parameters the parameters
-   * @param headers    the headers
+   * @param headers the headers
    */
   default void setContentTypeHeader(
       final InvocationParameters parameters,

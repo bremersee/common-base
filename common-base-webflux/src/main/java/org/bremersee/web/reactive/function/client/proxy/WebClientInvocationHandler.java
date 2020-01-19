@@ -46,8 +46,8 @@ class WebClientInvocationHandler implements InvocationHandler {
    *
    * @param methodFunctions the method functions
    * @param commonFunctions the common functions
-   * @param webClient       the web client
-   * @param targetClass     the target class
+   * @param webClient the web client
+   * @param targetClass the target class
    */
   WebClientInvocationHandler(
       final Map<MethodDescription, InvocationFunctions> methodFunctions,

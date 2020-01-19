@@ -35,7 +35,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @Getter
 @Setter
 @ToString(exclude = {"bindCredential"})
-@EqualsAndHashCode(exclude = {"bindCredential"})
+@EqualsAndHashCode(exclude = {"bindCredential", "searchValidator"})
 @NoArgsConstructor
 public class LdaptiveProperties {
 

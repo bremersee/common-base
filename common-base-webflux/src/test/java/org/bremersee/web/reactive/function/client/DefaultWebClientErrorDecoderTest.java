@@ -16,8 +16,8 @@
 
 package org.bremersee.web.reactive.function.client;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -28,10 +28,11 @@ import java.time.ZoneId;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.UUID;
+import org.bremersee.exception.RestApiExceptionParserImpl;
 import org.bremersee.exception.ServiceException;
 import org.bremersee.exception.model.RestApiException;
 import org.bremersee.http.MediaTypeHelper;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -45,9 +46,7 @@ import reactor.test.StepVerifier;
  *
  * @author Christian Bremer
  */
-public class DefaultWebClientErrorDecoderTest {
-
-  private static final DefaultWebClientErrorDecoder decoder = new DefaultWebClientErrorDecoder();
+class DefaultWebClientErrorDecoderTest {
 
   /**
    * Test decode json.
@@ -55,7 +54,7 @@ public class DefaultWebClientErrorDecoderTest {
    * @throws Exception the exception
    */
   @Test
-  public void testDecodeJson() throws Exception {
+  void testDecodeJson() throws Exception {
     testDecode(MediaType.APPLICATION_JSON_VALUE);
   }
 
@@ -65,7 +64,7 @@ public class DefaultWebClientErrorDecoderTest {
    * @throws Exception the exception
    */
   @Test
-  public void testDecodeXml() throws Exception {
+  void testDecodeXml() throws Exception {
     testDecode(MediaType.APPLICATION_XML_VALUE);
   }
 
@@ -96,6 +95,7 @@ public class DefaultWebClientErrorDecoderTest {
       throw new Exception("Content type is not supported in this test.");
     }
 
+    DefaultWebClientErrorDecoder decoder = new DefaultWebClientErrorDecoder();
     StepVerifier
         .create(decoder.apply(clientResponse))
         .assertNext(throwable -> {
@@ -113,7 +113,7 @@ public class DefaultWebClientErrorDecoderTest {
    * @throws Exception the exception
    */
   @Test
-  public void testDecodeSomethingElse() throws Exception {
+  void testDecodeSomethingElse() throws Exception {
 
     final HttpStatus httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
 
@@ -132,6 +132,8 @@ public class DefaultWebClientErrorDecoderTest {
         clientResponse.bodyToMono(String.class))
         .thenReturn(Mono.just(expected));
 
+    DefaultWebClientErrorDecoder decoder = new DefaultWebClientErrorDecoder(
+        new RestApiExceptionParserImpl());
     StepVerifier
         .create(decoder.apply(clientResponse))
         .assertNext(throwable -> {
@@ -148,7 +150,7 @@ public class DefaultWebClientErrorDecoderTest {
    * Test decode empty response.
    */
   @Test
-  public void testDecodeEmptyResponse() {
+  void testDecodeEmptyResponse() {
     final HttpStatus httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
 
     final HttpHeaders headers = new HttpHeaders();
@@ -164,6 +166,8 @@ public class DefaultWebClientErrorDecoderTest {
         clientResponse.bodyToMono(String.class))
         .thenReturn(Mono.empty());
 
+    DefaultWebClientErrorDecoder decoder = new DefaultWebClientErrorDecoder(
+        new RestApiExceptionParserImpl());
     StepVerifier
         .create(decoder.apply(clientResponse))
         .assertNext(throwable -> {

@@ -46,6 +46,7 @@ public interface AccessController {
    * @param acl the access control list
    * @return the access controller
    */
+  @SuppressWarnings("rawtypes")
   static AccessController from(@Nullable Acl acl) {
     return acl == null ? new Impl() : new Impl(AclBuilder.builder().from(acl).buildAcl());
   }

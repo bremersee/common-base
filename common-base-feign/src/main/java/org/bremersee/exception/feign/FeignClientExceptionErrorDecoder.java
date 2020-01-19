@@ -65,16 +65,6 @@ public class FeignClientExceptionErrorDecoder implements ErrorDecoder {
     this.parser = parser != null ? parser : new RestApiExceptionParserImpl();
   }
 
-  private static HttpMethod findHttpMethod(final Response response) {
-    if (response == null) {
-      return null;
-    }
-    if (response.request() == null) {
-      return null;
-    }
-    return response.request().httpMethod();
-  }
-
   @Override
   public Exception decode(final String methodKey, final Response response) {
 
@@ -109,8 +99,8 @@ public class FeignClientExceptionErrorDecoder implements ErrorDecoder {
     return feignClientException;
   }
 
-  private String readBody(final Response response) {
-    if (response.body() == null) {
+  static String readBody(final Response response) {
+    if (response == null || response.body() == null) {
       return null;
     }
     try {
@@ -120,7 +110,7 @@ public class FeignClientExceptionErrorDecoder implements ErrorDecoder {
     }
   }
 
-  private Date determineRetryAfter(final String retryAfter) {
+  static Date determineRetryAfter(final String retryAfter) {
     if (retryAfter == null) {
       return null;
     }
@@ -135,4 +125,12 @@ public class FeignClientExceptionErrorDecoder implements ErrorDecoder {
       return null;
     }
   }
+
+  static HttpMethod findHttpMethod(final Response response) {
+    if (response == null || response.request() == null) {
+      return null;
+    }
+    return response.request().httpMethod();
+  }
+
 }

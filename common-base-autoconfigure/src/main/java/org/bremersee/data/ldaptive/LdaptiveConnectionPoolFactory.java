@@ -17,7 +17,7 @@ public interface LdaptiveConnectionPoolFactory {
   /**
    * Creates connection pool.
    *
-   * @param properties               the properties
+   * @param properties the properties
    * @param defaultConnectionFactory the default connection factory
    * @return the connection pool
    */
@@ -51,7 +51,6 @@ public interface LdaptiveConnectionPoolFactory {
       if (properties.getBlockWaitTime() > 0L) {
         pool.setBlockWaitTime(Duration.ofMillis(properties.getBlockWaitTime()));
       }
-      pool.initialize();
       return pool;
     }
 

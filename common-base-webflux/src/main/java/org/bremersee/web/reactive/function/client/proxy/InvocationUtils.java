@@ -56,7 +56,7 @@ abstract class InvocationUtils {
   /**
    * Gets request path.
    *
-   * @param cls    the cls
+   * @param cls the cls
    * @param method the method
    * @return the request path
    */
@@ -119,7 +119,7 @@ abstract class InvocationUtils {
    * Gets path variables.
    *
    * @param method the method
-   * @param args   the args
+   * @param args the args
    * @return the path variables
    */
   static Map<String, Object> getPathVariables(final Method method, final Object[] args) {
@@ -142,7 +142,7 @@ abstract class InvocationUtils {
    * Gets request params.
    *
    * @param method the method
-   * @param args   the args
+   * @param args the args
    * @return the request params
    */
   @SuppressWarnings("WeakerAccess")
@@ -156,6 +156,7 @@ abstract class InvocationUtils {
           final String name = StringUtils.hasText(param.value()) ? param.value() : param.name();
           final Object value = args[i];
           if (value instanceof Map) {
+            //noinspection rawtypes
             final Map<?, ?> map = (Map) value;
             for (Map.Entry<?, ?> entry : map.entrySet()) {
               final String key = String.valueOf(entry.getKey());
@@ -180,8 +181,8 @@ abstract class InvocationUtils {
   /**
    * Sets request params.
    *
-   * @param method     the method
-   * @param args       the args
+   * @param method the method
+   * @param args the args
    * @param uriBuilder the uri builder
    * @return the request params
    */
@@ -286,10 +287,10 @@ abstract class InvocationUtils {
   /**
    * Find request mapping value optional.
    *
-   * @param <T>       the type parameter
-   * @param obj       the obj
+   * @param <T> the type parameter
+   * @param obj the obj
    * @param condition the condition
-   * @param selector  the selector
+   * @param selector the selector
    * @return the optional
    */
   @SuppressWarnings("WeakerAccess")
@@ -359,8 +360,8 @@ abstract class InvocationUtils {
   /**
    * Put to multi value map.
    *
-   * @param name          the name
-   * @param value         the value
+   * @param name the name
+   * @param value the value
    * @param multiValueMap the multi value map
    */
   static void putToMultiValueMap(
@@ -369,17 +370,20 @@ abstract class InvocationUtils {
       final MultiValueMap<String, String> multiValueMap) {
 
     if (value instanceof Map) {
+      //noinspection rawtypes
       final Map<?, ?> map = (Map) value;
       for (Map.Entry<?, ?> entry : map.entrySet()) {
         final String key = String.valueOf(entry.getKey());
         final Object mapValue = entry.getValue();
         if (mapValue instanceof Collection) {
+          //noinspection rawtypes
           putCollectionToValueMap(key, (Collection) mapValue, multiValueMap);
         } else if (mapValue != null) {
           multiValueMap.set(key, String.valueOf(mapValue));
         }
       }
     } else if (value instanceof Collection) {
+      //noinspection rawtypes
       putCollectionToValueMap(name, (Collection) value, multiValueMap);
     } else if (value != null) {
       multiValueMap.set(name, String.valueOf(value));

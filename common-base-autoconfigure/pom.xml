@@ -5,9 +5,9 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <artifactId>common-base-parent</artifactId>
     <groupId>org.bremersee</groupId>
-    <version>1.4.0</version>
+    <artifactId>common-base-parent</artifactId>
+    <version>1.4.1</version>
   </parent>
 
   <artifactId>common-base-autoconfigure</artifactId>
@@ -35,34 +35,6 @@
 
     <dependency>
       <groupId>org.bremersee</groupId>
-      <artifactId>common-base-web</artifactId>
-      <version>${project.version}</version>
-      <optional>true</optional>
-    </dependency>
-
-    <dependency>
-      <groupId>org.bremersee</groupId>
-      <artifactId>common-base-webmvc</artifactId>
-      <version>${project.version}</version>
-      <optional>true</optional>
-    </dependency>
-
-    <dependency>
-      <groupId>org.bremersee</groupId>
-      <artifactId>common-base-security</artifactId>
-      <version>${project.version}</version>
-      <optional>true</optional>
-    </dependency>
-
-    <dependency>
-      <groupId>org.bremersee</groupId>
-      <artifactId>common-base-webflux</artifactId>
-      <version>${project.version}</version>
-      <optional>true</optional>
-    </dependency>
-
-    <dependency>
-      <groupId>org.bremersee</groupId>
       <artifactId>common-base-feign</artifactId>
       <version>${project.version}</version>
       <optional>true</optional>
@@ -82,11 +54,38 @@
 
     <dependency>
       <groupId>org.bremersee</groupId>
+      <artifactId>common-base-security</artifactId>
+      <version>${project.version}</version>
+      <optional>true</optional>
+    </dependency>
+
+    <dependency>
+      <groupId>org.bremersee</groupId>
       <artifactId>common-base-thymeleaf</artifactId>
       <version>${project.version}</version>
       <optional>true</optional>
     </dependency>
 
+    <dependency>
+      <groupId>org.bremersee</groupId>
+      <artifactId>common-base-web</artifactId>
+      <version>${project.version}</version>
+      <optional>true</optional>
+    </dependency>
+
+    <dependency>
+      <groupId>org.bremersee</groupId>
+      <artifactId>common-base-webflux</artifactId>
+      <version>${project.version}</version>
+      <optional>true</optional>
+    </dependency>
+
+    <dependency>
+      <groupId>org.bremersee</groupId>
+      <artifactId>common-base-webmvc</artifactId>
+      <version>${project.version}</version>
+      <optional>true</optional>
+    </dependency>
 
 
     <dependency>

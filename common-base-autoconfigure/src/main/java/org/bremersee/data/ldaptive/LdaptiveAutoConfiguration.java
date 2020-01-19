@@ -59,10 +59,10 @@ public class LdaptiveAutoConfiguration {
   /**
    * Instantiates a new ldaptive configuration.
    *
-   * @param ldaptiveProperties      the ldaptive properties
+   * @param ldaptiveProperties the ldaptive properties
    * @param connectionConfigFactory the connection config factory
-   * @param connectionPoolFactory   the connection pool factory
-   * @param ldaptiveProvider        the ldaptive provider
+   * @param connectionPoolFactory the connection pool factory
+   * @param ldaptiveProvider the ldaptive provider
    */
   public LdaptiveAutoConfiguration(
       LdaptiveProperties ldaptiveProperties,
@@ -93,7 +93,7 @@ public class LdaptiveAutoConfiguration {
         ldaptiveProvider != null ? this.ldaptiveProvider.getClass().getSimpleName() : "null");
 
     if (properties.isPooled()) {
-      LdaptiveTemplate template = new LdaptiveTemplate(connectionFactory());
+      LdaptiveTemplate template = new LdaptiveTemplate(defaultConnectionFactory());
       boolean exists = template
           .findOne(properties.getSearchValidator().getSearchRequest())
           .isPresent();
@@ -149,7 +149,11 @@ public class LdaptiveAutoConfiguration {
   }
 
   private ConnectionPool connectionPool() {
-    return connectionPoolFactory.createConnectionPool(properties, defaultConnectionFactory());
+    ConnectionPool pool = connectionPoolFactory.createConnectionPool(
+        properties,
+        defaultConnectionFactory());
+    pool.initialize();
+    return pool;
   }
 
 }

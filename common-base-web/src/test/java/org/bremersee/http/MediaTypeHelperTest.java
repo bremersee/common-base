@@ -16,11 +16,11 @@
 
 package org.bremersee.http;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Arrays;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
 
 /**
@@ -28,13 +28,13 @@ import org.springframework.http.MediaType;
  *
  * @author Christian Bremer
  */
-public class MediaTypeHelperTest {
+class MediaTypeHelperTest {
 
   /**
    * Test media type helper.
    */
   @Test
-  public void testMediaTypeHelper() {
+  void testMediaTypeHelper() {
     assertTrue(MediaTypeHelper.canContentTypeBeJson(MediaTypeHelper.toString(Arrays.asList(
         MediaType.IMAGE_JPEG, MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON))));
     assertFalse(MediaTypeHelper.canContentTypeBeJson(MediaTypeHelper.toString(Arrays.asList(

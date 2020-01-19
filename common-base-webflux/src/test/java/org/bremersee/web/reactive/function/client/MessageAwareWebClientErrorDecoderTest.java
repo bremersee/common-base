@@ -16,13 +16,13 @@
 
 package org.bremersee.web.reactive.function.client;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.bremersee.exception.MessageExceptionParser;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.reactive.function.client.ClientResponse;
 import reactor.test.StepVerifier;
@@ -32,14 +32,18 @@ import reactor.test.StepVerifier;
  *
  * @author Christian Bremer
  */
-public class MessageAwareWebClientErrorDecoderTest {
+class MessageAwareWebClientErrorDecoderTest {
 
   /**
    * Tests Creation.
    */
   @Test
-  public void create() {
+  void create() {
     MessageAwareWebClientErrorDecoder decoder = new MessageAwareWebClientErrorDecoder();
+    assertTrue(decoder.getParser() instanceof MessageExceptionParser);
+    assertNull(decoder.getErrorCode());
+
+    decoder = new MessageAwareWebClientErrorDecoder(new MessageExceptionParser());
     assertTrue(decoder.getParser() instanceof MessageExceptionParser);
     assertNull(decoder.getErrorCode());
 
@@ -56,7 +60,7 @@ public class MessageAwareWebClientErrorDecoderTest {
    * Tests build exception.
    */
   @Test
-  public void buildException() {
+  void buildException() {
     MessageAwareWebClientErrorDecoder decoder = new MessageAwareWebClientErrorDecoder("FOO");
 
     ClientResponse clientResponse = ClientResponse.create(HttpStatus.INTERNAL_SERVER_ERROR)

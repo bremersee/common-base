@@ -1,11 +1,27 @@
+/*
+ * Copyright 2019 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.bremersee.data.ldaptive;
 
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -16,7 +32,7 @@ import java.util.Set;
 import javax.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Data;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.ldaptive.AttributeModification;
 import org.ldaptive.AttributeModificationType;
 import org.ldaptive.LdapAttribute;
@@ -31,7 +47,7 @@ import org.springframework.util.StringUtils;
  *
  * @author Christian Bremer
  */
-public class LdaptiveEntryMapperTest {
+class LdaptiveEntryMapperTest {
 
   private static final StringValueTranscoder STRING_TRANSCODER = new StringValueTranscoder();
 
@@ -43,7 +59,7 @@ public class LdaptiveEntryMapperTest {
    * Gets attribute value.
    */
   @Test
-  public void getAttributeValue() {
+  void getAttributeValue() {
     assertNull(LdaptiveEntryMapper
         .getAttributeValue(null, "foo", null, null));
     String expected = "bar";
@@ -65,7 +81,7 @@ public class LdaptiveEntryMapperTest {
    * Gets attribute values.
    */
   @Test
-  public void getAttributeValues() {
+  void getAttributeValues() {
     assertTrue(LdaptiveEntryMapper
         .getAttributeValues(null, "foo", STRING_TRANSCODER).isEmpty());
     LdapEntry entry = new LdapEntry();
@@ -82,7 +98,7 @@ public class LdaptiveEntryMapperTest {
    * Gets attribute values as set.
    */
   @Test
-  public void getAttributeValuesAsSet() {
+  void getAttributeValuesAsSet() {
     LdapEntry entry = new LdapEntry();
     entry.addAttribute(new LdapAttribute("key", "foo", "bar"));
     Set<String> actual = LdaptiveEntryMapper
@@ -95,7 +111,7 @@ public class LdaptiveEntryMapperTest {
    * Gets attribute values as list.
    */
   @Test
-  public void getAttributeValuesAsList() {
+  void getAttributeValuesAsList() {
     LdapEntry entry = new LdapEntry();
     entry.addAttribute(new LdapAttribute("key", "foo", "bar"));
     List<String> actual = LdaptiveEntryMapper
@@ -108,7 +124,7 @@ public class LdaptiveEntryMapperTest {
    * Sets attribute.
    */
   @Test
-  public void setAttribute() {
+  void setAttribute() {
     List<AttributeModification> modifications = new ArrayList<>();
     LdapEntry entry = new LdapEntry();
 
@@ -181,7 +197,7 @@ public class LdaptiveEntryMapperTest {
    * Sets attributes.
    */
   @Test
-  public void setAttributes() {
+  void setAttributes() {
     List<AttributeModification> modifications = new ArrayList<>();
     List<String> expected = Arrays.asList("anna", "livia");
     LdapEntry entry = new LdapEntry();
@@ -213,7 +229,7 @@ public class LdaptiveEntryMapperTest {
    * Add attribute.
    */
   @Test
-  public void addAttribute() {
+  void addAttribute() {
     List<AttributeModification> modifications = new ArrayList<>();
     LdapEntry entry = new LdapEntry();
 
@@ -251,7 +267,7 @@ public class LdaptiveEntryMapperTest {
    * Add attributes.
    */
   @Test
-  public void addAttributes() {
+  void addAttributes() {
     List<AttributeModification> modifications = new ArrayList<>();
     LdapEntry entry = new LdapEntry();
     byte[] annaBytes = "anna".getBytes(StandardCharsets.UTF_8);
@@ -291,7 +307,7 @@ public class LdaptiveEntryMapperTest {
    * Remove attribute.
    */
   @Test
-  public void removeAttribute() {
+  void removeAttribute() {
     List<AttributeModification> modifications = new ArrayList<>();
     LdapEntry entry = new LdapEntry();
     entry.addAttribute(new LdapAttribute("foo", "anna", "livia"));
@@ -329,7 +345,7 @@ public class LdaptiveEntryMapperTest {
    * Remove attributes.
    */
   @Test
-  public void removeAttributes() {
+  void removeAttributes() {
     List<AttributeModification> modifications = new ArrayList<>();
     LdapEntry entry = new LdapEntry();
     entry.addAttribute(new LdapAttribute("foo", "anna", "livia", "hans", "castorp"));
@@ -351,7 +367,7 @@ public class LdaptiveEntryMapperTest {
    * Create dn.
    */
   @Test
-  public void createDn() {
+  void createDn() {
     assertEquals(
         "cn=anna,cn=users,dc=example,dc=org",
         LdaptiveEntryMapper.createDn("cn", "anna", "cn=users,dc=example,dc=org"));
@@ -361,7 +377,7 @@ public class LdaptiveEntryMapperTest {
    * Gets rdn.
    */
   @Test
-  public void getRdn() {
+  void getRdn() {
     assertNull(LdaptiveEntryMapper.getRdn(null));
     assertEquals("no-real-dn", LdaptiveEntryMapper.getRdn("no-real-dn"));
     assertEquals("anna", LdaptiveEntryMapper.getRdn("cn=anna,cn=users,dc=example,dc=org"));
@@ -371,7 +387,7 @@ public class LdaptiveEntryMapperTest {
    * Map dn.
    */
   @Test
-  public void mapDn() {
+  void mapDn() {
     assertEquals(
         "cn=anna,dc=example,dc=org",
         mapper.mapDn(Person.builder().name("anna").build()));
@@ -381,7 +397,7 @@ public class LdaptiveEntryMapperTest {
    * Map.
    */
   @Test
-  public void map() {
+  void map() {
     LdapEntry entry = new LdapEntry();
     entry.addAttribute(new LdapAttribute("name", "hans"));
     entry.addAttribute(new LdapAttribute(
@@ -402,7 +418,7 @@ public class LdaptiveEntryMapperTest {
    * Map and compute modify request.
    */
   @Test
-  public void mapAndComputeModifyRequest() {
+  void mapAndComputeModifyRequest() {
     Person person = Person.builder()
         .name("hans")
         .photo("zzz".getBytes(StandardCharsets.UTF_8))

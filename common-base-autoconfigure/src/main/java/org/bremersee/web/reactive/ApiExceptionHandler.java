@@ -17,7 +17,7 @@
 package org.bremersee.web.reactive;
 
 import java.time.OffsetDateTime;
-import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.util.Objects;
 import javax.validation.constraints.NotNull;
 import lombok.AccessLevel;
@@ -67,10 +67,10 @@ public class ApiExceptionHandler extends AbstractErrorWebExceptionHandler {
   /**
    * Instantiates a new api exception handler.
    *
-   * @param errorAttributes        the error attributes
-   * @param resourceProperties     the resource properties
-   * @param applicationContext     the application context
-   * @param serverCodecConfigurer  the server codec configurer
+   * @param errorAttributes the error attributes
+   * @param resourceProperties the resource properties
+   * @param applicationContext the application context
+   * @param serverCodecConfigurer the server codec configurer
    * @param restApiExceptionMapper the rest api exception mapper
    */
   public ApiExceptionHandler(
@@ -102,8 +102,8 @@ public class ApiExceptionHandler extends AbstractErrorWebExceptionHandler {
    * @return {@code true} if it is responsible, otherwise {@code false}
    */
   protected boolean isResponsibleExceptionHandler(final ServerRequest request) {
-    return restApiExceptionMapper.getApiPaths().stream().anyMatch(
-        path -> pathMatcher.match(path, request.path()));
+    return getRestApiExceptionMapper().getApiPaths().stream().anyMatch(
+        path -> getPathMatcher().match(path, request.path()));
   }
 
   /**
@@ -114,17 +114,17 @@ public class ApiExceptionHandler extends AbstractErrorWebExceptionHandler {
    */
   protected Mono<ServerResponse> renderErrorResponse(final ServerRequest request) {
 
-    final RestApiException response = restApiExceptionMapper
+    final RestApiException response = getRestApiExceptionMapper()
         .build(getError(request), request.path(), null);
     final String accepts = MediaTypeHelper.toString(request.headers().accept());
     if (MediaTypeHelper.canContentTypeBeJson(accepts)) {
       return ServerResponse
-          .status(restApiExceptionMapper.detectHttpStatus(getError(request), null))
+          .status(getRestApiExceptionMapper().detectHttpStatus(getError(request), null))
           .contentType(MediaType.APPLICATION_JSON)
           .body(BodyInserters.fromValue(response));
     } else if (MediaTypeHelper.canContentTypeBeXml(accepts)) {
       return ServerResponse
-          .status(restApiExceptionMapper.detectHttpStatus(getError(request), null))
+          .status(getRestApiExceptionMapper().detectHttpStatus(getError(request), null))
           .contentType(MediaType.APPLICATION_XML)
           .body(BodyInserters.fromValue(response));
     } else {
@@ -133,7 +133,7 @@ public class ApiExceptionHandler extends AbstractErrorWebExceptionHandler {
           : RestApiExceptionUtils.NO_ID_VALUE;
       final String timestamp = response.getTimestamp() != null
           ? response.getTimestamp().format(RestApiExceptionUtils.TIMESTAMP_FORMATTER)
-          : OffsetDateTime.now(ZoneId.of("UTC")).format(RestApiExceptionUtils.TIMESTAMP_FORMATTER);
+          : OffsetDateTime.now(ZoneOffset.UTC).format(RestApiExceptionUtils.TIMESTAMP_FORMATTER);
       final String msg = StringUtils.hasText(response.getMessage())
           ? response.getMessage()
           : RestApiExceptionUtils.NO_MESSAGE_VALUE;
@@ -144,7 +144,7 @@ public class ApiExceptionHandler extends AbstractErrorWebExceptionHandler {
           ? response.getClassName()
           : RestApiExceptionUtils.NO_CLASS_VALUE;
       return ServerResponse
-          .status(restApiExceptionMapper.detectHttpStatus(getError(request), null))
+          .status(getRestApiExceptionMapper().detectHttpStatus(getError(request), null))
           .header(RestApiExceptionUtils.ID_HEADER_NAME, id)
           .header(RestApiExceptionUtils.TIMESTAMP_HEADER_NAME, timestamp)
           .header(RestApiExceptionUtils.MESSAGE_HEADER_NAME, msg)

@@ -16,24 +16,23 @@
 
 package org.bremersee.exception;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.UUID;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * The service exception test.
  *
  * @author Christian Bremer
  */
-public class ServiceExceptionTest {
+class ServiceExceptionTest {
 
   /**
    * Tests status method.
    */
   @Test
-  public void status() {
+  void status() {
     ServiceException serviceException = new ServiceException();
     assertEquals(0, serviceException.status());
 
@@ -45,7 +44,7 @@ public class ServiceExceptionTest {
    * Tests get error code.
    */
   @Test
-  public void getErrorCode() {
+  void getErrorCode() {
     ServiceException serviceException = new ServiceException();
     assertNull(serviceException.getErrorCode());
 
@@ -57,7 +56,7 @@ public class ServiceExceptionTest {
    * Internal server error.
    */
   @Test
-  public void internalServerError() {
+  void internalServerError() {
     ServiceException serviceException = ServiceException.internalServerError();
     assertNull(serviceException.getMessage());
     assertEquals(500, serviceException.status());
@@ -93,7 +92,7 @@ public class ServiceExceptionTest {
    * Bad request.
    */
   @Test
-  public void badRequest() {
+  void badRequest() {
     ServiceException serviceException = ServiceException.badRequest();
     assertNull(serviceException.getMessage());
     assertEquals(400, serviceException.status());
@@ -129,7 +128,7 @@ public class ServiceExceptionTest {
    * Not found.
    */
   @Test
-  public void notFound() {
+  void notFound() {
     ServiceException serviceException = ServiceException.notFound();
     assertNull(serviceException.getMessage());
     assertEquals(404, serviceException.status());
@@ -171,7 +170,7 @@ public class ServiceExceptionTest {
    * Already exists.
    */
   @Test
-  public void alreadyExists() {
+  void alreadyExists() {
     ServiceException serviceException = ServiceException.alreadyExists();
     assertNull(serviceException.getMessage());
     assertEquals(409, serviceException.status());
@@ -214,7 +213,7 @@ public class ServiceExceptionTest {
    * Forbidden.
    */
   @Test
-  public void forbidden() {
+  void forbidden() {
     ServiceException serviceException = ServiceException.forbidden();
     assertNull(serviceException.getMessage());
     assertEquals(403, serviceException.status());

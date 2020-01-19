@@ -82,7 +82,11 @@ public interface PasswordFlowProperties extends AccessTokenRetrieverProperties {
       body.set("client_secret", "");
     }
     body.set("username", getUsername());
-    body.set("password", getPassword());
+    if (getPassword() != null) {
+      body.set("password", getPassword());
+    } else {
+      body.set("password", "");
+    }
     return body;
   }
 
@@ -172,7 +176,7 @@ public interface PasswordFlowProperties extends AccessTokenRetrieverProperties {
     /**
      * Adds an additional property on builder.
      *
-     * @param key    the key
+     * @param key the key
      * @param values the values
      * @return the builder
      */

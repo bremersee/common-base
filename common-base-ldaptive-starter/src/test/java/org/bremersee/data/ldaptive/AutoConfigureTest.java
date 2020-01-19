@@ -1,3 +1,19 @@
+/*
+ * Copyright 2019 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.bremersee.data.ldaptive;
 
 import static org.junit.Assert.assertTrue;
@@ -7,8 +23,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.bremersee.data.ldaptive.app.GroupMapper;
 import org.bremersee.data.ldaptive.app.PersonMapper;
 import org.bremersee.data.ldaptive.app.TestConfiguration;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
 import org.ldaptive.LdapEntry;
 import org.ldaptive.SearchFilter;
 import org.ldaptive.SearchRequest;
@@ -17,12 +32,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
-import org.springframework.test.context.junit4.SpringRunner;
 
 /**
  * The auto configure test.
+ *
+ * @author Christian Bremer
  */
-@RunWith(SpringRunner.class)
 @SpringBootTest(
     classes = TestConfiguration.class,
     webEnvironment = WebEnvironment.NONE,
@@ -43,7 +58,7 @@ import org.springframework.test.context.junit4.SpringRunner;
         "bremersee.ldaptive.pooled=false"
     })
 @Slf4j
-public class AutoConfigureTest {
+class AutoConfigureTest {
 
   @Value("${spring.ldap.embedded.base-dn}")
   private String baseDn;
@@ -62,7 +77,7 @@ public class AutoConfigureTest {
    * Find existing persons.
    */
   @Test
-  public void findExistingPersons() {
+  void findExistingPersons() {
     SearchFilter searchFilter = new SearchFilter("(objectclass=inetOrgPerson)");
     SearchRequest searchRequest = new SearchRequest(
         "ou=people," + baseDn, searchFilter);
@@ -98,30 +113,30 @@ public class AutoConfigureTest {
    * Find existing groups.
    */
   @Test
-    public void findExistingGroups() {
-        SearchFilter searchFilter = new SearchFilter("(objectclass=groupOfUniqueNames)");
-        SearchRequest searchRequest = new SearchRequest(
-            "ou=groups," + baseDn, searchFilter);
-        searchRequest.setSearchScope(SearchScope.ONELEVEL);
+  void findExistingGroups() {
+    SearchFilter searchFilter = new SearchFilter("(objectclass=groupOfUniqueNames)");
+    SearchRequest searchRequest = new SearchRequest(
+        "ou=groups," + baseDn, searchFilter);
+    searchRequest.setSearchScope(SearchScope.ONELEVEL);
 
-        // without mapper
-        Collection<LdapEntry> entries = ldaptiveTemplate.findAll(searchRequest);
-        entries.forEach(ldapEntry -> log.info("Ldap entry found with cn = {}",
-            ldapEntry.getAttribute("cn").getStringValue()));
-        assertTrue(entries.stream()
-            .anyMatch(entry -> "developers"
-                .equalsIgnoreCase(entry.getAttribute("cn").getStringValue())));
-        assertTrue(entries.stream()
-            .anyMatch(entry -> "managers"
-                .equalsIgnoreCase(entry.getAttribute("cn").getStringValue())));
+    // without mapper
+    Collection<LdapEntry> entries = ldaptiveTemplate.findAll(searchRequest);
+    entries.forEach(ldapEntry -> log.info("Ldap entry found with cn = {}",
+        ldapEntry.getAttribute("cn").getStringValue()));
+    assertTrue(entries.stream()
+        .anyMatch(entry -> "developers"
+            .equalsIgnoreCase(entry.getAttribute("cn").getStringValue())));
+    assertTrue(entries.stream()
+        .anyMatch(entry -> "managers"
+            .equalsIgnoreCase(entry.getAttribute("cn").getStringValue())));
 
-        // with mapper
-        assertTrue(ldaptiveTemplate.findAll(searchRequest, groupMapper)
-            .anyMatch(entry -> "developers"
-                .equalsIgnoreCase(entry.getCn())));
-        assertTrue(ldaptiveTemplate.findAll(searchRequest, groupMapper)
-            .anyMatch(entry -> "managers"
-                .equalsIgnoreCase(entry.getCn())));
-    }
+    // with mapper
+    assertTrue(ldaptiveTemplate.findAll(searchRequest, groupMapper)
+        .anyMatch(entry -> "developers"
+            .equalsIgnoreCase(entry.getCn())));
+    assertTrue(ldaptiveTemplate.findAll(searchRequest, groupMapper)
+        .anyMatch(entry -> "managers"
+            .equalsIgnoreCase(entry.getCn())));
+  }
 
 }
