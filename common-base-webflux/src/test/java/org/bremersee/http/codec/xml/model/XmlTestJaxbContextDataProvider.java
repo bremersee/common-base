@@ -18,7 +18,6 @@ package org.bremersee.http.codec.xml.model;
 
 import java.util.Arrays;
 import java.util.Collection;
-import org.bremersee.http.codec.xml.model.xml1.ObjectFactory;
 import org.bremersee.xml.JaxbContextData;
 import org.bremersee.xml.JaxbContextDataProvider;
 
@@ -32,7 +31,7 @@ public class XmlTestJaxbContextDataProvider implements JaxbContextDataProvider {
   @Override
   public Collection<JaxbContextData> getJaxbContextData() {
     return Arrays.asList(
-        new JaxbContextData(ObjectFactory.class.getPackage()),
+        // new JaxbContextData(ObjectFactory.class.getPackage()),
         new JaxbContextData(
             org.bremersee.http.codec.xml.model.xml2.ObjectFactory.class.getPackage(),
             "http://bremersee.github.io/xmlschemas/common-xml-test-model-2.xsd"),
@@ -40,7 +39,8 @@ public class XmlTestJaxbContextDataProvider implements JaxbContextDataProvider {
             org.bremersee.http.codec.xml.model.xml3.ObjectFactory.class.getPackage().getName(),
             null,
             null),
-        new JaxbContextData(org.bremersee.http.codec.xml.model.xml4.ObjectFactory.class.getPackage())
+        new JaxbContextData(
+            org.bremersee.http.codec.xml.model.xml4.ObjectFactory.class.getPackage())
     );
   }
 }

@@ -77,29 +77,25 @@ public class ReactiveJaxbDecoder extends AbstractDecoder<Object> {
 
   private final JaxbContextBuilder jaxbContextBuilder;
 
-  private final String[] nameSpaces;
-
   /**
    * Instantiates a new reactive jaxb decoder.
    *
    * @param jaxbContextBuilder the jaxb context builder
-   * @param nameSpaces         the name spaces
    */
-  @SuppressWarnings("WeakerAccess")
-  public ReactiveJaxbDecoder(
-      final JaxbContextBuilder jaxbContextBuilder,
-      final String... nameSpaces) {
+  public ReactiveJaxbDecoder(final JaxbContextBuilder jaxbContextBuilder) {
 
     super(MimeTypeUtils.APPLICATION_XML, MimeTypeUtils.TEXT_XML);
-    this.jaxbContextBuilder = jaxbContextBuilder;
-    this.nameSpaces = nameSpaces;
+    this.jaxbContextBuilder = jaxbContextBuilder != null
+        ? jaxbContextBuilder
+        : JaxbContextBuilder.builder()
+            .withCanUnmarshal(JaxbContextBuilder.CAN_UNMARSHAL_ALL);
   }
 
   @Override
   public boolean canDecode(final ResolvableType elementType, @Nullable final MimeType mimeType) {
     if (super.canDecode(elementType, mimeType)) {
       final Class<?> outputClass = elementType.getRawClass();
-      return jaxbContextBuilder.supports(outputClass, nameSpaces);
+      return jaxbContextBuilder.canUnmarshal(outputClass);
     } else {
       return false;
     }
@@ -143,8 +139,7 @@ public class ReactiveJaxbDecoder extends AbstractDecoder<Object> {
   private Object unmarshal(final List<XMLEvent> events, final Class<?> outputClass) {
     try {
       final Unmarshaller unmarshaller = jaxbContextBuilder
-          .buildJaxbContext(nameSpaces)
-          .createUnmarshaller();
+          .buildUnmarshaller(outputClass);
       final XMLEventReader eventReader = StaxUtils.createXMLEventReader(events);
       if (outputClass.isAnnotationPresent(XmlRootElement.class)) {
         return unmarshaller.unmarshal(eventReader);
