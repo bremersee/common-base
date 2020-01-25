@@ -17,7 +17,6 @@
 package org.bremersee.http.codec.xml;
 
 import java.io.OutputStream;
-import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.MarshalException;
@@ -56,28 +55,24 @@ public class ReactiveJaxbEncoder extends AbstractSingleValueEncoder<Object> {
 
   private final JaxbContextBuilder jaxbContextBuilder;
 
-  private final String[] nameSpaces;
-
   /**
    * Instantiates a new reactive jaxb encoder.
    *
    * @param jaxbContextBuilder the jaxb context builder
-   * @param nameSpaces         the name spaces
    */
-  @SuppressWarnings("WeakerAccess")
-  public ReactiveJaxbEncoder(
-      final JaxbContextBuilder jaxbContextBuilder,
-      final String... nameSpaces) {
+  public ReactiveJaxbEncoder(final JaxbContextBuilder jaxbContextBuilder) {
     super(MimeTypeUtils.APPLICATION_XML, MimeTypeUtils.TEXT_XML);
-    this.jaxbContextBuilder = jaxbContextBuilder;
-    this.nameSpaces = nameSpaces;
+    this.jaxbContextBuilder = jaxbContextBuilder != null
+        ? jaxbContextBuilder
+        : JaxbContextBuilder.builder()
+            .withCanUnmarshal(JaxbContextBuilder.CAN_UNMARSHAL_ALL);
   }
 
   @Override
   public boolean canEncode(final ResolvableType elementType, @Nullable final MimeType mimeType) {
     if (super.canEncode(elementType, mimeType)) {
       final Class<?> outputClass = elementType.toClass();
-      return jaxbContextBuilder.supports(outputClass, nameSpaces);
+      return jaxbContextBuilder.canMarshal(outputClass);
     } else {
       return false;
     }
@@ -102,8 +97,7 @@ public class ReactiveJaxbEncoder extends AbstractSingleValueEncoder<Object> {
     DataBuffer buffer = dataBufferFactory.allocateBuffer(1024);
     OutputStream outputStream = buffer.asOutputStream();
     try {
-      Marshaller marshaller = jaxbContextBuilder.buildJaxbContext(nameSpaces).createMarshaller();
-      marshaller.setProperty(Marshaller.JAXB_ENCODING, StandardCharsets.UTF_8.name());
+      Marshaller marshaller = jaxbContextBuilder.buildMarshaller(value);
       marshaller.marshal(value, outputStream);
       release = false;
       return Flux.just(buffer);
