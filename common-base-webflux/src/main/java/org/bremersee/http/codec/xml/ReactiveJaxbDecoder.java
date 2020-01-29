@@ -17,9 +17,10 @@
 package org.bremersee.http.codec.xml;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
+import java.util.function.BiConsumer;
 import javax.xml.XMLConstants;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
@@ -30,6 +31,8 @@ import javax.xml.bind.annotation.XmlSchema;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLEventReader;
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.XMLEvent;
 import org.bremersee.xml.JaxbContextBuilder;
 import org.reactivestreams.Publisher;
@@ -39,7 +42,10 @@ import org.springframework.core.codec.CodecException;
 import org.springframework.core.codec.DecodingException;
 import org.springframework.core.codec.Hints;
 import org.springframework.core.io.buffer.DataBuffer;
+import org.springframework.core.io.buffer.DataBufferLimitException;
+import org.springframework.core.io.buffer.DataBufferUtils;
 import org.springframework.core.log.LogFormatUtils;
+import org.springframework.http.MediaType;
 import org.springframework.http.codec.xml.XmlEventDecoder;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
@@ -48,8 +54,10 @@ import org.springframework.util.MimeType;
 import org.springframework.util.MimeTypeUtils;
 import org.springframework.util.xml.StaxUtils;
 import org.springframework.validation.annotation.Validated;
+import reactor.core.Exceptions;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.core.publisher.SynchronousSink;
 
 /**
  * Decode from a bytes stream containing XML elements to a stream of {@code Object}s (POJOs).
@@ -73,79 +81,116 @@ public class ReactiveJaxbDecoder extends AbstractDecoder<Object> {
    */
   private static final String JAXB_DEFAULT_ANNOTATION_VALUE = "##default";
 
+  private static final XMLInputFactory inputFactory = StaxUtils.createDefensiveInputFactory();
+
+
   private final XmlEventDecoder xmlEventDecoder = new XmlEventDecoder();
 
   private final JaxbContextBuilder jaxbContextBuilder;
 
-  private final String[] nameSpaces;
+  private int maxInMemorySize = 256 * 1024;
 
   /**
    * Instantiates a new reactive jaxb decoder.
    *
    * @param jaxbContextBuilder the jaxb context builder
-   * @param nameSpaces         the name spaces
    */
-  @SuppressWarnings("WeakerAccess")
-  public ReactiveJaxbDecoder(
-      final JaxbContextBuilder jaxbContextBuilder,
-      final String... nameSpaces) {
-
-    super(MimeTypeUtils.APPLICATION_XML, MimeTypeUtils.TEXT_XML);
-    this.jaxbContextBuilder = jaxbContextBuilder;
-    this.nameSpaces = nameSpaces;
+  public ReactiveJaxbDecoder(final JaxbContextBuilder jaxbContextBuilder) {
+    super(MimeTypeUtils.APPLICATION_XML, MimeTypeUtils.TEXT_XML,
+        new MediaType("application", "*+xml"));
+    this.jaxbContextBuilder = jaxbContextBuilder != null
+        ? jaxbContextBuilder
+        : JaxbContextBuilder.builder()
+            .withCanUnmarshal(JaxbContextBuilder.CAN_UNMARSHAL_ALL);
   }
+
+  /**
+   * Set the max number of bytes that can be buffered by this decoder. This is either the size of
+   * the entire input when decoding as a whole, or when using async parsing with Aalto XML, it is
+   * the size of one top-level XML tree. When the limit is exceeded,
+   * {@link DataBufferLimitException} is raised.
+   *
+   * <p>By default this is set to 256K.
+   *
+   * @param byteCount the max number of bytes to buffer, or -1 for unlimited
+   */
+  public void setMaxInMemorySize(int byteCount) {
+    this.maxInMemorySize = byteCount;
+    this.xmlEventDecoder.setMaxInMemorySize(byteCount);
+  }
+
+  /**
+   * Return the {@link #setMaxInMemorySize configured} byte count limit.
+   *
+   * @return the max in memory size
+   */
+  public int getMaxInMemorySize() {
+    return this.maxInMemorySize;
+  }
+
 
   @Override
   public boolean canDecode(final ResolvableType elementType, @Nullable final MimeType mimeType) {
     if (super.canDecode(elementType, mimeType)) {
       final Class<?> outputClass = elementType.getRawClass();
-      return jaxbContextBuilder.supports(outputClass, nameSpaces);
+      return jaxbContextBuilder.canUnmarshal(outputClass);
     } else {
       return false;
     }
   }
 
   @Override
-  public Mono<Object> decodeToMono(
-      final Publisher<DataBuffer> inputStream,
-      final ResolvableType elementType,
-      @Nullable final MimeType mimeType,
-      @Nullable final Map<String, Object> hints) {
-    return decode(inputStream, elementType, mimeType, hints).singleOrEmpty();
-  }
+  public Flux<Object> decode(Publisher<DataBuffer> inputStream, ResolvableType elementType,
+      @Nullable MimeType mimeType, @Nullable Map<String, Object> hints) {
 
-  @Override
-  public Flux<Object> decode(
-      final Publisher<DataBuffer> inputStream,
-      final ResolvableType elementType,
-      @Nullable final MimeType mimeType,
-      @Nullable final Map<String, Object> hints) {
-
-    final Class<?> outputClass = elementType.getRawClass();
-    Assert.state(outputClass != null, "Unresolvable output class");
-
-    final Flux<XMLEvent> xmlEventFlux = this.xmlEventDecoder.decode(
+    Flux<XMLEvent> xmlEventFlux = this.xmlEventDecoder.decode(
         inputStream, ResolvableType.forClass(XMLEvent.class), mimeType, hints);
 
-    final QName typeName = toQName(outputClass);
-    final Flux<List<XMLEvent>> splitEvents = split(xmlEventFlux, typeName);
+    Class<?> outputClass = elementType.toClass();
+    QName typeName = toQName(outputClass);
+    Flux<List<XMLEvent>> splitEvents = split(xmlEventFlux, typeName);
 
     return splitEvents.map(events -> {
-      final Object value = unmarshal(events, outputClass);
+      Object value = unmarshal(events, outputClass);
       LogFormatUtils.traceDebug(logger, traceOn -> {
-        final String formatted = LogFormatUtils.formatValue(value, !traceOn);
+        String formatted = LogFormatUtils.formatValue(value, !traceOn);
         return Hints.getLogPrefix(hints) + "Decoded [" + formatted + "]";
       });
       return value;
     });
   }
 
-  private Object unmarshal(final List<XMLEvent> events, final Class<?> outputClass) {
+  @Override
+  public Mono<Object> decodeToMono(Publisher<DataBuffer> input, ResolvableType elementType,
+      @Nullable MimeType mimeType, @Nullable Map<String, Object> hints) {
+
+    //noinspection NullableInLambdaInTransform
+    return DataBufferUtils.join(input, this.maxInMemorySize)
+        .map(dataBuffer -> decode(dataBuffer, elementType, mimeType, hints));
+  }
+
+  @Override
+  @SuppressWarnings({"rawtypes", "unchecked", "cast"})
+  // XMLEventReader is Iterator<Object> on JDK 9
+  public Object decode(DataBuffer dataBuffer, ResolvableType targetType,
+      @Nullable MimeType mimeType, @Nullable Map<String, Object> hints) throws DecodingException {
+
     try {
-      final Unmarshaller unmarshaller = jaxbContextBuilder
-          .buildJaxbContext(nameSpaces)
-          .createUnmarshaller();
-      final XMLEventReader eventReader = StaxUtils.createXMLEventReader(events);
+      Iterator eventReader = inputFactory.createXMLEventReader(dataBuffer.asInputStream());
+      List<XMLEvent> events = new ArrayList<>();
+      eventReader.forEachRemaining(event -> events.add((XMLEvent) event));
+      return unmarshal(events, targetType.toClass());
+    } catch (XMLStreamException ex) {
+      throw Exceptions.propagate(ex);
+    } finally {
+      DataBufferUtils.release(dataBuffer);
+    }
+  }
+
+  private Object unmarshal(List<XMLEvent> events, Class<?> outputClass) {
+    try {
+      Unmarshaller unmarshaller = jaxbContextBuilder.buildUnmarshaller(outputClass);
+      XMLEventReader eventReader = StaxUtils.createXMLEventReader(events);
       if (outputClass.isAnnotationPresent(XmlRootElement.class)) {
         return unmarshaller.unmarshal(eventReader);
       } else {
@@ -162,31 +207,34 @@ public class ReactiveJaxbDecoder extends AbstractDecoder<Object> {
   /**
    * Returns the qualified name for the given class, according to the mapping rules in the JAXB
    * specification.
+   *
+   * @param outputClass the output class
+   * @return the q name
    */
-  private QName toQName(final Class<?> outputClass) {
+  QName toQName(Class<?> outputClass) {
     String localPart;
     String namespaceUri;
 
     if (outputClass.isAnnotationPresent(XmlRootElement.class)) {
-      final XmlRootElement annotation = outputClass.getAnnotation(XmlRootElement.class);
+      XmlRootElement annotation = outputClass.getAnnotation(XmlRootElement.class);
       localPart = annotation.name();
       namespaceUri = annotation.namespace();
     } else if (outputClass.isAnnotationPresent(XmlType.class)) {
-      final XmlType annotation = outputClass.getAnnotation(XmlType.class);
+      XmlType annotation = outputClass.getAnnotation(XmlType.class);
       localPart = annotation.name();
       namespaceUri = annotation.namespace();
     } else {
-      throw new IllegalArgumentException("Output class [" + outputClass.getName()
-          + "] is neither annotated with @XmlRootElement nor @XmlType");
+      throw new IllegalArgumentException("Output class [" + outputClass.getName() +
+          "] is neither annotated with @XmlRootElement nor @XmlType");
     }
 
     if (JAXB_DEFAULT_ANNOTATION_VALUE.equals(localPart)) {
       localPart = ClassUtils.getShortNameAsProperty(outputClass);
     }
     if (JAXB_DEFAULT_ANNOTATION_VALUE.equals(namespaceUri)) {
-      final Package outputClassPackage = outputClass.getPackage();
+      Package outputClassPackage = outputClass.getPackage();
       if (outputClassPackage != null && outputClassPackage.isAnnotationPresent(XmlSchema.class)) {
-        final XmlSchema annotation = outputClassPackage.getAnnotation(XmlSchema.class);
+        XmlSchema annotation = outputClassPackage.getAnnotation(XmlSchema.class);
         namespaceUri = annotation.namespace();
       } else {
         namespaceUri = XMLConstants.NULL_NS_URI;
@@ -216,13 +264,18 @@ public class ReactiveJaxbDecoder extends AbstractDecoder<Object> {
    * </ol>
    * </li>
    * </ol>
+   *
+   * @param xmlEventFlux the xml event as flux
+   * @param desiredName the desired name
+   * @return the list of xml events as flux
    */
-  private Flux<List<XMLEvent>> split(Flux<XMLEvent> xmlEventFlux, QName desiredName) {
-    return xmlEventFlux.flatMap(new SplitFunction(desiredName));
+  Flux<List<XMLEvent>> split(Flux<XMLEvent> xmlEventFlux, QName desiredName) {
+    return xmlEventFlux.handle(new SplitHandler(desiredName));
   }
 
-  private static class SplitFunction implements
-      Function<XMLEvent, Publisher<? extends List<XMLEvent>>> {
+
+  private static class SplitHandler implements
+      BiConsumer<XMLEvent, SynchronousSink<List<XMLEvent>>> {
 
     private final QName desiredName;
 
@@ -234,16 +287,16 @@ public class ReactiveJaxbDecoder extends AbstractDecoder<Object> {
     private int barrier = Integer.MAX_VALUE;
 
     /**
-     * Instantiates a new Split function.
+     * Instantiates a new split handler.
      *
      * @param desiredName the desired name
      */
-    SplitFunction(QName desiredName) {
+    public SplitHandler(QName desiredName) {
       this.desiredName = desiredName;
     }
 
     @Override
-    public Publisher<? extends List<XMLEvent>> apply(XMLEvent event) {
+    public void accept(XMLEvent event, SynchronousSink<List<XMLEvent>> sink) {
       if (event.isStartElement()) {
         if (this.barrier == Integer.MAX_VALUE) {
           QName startElementName = event.asStartElement().getName();
@@ -263,10 +316,9 @@ public class ReactiveJaxbDecoder extends AbstractDecoder<Object> {
         if (this.elementDepth == this.barrier) {
           this.barrier = Integer.MAX_VALUE;
           Assert.state(this.events != null, "No XMLEvent List");
-          return Mono.just(this.events);
+          sink.next(this.events);
         }
       }
-      return Mono.empty();
     }
   }
 

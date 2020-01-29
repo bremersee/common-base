@@ -45,17 +45,11 @@ class ReactiveJaxbEncoderTest {
   void testCanEncode() {
     JaxbContextBuilder jaxbContextBuilder = JaxbContextBuilder
         .builder()
+        .withCanMarshal(JaxbContextBuilder.CAN_MARSHAL_ONLY_PREDEFINED_DATA)
+        .withCanUnmarshal(JaxbContextBuilder.CAN_UNMARSHAL_ONLY_PREDEFINED_DATA)
         .processAll(ServiceLoader.load(JaxbContextDataProvider.class));
 
     ReactiveJaxbEncoder encoder = new ReactiveJaxbEncoder(jaxbContextBuilder);
-
-    assertTrue(
-        encoder
-            .canEncode(ResolvableType.forRawClass(Person.class), null));
-
-    assertTrue(
-        encoder
-            .canEncode(ResolvableType.forRawClass(Person.class), MimeTypeUtils.APPLICATION_XML));
 
     assertTrue(
         encoder
@@ -79,9 +73,7 @@ class ReactiveJaxbEncoderTest {
                 ResolvableType.forRawClass(XmlTestJaxbContextDataProvider.class),
                 MimeTypeUtils.APPLICATION_XML));
 
-    encoder = new ReactiveJaxbEncoder(
-        jaxbContextBuilder,
-        "http://bremersee.org/xmlschemas/common-xml-test-model-2");
+    encoder = new ReactiveJaxbEncoder(jaxbContextBuilder);
 
     assertFalse(
         encoder
@@ -90,14 +82,6 @@ class ReactiveJaxbEncoderTest {
     assertTrue(
         encoder
             .canEncode(ResolvableType.forRawClass(Vehicle.class), MimeTypeUtils.APPLICATION_XML));
-
-    assertFalse(
-        encoder
-            .canEncode(ResolvableType.forRawClass(Company.class), MimeTypeUtils.APPLICATION_XML));
-
-    assertFalse(
-        encoder
-            .canEncode(ResolvableType.forRawClass(Address.class), MimeTypeUtils.APPLICATION_XML));
   }
 
 }

@@ -17,7 +17,6 @@
 package org.bremersee.http.codec.xml;
 
 import java.io.OutputStream;
-import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.MarshalException;
@@ -37,6 +36,7 @@ import org.springframework.util.MimeType;
 import org.springframework.util.MimeTypeUtils;
 import org.springframework.validation.annotation.Validated;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 /**
  * Encode from single value to a byte stream containing XML elements.
@@ -56,40 +56,41 @@ public class ReactiveJaxbEncoder extends AbstractSingleValueEncoder<Object> {
 
   private final JaxbContextBuilder jaxbContextBuilder;
 
-  private final String[] nameSpaces;
-
   /**
    * Instantiates a new reactive jaxb encoder.
    *
    * @param jaxbContextBuilder the jaxb context builder
-   * @param nameSpaces         the name spaces
    */
-  @SuppressWarnings("WeakerAccess")
-  public ReactiveJaxbEncoder(
-      final JaxbContextBuilder jaxbContextBuilder,
-      final String... nameSpaces) {
+  public ReactiveJaxbEncoder(final JaxbContextBuilder jaxbContextBuilder) {
     super(MimeTypeUtils.APPLICATION_XML, MimeTypeUtils.TEXT_XML);
-    this.jaxbContextBuilder = jaxbContextBuilder;
-    this.nameSpaces = nameSpaces;
+    this.jaxbContextBuilder = jaxbContextBuilder != null
+        ? jaxbContextBuilder
+        : JaxbContextBuilder.builder()
+            .withCanUnmarshal(JaxbContextBuilder.CAN_UNMARSHAL_ALL);
   }
 
   @Override
   public boolean canEncode(final ResolvableType elementType, @Nullable final MimeType mimeType) {
     if (super.canEncode(elementType, mimeType)) {
       final Class<?> outputClass = elementType.toClass();
-      return jaxbContextBuilder.supports(outputClass, nameSpaces);
+      return jaxbContextBuilder.canMarshal(outputClass);
     } else {
       return false;
     }
   }
 
   @Override
-  protected Flux<DataBuffer> encode(
-      final Object value,
-      final DataBufferFactory dataBufferFactory,
-      final ResolvableType type,
-      @Nullable final MimeType mimeType,
-      @Nullable final Map<String, Object> hints) {
+  protected Flux<DataBuffer> encode(Object value, DataBufferFactory bufferFactory,
+      ResolvableType valueType, @Nullable MimeType mimeType, @Nullable Map<String, Object> hints) {
+
+    // we're relying on doOnDiscard in base class
+    return Mono.fromCallable(() -> encodeValue(value, bufferFactory, valueType, mimeType, hints))
+        .flux();
+  }
+
+  @Override
+  public DataBuffer encodeValue(Object value, DataBufferFactory bufferFactory,
+      ResolvableType valueType, @Nullable MimeType mimeType, @Nullable Map<String, Object> hints) {
 
     if (!Hints.isLoggingSuppressed(hints)) {
       LogFormatUtils.traceDebug(logger, traceOn -> {
@@ -99,19 +100,17 @@ public class ReactiveJaxbEncoder extends AbstractSingleValueEncoder<Object> {
     }
 
     boolean release = true;
-    DataBuffer buffer = dataBufferFactory.allocateBuffer(1024);
-    OutputStream outputStream = buffer.asOutputStream();
+    DataBuffer buffer = bufferFactory.allocateBuffer(1024);
     try {
-      Marshaller marshaller = jaxbContextBuilder.buildJaxbContext(nameSpaces).createMarshaller();
-      marshaller.setProperty(Marshaller.JAXB_ENCODING, StandardCharsets.UTF_8.name());
+      OutputStream outputStream = buffer.asOutputStream();
+      Marshaller marshaller = jaxbContextBuilder.buildMarshaller(value);
       marshaller.marshal(value, outputStream);
       release = false;
-      return Flux.just(buffer);
+      return buffer;
     } catch (MarshalException ex) {
-      return Flux.error(new EncodingException(
-          "Could not marshal " + value.getClass() + " to XML", ex));
+      throw new EncodingException("Could not marshal " + value.getClass() + " to XML", ex);
     } catch (JAXBException ex) {
-      return Flux.error(new CodecException("Invalid JAXB configuration", ex));
+      throw new CodecException("Invalid JAXB configuration", ex);
     } finally {
       if (release) {
         DataBufferUtils.release(buffer);
