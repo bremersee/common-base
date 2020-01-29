@@ -36,6 +36,7 @@ import org.springframework.util.MimeType;
 import org.springframework.util.MimeTypeUtils;
 import org.springframework.validation.annotation.Validated;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 /**
  * Encode from single value to a byte stream containing XML elements.
@@ -79,12 +80,17 @@ public class ReactiveJaxbEncoder extends AbstractSingleValueEncoder<Object> {
   }
 
   @Override
-  protected Flux<DataBuffer> encode(
-      final Object value,
-      final DataBufferFactory dataBufferFactory,
-      final ResolvableType type,
-      @Nullable final MimeType mimeType,
-      @Nullable final Map<String, Object> hints) {
+  protected Flux<DataBuffer> encode(Object value, DataBufferFactory bufferFactory,
+      ResolvableType valueType, @Nullable MimeType mimeType, @Nullable Map<String, Object> hints) {
+
+    // we're relying on doOnDiscard in base class
+    return Mono.fromCallable(() -> encodeValue(value, bufferFactory, valueType, mimeType, hints))
+        .flux();
+  }
+
+  @Override
+  public DataBuffer encodeValue(Object value, DataBufferFactory bufferFactory,
+      ResolvableType valueType, @Nullable MimeType mimeType, @Nullable Map<String, Object> hints) {
 
     if (!Hints.isLoggingSuppressed(hints)) {
       LogFormatUtils.traceDebug(logger, traceOn -> {
@@ -94,18 +100,17 @@ public class ReactiveJaxbEncoder extends AbstractSingleValueEncoder<Object> {
     }
 
     boolean release = true;
-    DataBuffer buffer = dataBufferFactory.allocateBuffer(1024);
-    OutputStream outputStream = buffer.asOutputStream();
+    DataBuffer buffer = bufferFactory.allocateBuffer(1024);
     try {
+      OutputStream outputStream = buffer.asOutputStream();
       Marshaller marshaller = jaxbContextBuilder.buildMarshaller(value);
       marshaller.marshal(value, outputStream);
       release = false;
-      return Flux.just(buffer);
+      return buffer;
     } catch (MarshalException ex) {
-      return Flux.error(new EncodingException(
-          "Could not marshal " + value.getClass() + " to XML", ex));
+      throw new EncodingException("Could not marshal " + value.getClass() + " to XML", ex);
     } catch (JAXBException ex) {
-      return Flux.error(new CodecException("Invalid JAXB configuration", ex));
+      throw new CodecException("Invalid JAXB configuration", ex);
     } finally {
       if (release) {
         DataBufferUtils.release(buffer);

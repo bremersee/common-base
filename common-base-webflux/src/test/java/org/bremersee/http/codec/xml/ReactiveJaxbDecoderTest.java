@@ -16,6 +16,7 @@
 
 package org.bremersee.http.codec.xml;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -37,6 +38,13 @@ import org.springframework.util.MimeTypeUtils;
  * @author Christian Bremer
  */
 class ReactiveJaxbDecoderTest {
+
+  @Test
+  void maxInMemorySize() {
+    ReactiveJaxbDecoder decoder = new ReactiveJaxbDecoder(null);
+    decoder.setMaxInMemorySize(512 * 1024);
+    assertEquals(512 * 1024, decoder.getMaxInMemorySize());
+  }
 
   /**
    * Test can decode.
