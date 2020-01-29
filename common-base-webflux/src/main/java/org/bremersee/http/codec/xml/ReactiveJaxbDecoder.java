@@ -107,12 +107,12 @@ public class ReactiveJaxbDecoder extends AbstractDecoder<Object> {
   /**
    * Set the max number of bytes that can be buffered by this decoder. This is either the size of
    * the entire input when decoding as a whole, or when using async parsing with Aalto XML, it is
-   * the size of one top-level XML tree. When the limit is exceeded, {@link
-   * DataBufferLimitException} is raised.
+   * the size of one top-level XML tree. When the limit is exceeded,
+   * {@link DataBufferLimitException} is raised.
+   *
    * <p>By default this is set to 256K.
    *
    * @param byteCount the max number of bytes to buffer, or -1 for unlimited
-   * @since 5.1.11
    */
   public void setMaxInMemorySize(int byteCount) {
     this.maxInMemorySize = byteCount;
@@ -122,7 +122,7 @@ public class ReactiveJaxbDecoder extends AbstractDecoder<Object> {
   /**
    * Return the {@link #setMaxInMemorySize configured} byte count limit.
    *
-   * @since 5.1.11
+   * @return the max in memory size
    */
   public int getMaxInMemorySize() {
     return this.maxInMemorySize;
@@ -207,6 +207,9 @@ public class ReactiveJaxbDecoder extends AbstractDecoder<Object> {
   /**
    * Returns the qualified name for the given class, according to the mapping rules in the JAXB
    * specification.
+   *
+   * @param outputClass the output class
+   * @return the q name
    */
   QName toQName(Class<?> outputClass) {
     String localPart;
@@ -261,6 +264,10 @@ public class ReactiveJaxbDecoder extends AbstractDecoder<Object> {
    * </ol>
    * </li>
    * </ol>
+   *
+   * @param xmlEventFlux the xml event as flux
+   * @param desiredName the desired name
+   * @return the list of xml events as flux
    */
   Flux<List<XMLEvent>> split(Flux<XMLEvent> xmlEventFlux, QName desiredName) {
     return xmlEventFlux.handle(new SplitHandler(desiredName));
@@ -279,6 +286,11 @@ public class ReactiveJaxbDecoder extends AbstractDecoder<Object> {
 
     private int barrier = Integer.MAX_VALUE;
 
+    /**
+     * Instantiates a new split handler.
+     *
+     * @param desiredName the desired name
+     */
     public SplitHandler(QName desiredName) {
       this.desiredName = desiredName;
     }
