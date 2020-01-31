@@ -17,6 +17,8 @@
 package org.bremersee.security.access;
 
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -73,7 +75,7 @@ public interface AclBuilder {
    * @param acl the acl (entity)
    * @return the acl builder
    */
-  AclBuilder from(@Nullable Acl acl);
+  AclBuilder from(@Nullable Acl<? extends Ace> acl);
 
   /**
    * Sets owner.
@@ -86,7 +88,7 @@ public interface AclBuilder {
   /**
    * Sets guest.
    *
-   * @param isPublic    is public
+   * @param isPublic is public
    * @param permissions the permissions
    * @return the acl builder
    */
@@ -95,7 +97,7 @@ public interface AclBuilder {
   /**
    * Adds user.
    *
-   * @param user        the user
+   * @param user the user
    * @param permissions the permissions
    * @return the acl builder
    */
@@ -104,7 +106,7 @@ public interface AclBuilder {
   /**
    * Adds role.
    *
-   * @param role        the role
+   * @param role the role
    * @param permissions the permissions
    * @return the acl builder
    */
@@ -113,7 +115,7 @@ public interface AclBuilder {
   /**
    * Adds group.
    *
-   * @param group       the group
+   * @param group the group
    * @param permissions the permissions
    * @return the acl builder
    */
@@ -122,7 +124,7 @@ public interface AclBuilder {
   /**
    * Removes user.
    *
-   * @param user        the user
+   * @param user the user
    * @param permissions the permissions
    * @return the acl builder
    */
@@ -131,7 +133,7 @@ public interface AclBuilder {
   /**
    * Removes role.
    *
-   * @param role        the role
+   * @param role the role
    * @param permissions the permissions
    * @return the acl builder
    */
@@ -140,7 +142,7 @@ public interface AclBuilder {
   /**
    * Removes group.
    *
-   * @param group       the group
+   * @param group the group
    * @param permissions the permissions
    * @return the acl builder
    */
@@ -156,13 +158,30 @@ public interface AclBuilder {
   }
 
   /**
-   * acl builder.
+   * Adds admin access.
    *
-   * @param adminRole   the admin role
+   * @param adminRole the admin role
    * @param permissions the permissions
    * @return the acl builder
    */
-  AclBuilder ensureAdminAccess(@Nullable String adminRole, @Nullable String... permissions);
+  default AclBuilder ensureAdminAccess(
+      @Nullable String adminRole,
+      @Nullable String... permissions) {
+
+    return ensureAdminAccess(
+        StringUtils.hasText(adminRole) ? Collections.singleton(adminRole) : null, permissions);
+  }
+
+  /**
+   * Adds admin access.
+   *
+   * @param adminRoles the admin roles
+   * @param permissions the permissions
+   * @return the acl builder
+   */
+  AclBuilder ensureAdminAccess(
+      @Nullable Collection<String> adminRoles,
+      @Nullable String... permissions);
 
   /**
    * Removes admin access.
@@ -176,16 +195,33 @@ public interface AclBuilder {
   /**
    * Removes admin access.
    *
-   * @param adminRole   the admin role
+   * @param adminRole the admin role
    * @param permissions the permissions
    * @return the acl builder
    */
-  AclBuilder removeAdminAccess(@Nullable String adminRole, @Nullable String... permissions);
+  default AclBuilder removeAdminAccess(
+      @Nullable String adminRole,
+      @Nullable String... permissions) {
+
+    return removeAdminAccess(
+        StringUtils.hasText(adminRole) ? Collections.singleton(adminRole) : null, permissions);
+  }
+
+  /**
+   * Removes admin access.
+   *
+   * @param adminRoles the admin roles
+   * @param permissions the permissions
+   * @return the acl builder
+   */
+  AclBuilder removeAdminAccess(
+      @Nullable Collection<String> adminRoles,
+      @Nullable String... permissions);
 
   /**
    * Build acl.
    *
-   * @param <T>     the type of the acl
+   * @param <T> the type of the acl
    * @param factory the factory
    * @return the acl
    */
@@ -273,10 +309,9 @@ public interface AclBuilder {
     }
 
     @Override
-    public AclBuilder from(final Acl acl) {
+    public AclBuilder from(final Acl<? extends Ace> acl) {
       if (acl != null) {
         this.owner = acl.getOwner();
-        //noinspection unchecked
         final Map<String, ? extends Ace> map = acl.entryMap();
         if (map != null) {
           map.entrySet()
@@ -416,24 +451,32 @@ public interface AclBuilder {
     }
 
     @Override
-    public AclBuilder ensureAdminAccess(final String adminRole, final String... permissions) {
-      if (adminRole != null) {
+    public AclBuilder ensureAdminAccess(
+        final Collection<String> adminRoles,
+        final String... permissions) {
+
+      if (adminRoles != null && !adminRoles.isEmpty()) {
         if (permissions == null || permissions.length == 0) {
-          entries.keySet().forEach(permission -> addRole(adminRole, permission));
+          adminRoles.forEach(adminRole -> entries.keySet()
+              .forEach(permission -> addRole(adminRole, permission)));
         } else {
-          addRole(adminRole, permissions);
+          adminRoles.forEach(adminRole -> addRole(adminRole, permissions));
         }
       }
       return this;
     }
 
     @Override
-    public AclBuilder removeAdminAccess(final String adminRole, final String... permissions) {
-      if (adminRole != null) {
+    public AclBuilder removeAdminAccess(
+        final Collection<String> adminRoles,
+        final String... permissions) {
+
+      if (adminRoles != null && !adminRoles.isEmpty()) {
         if (permissions == null || permissions.length == 0) {
-          entries.keySet().forEach(permission -> removeRole(adminRole, permission));
+          adminRoles.forEach(adminRole -> entries.keySet()
+              .forEach(permission -> removeRole(adminRole, permission)));
         } else {
-          removeRole(adminRole, permissions);
+          adminRoles.forEach(adminRole -> removeRole(adminRole, permissions));
         }
       }
       return this;

@@ -18,12 +18,14 @@ package org.bremersee.security.access;
 
 import static org.springframework.util.Assert.notNull;
 
+import java.util.Collections;
+import java.util.LinkedHashSet;
+import java.util.Set;
 import javax.validation.constraints.NotNull;
-import lombok.Getter;
-import lombok.Setter;
 import org.bremersee.common.model.AccessControlList;
 import org.bremersee.security.core.AuthorityConstants;
 import org.springframework.lang.Nullable;
+import org.springframework.util.StringUtils;
 
 /**
  * The acl mapper implementation.
@@ -31,7 +33,6 @@ import org.springframework.lang.Nullable;
  * @param <T> the acl type
  * @author Christian Bremer
  */
-@SuppressWarnings({"WeakerAccess"})
 public class AclMapperImpl<T extends Acl<? extends Ace>> implements AclMapper<T> {
 
   private final AclFactory<T> aclFactory;
@@ -42,9 +43,7 @@ public class AclMapperImpl<T extends Acl<? extends Ace>> implements AclMapper<T>
 
   private final boolean returnNull;
 
-  @Getter
-  @Setter
-  private String adminRole = AuthorityConstants.ADMIN_ROLE_NAME;
+  private Set<String> adminRoles;
 
   /**
    * Instantiates a new acl mapper.
@@ -88,6 +87,54 @@ public class AclMapperImpl<T extends Acl<? extends Ace>> implements AclMapper<T>
     this.defaultPermissions = defaultPermissions;
     this.switchAdminAccess = switchAdminAccess;
     this.returnNull = returnNull;
+    getAdminRoles().add(AuthorityConstants.ADMIN_ROLE_NAME);
+  }
+
+  /**
+   * Gets admin role.
+   *
+   * @return the admin role
+   * @deprecated Use {@link #getAdminRoles()} instead.
+   */
+  @Deprecated
+  public String getAdminRole() {
+    return adminRoles != null && !adminRoles.isEmpty() ? adminRoles.iterator().next() : null;
+  }
+
+  /**
+   * Sets admin role.
+   *
+   * @param adminRole the admin role
+   * @deprecated Use {@link #setAdminRoles(Set)} instead.
+   */
+  @Deprecated
+  public void setAdminRole(String adminRole) {
+    if (StringUtils.hasText(adminRole)) {
+      this.setAdminRoles(Collections.singleton(adminRole));
+    } else {
+      this.setAdminRoles(Collections.emptySet());
+    }
+  }
+
+  /**
+   * Gets admin roles.
+   *
+   * @return the admin roles
+   */
+  public Set<String> getAdminRoles() {
+    if (adminRoles == null) {
+      adminRoles = new LinkedHashSet<>();
+    }
+    return adminRoles;
+  }
+
+  /**
+   * Sets admin roles.
+   *
+   * @param adminRoles the admin roles
+   */
+  public void setAdminRoles(Set<String> adminRoles) {
+    this.adminRoles = new LinkedHashSet<>(adminRoles != null ? adminRoles : Collections.emptySet());
   }
 
   @Override
@@ -100,7 +147,7 @@ public class AclMapperImpl<T extends Acl<? extends Ace>> implements AclMapper<T>
   }
 
   @Override
-  public AccessControlList map(@SuppressWarnings("rawtypes") Acl acl) {
+  public AccessControlList map(T acl) {
     if (acl == null && returnNull) {
       return null;
     }
@@ -110,7 +157,7 @@ public class AclMapperImpl<T extends Acl<? extends Ace>> implements AclMapper<T>
         .defaults(defaultPermissions);
     if (switchAdminAccess) {
       return aclBuilder
-          .removeAdminAccess(adminRole)
+          .removeAdminAccess(adminRoles)
           .buildAccessControlList();
     }
     return aclBuilder
@@ -128,7 +175,7 @@ public class AclMapperImpl<T extends Acl<? extends Ace>> implements AclMapper<T>
         .defaults(defaultPermissions);
     if (switchAdminAccess) {
       return aclBuilder
-          .ensureAdminAccess(adminRole)
+          .ensureAdminAccess(adminRoles)
           .build(aclFactory);
     }
     return aclBuilder
@@ -136,14 +183,14 @@ public class AclMapperImpl<T extends Acl<? extends Ace>> implements AclMapper<T>
   }
 
   @Override
-  public T defaultAcl(@Nullable String owner) {
+  public T defaultAcl(String owner) {
     final AclBuilder aclBuilder = AclBuilder
         .builder()
         .owner(owner)
         .addUser(owner, defaultPermissions);
     if (switchAdminAccess) {
       return aclBuilder
-          .ensureAdminAccess(adminRole)
+          .ensureAdminAccess(adminRoles)
           .build(aclFactory);
     }
     return aclBuilder
