@@ -138,6 +138,11 @@ public class AclMapperImpl<T extends Acl<? extends Ace>> implements AclMapper<T>
   }
 
   @Override
+  public AclFactory<T> getAclFactory() {
+    return aclFactory;
+  }
+
+  @Override
   public AccessControlList defaultAccessControlList(String owner) {
     return AclBuilder
         .builder()
