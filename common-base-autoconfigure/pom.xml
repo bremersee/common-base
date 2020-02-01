@@ -32,6 +32,11 @@
       <version>${project.version}</version>
       <optional>true</optional>
     </dependency>
+    <dependency>
+      <groupId>org.modelmapper</groupId>
+      <artifactId>modelmapper</artifactId>
+      <optional>true</optional>
+    </dependency>
 
     <dependency>
       <groupId>org.bremersee</groupId>

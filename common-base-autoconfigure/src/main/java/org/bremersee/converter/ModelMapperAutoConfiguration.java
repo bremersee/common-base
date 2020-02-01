@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 the original author or authors.
+ * Copyright 2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,28 +14,26 @@
  * limitations under the License.
  */
 
-package org.bremersee.web.reactive;
+package org.bremersee.converter;
 
 import lombok.extern.slf4j.Slf4j;
-import org.bremersee.converter.BaseCommonConverters;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication.Type;
+import org.modelmapper.ModelMapper;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.event.EventListener;
-import org.springframework.format.FormatterRegistry;
 import org.springframework.util.ClassUtils;
-import org.springframework.web.reactive.config.WebFluxConfigurer;
 
 /**
- * The base common converters auto configuration.
+ * The model mapper auto configuration.
  *
  * @author Christian Bremer
  */
-@ConditionalOnWebApplication(type = Type.REACTIVE)
+@ConditionalOnClass(ModelMapper.class)
 @Configuration
 @Slf4j
-public class BaseCommonConvertersAutoConfiguration implements WebFluxConfigurer {
+public class ModelMapperAutoConfiguration {
 
   /**
    * Init.
@@ -49,9 +47,14 @@ public class BaseCommonConvertersAutoConfiguration implements WebFluxConfigurer 
         ClassUtils.getUserClass(getClass()).getSimpleName());
   }
 
-  @Override
-  public void addFormatters(FormatterRegistry registry) {
-    BaseCommonConverters.registerAll(registry);
+  /**
+   * Creates the model mapper bean.
+   *
+   * @return the model mapper
+   */
+  @Bean
+  public ModelMapper modelMapper() {
+    return new ModelMapper();
   }
 
 }

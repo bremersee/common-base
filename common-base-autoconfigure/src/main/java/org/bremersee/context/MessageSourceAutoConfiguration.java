@@ -31,6 +31,7 @@ import org.springframework.context.event.EventListener;
 import org.springframework.context.support.AbstractResourceBasedMessageSource;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
 import org.springframework.context.support.ResourceBundleMessageSource;
+import org.springframework.util.ClassUtils;
 import org.springframework.util.StringUtils;
 
 /**
@@ -72,7 +73,7 @@ public class MessageSourceAutoConfiguration {
             + "* fallbackToSystemLocale = {}\n"
             + "* defaultEncoding = {}\n"
             + "*********************************************************************************",
-        getClass().getSimpleName(),
+        ClassUtils.getUserClass(getClass()).getSimpleName(),
         getBaseNames(),
         properties.getDefaultLocale(),
         properties.isFallbackToSystemLocale(),

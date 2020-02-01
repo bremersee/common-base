@@ -16,8 +16,15 @@
 
 package org.bremersee.base.app;
 
+import java.time.Instant;
+import java.util.Date;
+import java.util.Optional;
+import lombok.extern.slf4j.Slf4j;
+import org.bremersee.converter.ModelMapperConfigurerAdapter;
+import org.bremersee.security.access.AclFactory;
 import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 
 /**
@@ -28,6 +35,30 @@ import org.springframework.context.annotation.ComponentScan;
 @SpringBootConfiguration
 @EnableAutoConfiguration
 @ComponentScan(basePackageClasses = {TestConfiguration.class})
+@Slf4j
 public class TestConfiguration {
+
+  @Bean
+  public AclFactory<AclEntity> aclFactory() {
+    log.info("Creating bean 'aclFactory' ...");
+    return AclEntity::new;
+  }
+
+  @Bean
+  public ModelMapperConfigurerAdapter customModelMapperConfig() {
+    log.info("Creating custom model mapper config ...");
+    return modelMapper -> {
+      modelMapper
+          .typeMap(Date.class, Instant.class)
+          .setConverter(context -> Optional.ofNullable(context.getSource())
+              .map(Date::toInstant)
+              .orElse(null));
+      modelMapper
+          .typeMap(Instant.class, Date.class)
+          .setConverter(context -> Optional.ofNullable(context.getSource())
+              .map(Date::from)
+              .orElse(null));
+    };
+  }
 
 }

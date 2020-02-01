@@ -24,6 +24,7 @@ import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.event.EventListener;
+import org.springframework.util.ClassUtils;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
@@ -60,7 +61,7 @@ public class CorsAutoConfiguration implements WebMvcConfigurer {
             + "*********************************************************************************\n"
             + "* corsProperties = {}\n"
             + "*********************************************************************************",
-        getClass().getSimpleName(), properties);
+        ClassUtils.getUserClass(getClass()).getSimpleName(), properties);
   }
 
   @Override

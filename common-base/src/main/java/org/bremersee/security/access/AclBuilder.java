@@ -22,6 +22,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import javax.validation.constraints.NotNull;
 import org.bremersee.common.model.AccessControlList;
 import org.bremersee.security.core.AuthorityConstants;
@@ -75,7 +76,20 @@ public interface AclBuilder {
    * @param acl the acl (entity)
    * @return the acl builder
    */
-  AclBuilder from(@Nullable Acl<? extends Ace> acl);
+  default AclBuilder from(@Nullable Acl<? extends Ace> acl) {
+    return Optional.ofNullable(acl)
+        .map(a -> from(a.getOwner(), a.entryMap()))
+        .orElse(this);
+  }
+
+  /**
+   * From acl (entity) values.
+   *
+   * @param owner the owner
+   * @param map the acl (entity) entry map
+   * @return the acl builder
+   */
+  AclBuilder from(String owner, Map<String, ? extends Ace> map);
 
   /**
    * Sets owner.
@@ -309,25 +323,22 @@ public interface AclBuilder {
     }
 
     @Override
-    public AclBuilder from(final Acl<? extends Ace> acl) {
-      if (acl != null) {
-        this.owner = acl.getOwner();
-        final Map<String, ? extends Ace> map = acl.entryMap();
-        if (map != null) {
-          map.entrySet()
-              .stream()
-              .filter(Objects::nonNull)
-              .filter(entry -> StringUtils.hasText(entry.getKey()))
-              .filter(entry -> entry.getValue() != null)
-              .forEach(entry -> {
-                final String permission = entry.getKey().toLowerCase();
-                final Ace ace = entry.getValue();
-                guest(ace.isGuest(), permission);
-                ace.getGroups().forEach(group -> addGroup(group, permission));
-                ace.getRoles().forEach(role -> addRole(role, permission));
-                ace.getUsers().forEach(user -> addUser(user, permission));
-              });
-        }
+    public AclBuilder from(String owner, Map<String, ? extends Ace> map) {
+      this.owner = owner;
+      if (map != null) {
+        map.entrySet()
+            .stream()
+            .filter(Objects::nonNull)
+            .filter(entry -> StringUtils.hasText(entry.getKey()))
+            .filter(entry -> entry.getValue() != null)
+            .forEach(entry -> {
+              final String permission = entry.getKey().toLowerCase();
+              final Ace ace = entry.getValue();
+              guest(ace.isGuest(), permission);
+              ace.getGroups().forEach(group -> addGroup(group, permission));
+              ace.getRoles().forEach(role -> addRole(role, permission));
+              ace.getUsers().forEach(user -> addUser(user, permission));
+            });
       }
       return this;
     }

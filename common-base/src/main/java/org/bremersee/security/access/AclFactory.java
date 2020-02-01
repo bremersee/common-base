@@ -17,6 +17,7 @@
 package org.bremersee.security.access;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Map;
 import java.util.stream.Collectors;
 import org.bremersee.common.model.AccessControlEntry;
@@ -33,11 +34,21 @@ public interface AclFactory<T> {
   /**
    * Create access control list of the specified type.
    *
-   * @param owner   the owner
+   * @param owner the owner
    * @param entries the entries
    * @return the acl type
    */
   T createAccessControlList(String owner, Map<String, ? extends Ace> entries);
+
+  /**
+   * Gets class of access control list (entity).
+   *
+   * @return the access control list class
+   */
+  default Class<T> getAccessControlListClass() {
+    //noinspection unchecked
+    return (Class<T>) createAccessControlList("someone", Collections.emptyMap()).getClass();
+  }
 
   /**
    * Acl dto factory.
