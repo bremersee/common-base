@@ -2,6 +2,8 @@ package org.bremersee.web.reactive.function.client.proxy;
 
 import static org.bremersee.web.reactive.function.client.proxy.app.ControllerOne.OK_RESPONSE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.util.LinkedHashMap;
 import lombok.extern.slf4j.Slf4j;
@@ -72,6 +74,17 @@ class WebClientProxyBuilderTest {
   }
 
   /**
+   * Call object methods.
+   */
+  @Test
+  void callObjectMethods() {
+    ControllerOne proxy = newControllerOneClient();
+    assertEquals(proxy.hashCode(), proxy.hashCode());
+    assertNotEquals(proxy, null);
+    assertNotNull(proxy.toString());
+  }
+
+  /**
    * Call with web test client.
    */
   @Test
@@ -119,7 +132,7 @@ class WebClientProxyBuilderTest {
   /**
    * Do post.
    */
-  // @Disabled
+// @Disabled
   @Test
   void doPost() {
     MultiValueMap<String, String> form = new LinkedMultiValueMap<>();

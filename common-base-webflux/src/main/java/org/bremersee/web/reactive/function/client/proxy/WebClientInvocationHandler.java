@@ -20,6 +20,7 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.util.ReflectionUtils;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClient.RequestBodyUriSpec;
 import org.springframework.web.reactive.function.client.WebClient.RequestHeadersUriSpec;
@@ -35,7 +36,7 @@ class WebClientInvocationHandler implements InvocationHandler {
 
   private final Map<MethodDescription, InvocationFunctions> methodFunctions;
 
-  private InvocationFunctions commonFunctions;
+  private final InvocationFunctions commonFunctions;
 
   private final WebClient webClient;
 
@@ -62,6 +63,17 @@ class WebClientInvocationHandler implements InvocationHandler {
 
   @Override
   public Object invoke(final Object proxy, final Method method, final Object[] args) {
+    if (ReflectionUtils.isObjectMethod(method)) {
+      if (ReflectionUtils.isEqualsMethod(method)) {
+        return this.equals(args[0]);
+      } else if (ReflectionUtils.isHashCodeMethod(method)) {
+        return this.hashCode();
+      } else if (ReflectionUtils.isToStringMethod(method)) {
+        return "WebClient Proxy of " + (targetClass != null ? targetClass.getName() : "null");
+      } else {
+        return ReflectionUtils.invokeMethod(method, this, args);
+      }
+    }
     final InvocationParameters parameters = new InvocationParameters(targetClass, method, args);
     final InvocationFunctions functions = InvocationFunctions.merge(
         commonFunctions,
