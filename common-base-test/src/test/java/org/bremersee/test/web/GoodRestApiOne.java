@@ -16,14 +16,17 @@
 
 package org.bremersee.test.web;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import java.util.List;
 import javax.validation.Valid;
 import org.bremersee.geojson.model.Geometry;
+import org.junit.jupiter.api.Tag;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -37,7 +40,7 @@ import org.springframework.web.bind.annotation.RequestParam;
  *
  * @author Christian Bremer
  */
-@Api(value = "GoodRestApiController")
+@Tag(value = "GoodRestApiController")
 @Validated
 public interface GoodRestApiOne {
 
@@ -47,23 +50,28 @@ public interface GoodRestApiOne {
    * @param query the query
    * @return the geometries
    */
-  @ApiOperation(
-      value = "Get geometries.",
-      nickname = "getGeometries",
-      response = Geometry.class,
-      responseContainer = "List",
+  @Operation(
+      summary = "Get geometries.",
+      operationId = "getGeometries",
       tags = {"geometry-controller"})
   @ApiResponses(value = {
-      @ApiResponse(code = 200, message = "OK", response = Geometry.class,
-          responseContainer = "List"),
-      @ApiResponse(code = 403, message = "Forbidden")
+      @ApiResponse(
+          responseCode = "200",
+          description = "OK",
+          content = @Content(
+              array = @ArraySchema(
+                  schema = @Schema(implementation = Geometry.class)))),
+      @ApiResponse(
+          responseCode = "403",
+          description = "Forbidden")
   })
   @RequestMapping(
       value = "/api/geometries",
       produces = {"application/json"},
       method = RequestMethod.GET)
   ResponseEntity<List<Geometry>> getGeometries(
-      @ApiParam(value = "The query.") @RequestParam(name = "q", required = false) String query);
+      @Parameter(description = "The query.")
+      @RequestParam(name = "q", required = false) String query);
 
   /**
    * Add geometry response entity.
@@ -71,16 +79,23 @@ public interface GoodRestApiOne {
    * @param geometry the geometry
    * @return the response entity
    */
-  @ApiOperation(
-      value = "Add geometry.",
-      nickname = "addGeometry",
-      response = Geometry.class,
+  @Operation(
+      summary = "Add geometry.",
+      operationId = "addGeometry",
       tags = {"geometry-controller"})
   @ApiResponses(value = {
-      @ApiResponse(code = 200, message = "OK", response = Geometry.class),
-      @ApiResponse(code = 400, message = "Bad Request",
-          response = org.bremersee.exception.model.RestApiException.class),
-      @ApiResponse(code = 403, message = "Forbidden")
+      @ApiResponse(
+          responseCode = "200",
+          description = "OK",
+          content = @Content(schema = @Schema(implementation = Geometry.class))),
+      @ApiResponse(
+          responseCode = "400",
+          description = "Bad Request",
+          content = @Content(schema = @Schema(
+              implementation = org.bremersee.exception.model.RestApiException.class))),
+      @ApiResponse(
+          responseCode = "403",
+          description = "Forbidden")
   })
   @RequestMapping(
       value = "/api/geometries",
@@ -88,7 +103,8 @@ public interface GoodRestApiOne {
       consumes = {"application/json"},
       method = RequestMethod.POST)
   ResponseEntity<Geometry> addGeometry(
-      @ApiParam(value = "The geometry.", required = true) @Valid @RequestBody Geometry geometry);
+      @Parameter(description = "The geometry.", required = true)
+      @Valid @RequestBody Geometry geometry);
 
   /**
    * Gets geometry.
@@ -96,43 +112,60 @@ public interface GoodRestApiOne {
    * @param id the id
    * @return the geometry
    */
-  @ApiOperation(
-      value = "Get geometry.",
-      nickname = "getGeometry",
-      response = Geometry.class,
+  @Operation(
+      description = "Get geometry.",
+      operationId = "getGeometry",
       tags = {"geometry-controller"})
   @ApiResponses(value = {
-      @ApiResponse(code = 200, message = "OK", response = Geometry.class),
-      @ApiResponse(code = 403, message = "Forbidden"),
-      @ApiResponse(code = 404, message = "Not Found",
-          response = org.bremersee.exception.model.RestApiException.class)
+      @ApiResponse(
+          responseCode = "200",
+          description = "OK",
+          content = @Content(schema = @Schema(implementation = Geometry.class))),
+      @ApiResponse(
+          responseCode = "403",
+          description = "Forbidden"),
+      @ApiResponse(
+          responseCode = "404",
+          description = "Not Found",
+          content = @Content(schema = @Schema(
+              implementation = org.bremersee.exception.model.RestApiException.class)))
   })
   @RequestMapping(
       value = "/api/geometries/{id}",
       produces = {"application/json"},
       method = RequestMethod.GET)
   ResponseEntity<Geometry> getGeometry(
-      @ApiParam(value = "The geometry ID.", required = true) @PathVariable("id") String id);
+      @Parameter(description = "The geometry ID.", required = true) @PathVariable("id") String id);
 
   /**
    * Update geometry response entity.
    *
-   * @param id       the id
+   * @param id the id
    * @param geometry the geometry
    * @return the response entity
    */
-  @ApiOperation(
-      value = "Update geometry.",
-      nickname = "updateGeometry",
-      response = Geometry.class,
+  @Operation(
+      summary = "Update geometry.",
+      operationId = "updateGeometry",
       tags = {"geometry-controller"})
   @ApiResponses(value = {
-      @ApiResponse(code = 200, message = "OK", response = Geometry.class),
-      @ApiResponse(code = 400, message = "Bad Request",
-          response = org.bremersee.exception.model.RestApiException.class),
-      @ApiResponse(code = 403, message = "Forbidden"),
-      @ApiResponse(code = 404, message = "Not Found",
-          response = org.bremersee.exception.model.RestApiException.class)
+      @ApiResponse(
+          responseCode = "200",
+          description = "OK",
+          content = @Content(schema = @Schema(implementation = Geometry.class))),
+      @ApiResponse(
+          responseCode = "400",
+          description = "Bad Request",
+          content = @Content(schema = @Schema(
+              implementation = org.bremersee.exception.model.RestApiException.class))),
+      @ApiResponse(
+          responseCode = "403",
+          description = "Forbidden"),
+      @ApiResponse(
+          responseCode = "404",
+          description = "Not Found",
+          content = @Content(schema = @Schema(
+              implementation = org.bremersee.exception.model.RestApiException.class)))
   })
   @RequestMapping(
       value = "/api/geometries/{id}",
@@ -140,8 +173,9 @@ public interface GoodRestApiOne {
       consumes = {"application/json"},
       method = RequestMethod.PUT)
   ResponseEntity<Geometry> updateGeometry(
-      @ApiParam(value = "The geometry ID.", required = true) @PathVariable("id") String id,
-      @ApiParam(value = "The geometry.", required = true) @Valid @RequestBody Geometry geometry);
+      @Parameter(description = "The geometry ID.", required = true) @PathVariable("id") String id,
+      @Parameter(description = "The geometry.", required = true)
+      @Valid @RequestBody Geometry geometry);
 
   /**
    * Delete geometry response entity.
@@ -149,21 +183,28 @@ public interface GoodRestApiOne {
    * @param id the id
    * @return the response entity
    */
-  @ApiOperation(
-      value = "Delete geometry.",
-      nickname = "deleteGeometry",
+  @Operation(
+      summary = "Delete geometry.",
+      operationId = "deleteGeometry",
       tags = {"geometry-controller"})
   @ApiResponses(value = {
-      @ApiResponse(code = 200, message = "OK"),
-      @ApiResponse(code = 403, message = "Forbidden"),
-      @ApiResponse(code = 404, message = "Not Found",
-          response = org.bremersee.exception.model.RestApiException.class)
+      @ApiResponse(
+          responseCode = "200",
+          description = "OK"),
+      @ApiResponse(
+          responseCode = "403",
+          description = "Forbidden"),
+      @ApiResponse(
+          responseCode = "404",
+          description = "Not Found",
+          content = @Content(schema = @Schema(
+              implementation = org.bremersee.exception.model.RestApiException.class)))
   })
   @RequestMapping(
       value = "/api/geometries/{id}",
       produces = {"application/json"},
       method = RequestMethod.DELETE)
   ResponseEntity<Void> deleteGeometry(
-      @ApiParam(value = "The geometry ID.", required = true) @PathVariable("id") String id);
+      @Parameter(description = "The geometry ID.", required = true) @PathVariable("id") String id);
 
 }

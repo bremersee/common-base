@@ -16,11 +16,13 @@
 
 package org.bremersee.test.web;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import org.bremersee.geojson.model.Geometry;
 import org.springframework.http.ResponseEntity;
@@ -43,21 +45,23 @@ public class BadApis {
   /**
    * The interface One.
    */
-  @Api(value = "BadApiController")
+  @Tag(name = "BadApiController")
   public interface One {
+
   }
 
   /**
    * The interface Two.
    */
   public interface Two {
+
   }
 
 
   /**
    * The interface Three.
    */
-  @Api(value = "BadApiController")
+  @Tag(name = "BadApiController")
   public interface Three {
 
     /**
@@ -71,7 +75,8 @@ public class BadApis {
         produces = {"application/json"},
         method = RequestMethod.GET)
     ResponseEntity<List<Geometry>> getGeometries(
-        @ApiParam(value = "The query.") @RequestParam(name = "q", required = false) String query);
+        @Parameter(description = "The query.") @RequestParam(name = "q", required = false)
+            String query);
 
     /**
      * Update geometry response entity.
@@ -101,13 +106,15 @@ public class BadApis {
      * @param id the id
      * @return the geometry
      */
-    @ApiOperation(
-        value = "Get geometry by ID.",
-        nickname = "getGeometry",
-        response = Geometry.class,
+    @Operation(
+        summary = "Get geometry by ID.",
+        operationId = "getGeometry",
         tags = {"geometry-controller"})
     @ApiResponses(value = {
-        @ApiResponse(code = 200, message = "OK", response = Geometry.class)
+        @ApiResponse(
+            responseCode = "200",
+            description = "OK",
+            content = @Content(schema = @Schema(implementation = Geometry.class)))
     })
     @GetMapping(path = "/api/geometries/{id}")
     ResponseEntity<Geometry> getGeometry(@PathVariable("id") String id);
@@ -116,7 +123,7 @@ public class BadApis {
   /**
    * The interface Four.
    */
-  @Api(value = "BadApiController")
+  @Tag(name = "BadApiController")
   public interface Four {
 
     /**
@@ -146,13 +153,15 @@ public class BadApis {
      * @param id the id
      * @return the geometry
      */
-    @ApiOperation(
-        value = "Get geometry by ID.",
-        nickname = "getGeometry",
-        response = String.class,
+    @Operation(
+        summary = "Get geometry by ID.",
+        operationId = "getGeometry",
         tags = {"geometry-controller"})
     @ApiResponses(value = {
-        @ApiResponse(code = 200, message = "OK", response = String.class)
+        @ApiResponse(
+            responseCode = "200",
+            description = "OK",
+            content = @Content(schema = @Schema(implementation = String.class)))
     })
     @GetMapping(path = "/api/geometries/{id}")
     ResponseEntity<String> getGeometry(@PathVariable("id") String id);
@@ -162,7 +171,7 @@ public class BadApis {
   /**
    * The interface Five.
    */
-  @Api(value = "BadApiController")
+  @Tag(name = "BadApiController")
   public interface Five {
 
     /**
@@ -176,13 +185,13 @@ public class BadApis {
         produces = {"application/json"},
         method = RequestMethod.GET)
     ResponseEntity<List<Geometry>> getGeometries(
-        @ApiParam(value = "The query.") @RequestParam(name = "q", required = false) String query);
+        @Parameter(description = "The query.") @RequestParam(name = "q", required = false) String query);
   }
 
   /**
    * The interface Six.
    */
-  @Api(value = "BadApiController")
+  @Tag(name = "BadApiController")
   public interface Six {
 
     /**
@@ -195,14 +204,15 @@ public class BadApis {
         value = "/api/geometries",
         produces = {"application/json"})
     ResponseEntity<List<Geometry>> getGeometries(
-        @ApiParam(value = "The query.") @RequestParam(name = "q", required = false) String query);
+        @Parameter(description = "The query.") @RequestParam(name = "q", required = false)
+            String query);
   }
 
 
   /**
    * The interface Seven.
    */
-  @Api(value = "BadApiController")
+  @Tag(name = "BadApiController")
   public interface Seven {
 
     /**
@@ -216,13 +226,14 @@ public class BadApis {
         produces = {"application/json"},
         method = RequestMethod.GET)
     ResponseEntity<List<Geometry>> getGeometries(
-        @ApiParam(value = "The query.") @RequestParam(name = "q", required = false) String query);
+        @Parameter(description = "The query.") @RequestParam(name = "q", required = false)
+            String query);
   }
 
   /**
    * The interface Eight.
    */
-  @Api(value = "BadApiController")
+  @Tag(name = "BadApiController")
   public interface Eight {
 
     /**
