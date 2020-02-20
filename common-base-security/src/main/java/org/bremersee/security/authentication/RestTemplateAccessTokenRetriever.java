@@ -54,6 +54,10 @@ public class RestTemplateAccessTokenRetriever implements
   public String retrieveAccessToken(AccessTokenRetrieverProperties input) {
     final HttpHeaders headers = new HttpHeaders();
     headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+    input.getBasicAuthProperties()
+        .ifPresent(basicAuthProperties -> headers.setBasicAuth(
+            basicAuthProperties.getUsername(),
+            basicAuthProperties.getPassword()));
     final HttpEntity<?> request = new HttpEntity<>(input.createBody(), headers);
     final String response = restTemplate.exchange(
         input.getTokenEndpoint(),
