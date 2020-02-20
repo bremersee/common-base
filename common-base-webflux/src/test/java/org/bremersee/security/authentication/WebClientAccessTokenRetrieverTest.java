@@ -66,6 +66,7 @@ class WebClientAccessTokenRetrieverTest {
 
     RequestBodySpec requestBodySpec = mock(RequestBodySpec.class);
     when(requestBodySpec.contentType(any(MediaType.class))).thenReturn(requestBodySpec);
+    when(requestBodySpec.headers(any())).thenReturn(requestBodySpec);
     //noinspection unchecked
     when(requestBodySpec.body(any())).thenReturn(requestHeadersSpec);
 

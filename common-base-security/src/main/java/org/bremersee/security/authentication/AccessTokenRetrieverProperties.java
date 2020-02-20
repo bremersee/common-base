@@ -16,6 +16,7 @@
 
 package org.bremersee.security.authentication;
 
+import java.util.Optional;
 import org.springframework.util.MultiValueMap;
 
 /**
@@ -31,6 +32,15 @@ public interface AccessTokenRetrieverProperties {
    * @return the token endpoint
    */
   String getTokenEndpoint();
+
+  /**
+   * Gets basic auth properties.
+   *
+   * @return the basic auth properties or {@link Optional#empty()}, if no basic auth is required
+   */
+  default Optional<BasicAuthProperties> getBasicAuthProperties() {
+    return Optional.empty();
+  }
 
   /**
    * Create http request body.

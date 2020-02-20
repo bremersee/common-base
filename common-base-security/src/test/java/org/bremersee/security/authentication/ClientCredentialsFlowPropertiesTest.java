@@ -21,30 +21,31 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import org.bremersee.security.authentication.PasswordFlowProperties.Builder;
+import java.util.Optional;
+import org.bremersee.security.authentication.ClientCredentialsFlowProperties.Builder;
 import org.junit.jupiter.api.Test;
 import org.springframework.util.MultiValueMap;
 
 /**
- * The password flow properties test.
+ * The client credentials flow properties test.
  *
  * @author Christian Bremer
  */
-class PasswordFlowPropertiesTest {
+class ClientCredentialsFlowPropertiesTest {
 
   /**
    * Gets client id.
    */
   @Test
   void getClientId() {
-    Builder model = PasswordFlowProperties.builder();
+    Builder model = ClientCredentialsFlowProperties.builder();
     model.clientId("value");
     assertEquals("value", model.build().getClientId());
 
     assertNotEquals(model, null);
     assertNotEquals(model, new Object());
     assertEquals(model, model);
-    assertEquals(model, PasswordFlowProperties.builder().clientId("value"));
+    assertEquals(model, ClientCredentialsFlowProperties.builder().clientId("value"));
 
     assertTrue(model.toString().contains("value"));
   }
@@ -54,34 +55,10 @@ class PasswordFlowPropertiesTest {
    */
   @Test
   void getClientSecret() {
-    Builder model = PasswordFlowProperties.builder();
+    Builder model = ClientCredentialsFlowProperties.builder();
     model.clientSecret("value");
     assertEquals("value", model.build().getClientSecret());
-    assertEquals(model, PasswordFlowProperties.builder().clientSecret("value"));
-    assertFalse(model.toString().contains("value"));
-  }
-
-  /**
-   * Gets username.
-   */
-  @Test
-  void getUsername() {
-    Builder model = PasswordFlowProperties.builder();
-    model.username("value");
-    assertEquals("value", model.build().getUsername());
-    assertEquals(model, PasswordFlowProperties.builder().username("value"));
-    assertTrue(model.toString().contains("value"));
-  }
-
-  /**
-   * Gets password.
-   */
-  @Test
-  void getPassword() {
-    Builder model = PasswordFlowProperties.builder();
-    model.password("value");
-    assertEquals("value", model.build().getPassword());
-    assertEquals(model, PasswordFlowProperties.builder().password("value"));
+    assertEquals(model, ClientCredentialsFlowProperties.builder().clientSecret("value"));
     assertFalse(model.toString().contains("value"));
   }
 
@@ -90,10 +67,10 @@ class PasswordFlowPropertiesTest {
    */
   @Test
   void getAdditionalProperties() {
-    Builder model = PasswordFlowProperties.builder();
+    Builder model = ClientCredentialsFlowProperties.builder();
     model.add("key", "value");
     assertEquals("value", model.build().getAdditionalProperties().getFirst("key"));
-    assertEquals(model, PasswordFlowProperties.builder().add("key", "value"));
+    assertEquals(model, ClientCredentialsFlowProperties.builder().add("key", "value"));
     assertTrue(model.toString().contains("value"));
   }
 
@@ -102,10 +79,10 @@ class PasswordFlowPropertiesTest {
    */
   @Test
   void getTokenEndpoint() {
-    Builder model = PasswordFlowProperties.builder();
+    Builder model = ClientCredentialsFlowProperties.builder();
     model.tokenEndpoint("value");
     assertEquals("value", model.build().getTokenEndpoint());
-    assertEquals(model, PasswordFlowProperties.builder().tokenEndpoint("value"));
+    assertEquals(model, ClientCredentialsFlowProperties.builder().tokenEndpoint("value"));
     assertTrue(model.toString().contains("value"));
   }
 
@@ -114,7 +91,14 @@ class PasswordFlowPropertiesTest {
    */
   @Test
   void getBasicAuthProperties() {
-    assertTrue(PasswordFlowProperties.builder().build().getBasicAuthProperties().isEmpty());
+    Optional<BasicAuthProperties> model = ClientCredentialsFlowProperties.builder()
+        .clientId("foo")
+        .clientSecret("bar")
+        .build()
+        .getBasicAuthProperties();
+    assertTrue(model.isPresent());
+    assertEquals("foo", model.get().getUsername());
+    assertEquals("bar", model.get().getPassword());
   }
 
   /**
@@ -122,7 +106,7 @@ class PasswordFlowPropertiesTest {
    */
   @Test
   void from() {
-    PasswordFlowProperties expected = PasswordFlowProperties.builder()
+    ClientCredentialsFlowProperties expected = ClientCredentialsFlowProperties.builder()
         .clientId("client")
         .clientSecret("secret")
         .tokenEndpoint("http://localhost/token")
@@ -130,7 +114,7 @@ class PasswordFlowPropertiesTest {
         .from(null)
         .build();
 
-    PasswordFlowProperties actual = PasswordFlowProperties.builder()
+    ClientCredentialsFlowProperties actual = ClientCredentialsFlowProperties.builder()
         .from(expected)
         .build();
 
@@ -143,30 +127,15 @@ class PasswordFlowPropertiesTest {
    */
   @Test
   void createBody() {
-    PasswordFlowProperties expected = PasswordFlowProperties.builder()
-        .clientId("client")
-        .username("user")
+    ClientCredentialsFlowProperties expected = ClientCredentialsFlowProperties.builder()
+        .clientId("foo")
+        .clientSecret("bar")
         .tokenEndpoint("http://localhost/token")
         .add("key", "value")
         .build();
     MultiValueMap<String, String> actual = expected.createBody();
-    assertEquals("password", actual.getFirst("grant_type"));
-    assertEquals("client", actual.getFirst("client_id"));
-    assertEquals("", actual.getFirst("client_secret"));
-    assertEquals("user", actual.getFirst("username"));
-    assertEquals("", actual.getFirst("password"));
-
-    expected = PasswordFlowProperties.builder()
-        .from(expected)
-        .clientSecret("secret")
-        .password("changeit")
-        .build();
-
-    actual = expected.createBody();
-    assertEquals("password", actual.getFirst("grant_type"));
-    assertEquals("client", actual.getFirst("client_id"));
-    assertEquals("secret", actual.getFirst("client_secret"));
-    assertEquals("user", actual.getFirst("username"));
-    assertEquals("changeit", actual.getFirst("password"));
+    assertEquals("client_credentials", actual.getFirst("grant_type"));
+    assertFalse(actual.containsKey("client_id"));
+    assertFalse(actual.containsKey("client_secret"));
   }
 }
