@@ -17,8 +17,15 @@
 package org.bremersee.converter;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
+import java.util.Collections;
 import org.junit.jupiter.api.Test;
+import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.ObjectProvider;
 
 /**
  * The model mapper auto configuration test.
@@ -33,8 +40,16 @@ class ModelMapperAutoConfigurationTest {
   @Test
   void modelMapper() {
     ModelMapperAutoConfiguration configuration = new ModelMapperAutoConfiguration();
-    configuration.init();
-    assertNotNull(configuration.modelMapper());
+    ModelMapperConfigurerAdapter adapter = mock(ModelMapperConfigurerAdapter.class);
+    assertNotNull(configuration.modelMapper(objectProvider(Collections.singletonList(adapter))));
+    verify(adapter).configure(any(ModelMapper.class));
   }
 
+  private static <T> ObjectProvider<T> objectProvider(T provides) {
+    //noinspection unchecked
+    ObjectProvider<T> provider = mock(ObjectProvider.class);
+    when(provider.getIfAvailable()).thenReturn(provides);
+    when(provider.getIfAvailable(any())).thenReturn(provides);
+    return provider;
+  }
 }
