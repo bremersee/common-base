@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>MessageSourceAutoConfiguration.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">common-base-autoconfigure</a> &gt; <a href="index.source.html" class="el_package">org.bremersee.context</a> &gt; <span class="el_source">MessageSourceAutoConfiguration.java</span></div><h1>MessageSourceAutoConfiguration.java</h1><pre class="source lang-java linenums">/*
+ * Copyright 2019 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package org.bremersee.context;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Properties;
+import lombok.extern.slf4j.Slf4j;
+import org.bremersee.common.model.JavaLocale;
+import org.springframework.boot.autoconfigure.AutoConfigureBefore;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.context.MessageSource;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.event.EventListener;
+import org.springframework.context.support.AbstractResourceBasedMessageSource;
+import org.springframework.context.support.ReloadableResourceBundleMessageSource;
+import org.springframework.context.support.ResourceBundleMessageSource;
+import org.springframework.util.ClassUtils;
+import org.springframework.util.StringUtils;
+
+/**
+ * The message source configuration.
+ *
+ * @author Christian Bremer
+ */
+@AutoConfigureBefore({
+    org.springframework.boot.autoconfigure.context.MessageSourceAutoConfiguration.class
+})
+@Configuration
+@EnableConfigurationProperties({
+    MessageSourceProperties.class
+})
+<span class="fc" id="L49">@Slf4j</span>
+public class MessageSourceAutoConfiguration {
+
+  private static final String DEFAULT_MESSAGES_BASE_NAME = &quot;messages&quot;;
+
+  private final MessageSourceProperties properties;
+
+  /**
+   * Instantiates a new message source configuration.
+   *
+   * @param properties the message source properties
+   */
+<span class="fc" id="L61">  public MessageSourceAutoConfiguration(MessageSourceProperties properties) {</span>
+<span class="fc" id="L62">    this.properties = properties;</span>
+<span class="fc" id="L63">  }</span>
+
+  @EventListener(ApplicationReadyEvent.class)
+  public void init() {
+<span class="fc" id="L67">    log.info(&quot;\n&quot;</span>
+            + &quot;*********************************************************************************\n&quot;
+            + &quot;* {}\n&quot;
+            + &quot;*********************************************************************************\n&quot;
+            + &quot;* baseNames = {}\n&quot;
+            + &quot;* defaultLocale = {}\n&quot;
+            + &quot;* fallbackToSystemLocale = {}\n&quot;
+            + &quot;* defaultEncoding = {}\n&quot;
+            + &quot;*********************************************************************************&quot;,
+<span class="fc" id="L76">        ClassUtils.getUserClass(getClass()).getSimpleName(),</span>
+<span class="fc" id="L77">        getBaseNames(),</span>
+<span class="fc" id="L78">        properties.getDefaultLocale(),</span>
+<span class="fc" id="L79">        properties.isFallbackToSystemLocale(),</span>
+<span class="fc" id="L80">        properties.getDefaultEncoding());</span>
+<span class="fc" id="L81">  }</span>
+
+  /**
+   * Creates message source bean.
+   *
+   * @return the message source bean
+   */
+  @Bean
+  public MessageSource messageSource() {
+<span class="fc bfc" id="L90" title="All 2 branches covered.">    AbstractResourceBasedMessageSource messageSource = properties.isUseReloadableMessageSource()</span>
+<span class="fc" id="L91">        ? createReloadableMessageSource()</span>
+<span class="fc" id="L92">        : createMessageSource();</span>
+<span class="fc" id="L93">    configure(messageSource);</span>
+<span class="fc" id="L94">    return messageSource;</span>
+  }
+
+  private AbstractResourceBasedMessageSource createReloadableMessageSource() {
+<span class="fc" id="L98">    final ReloadableResourceBundleMessageSource messageSource</span>
+        = new ReloadableResourceBundleMessageSource();
+<span class="pc bpc" id="L100" title="1 of 2 branches missed.">    if (!properties.getFileEncodings().isEmpty()) {</span>
+<span class="nc" id="L101">      final Properties fileEncodings = new Properties();</span>
+<span class="nc" id="L102">      fileEncodings.putAll(properties.getFileEncodings());</span>
+<span class="nc" id="L103">      messageSource.setFileEncodings(fileEncodings);</span>
+    }
+<span class="fc" id="L105">    return messageSource;</span>
+  }
+
+  private AbstractResourceBasedMessageSource createMessageSource() {
+<span class="fc" id="L109">    return new ResourceBundleMessageSource();</span>
+  }
+
+  private void configure(AbstractResourceBasedMessageSource messageSource) {
+<span class="pc bpc" id="L113" title="1 of 2 branches missed.">    if (StringUtils.hasText(properties.getDefaultLocale())) {</span>
+<span class="nc" id="L114">      JavaLocale javaLocale = JavaLocale.fromValue(properties.getDefaultLocale());</span>
+<span class="nc" id="L115">      messageSource.setDefaultLocale(javaLocale.toLocale());</span>
+    }
+<span class="fc" id="L117">    messageSource.setFallbackToSystemLocale(properties.isFallbackToSystemLocale());</span>
+<span class="fc" id="L118">    messageSource.setDefaultEncoding(properties.getDefaultEncoding());</span>
+<span class="fc" id="L119">    final List&lt;String&gt; baseNames = getBaseNames();</span>
+<span class="fc" id="L120">    messageSource.setBasenames(baseNames.toArray(new String[0]));</span>
+<span class="fc" id="L121">    messageSource.setCacheSeconds(properties.getCacheSeconds());</span>
+<span class="fc" id="L122">    messageSource.setAlwaysUseMessageFormat(properties.isAlwaysUseMessageFormat());</span>
+<span class="fc" id="L123">    messageSource.setUseCodeAsDefaultMessage(properties.isUseCodeAsDefaultMessage());</span>
+<span class="fc" id="L124">  }</span>
+
+  private List&lt;String&gt; getBaseNames() {
+<span class="fc" id="L127">    final List&lt;String&gt; baseNames = new ArrayList&lt;&gt;(properties.getBaseNames());</span>
+<span class="pc bpc" id="L128" title="1 of 2 branches missed.">    if (baseNames.isEmpty()) {</span>
+<span class="fc" id="L129">      baseNames.add(DEFAULT_MESSAGES_BASE_NAME);</span>
+    }
+<span class="fc" id="L131">    return baseNames;</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

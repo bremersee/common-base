@@ -1,0 +1,1 @@
+typeSearchIndex = [{"l":"All Classes","url":"allclasses-index.html"},{"p":"org.bremersee.data.ldaptive.app","l":"Group"},{"p":"org.bremersee.data.ldaptive.app","l":"GroupMapper"},{"p":"org.bremersee.data.ldaptive.app","l":"Person"},{"p":"org.bremersee.data.ldaptive.app","l":"PersonMapper"},{"p":"org.bremersee.data.ldaptive.app","l":"TestConfiguration"}]

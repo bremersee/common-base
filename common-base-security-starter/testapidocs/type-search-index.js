@@ -1,0 +1,1 @@
+typeSearchIndex = [{"l":"All Classes","url":"allclasses-index.html"},{"p":"org.bremersee.base.security","l":"AutoConfigureTest"},{"p":"org.bremersee.base.security.app","l":"TestConfiguration"},{"p":"org.bremersee.base.security.app","l":"TestController"}]

@@ -25,7 +25,8 @@ import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.TreeMap;
-import org.bremersee.security.authentication.KeycloakJwtConverter;
+import lombok.extern.slf4j.Slf4j;
+import org.bremersee.security.authentication.JsonPathJwtConverter;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -40,139 +41,142 @@ import org.springframework.util.StringUtils;
  *
  * @author Christian Bremer
  */
-<span class="fc" id="L43">public class JwtAuthenticationTokenSecurityContextFactory</span>
+<span class="fc" id="L44">@Slf4j</span>
+<span class="fc" id="L45">public class JwtAuthenticationTokenSecurityContextFactory</span>
     implements WithSecurityContextFactory&lt;WithJwtAuthenticationToken&gt; {
 
   @Override
   public SecurityContext createSecurityContext(
       WithJwtAuthenticationToken withJwtAuthenticationToken) {
 
-<span class="fc" id="L50">    SecurityContext context = SecurityContextHolder.createEmptyContext();</span>
-<span class="fc" id="L51">    Authentication authentication = createJwtConverter(withJwtAuthenticationToken)</span>
-<span class="fc" id="L52">        .convert(createSpringJwt(createJwt(withJwtAuthenticationToken)));</span>
-<span class="fc" id="L53">    context.setAuthentication(authentication);</span>
-<span class="fc" id="L54">    return context;</span>
+<span class="fc" id="L52">    SecurityContext context = SecurityContextHolder.createEmptyContext();</span>
+<span class="fc" id="L53">    Authentication authentication = createJwtConverter(withJwtAuthenticationToken)</span>
+<span class="fc" id="L54">        .convert(createSpringJwt(createJwt(withJwtAuthenticationToken)));</span>
+<span class="fc" id="L55">    context.setAuthentication(authentication);</span>
+<span class="fc" id="L56">    return context;</span>
   }
 
   private Converter&lt;Jwt, ? extends AbstractAuthenticationToken&gt; createJwtConverter(
-      WithJwtAuthenticationToken withJwtAuthenticationToken) {
-    try {
-<span class="fc" id="L60">      return withJwtAuthenticationToken.jwtConverterFactory().newInstance().createJwtConverter();</span>
-<span class="nc" id="L61">    } catch (Exception e) {</span>
-<span class="nc" id="L62">      return new KeycloakJwtConverter();</span>
-    }
+      WithJwtAuthenticationToken contextConfig) {
+<span class="fc" id="L61">    JsonPathJwtConverter converter = new JsonPathJwtConverter();</span>
+<span class="fc" id="L62">    converter.setRolesValueSeparator(contextConfig.jwtConverter().rolesValueSeparator());</span>
+<span class="fc" id="L63">    converter.setRolePrefix(contextConfig.jwtConverter().rolePrefix());</span>
+<span class="fc" id="L64">    converter.setNameJsonPath(contextConfig.jwtConverter().nameJsonPath());</span>
+<span class="fc" id="L65">    converter.setRolesJsonPath(contextConfig.jwtConverter().rolesJsonPath());</span>
+<span class="fc" id="L66">    converter.setRolesValueList(contextConfig.jwtConverter().rolesValueList());</span>
+<span class="fc" id="L67">    return converter;</span>
   }
 
   private JWT createJwt(WithJwtAuthenticationToken tokenValues) {
-<span class="fc" id="L67">    JWTClaimsSet.Builder builder = new JWTClaimsSet.Builder()</span>
-<span class="fc" id="L68">        .audience(tokenValues.audience())</span>
-<span class="fc" id="L69">        .expirationTime(new Date(System.currentTimeMillis()</span>
-<span class="fc" id="L70">            + tokenValues.addMillisToExpirationTime()))</span>
-<span class="fc" id="L71">        .issuer(tokenValues.issuer())</span>
-<span class="fc" id="L72">        .issueTime(new Date(System.currentTimeMillis()</span>
-<span class="fc" id="L73">            + tokenValues.addMillisToIssueTime()))</span>
-<span class="fc" id="L74">        .jwtID(tokenValues.jwtId())</span>
-<span class="fc" id="L75">        .notBeforeTime(new Date(System.currentTimeMillis()</span>
-<span class="fc" id="L76">            + tokenValues.addMillisToNotBeforeTime()))</span>
-<span class="fc" id="L77">        .subject(tokenValues.subject());</span>
-<span class="fc bfc" id="L78" title="All 2 branches covered.">    for (Map.Entry&lt;String, Object&gt; entry : createAdditionalClaims(tokenValues).entrySet()) {</span>
-<span class="fc" id="L79">      builder.claim(entry.getKey(), entry.getValue());</span>
-<span class="fc" id="L80">    }</span>
-<span class="fc" id="L81">    JWTClaimsSet claimsSet = builder.build();</span>
-<span class="fc" id="L82">    return new PlainJWT(claimsSet);</span>
+<span class="fc" id="L71">    JWTClaimsSet.Builder builder = new JWTClaimsSet.Builder()</span>
+<span class="fc" id="L72">        .audience(tokenValues.audience())</span>
+<span class="fc" id="L73">        .expirationTime(new Date(System.currentTimeMillis()</span>
+<span class="fc" id="L74">            + tokenValues.addMillisToExpirationTime()))</span>
+<span class="fc" id="L75">        .issuer(tokenValues.issuer())</span>
+<span class="fc" id="L76">        .issueTime(new Date(System.currentTimeMillis()</span>
+<span class="fc" id="L77">            + tokenValues.addMillisToIssueTime()))</span>
+<span class="fc" id="L78">        .jwtID(tokenValues.jwtId())</span>
+<span class="fc" id="L79">        .notBeforeTime(new Date(System.currentTimeMillis()</span>
+<span class="fc" id="L80">            + tokenValues.addMillisToNotBeforeTime()))</span>
+<span class="fc" id="L81">        .subject(tokenValues.subject());</span>
+<span class="fc bfc" id="L82" title="All 2 branches covered.">    for (Map.Entry&lt;String, Object&gt; entry : createAdditionalClaims(tokenValues).entrySet()) {</span>
+<span class="fc" id="L83">      builder.claim(entry.getKey(), entry.getValue());</span>
+<span class="fc" id="L84">    }</span>
+<span class="fc" id="L85">    JWTClaimsSet claimsSet = builder.build();</span>
+<span class="fc" id="L86">    return new PlainJWT(claimsSet);</span>
   }
 
   private Map&lt;String, Object&gt; createAdditionalClaims(WithJwtAuthenticationToken tokenValues) {
-<span class="fc" id="L86">    Map&lt;String, Object&gt; map = new LinkedHashMap&lt;&gt;();</span>
-<span class="fc bfc" id="L87" title="All 2 branches covered.">    for (Map.Entry&lt;String, Object&gt; entry : createPathMap(tokenValues).entrySet()) {</span>
-<span class="fc" id="L88">      addClaim(entry.getKey(), entry.getValue(), map);</span>
-<span class="fc" id="L89">    }</span>
-<span class="fc" id="L90">    return map;</span>
+<span class="fc" id="L90">    Map&lt;String, Object&gt; map = new LinkedHashMap&lt;&gt;();</span>
+<span class="fc bfc" id="L91" title="All 2 branches covered.">    for (Map.Entry&lt;String, Object&gt; entry : createPathMap(tokenValues).entrySet()) {</span>
+<span class="fc" id="L92">      addClaim(entry.getKey(), entry.getValue(), map);</span>
+<span class="fc" id="L93">    }</span>
+<span class="fc" id="L94">    return map;</span>
   }
 
   private void addClaim(String path, Object value, Map&lt;String, Object&gt; map) {
-<span class="fc" id="L94">    int index = path.indexOf('.');</span>
-<span class="fc bfc" id="L95" title="All 2 branches covered.">    if (index &lt; 0) {</span>
-<span class="fc" id="L96">      map.put(path, value);</span>
+<span class="fc" id="L98">    int index = path.indexOf('.');</span>
+<span class="fc bfc" id="L99" title="All 2 branches covered.">    if (index &lt; 0) {</span>
+<span class="fc" id="L100">      map.put(path, value);</span>
     } else {
-<span class="fc" id="L98">      String key = path.substring(0, index);</span>
-<span class="fc" id="L99">      String nextPath = path.substring(index + 1);</span>
-<span class="fc" id="L100">      Object child = map.get(key);</span>
-<span class="pc bpc" id="L101" title="1 of 2 branches missed.">      if (child instanceof Map) {</span>
+<span class="fc" id="L102">      String key = path.substring(0, index);</span>
+<span class="fc" id="L103">      String nextPath = path.substring(index + 1);</span>
+<span class="fc" id="L104">      Object child = map.get(key);</span>
+<span class="pc bpc" id="L105" title="1 of 2 branches missed.">      if (child instanceof Map) {</span>
         //noinspection unchecked
-<span class="nc" id="L103">        Map&lt;String, Object&gt; childMap = (Map&lt;String, Object&gt;) child;</span>
-<span class="nc" id="L104">        addClaim(nextPath, value, childMap);</span>
-<span class="nc" id="L105">      } else {</span>
-<span class="fc" id="L106">        Map&lt;String, Object&gt; childMap = new LinkedHashMap&lt;&gt;();</span>
-<span class="fc" id="L107">        map.put(key, childMap);</span>
-<span class="fc" id="L108">        addClaim(nextPath, value, childMap);</span>
+<span class="nc" id="L107">        Map&lt;String, Object&gt; childMap = (Map&lt;String, Object&gt;) child;</span>
+<span class="nc" id="L108">        addClaim(nextPath, value, childMap);</span>
+<span class="nc" id="L109">      } else {</span>
+<span class="fc" id="L110">        Map&lt;String, Object&gt; childMap = new LinkedHashMap&lt;&gt;();</span>
+<span class="fc" id="L111">        map.put(key, childMap);</span>
+<span class="fc" id="L112">        addClaim(nextPath, value, childMap);</span>
       }
     }
-<span class="fc" id="L111">  }</span>
+<span class="fc" id="L115">  }</span>
 
   private Map&lt;String, Object&gt; createPathMap(WithJwtAuthenticationToken tokenValues) {
-<span class="fc" id="L114">    Map&lt;String, Object&gt; map = new TreeMap&lt;&gt;();</span>
-<span class="pc bpc" id="L115" title="1 of 2 branches missed.">    if (StringUtils.hasText(trimPath(tokenValues.rolesPath()))) {</span>
-<span class="fc" id="L116">      map.put(</span>
-<span class="fc" id="L117">          tokenValues.rolesPath(),</span>
-<span class="fc" id="L118">          Arrays.asList(tokenValues.roles()));</span>
+<span class="fc" id="L118">    Map&lt;String, Object&gt; map = new TreeMap&lt;&gt;();</span>
+<span class="pc bpc" id="L119" title="1 of 2 branches missed.">    if (StringUtils.hasText(trimPath(tokenValues.rolesPath()))) {</span>
+<span class="fc" id="L120">      map.put(</span>
+<span class="fc" id="L121">          tokenValues.rolesPath(),</span>
+<span class="fc" id="L122">          Arrays.asList(tokenValues.roles()));</span>
     }
-<span class="pc bpc" id="L120" title="1 of 2 branches missed.">    if (StringUtils.hasText(trimPath(tokenValues.scopePath()))) {</span>
-<span class="fc" id="L121">      map.put(</span>
-<span class="fc" id="L122">          tokenValues.scopePath(),</span>
-<span class="fc" id="L123">          Arrays.asList(tokenValues.scope()));</span>
+<span class="pc bpc" id="L124" title="1 of 2 branches missed.">    if (StringUtils.hasText(trimPath(tokenValues.scopePath()))) {</span>
+<span class="fc" id="L125">      map.put(</span>
+<span class="fc" id="L126">          tokenValues.scopePath(),</span>
+<span class="fc" id="L127">          Arrays.asList(tokenValues.scope()));</span>
     }
-<span class="pc bpc" id="L125" title="1 of 2 branches missed.">    if (StringUtils.hasText(trimPath(tokenValues.namePath()))) {</span>
-<span class="fc" id="L126">      map.put(tokenValues.namePath(), tokenValues.name());</span>
+<span class="pc bpc" id="L129" title="1 of 2 branches missed.">    if (StringUtils.hasText(trimPath(tokenValues.namePath()))) {</span>
+<span class="fc" id="L130">      map.put(tokenValues.namePath(), tokenValues.name());</span>
     }
-<span class="pc bpc" id="L128" title="1 of 2 branches missed.">    if (StringUtils.hasText(trimPath(tokenValues.preferredUsernamePath()))) {</span>
-<span class="fc" id="L129">      map.put(</span>
-<span class="fc" id="L130">          tokenValues.preferredUsernamePath(),</span>
-<span class="fc" id="L131">          tokenValues.preferredUsername());</span>
+<span class="pc bpc" id="L132" title="1 of 2 branches missed.">    if (StringUtils.hasText(trimPath(tokenValues.preferredUsernamePath()))) {</span>
+<span class="fc" id="L133">      map.put(</span>
+<span class="fc" id="L134">          tokenValues.preferredUsernamePath(),</span>
+<span class="fc" id="L135">          tokenValues.preferredUsername());</span>
     }
-<span class="pc bpc" id="L133" title="1 of 2 branches missed.">    if (StringUtils.hasText(trimPath(tokenValues.givenNamePath()))) {</span>
-<span class="fc" id="L134">      map.put(</span>
-<span class="fc" id="L135">          tokenValues.givenNamePath(),</span>
-<span class="fc" id="L136">          tokenValues.givenName());</span>
+<span class="pc bpc" id="L137" title="1 of 2 branches missed.">    if (StringUtils.hasText(trimPath(tokenValues.givenNamePath()))) {</span>
+<span class="fc" id="L138">      map.put(</span>
+<span class="fc" id="L139">          tokenValues.givenNamePath(),</span>
+<span class="fc" id="L140">          tokenValues.givenName());</span>
     }
-<span class="pc bpc" id="L138" title="1 of 2 branches missed.">    if (StringUtils.hasText(trimPath(tokenValues.familyNamePath()))) {</span>
-<span class="fc" id="L139">      map.put(</span>
-<span class="fc" id="L140">          tokenValues.familyNamePath(),</span>
-<span class="fc" id="L141">          tokenValues.familyName());</span>
+<span class="pc bpc" id="L142" title="1 of 2 branches missed.">    if (StringUtils.hasText(trimPath(tokenValues.familyNamePath()))) {</span>
+<span class="fc" id="L143">      map.put(</span>
+<span class="fc" id="L144">          tokenValues.familyNamePath(),</span>
+<span class="fc" id="L145">          tokenValues.familyName());</span>
     }
-<span class="pc bpc" id="L143" title="1 of 2 branches missed.">    if (StringUtils.hasText(trimPath(tokenValues.emailPath()))) {</span>
-<span class="fc" id="L144">      map.put(tokenValues.emailPath(), tokenValues.email());</span>
+<span class="pc bpc" id="L147" title="1 of 2 branches missed.">    if (StringUtils.hasText(trimPath(tokenValues.emailPath()))) {</span>
+<span class="fc" id="L148">      map.put(tokenValues.emailPath(), tokenValues.email());</span>
     }
-<span class="fc" id="L146">    return map;</span>
+<span class="fc" id="L150">    return map;</span>
   }
 
   private String trimPath(String path) {
-<span class="pc bpc" id="L150" title="1 of 2 branches missed.">    if (path == null) {</span>
-<span class="nc" id="L151">      return null;</span>
+<span class="pc bpc" id="L154" title="1 of 2 branches missed.">    if (path == null) {</span>
+<span class="nc" id="L155">      return null;</span>
     }
-<span class="fc" id="L153">    String tmp = path</span>
-<span class="fc" id="L154">        .replace(&quot;..&quot;, &quot;.&quot;)</span>
-<span class="fc" id="L155">        .trim();</span>
-<span class="pc bpc" id="L156" title="1 of 2 branches missed.">    while (tmp.startsWith(&quot;.&quot;)) {</span>
-<span class="nc" id="L157">      tmp = tmp.substring(1).trim();</span>
+<span class="fc" id="L157">    String tmp = path</span>
+<span class="fc" id="L158">        .replace(&quot;..&quot;, &quot;.&quot;)</span>
+<span class="fc" id="L159">        .trim();</span>
+<span class="pc bpc" id="L160" title="1 of 2 branches missed.">    while (tmp.startsWith(&quot;.&quot;)) {</span>
+<span class="nc" id="L161">      tmp = tmp.substring(1).trim();</span>
     }
-<span class="pc bpc" id="L159" title="1 of 2 branches missed.">    while (tmp.endsWith(&quot;.&quot;)) {</span>
-<span class="nc" id="L160">      tmp = tmp.substring(0, tmp.length() - 1).trim();</span>
+<span class="pc bpc" id="L163" title="1 of 2 branches missed.">    while (tmp.endsWith(&quot;.&quot;)) {</span>
+<span class="nc" id="L164">      tmp = tmp.substring(0, tmp.length() - 1).trim();</span>
     }
-<span class="fc" id="L162">    return tmp;</span>
+<span class="fc" id="L166">    return tmp;</span>
   }
 
   private Jwt createSpringJwt(JWT jwt) {
     try {
-<span class="fc" id="L167">      String tokenValue = jwt.serialize();</span>
-<span class="fc" id="L168">      Instant issuedAt = jwt.getJWTClaimsSet().getIssueTime().toInstant();</span>
-<span class="fc" id="L169">      Instant expiresAt = jwt.getJWTClaimsSet().getExpirationTime().toInstant();</span>
-<span class="fc" id="L170">      Map&lt;String, Object&gt; headers = jwt.getHeader().toJSONObject();</span>
-<span class="fc" id="L171">      Map&lt;String, Object&gt; claims = jwt.getJWTClaimsSet().toJSONObject();</span>
-<span class="fc" id="L172">      return new Jwt(tokenValue, issuedAt, expiresAt, headers, claims);</span>
-<span class="nc" id="L173">    } catch (Exception e) {</span>
-<span class="nc" id="L174">      throw new RuntimeException(&quot;Creating Spring Jwt failed.&quot;, e);</span>
+<span class="fc" id="L171">      String tokenValue = jwt.serialize();</span>
+<span class="fc" id="L172">      Instant issuedAt = jwt.getJWTClaimsSet().getIssueTime().toInstant();</span>
+<span class="fc" id="L173">      Instant expiresAt = jwt.getJWTClaimsSet().getExpirationTime().toInstant();</span>
+<span class="fc" id="L174">      Map&lt;String, Object&gt; headers = jwt.getHeader().toJSONObject();</span>
+<span class="fc" id="L175">      Map&lt;String, Object&gt; claims = jwt.getJWTClaimsSet().toJSONObject();</span>
+<span class="fc" id="L176">      return new Jwt(tokenValue, issuedAt, expiresAt, headers, claims);</span>
+<span class="nc" id="L177">    } catch (Exception e) {</span>
+<span class="nc" id="L178">      throw new RuntimeException(&quot;Creating Spring Jwt failed.&quot;, e);</span>
     }
   }
 }
-</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.3.201901230119</span></div></body></html>
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

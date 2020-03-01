@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>FeignClientExceptionErrorDecoder.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">common-base-feign</a> &gt; <a href="index.source.html" class="el_package">org.bremersee.exception.feign</a> &gt; <span class="el_source">FeignClientExceptionErrorDecoder.java</span></div><h1>FeignClientExceptionErrorDecoder.java</h1><pre class="source lang-java linenums">/*
+ * Copyright 2019 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package org.bremersee.exception.feign;
+
+import static feign.Util.RETRY_AFTER;
+import static java.util.concurrent.TimeUnit.SECONDS;
+
+import feign.Request.HttpMethod;
+import feign.Response;
+import feign.RetryableException;
+import feign.Util;
+import feign.codec.ErrorDecoder;
+import java.time.OffsetDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Collections;
+import java.util.Date;
+import lombok.extern.slf4j.Slf4j;
+import org.bremersee.exception.RestApiExceptionParser;
+import org.bremersee.exception.RestApiExceptionParserImpl;
+import org.bremersee.exception.model.RestApiException;
+import org.bremersee.http.HttpHeadersHelper;
+import org.springframework.http.HttpHeaders;
+
+/**
+ * This error decoder produces either a {@link FeignClientException} or a {@link
+ * feign.RetryableException}.
+ *
+ * @author Christian Bremer
+ */
+<span class="fc" id="L44">@Slf4j</span>
+public class FeignClientExceptionErrorDecoder implements ErrorDecoder {
+
+  private final RestApiExceptionParser parser;
+
+  /**
+   * Instantiates a new feign client exception error decoder.
+   */
+  @SuppressWarnings(&quot;WeakerAccess&quot;)
+<span class="fc" id="L53">  public FeignClientExceptionErrorDecoder() {</span>
+<span class="fc" id="L54">    this.parser = new RestApiExceptionParserImpl();</span>
+<span class="fc" id="L55">  }</span>
+
+  /**
+   * Instantiates a new Feign client exception error decoder.
+   *
+   * @param parser the parser
+   */
+  @SuppressWarnings(&quot;unused&quot;)
+  public FeignClientExceptionErrorDecoder(
+<span class="fc" id="L64">      final RestApiExceptionParser parser) {</span>
+<span class="fc bfc" id="L65" title="All 2 branches covered.">    this.parser = parser != null ? parser : new RestApiExceptionParserImpl();</span>
+<span class="fc" id="L66">  }</span>
+
+  @Override
+  public Exception decode(final String methodKey, final Response response) {
+
+<span class="pc bpc" id="L71" title="1 of 2 branches missed.">    if (log.isDebugEnabled()) {</span>
+<span class="fc" id="L72">      log.debug(&quot;msg=[Decoding error at {}]&quot;, methodKey);</span>
+    }
+<span class="fc" id="L74">    final String body = readBody(response);</span>
+<span class="fc" id="L75">    final String message = String.format(&quot;status %s reading %s&quot;, response.status(), methodKey);</span>
+<span class="fc" id="L76">    final RestApiException restApiException = parser.parseException(</span>
+<span class="fc" id="L77">        body, response.headers());</span>
+<span class="pc bpc" id="L78" title="2 of 4 branches missed.">    if (log.isDebugEnabled() &amp;&amp; body != null) {</span>
+<span class="pc bpc" id="L79" title="1 of 2 branches missed.">      log.debug(&quot;msg=[Is error formatted as rest api exception? {}]&quot;,</span>
+<span class="fc bfc" id="L80" title="All 2 branches covered.">          restApiException != null &amp;&amp; !body.equals(restApiException.getMessage()));</span>
+    }
+<span class="fc" id="L82">    final FeignClientException feignClientException = new FeignClientException(</span>
+<span class="fc" id="L83">        response.request(),</span>
+<span class="pc bpc" id="L84" title="1 of 2 branches missed.">        response.headers() != null ? Collections.unmodifiableMap(response.headers()) : null,</span>
+<span class="fc" id="L85">        response.status(),</span>
+        message,
+        restApiException);
+<span class="fc" id="L88">    final HttpHeaders httpHeaders = HttpHeadersHelper.buildHttpHeaders(response.headers());</span>
+<span class="fc" id="L89">    final Date retryAfter = determineRetryAfter(httpHeaders.getFirst(RETRY_AFTER));</span>
+<span class="fc bfc" id="L90" title="All 2 branches covered.">    if (retryAfter != null) {</span>
+<span class="fc" id="L91">      return new RetryableException(</span>
+<span class="fc" id="L92">          response.status(),</span>
+<span class="fc" id="L93">          feignClientException.getMessage(),</span>
+<span class="fc" id="L94">          findHttpMethod(response),</span>
+          feignClientException,
+          retryAfter,
+<span class="fc" id="L97">          response.request());</span>
+    }
+<span class="fc" id="L99">    return feignClientException;</span>
+  }
+
+  static String readBody(final Response response) {
+<span class="pc bpc" id="L103" title="1 of 4 branches missed.">    if (response == null || response.body() == null) {</span>
+<span class="fc" id="L104">      return null;</span>
+    }
+    try {
+<span class="fc" id="L107">      return Util.toString(response.body().asReader());</span>
+<span class="fc" id="L108">    } catch (Exception ignored) {</span>
+<span class="fc" id="L109">      return null;</span>
+    }
+  }
+
+  static Date determineRetryAfter(final String retryAfter) {
+<span class="fc bfc" id="L114" title="All 2 branches covered.">    if (retryAfter == null) {</span>
+<span class="fc" id="L115">      return null;</span>
+    }
+<span class="fc bfc" id="L117" title="All 2 branches covered.">    if (retryAfter.matches(&quot;^[0-9]+$&quot;)) {</span>
+<span class="fc" id="L118">      long deltaMillis = SECONDS.toMillis(Long.parseLong(retryAfter));</span>
+<span class="fc" id="L119">      return new Date(System.currentTimeMillis() + deltaMillis);</span>
+    }
+    try {
+<span class="fc" id="L122">      return Date.from(OffsetDateTime.parse(retryAfter,</span>
+<span class="fc" id="L123">          DateTimeFormatter.RFC_1123_DATE_TIME).toInstant());</span>
+<span class="fc" id="L124">    } catch (Exception ignored) {</span>
+<span class="fc" id="L125">      return null;</span>
+    }
+  }
+
+  static HttpMethod findHttpMethod(final Response response) {
+<span class="pc bpc" id="L130" title="1 of 4 branches missed.">    if (response == null || response.request() == null) {</span>
+<span class="fc" id="L131">      return null;</span>
+    }
+<span class="fc" id="L133">    return response.request().httpMethod();</span>
+  }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

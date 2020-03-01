@@ -31,13 +31,24 @@ import org.springframework.validation.annotation.Validated;
 public interface AclMapper&lt;T extends Acl&lt;? extends Ace&gt;&gt; {
 
   /**
+   * Gets acl factory.
+   *
+   * @return the acl factory
+   */
+  default AclFactory&lt;T&gt; getAclFactory() {
+<span class="nc" id="L39">    return (owner, entries) -&gt; map(AclBuilder.builder()</span>
+<span class="nc" id="L40">        .from(owner, entries)</span>
+<span class="nc" id="L41">        .buildAccessControlList());</span>
+  }
+
+  /**
    * Default access control list (dto).
    *
    * @param owner the owner
    * @return the access control list (can be null)
    */
   default AccessControlList defaultAccessControlList(@Nullable String owner) {
-<span class="fc" id="L40">    return AclBuilder.builder().owner(owner).buildAccessControlList();</span>
+<span class="fc" id="L51">    return AclBuilder.builder().owner(owner).buildAccessControlList();</span>
   }
 
   /**
@@ -47,18 +58,18 @@ public interface AclMapper&lt;T extends Acl&lt;? extends Ace&gt;&gt; {
    * @return the access control list
    */
   default AccessControlList map(@Nullable T acl) {
-<span class="nc" id="L50">    return AclBuilder.builder().from(acl).buildAccessControlList();</span>
+<span class="fc" id="L61">    return AclBuilder.builder().from(acl).buildAccessControlList();</span>
   }
 
   /**
    * Map access control list dto to entity.
    *
    * @param accessControlList the access control list
-   * @param aclFactory        the acl factory
+   * @param aclFactory the acl factory
    * @return the acl of the specified type
    */
   default T map(@Nullable AccessControlList accessControlList, @NotNull AclFactory&lt;T&gt; aclFactory) {
-<span class="fc" id="L61">    return AclBuilder.builder().from(accessControlList).build(aclFactory);</span>
+<span class="fc" id="L72">    return AclBuilder.builder().from(accessControlList).build(aclFactory);</span>
   }
 
   /**
@@ -76,12 +87,12 @@ public interface AclMapper&lt;T extends Acl&lt;? extends Ace&gt;&gt; {
    * @return the acl (can be null)
    */
   default T defaultAcl(@Nullable String owner) {
-<span class="fc" id="L79">    T acl = map((AccessControlList) null);</span>
-<span class="fc bfc" id="L80" title="All 2 branches covered.">    if (acl != null) {</span>
-<span class="fc" id="L81">      acl.setOwner(owner);</span>
+<span class="fc" id="L90">    T acl = map((AccessControlList) null);</span>
+<span class="fc bfc" id="L91" title="All 2 branches covered.">    if (acl != null) {</span>
+<span class="fc" id="L92">      acl.setOwner(owner);</span>
     }
-<span class="fc" id="L83">    return acl;</span>
+<span class="fc" id="L94">    return acl;</span>
   }
 
 }
-</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.3.201901230119</span></div></body></html>
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>LdaptiveProperties.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">common-base-autoconfigure</a> &gt; <a href="index.source.html" class="el_package">org.bremersee.data.ldaptive</a> &gt; <span class="el_source">LdaptiveProperties.java</span></div><h1>LdaptiveProperties.java</h1><pre class="source lang-java linenums">/*
+ * Copyright 2019 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package org.bremersee.data.ldaptive;
+
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
+import org.ldaptive.pool.PoolConfig;
+import org.ldaptive.pool.SearchValidator;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+
+/**
+ * The ldap properties.
+ *
+ * @author Christian Bremer
+ */
+@SuppressWarnings({&quot;WeakerAccess&quot;})
+@ConfigurationProperties(prefix = &quot;bremersee.ldaptive&quot;)
+@Getter
+<span class="fc" id="L36">@Setter</span>
+<span class="fc" id="L37">@ToString(exclude = {&quot;bindCredential&quot;})</span>
+<span class="pc bpc" id="L38" title="56 of 94 branches missed.">@EqualsAndHashCode(exclude = {&quot;bindCredential&quot;, &quot;searchValidator&quot;})</span>
+<span class="fc" id="L39">@NoArgsConstructor</span>
+public class LdaptiveProperties {
+
+  /**
+   * Specifies whether ldap connection should be configured or not.
+   */
+<span class="fc" id="L45">  private boolean enabled = true;</span>
+
+  /**
+   * Specifies whether to use the UnboundId provider or not.
+   */
+<span class="fc" id="L50">  private boolean useUnboundIdProvider = true;</span>
+
+  /**
+   * URL to the LDAP(s).
+   */
+<span class="fc" id="L55">  private String ldapUrl = &quot;ldap://localhost:12389&quot;;</span>
+
+  /**
+   * Amount of time in milliseconds that connects will block.
+   */
+<span class="fc" id="L60">  private long connectTimeout = -1;</span>
+
+  /**
+   * Amount of time in milliseconds to wait for responses.
+   */
+<span class="fc" id="L65">  private long responseTimeout = -1;</span>
+
+  /**
+   * Connect to LDAP using SSL protocol.
+   */
+<span class="fc" id="L70">  private boolean useSsl;</span>
+
+  /**
+   * Connect to LDAP using startTLS.
+   */
+<span class="fc" id="L75">  private boolean useStartTls;</span>
+
+  /**
+   * Name of the trust certificates to use for the SSL connection.
+   */
+<span class="fc" id="L80">  private String trustCertificates;</span>
+
+  /**
+   * Name of the authentication certificate to use for the SSL connection.
+   */
+<span class="fc" id="L85">  private String authenticationCertificate;</span>
+
+  /**
+   * Name of the key to use for the SSL connection.
+   */
+<span class="fc" id="L90">  private String authenticationKey;</span>
+
+  /**
+   * DN to bind as before performing operations.
+   */
+<span class="fc" id="L95">  private String bindDn;</span>
+
+  /**
+   * Credential for the bind DN.
+   */
+<span class="fc" id="L100">  private String bindCredential;</span>
+
+  /**
+   * Specifies whether the connection should be pooled or not. Default is {@code false}.
+   */
+<span class="fc" id="L105">  private boolean pooled = false;</span>
+
+  /**
+   * Minimum pool size.
+   */
+<span class="fc" id="L110">  private int minPoolSize = PoolConfig.DEFAULT_MIN_POOL_SIZE;</span>
+
+  /**
+   * Maximum pool size.
+   */
+<span class="fc" id="L115">  private int maxPoolSize = PoolConfig.DEFAULT_MAX_POOL_SIZE;</span>
+
+  /**
+   * Whether the ldap object should be validated when returned to the pool.
+   */
+<span class="fc" id="L120">  private boolean validateOnCheckIn = PoolConfig.DEFAULT_VALIDATE_ON_CHECKIN;</span>
+
+  /**
+   * Whether the ldap object should be validated when given from the pool.
+   */
+<span class="fc" id="L125">  private boolean validateOnCheckOut = PoolConfig.DEFAULT_VALIDATE_ON_CHECKOUT;</span>
+
+  /**
+   * Whether the pool should be validated periodically.
+   */
+<span class="fc" id="L130">  private boolean validatePeriodically = PoolConfig.DEFAULT_VALIDATE_PERIODICALLY;</span>
+
+  /**
+   * Time in seconds that the validate pool should repeat.
+   */
+<span class="fc" id="L135">  private long validatePeriod = PoolConfig.DEFAULT_VALIDATE_PERIOD.toMillis();</span>
+
+  /**
+   * Prune period in seconds.
+   */
+<span class="fc" id="L140">  private long prunePeriod = 300L;</span>
+
+  /**
+   * Idle time in seconds.
+   */
+<span class="fc" id="L145">  private long idleTime = 600L;</span>
+
+  /**
+   * Time in milliseconds to wait for an available connection.
+   */
+<span class="fc" id="L150">  private long blockWaitTime = 10000L;</span>
+
+  /**
+   * The search validator of the connection pool.
+   */
+<span class="fc" id="L155">  private SearchValidator searchValidator = new SearchValidator();</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

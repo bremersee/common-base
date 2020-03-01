@@ -37,7 +37,7 @@ public interface AccessController {
    * @return the access controller
    */
   static AccessController from(@Nullable AccessControlList acl) {
-<span class="pc bpc" id="L40" title="1 of 2 branches missed.">    return acl == null ? new Impl() : new Impl(AclBuilder.builder().from(acl).buildAcl());</span>
+<span class="fc bfc" id="L40" title="All 2 branches covered.">    return acl == null ? new Impl() : new Impl(AclBuilder.builder().from(acl).buildAcl());</span>
   }
 
   /**
@@ -46,8 +46,9 @@ public interface AccessController {
    * @param acl the access control list
    * @return the access controller
    */
+  @SuppressWarnings(&quot;rawtypes&quot;)
   static AccessController from(@Nullable Acl acl) {
-<span class="nc bnc" id="L50" title="All 2 branches missed.">    return acl == null ? new Impl() : new Impl(AclBuilder.builder().from(acl).buildAcl());</span>
+<span class="fc bfc" id="L51" title="All 2 branches covered.">    return acl == null ? new Impl() : new Impl(AclBuilder.builder().from(acl).buildAcl());</span>
   }
 
   /**
@@ -82,11 +83,11 @@ public interface AccessController {
       @Nullable Collection&lt;String&gt; groups,
       @Nullable String... permissions) {
 
-<span class="pc bpc" id="L85" title="1 of 2 branches missed.">    return hasAnyPermission(</span>
+<span class="fc" id="L86">    return hasAnyPermission(</span>
         user,
         roles,
         groups,
-<span class="pc" id="L89">        permissions == null ? Collections.emptyList() : Arrays.asList(permissions));</span>
+<span class="pc bpc" id="L90" title="1 of 2 branches missed.">        permissions == null ? Collections.emptyList() : Arrays.asList(permissions));</span>
   }
 
   /**
@@ -105,11 +106,11 @@ public interface AccessController {
       @Nullable Collection&lt;String&gt; groups,
       @Nullable Collection&lt;String&gt; permissions) {
 
-<span class="pc bpc" id="L108" title="1 of 2 branches missed.">    return permissions != null</span>
-<span class="pc bpc" id="L109" title="1 of 2 branches missed.">        &amp;&amp; !permissions.isEmpty()</span>
+<span class="pc bpc" id="L109" title="1 of 2 branches missed.">    return permissions != null</span>
+<span class="fc bfc" id="L110" title="All 2 branches covered.">        &amp;&amp; !permissions.isEmpty()</span>
         &amp;&amp; permissions
-<span class="fc" id="L111">        .stream()</span>
-<span class="fc bfc" id="L112" title="All 2 branches covered.">        .anyMatch(permission -&gt; hasPermission(user, roles, groups, permission));</span>
+<span class="fc" id="L112">        .stream()</span>
+<span class="fc bfc" id="L113" title="All 2 branches covered.">        .anyMatch(permission -&gt; hasPermission(user, roles, groups, permission));</span>
   }
 
   /**
@@ -128,11 +129,11 @@ public interface AccessController {
       Collection&lt;String&gt; groups,
       String... permissions) {
 
-<span class="pc bpc" id="L131" title="1 of 2 branches missed.">    return hasAllPermissions(</span>
+<span class="fc" id="L132">    return hasAllPermissions(</span>
         user,
         roles,
         groups,
-<span class="pc" id="L135">        permissions == null ? Collections.emptyList() : Arrays.asList(permissions));</span>
+<span class="pc bpc" id="L136" title="1 of 2 branches missed.">        permissions == null ? Collections.emptyList() : Arrays.asList(permissions));</span>
   }
 
   /**
@@ -151,11 +152,11 @@ public interface AccessController {
       Collection&lt;String&gt; groups,
       Collection&lt;String&gt; permissions) {
 
-<span class="pc bpc" id="L154" title="1 of 2 branches missed.">    return permissions != null</span>
-<span class="pc bpc" id="L155" title="1 of 2 branches missed.">        &amp;&amp; !permissions.isEmpty()</span>
+<span class="pc bpc" id="L155" title="1 of 2 branches missed.">    return permissions != null</span>
+<span class="fc bfc" id="L156" title="All 2 branches covered.">        &amp;&amp; !permissions.isEmpty()</span>
         &amp;&amp; permissions
-<span class="fc" id="L157">        .stream()</span>
-<span class="fc bfc" id="L158" title="All 2 branches covered.">        .allMatch(permission -&gt; hasPermission(user, roles, groups, permission));</span>
+<span class="fc" id="L158">        .stream()</span>
+<span class="fc bfc" id="L159" title="All 2 branches covered.">        .allMatch(permission -&gt; hasPermission(user, roles, groups, permission));</span>
   }
 
   /**
@@ -168,18 +169,18 @@ public interface AccessController {
     /**
      * Instantiates a new access controller.
      */
-<span class="nc" id="L171">    Impl() {</span>
-<span class="nc" id="L172">      acl = null;</span>
-<span class="nc" id="L173">    }</span>
+<span class="fc" id="L172">    Impl() {</span>
+<span class="fc" id="L173">      acl = null;</span>
+<span class="fc" id="L174">    }</span>
 
     /**
      * Instantiates a new access controller.
      *
      * @param acl the acl
      */
-<span class="fc" id="L180">    Impl(final Acl&lt;? extends Ace&gt; acl) {</span>
-<span class="fc" id="L181">      this.acl = acl;</span>
-<span class="fc" id="L182">    }</span>
+<span class="fc" id="L181">    Impl(final Acl&lt;? extends Ace&gt; acl) {</span>
+<span class="fc" id="L182">      this.acl = acl;</span>
+<span class="fc" id="L183">    }</span>
 
     @Override
     public boolean hasPermission(
@@ -188,35 +189,35 @@ public interface AccessController {
         final Collection&lt;String&gt; groups,
         final String permission) {
 
-<span class="pc bpc" id="L191" title="1 of 2 branches missed.">      if (acl == null) {</span>
-<span class="nc" id="L192">        return false;</span>
+<span class="fc bfc" id="L192" title="All 2 branches covered.">      if (acl == null) {</span>
+<span class="fc" id="L193">        return false;</span>
       }
-<span class="pc bpc" id="L194" title="1 of 2 branches missed.">      if (permission == null) {</span>
-<span class="nc" id="L195">        return false;</span>
+<span class="fc bfc" id="L195" title="All 2 branches covered.">      if (permission == null) {</span>
+<span class="fc" id="L196">        return false;</span>
       }
-<span class="pc bpc" id="L197" title="1 of 4 branches missed.">      if (user != null &amp;&amp; user.equals(acl.getOwner())) {</span>
-<span class="fc" id="L198">        return true;</span>
+<span class="pc bpc" id="L198" title="1 of 4 branches missed.">      if (user != null &amp;&amp; user.equals(acl.getOwner())) {</span>
+<span class="fc" id="L199">        return true;</span>
       }
-<span class="fc" id="L200">      final Map&lt;String, ? extends Ace&gt; map = acl.entryMap();</span>
-<span class="pc bpc" id="L201" title="1 of 2 branches missed.">      if (map == null) {</span>
-<span class="nc" id="L202">        return false;</span>
+<span class="fc" id="L201">      final Map&lt;String, ? extends Ace&gt; map = acl.entryMap();</span>
+<span class="pc bpc" id="L202" title="1 of 2 branches missed.">      if (map == null) {</span>
+<span class="nc" id="L203">        return false;</span>
       }
-<span class="fc" id="L204">      final Ace ace = map.get(permission.toLowerCase());</span>
-<span class="fc bfc" id="L205" title="All 2 branches covered.">      if (ace == null) {</span>
-<span class="fc" id="L206">        return false;</span>
+<span class="fc" id="L205">      final Ace ace = map.get(permission.toLowerCase());</span>
+<span class="fc bfc" id="L206" title="All 2 branches covered.">      if (ace == null) {</span>
+<span class="fc" id="L207">        return false;</span>
       }
-<span class="fc bfc" id="L208" title="All 2 branches covered.">      if (ace.isGuest()) {</span>
-<span class="fc" id="L209">        return true;</span>
+<span class="fc bfc" id="L209" title="All 2 branches covered.">      if (ace.isGuest()) {</span>
+<span class="fc" id="L210">        return true;</span>
       }
-<span class="fc bfc" id="L211" title="All 2 branches covered.">      if (ace.getUsers().contains(user)) {</span>
-<span class="fc" id="L212">        return true;</span>
+<span class="fc bfc" id="L212" title="All 2 branches covered.">      if (ace.getUsers().contains(user)) {</span>
+<span class="fc" id="L213">        return true;</span>
       }
-<span class="pc bpc" id="L214" title="1 of 4 branches missed.">      if (roles != null &amp;&amp; roles.stream().anyMatch(role -&gt; ace.getRoles().contains(role))) {</span>
-<span class="fc" id="L215">        return true;</span>
+<span class="pc bpc" id="L215" title="1 of 4 branches missed.">      if (roles != null &amp;&amp; roles.stream().anyMatch(role -&gt; ace.getRoles().contains(role))) {</span>
+<span class="fc" id="L216">        return true;</span>
       }
-<span class="pc bpc" id="L217" title="1 of 4 branches missed.">      return groups != null &amp;&amp; groups.stream().anyMatch(group -&gt; ace.getGroups().contains(group));</span>
+<span class="pc bpc" id="L218" title="1 of 4 branches missed.">      return groups != null &amp;&amp; groups.stream().anyMatch(group -&gt; ace.getGroups().contains(group));</span>
     }
   }
 
 }
-</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.3.201901230119</span></div></body></html>
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

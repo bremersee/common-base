@@ -16,6 +16,7 @@
 
 package org.bremersee.converter;
 
+import lombok.ToString;
 import org.bremersee.common.model.TwoLetterLanguageCode;
 import org.springframework.core.convert.converter.Converter;
 
@@ -24,12 +25,13 @@ import org.springframework.core.convert.converter.Converter;
  *
  * @author Christian Bremer
  */
-<span class="nc" id="L27">public class StringToTwoLetterLanguageCodeConverter implements</span>
+<span class="fc" id="L28">@ToString</span>
+<span class="fc" id="L29">public class StringToTwoLetterLanguageCodeConverter implements</span>
     Converter&lt;String, TwoLetterLanguageCode&gt; {
 
   @Override
   public TwoLetterLanguageCode convert(String source) {
-<span class="nc" id="L32">    return TwoLetterLanguageCode.fromValue(source.toLowerCase());</span>
+<span class="fc" id="L34">    return TwoLetterLanguageCode.fromValue(source.toLowerCase());</span>
   }
 }
-</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.3.201901230119</span></div></body></html>
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

@@ -1,0 +1,450 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>RestApiExceptionMapperImpl.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">common-base-autoconfigure</a> &gt; <a href="index.source.html" class="el_package">org.bremersee.exception</a> &gt; <span class="el_source">RestApiExceptionMapperImpl.java</span></div><h1>RestApiExceptionMapperImpl.java</h1><pre class="source lang-java linenums">/*
+ * Copyright 2019 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package org.bremersee.exception;
+
+import java.lang.reflect.Method;
+import java.time.OffsetDateTime;
+import java.time.ZoneId;
+import java.util.Arrays;
+import java.util.List;
+import java.util.UUID;
+import java.util.stream.Collectors;
+import javax.validation.constraints.NotNull;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
+import org.bremersee.exception.RestApiExceptionMapperProperties.ExceptionMappingConfig;
+import org.bremersee.exception.annotation.ErrorCode;
+import org.bremersee.exception.model.Handler;
+import org.bremersee.exception.model.RestApiException;
+import org.bremersee.exception.model.StackTraceItem;
+import org.springframework.core.annotation.AnnotatedElementUtils;
+import org.springframework.core.annotation.AnnotationUtils;
+import org.springframework.http.HttpStatus;
+import org.springframework.lang.Nullable;
+import org.springframework.util.ReflectionUtils;
+import org.springframework.util.StringUtils;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.method.HandlerMethod;
+import org.springframework.web.server.ResponseStatusException;
+
+/**
+ * The default implementation of a rest api exception mapper.
+ *
+ * @author Christian Bremer
+ */
+@Validated
+<span class="fc" id="L52">@Slf4j</span>
+public class RestApiExceptionMapperImpl implements RestApiExceptionMapper {
+
+<span class="fc" id="L55">  @Getter(AccessLevel.PROTECTED)</span>
+  private RestApiExceptionMapperProperties properties;
+
+<span class="fc" id="L58">  @Getter(AccessLevel.PROTECTED)</span>
+  private String applicationName;
+
+  /**
+   * Instantiates a new rest api exception mapper.
+   *
+   * @param properties the properties
+   * @param applicationName the application name
+   */
+  public RestApiExceptionMapperImpl(
+      RestApiExceptionMapperProperties properties,
+<span class="fc" id="L69">      String applicationName) {</span>
+<span class="fc" id="L70">    this.properties = properties;</span>
+<span class="fc" id="L71">    this.applicationName = applicationName;</span>
+<span class="fc" id="L72">  }</span>
+
+  @Override
+  public List&lt;String&gt; getApiPaths() {
+<span class="fc" id="L76">    return properties.getApiPaths();</span>
+  }
+
+  @Override
+  public HttpStatus detectHttpStatus(@NotNull Throwable exception, @Nullable Object handler) {
+
+<span class="fc" id="L82">    HttpStatus httpStatus = null;</span>
+<span class="fc bfc" id="L83" title="All 2 branches covered.">    if (exception instanceof HttpStatusAware) {</span>
+<span class="fc" id="L84">      httpStatus = fromStatus(((HttpStatusAware) exception).status());</span>
+    }
+<span class="fc bfc" id="L86" title="All 4 branches covered.">    if (httpStatus == null &amp;&amp; (exception instanceof ResponseStatusException)) {</span>
+<span class="fc" id="L87">      httpStatus = ((ResponseStatusException) exception).getStatus();</span>
+    }
+<span class="fc bfc" id="L89" title="All 2 branches covered.">    if (httpStatus == null) {</span>
+<span class="fc" id="L90">      final ResponseStatus ann = AnnotatedElementUtils</span>
+<span class="fc" id="L91">          .findMergedAnnotation(exception.getClass(), ResponseStatus.class);</span>
+<span class="pc bpc" id="L92" title="1 of 2 branches missed.">      if (ann != null) {</span>
+<span class="nc" id="L93">        httpStatus = ann.code();</span>
+      }
+    }
+<span class="fc bfc" id="L96" title="All 2 branches covered.">    if (httpStatus == null) {</span>
+<span class="fc" id="L97">      final Method method = findHandlerMethod(handler);</span>
+<span class="pc bpc" id="L98" title="1 of 2 branches missed.">      if (method != null) {</span>
+<span class="nc" id="L99">        final ResponseStatus ann = AnnotatedElementUtils</span>
+<span class="nc" id="L100">            .findMergedAnnotation(method, ResponseStatus.class);</span>
+<span class="nc bnc" id="L101" title="All 2 branches missed.">        if (ann != null) {</span>
+<span class="nc" id="L102">          httpStatus = ann.code();</span>
+        }
+      }
+    }
+<span class="pc bpc" id="L106" title="1 of 4 branches missed.">    if (httpStatus == null &amp;&amp; !(exception instanceof HttpStatusAware)) {</span>
+<span class="fc" id="L107">      final Object result = getMethodValue(exception, &quot;status&quot;);</span>
+<span class="pc bpc" id="L108" title="1 of 2 branches missed.">      if (result instanceof Integer) {</span>
+<span class="nc" id="L109">        httpStatus = fromStatus((Integer) result);</span>
+      }
+    }
+<span class="fc bfc" id="L112" title="All 2 branches covered.">    if (httpStatus == null) {</span>
+<span class="fc" id="L113">      httpStatus = fromStatus(properties.findExceptionMapping(exception).getStatus());</span>
+    }
+<span class="pc bpc" id="L115" title="1 of 2 branches missed.">    if (httpStatus == null) {</span>
+<span class="nc" id="L116">      httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;</span>
+    }
+<span class="fc" id="L118">    return httpStatus;</span>
+  }
+
+  @SuppressWarnings(&quot;SameParameterValue&quot;)
+  private &lt;T&gt; T getMethodValue(
+      @NotNull final Throwable throwable,
+      @NotNull final String methodName) {
+
+    try {
+<span class="fc" id="L127">      final Method method = ReflectionUtils.findMethod(</span>
+<span class="fc" id="L128">          throwable.getClass(), methodName);</span>
+<span class="pc bpc" id="L129" title="1 of 2 branches missed.">      if (method != null) {</span>
+        //noinspection unchecked
+<span class="nc" id="L131">        return (T) ReflectionUtils.invokeMethod(method, throwable);</span>
+      } else {
+<span class="fc" id="L133">        log.debug(&quot;Method &quot; + methodName + &quot; not found in &quot; + throwable.getClass().getName());</span>
+<span class="fc" id="L134">        return null;</span>
+      }
+<span class="nc" id="L136">    } catch (Exception e) {</span>
+<span class="nc" id="L137">      log.warn(&quot;Calling &quot; + methodName + &quot; from &quot; + throwable.getClass().getName() + &quot; failed. &quot;</span>
+          + &quot;Returning null.&quot;, e);
+<span class="nc" id="L139">      return null;</span>
+    }
+  }
+
+  @Nullable
+  private HttpStatus fromStatus(@Nullable final Integer status) {
+<span class="pc bpc" id="L145" title="1 of 2 branches missed.">    if (status == null) {</span>
+<span class="nc" id="L146">      return null;</span>
+    }
+<span class="fc" id="L148">    return HttpStatus.resolve(status);</span>
+  }
+
+  @Override
+  public RestApiException build(
+      @NotNull final Throwable exception,
+      @Nullable final String requestPath,
+      @Nullable final Object handler) {
+
+<span class="fc" id="L157">    final ExceptionMappingConfig config = getProperties().findExceptionMappingConfig(exception);</span>
+<span class="fc" id="L158">    final HttpStatus httpStatus = detectHttpStatus(exception, handler);</span>
+
+<span class="fc" id="L160">    final RestApiException restApiException = new RestApiException();</span>
+<span class="fc bfc" id="L161" title="All 2 branches covered.">    if (httpStatus.series() == HttpStatus.Series.SERVER_ERROR) {</span>
+<span class="fc" id="L162">      restApiException.setId(UUID.randomUUID().toString());</span>
+    }
+<span class="fc" id="L164">    restApiException.setTimestamp(OffsetDateTime.now(ZoneId.of(&quot;UTC&quot;)));</span>
+<span class="fc" id="L165">    restApiException.setMessage(detectMessage(exception, handler, config));</span>
+<span class="fc bfc" id="L166" title="All 2 branches covered.">    if (config.isIncludeExceptionClassName()) {</span>
+<span class="fc" id="L167">      restApiException.setClassName(exception.getClass().getName());</span>
+    }
+<span class="pc bpc" id="L169" title="1 of 2 branches missed.">    if (config.isIncludeApplicationName()) {</span>
+<span class="fc" id="L170">      restApiException.setApplication(getApplicationName());</span>
+    }
+<span class="pc bpc" id="L172" title="1 of 2 branches missed.">    if (config.isIncludePath()) {</span>
+<span class="fc" id="L173">      restApiException.setPath(requestPath);</span>
+    }
+<span class="fc bfc" id="L175" title="All 2 branches covered.">    if (config.isIncludeHandler()) {</span>
+<span class="fc" id="L176">      restApiException.setHandler(buildHandler(handler));</span>
+    }
+<span class="fc bfc" id="L178" title="All 2 branches covered.">    if (config.isIncludeStackTrace()) {</span>
+<span class="fc" id="L179">      addStackTraceItems(restApiException, exception.getStackTrace());</span>
+    }
+
+    final RestApiException cause;
+<span class="fc bfc" id="L183" title="All 2 branches covered.">    if (exception instanceof RestApiExceptionAware</span>
+<span class="pc bpc" id="L184" title="1 of 2 branches missed.">        &amp;&amp; ((RestApiExceptionAware) exception).getRestApiException() != null) {</span>
+<span class="fc" id="L185">      final RestApiException source = ((RestApiExceptionAware) exception).getRestApiException();</span>
+<span class="fc" id="L186">      cause = cloneRestApiException(source, config);</span>
+<span class="fc" id="L187">    } else {</span>
+<span class="fc" id="L188">      cause = buildRestApiExceptionCause(exception.getCause(), config);</span>
+    }
+<span class="pc bpc" id="L190" title="1 of 4 branches missed.">    if (cause != null &amp;&amp; StringUtils.hasText(cause.getErrorCode())</span>
+<span class="pc bpc" id="L191" title="1 of 2 branches missed.">        &amp;&amp; !RestApiExceptionUtils.NO_ERROR_CODE_VALUE.equals(cause.getErrorCode())) {</span>
+<span class="fc" id="L192">      restApiException.setErrorCode(cause.getErrorCode());</span>
+<span class="fc" id="L193">      restApiException.setErrorCodeInherited(true);</span>
+    } else {
+<span class="fc" id="L195">      restApiException.setErrorCode(detectErrorCode(exception, handler, config));</span>
+<span class="fc" id="L196">      restApiException.setErrorCodeInherited(false);</span>
+    }
+
+<span class="pc bpc" id="L199" title="1 of 2 branches missed.">    if (config.isIncludeCause()) {</span>
+<span class="fc" id="L200">      restApiException.setCause(cause);</span>
+    }
+
+<span class="fc" id="L203">    return restApiException;</span>
+  }
+
+  /**
+   * Find the handler class.
+   *
+   * @param handler the handler
+   * @return the class
+   */
+  @SuppressWarnings(&quot;WeakerAccess&quot;)
+  @Nullable
+  protected Class&lt;?&gt; findHandlerClass(@Nullable Object handler) {
+<span class="nc bnc" id="L215" title="All 2 branches missed.">    if (handler == null) {</span>
+<span class="nc" id="L216">      return null;</span>
+<span class="nc bnc" id="L217" title="All 2 branches missed.">    } else if (handler instanceof HandlerMethod) {</span>
+<span class="nc" id="L218">      return ((HandlerMethod) handler).getBean().getClass();</span>
+    } else {
+<span class="nc" id="L220">      return handler.getClass();</span>
+    }
+  }
+
+  /**
+   * Find the handler method.
+   *
+   * @param handler the handler
+   * @return the method
+   */
+  @SuppressWarnings(&quot;WeakerAccess&quot;)
+  @Nullable
+  protected Method findHandlerMethod(Object handler) {
+<span class="pc bpc" id="L233" title="1 of 2 branches missed.">    if (handler instanceof HandlerMethod) {</span>
+<span class="nc" id="L234">      return ((HandlerMethod) handler).getMethod();</span>
+    } else {
+<span class="fc" id="L236">      return null;</span>
+    }
+  }
+
+  /**
+   * Detect message exception message.
+   *
+   * @param exception the exception
+   * @param handler the handler
+   * @param config the config
+   * @return the exception message
+   */
+  @SuppressWarnings(&quot;WeakerAccess&quot;)
+  @NotNull
+  protected String detectMessage(
+      final @NotNull Throwable exception,
+      final @Nullable Object handler,
+      final @NotNull ExceptionMappingConfig config) {
+
+<span class="fc" id="L255">    String message = exception.getMessage();</span>
+<span class="pc bpc" id="L256" title="1 of 4 branches missed.">    if (StringUtils.hasText(message) &amp;&amp; !config.isEvaluateAnnotationFirst()) {</span>
+<span class="fc" id="L257">      return message;</span>
+    }
+
+<span class="fc" id="L260">    ResponseStatus responseStatus = AnnotatedElementUtils.findMergedAnnotation(</span>
+<span class="fc" id="L261">        exception.getClass(), ResponseStatus.class);</span>
+<span class="pc bpc" id="L262" title="1 of 2 branches missed.">    if (responseStatus == null) {</span>
+<span class="fc" id="L263">      Method method = findHandlerMethod(handler);</span>
+<span class="pc bpc" id="L264" title="1 of 2 branches missed.">      if (method != null) {</span>
+<span class="nc" id="L265">        responseStatus = AnnotatedElementUtils.findMergedAnnotation(method, ResponseStatus.class);</span>
+      }
+    }
+<span class="pc bpc" id="L268" title="3 of 4 branches missed.">    if (responseStatus != null &amp;&amp; StringUtils.hasText(responseStatus.reason())) {</span>
+<span class="nc" id="L269">      message = responseStatus.reason();</span>
+    }
+<span class="pc bpc" id="L271" title="1 of 2 branches missed.">    return StringUtils.hasText(message)</span>
+<span class="nc" id="L272">        ? message</span>
+<span class="fc" id="L273">        : getProperties().findExceptionMapping(exception).getMessage();</span>
+  }
+
+  /**
+   * Detect the error code.
+   *
+   * @param exception the exception
+   * @param handler the handler
+   * @param config the config
+   * @return the string
+   */
+  @SuppressWarnings(&quot;WeakerAccess&quot;)
+  @Nullable
+  protected String detectErrorCode(
+      final @NotNull Throwable exception,
+      final @Nullable Object handler,
+      final @NotNull ExceptionMappingConfig config) {
+
+<span class="fc bfc" id="L291" title="All 2 branches covered.">    String code = (exception instanceof ErrorCodeAware)</span>
+<span class="fc" id="L292">        ? ((ErrorCodeAware) exception).getErrorCode()</span>
+<span class="fc" id="L293">        : null;</span>
+<span class="pc bpc" id="L294" title="1 of 4 branches missed.">    if (StringUtils.hasText(code) &amp;&amp; !config.isEvaluateAnnotationFirst()) {</span>
+<span class="fc" id="L295">      return code;</span>
+    }
+
+<span class="fc" id="L298">    ErrorCode errorCode = AnnotationUtils.findAnnotation(exception.getClass(), ErrorCode.class);</span>
+<span class="pc bpc" id="L299" title="1 of 2 branches missed.">    if (errorCode == null) {</span>
+<span class="fc" id="L300">      Method method = findHandlerMethod(handler);</span>
+<span class="pc bpc" id="L301" title="1 of 2 branches missed.">      if (method != null) {</span>
+<span class="nc" id="L302">        errorCode = AnnotationUtils.findAnnotation(method, ErrorCode.class);</span>
+      }
+    }
+<span class="pc bpc" id="L305" title="3 of 4 branches missed.">    if (errorCode != null &amp;&amp; StringUtils.hasText(errorCode.value())) {</span>
+<span class="nc" id="L306">      code = errorCode.value();</span>
+    }
+<span class="pc bpc" id="L308" title="1 of 2 branches missed.">    return StringUtils.hasText(code)</span>
+<span class="nc" id="L309">        ? code</span>
+<span class="fc" id="L310">        : getProperties().findExceptionMapping(exception).getCode();</span>
+  }
+
+  /**
+   * Build the handler model of the rest ape exception.
+   *
+   * @param handler the handler
+   * @return the handler model
+   */
+  @SuppressWarnings(&quot;WeakerAccess&quot;)
+  @Nullable
+  protected Handler buildHandler(@Nullable Object handler) {
+<span class="fc" id="L322">    final Method method = findHandlerMethod(handler);</span>
+<span class="pc bpc" id="L323" title="1 of 2 branches missed.">    if (method == null) {</span>
+<span class="fc" id="L324">      return null;</span>
+    }
+<span class="nc" id="L326">    final Handler model = new Handler();</span>
+<span class="nc" id="L327">    model.setMethodName(method.getName());</span>
+<span class="nc" id="L328">    final Class&lt;?&gt; handlerClass = findHandlerClass(handler);</span>
+<span class="nc bnc" id="L329" title="All 2 branches missed.">    model.setClassName(handlerClass != null ? handlerClass.getName() : null);</span>
+<span class="nc" id="L330">    final Class&lt;?&gt;[] types = method.getParameterTypes();</span>
+<span class="nc" id="L331">    model.setMethodParameterTypes(</span>
+        Arrays
+<span class="nc" id="L333">            .stream(types)</span>
+<span class="nc" id="L334">            .map(Class::getName)</span>
+<span class="nc" id="L335">            .collect(Collectors.toList()));</span>
+<span class="nc" id="L336">    return model;</span>
+  }
+
+  /**
+   * Add stack trace items.
+   *
+   * @param restApiException the rest api exception
+   * @param stackTrace the stack trace
+   */
+  @SuppressWarnings(&quot;WeakerAccess&quot;)
+  protected void addStackTraceItems(
+      final @NotNull RestApiException restApiException,
+      final @Nullable StackTraceElement[] stackTrace) {
+
+<span class="pc bpc" id="L350" title="1 of 2 branches missed.">    if (stackTrace != null) {</span>
+<span class="fc" id="L351">      restApiException.setStackTrace(</span>
+          Arrays
+<span class="fc" id="L353">              .stream(stackTrace)</span>
+<span class="fc" id="L354">              .map(st -&gt; StackTraceItem</span>
+<span class="fc" id="L355">                  .builder()</span>
+<span class="fc" id="L356">                  .declaringClass(st.getClassName())</span>
+<span class="fc" id="L357">                  .fileName(st.getFileName())</span>
+<span class="fc" id="L358">                  .lineNumber(st.getLineNumber())</span>
+<span class="fc" id="L359">                  .methodName(st.getMethodName())</span>
+<span class="fc" id="L360">                  .build())</span>
+<span class="fc" id="L361">              .collect(Collectors.toList()));</span>
+    }
+<span class="fc" id="L363">  }</span>
+
+  /**
+   * Build the cause of a rest api exception.
+   *
+   * @param cause the cause
+   * @param config the config
+   * @return the rest api exception
+   */
+  @SuppressWarnings(&quot;WeakerAccess&quot;)
+  @Nullable
+  protected RestApiException buildRestApiExceptionCause(
+      final @Nullable Throwable cause,
+      final @NotNull ExceptionMappingConfig config) {
+
+<span class="pc bpc" id="L378" title="1 of 2 branches missed.">    if (cause == null) {</span>
+<span class="fc" id="L379">      return null;</span>
+    }
+
+<span class="nc bnc" id="L382" title="All 2 branches missed.">    if (cause instanceof RestApiExceptionAware</span>
+<span class="nc bnc" id="L383" title="All 2 branches missed.">        &amp;&amp; ((RestApiExceptionAware) config).getRestApiException() != null) {</span>
+<span class="nc" id="L384">      final RestApiException source = ((RestApiExceptionAware) cause).getRestApiException();</span>
+<span class="nc" id="L385">      return cloneRestApiException(source, config);</span>
+    }
+
+<span class="nc" id="L388">    final RestApiException restApiException = new RestApiException();</span>
+<span class="nc" id="L389">    restApiException.setMessage(detectMessage(cause, null, config));</span>
+<span class="nc" id="L390">    restApiException.setErrorCode(detectErrorCode(cause, null, config));</span>
+<span class="nc bnc" id="L391" title="All 2 branches missed.">    if (config.isIncludeExceptionClassName()) {</span>
+<span class="nc" id="L392">      restApiException.setClassName(cause.getClass().getName());</span>
+    }
+<span class="nc bnc" id="L394" title="All 2 branches missed.">    if (config.isIncludeStackTrace()) {</span>
+<span class="nc" id="L395">      addStackTraceItems(restApiException, cause.getStackTrace());</span>
+    }
+<span class="nc" id="L397">    restApiException.setCause(buildRestApiExceptionCause(cause.getCause(), config));</span>
+<span class="nc" id="L398">    return restApiException;</span>
+  }
+
+  @Nullable
+  private RestApiException cloneRestApiException(
+      final @Nullable RestApiException source,
+      final @NotNull ExceptionMappingConfig config) {
+
+<span class="fc bfc" id="L406" title="All 2 branches covered.">    if (source == null) {</span>
+<span class="fc" id="L407">      return null;</span>
+    }
+
+<span class="fc" id="L410">    final RestApiException destination = new RestApiException();</span>
+<span class="fc" id="L411">    destination.setId(source.getId());</span>
+<span class="fc" id="L412">    destination.setTimestamp(source.getTimestamp());</span>
+<span class="fc" id="L413">    destination.setMessage(source.getMessage());</span>
+<span class="fc" id="L414">    destination.setErrorCode(source.getErrorCode());</span>
+<span class="fc" id="L415">    destination.setErrorCodeInherited(source.getErrorCodeInherited());</span>
+<span class="pc bpc" id="L416" title="1 of 2 branches missed.">    if (config.isIncludeExceptionClassName()) {</span>
+<span class="fc" id="L417">      destination.setClassName(source.getClassName());</span>
+    }
+<span class="pc bpc" id="L419" title="1 of 2 branches missed.">    if (config.isIncludeApplicationName()) {</span>
+<span class="fc" id="L420">      destination.setApplication(source.getApplication());</span>
+    }
+<span class="pc bpc" id="L422" title="1 of 2 branches missed.">    if (config.isIncludePath()) {</span>
+<span class="fc" id="L423">      destination.setPath(source.getPath());</span>
+    }
+<span class="pc bpc" id="L425" title="1 of 2 branches missed.">    if (config.isIncludeHandler()) {</span>
+<span class="nc" id="L426">      destination.setHandler(cloneHandler(source.getHandler()));</span>
+    }
+<span class="pc bpc" id="L428" title="1 of 2 branches missed.">    if (config.isIncludeStackTrace()) {</span>
+<span class="nc" id="L429">      destination.setStackTrace(source.getStackTrace());</span>
+    }
+<span class="pc bpc" id="L431" title="1 of 2 branches missed.">    if (config.isIncludeCause()) {</span>
+<span class="fc" id="L432">      destination.setCause(cloneRestApiException(source.getCause(), config));</span>
+    }
+<span class="fc" id="L434">    return destination;</span>
+  }
+
+  @Nullable
+  private Handler cloneHandler(final @Nullable Handler source) {
+<span class="nc bnc" id="L439" title="All 2 branches missed.">    if (source == null) {</span>
+<span class="nc" id="L440">      return null;</span>
+    }
+<span class="nc" id="L442">    final Handler destination = new Handler();</span>
+<span class="nc" id="L443">    destination.setClassName(destination.getClassName());</span>
+<span class="nc" id="L444">    destination.setMethodName(source.getMethodName());</span>
+<span class="nc" id="L445">    destination.setMethodParameterTypes(source.getMethodParameterTypes());</span>
+<span class="nc" id="L446">    return destination;</span>
+  }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

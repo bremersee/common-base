@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>RestApiTesterPath.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">common-base-test</a> &gt; <a href="index.source.html" class="el_package">org.bremersee.test.web</a> &gt; <span class="el_source">RestApiTesterPath.java</span></div><h1>RestApiTesterPath.java</h1><pre class="source lang-java linenums">/*
+ * Copyright 2019 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package org.bremersee.test.web;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import lombok.EqualsAndHashCode;
+import org.springframework.util.StringUtils;
+
+/**
+ * The rest api tester path.
+ *
+ * @author Christian Bremer
+ */
+public interface RestApiTesterPath {
+
+  /**
+   * Creates a new path builder.
+   *
+   * @return the path builder
+   */
+  static RestApiTesterPath.Builder pathBuilder() {
+<span class="fc" id="L38">    return new BuilderImpl();</span>
+  }
+
+  /**
+   * To path builder.
+   *
+   * @return the path builder
+   */
+  RestApiTesterPath.Builder toPathBuilder();
+
+  /**
+   * The path builder interface.
+   */
+  interface Builder {
+
+    /**
+     * Add step and value.
+     *
+     * @param stepType the step type
+     * @param value the value
+     * @return the builder
+     */
+    Builder add(PathType stepType, String value);
+
+    /**
+     * Build rest api tester path.
+     *
+     * @return the rest api tester path
+     */
+    RestApiTesterPath build();
+  }
+
+  /**
+   * The rest api tester path implementation.
+   */
+  class Impl extends ArrayList&lt;RestApiTesterPathValues&gt; implements RestApiTesterPath {
+
+    private Impl(Collection&lt;? extends RestApiTesterPathValues&gt; collection) {
+<span class="fc" id="L76">      super(collection);</span>
+<span class="fc" id="L77">    }</span>
+
+    @Override
+    public RestApiTesterPath.Builder toPathBuilder() {
+<span class="fc" id="L81">      return new BuilderImpl(this);</span>
+    }
+
+    @Override
+    public String toString() {
+<span class="fc" id="L86">      return StringUtils.collectionToDelimitedString(this, &quot; -&gt; &quot;);</span>
+    }
+  }
+
+  /**
+   * The path builder implementation.
+   */
+  class BuilderImpl implements RestApiTesterPath.Builder {
+
+<span class="fc" id="L95">    private List&lt;RestApiTesterPathValues&gt; values = new ArrayList&lt;&gt;();</span>
+
+<span class="fc" id="L97">    private BuilderImpl() {</span>
+<span class="fc" id="L98">    }</span>
+
+<span class="fc" id="L100">    private BuilderImpl(Collection&lt;? extends RestApiTesterPathValues&gt; collection) {</span>
+<span class="pc bpc" id="L101" title="1 of 2 branches missed.">      if (collection != null) {</span>
+<span class="fc" id="L102">        values.addAll(collection);</span>
+      }
+<span class="fc" id="L104">    }</span>
+
+    @Override
+    public Builder add(PathType stepType, String value) {
+<span class="fc" id="L108">      values.add(new RestApiTesterPathValues(stepType, value));</span>
+<span class="fc" id="L109">      return this;</span>
+    }
+
+    @Override
+    public RestApiTesterPath build() {
+<span class="fc" id="L114">      return new Impl(new ArrayList&lt;&gt;(values));</span>
+    }
+  }
+
+  /**
+   * The path type.
+   */
+<span class="fc" id="L121">  enum PathType {</span>
+
+    /**
+     * Path type Class.
+     */
+<span class="fc" id="L126">    CLASS(&quot;Class&quot;),</span>
+
+    /**
+     * Path type Method.
+     */
+<span class="fc" id="L131">    METHOD(&quot;Method&quot;),</span>
+
+    /**
+     * Path type Method parameter.
+     */
+<span class="fc" id="L136">    METHOD_PARAMETER(&quot;Parameter&quot;),</span>
+
+    /**
+     * Path type Annotation.
+     */
+<span class="fc" id="L141">    ANNOTATION(&quot;Annotation&quot;),</span>
+
+    /**
+     * Path type Attribute.
+     */
+<span class="fc" id="L146">    ATTRIBUTE(&quot;Attribute&quot;);</span>
+
+    private String value;
+
+<span class="fc" id="L150">    PathType(String value) {</span>
+<span class="fc" id="L151">      this.value = value;</span>
+<span class="fc" id="L152">    }</span>
+
+    @Override
+    public String toString() {
+<span class="fc" id="L156">      return value;</span>
+    }
+  }
+
+  /**
+   * The path values.
+   */
+<span class="pc bpc" id="L163" title="13 of 22 branches missed.">  @EqualsAndHashCode(doNotUseGetters = true)</span>
+  class RestApiTesterPathValues {
+
+    private PathType type;
+
+    private String value;
+
+    /**
+     * Instantiates a new path model.
+     *
+     * @param type the type
+     * @param value the value
+     */
+<span class="fc" id="L176">    RestApiTesterPathValues(PathType type, String value) {</span>
+<span class="fc" id="L177">      this.type = type;</span>
+<span class="fc" id="L178">      this.value = value;</span>
+<span class="fc" id="L179">    }</span>
+
+    @Override
+    public String toString() {
+<span class="fc" id="L183">      return type + &quot; (&quot; + value + &quot;)&quot;;</span>
+    }
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

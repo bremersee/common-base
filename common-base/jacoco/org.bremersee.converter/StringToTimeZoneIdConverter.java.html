@@ -16,6 +16,7 @@
 
 package org.bremersee.converter;
 
+import lombok.ToString;
 import org.bremersee.common.model.TimeZoneId;
 import org.springframework.core.convert.converter.Converter;
 
@@ -24,11 +25,12 @@ import org.springframework.core.convert.converter.Converter;
  *
  * @author Christian Bremer
  */
-<span class="nc" id="L27">public class StringToTimeZoneIdConverter implements Converter&lt;String, TimeZoneId&gt; {</span>
+<span class="fc" id="L28">@ToString</span>
+<span class="fc" id="L29">public class StringToTimeZoneIdConverter implements Converter&lt;String, TimeZoneId&gt; {</span>
 
   @Override
   public TimeZoneId convert(String source) {
-<span class="nc" id="L31">    return TimeZoneId.fromValue(source);</span>
+<span class="fc" id="L33">    return TimeZoneId.fromValue(source);</span>
   }
 }
-</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.3.201901230119</span></div></body></html>
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

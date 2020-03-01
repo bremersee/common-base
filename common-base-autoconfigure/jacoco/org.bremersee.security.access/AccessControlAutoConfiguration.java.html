@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AccessControlAutoConfiguration.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">common-base-autoconfigure</a> &gt; <a href="index.source.html" class="el_package">org.bremersee.security.access</a> &gt; <span class="el_source">AccessControlAutoConfiguration.java</span></div><h1>AccessControlAutoConfiguration.java</h1><pre class="source lang-java linenums">/*
+ * Copyright 2020 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package org.bremersee.security.access;
+
+import lombok.extern.slf4j.Slf4j;
+import org.bremersee.common.model.AccessControlList;
+import org.bremersee.converter.ModelMapperConfigurerAdapter;
+import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.event.EventListener;
+import org.springframework.core.annotation.Order;
+import org.springframework.util.Assert;
+import org.springframework.util.ClassUtils;
+
+/**
+ * The access control auto configuration.
+ *
+ * @author Christian Bremer
+ */
+@EnableConfigurationProperties(AccessControlProperties.class)
+@ConditionalOnBean(AclFactory.class)
+@Configuration
+<span class="fc" id="L43">@Slf4j</span>
+public class AccessControlAutoConfiguration {
+
+  /**
+   * The properties.
+   */
+  AccessControlProperties properties;
+
+  /**
+   * Instantiates a new access control auto configuration.
+   *
+   * @param properties the properties
+   */
+<span class="fc" id="L56">  public AccessControlAutoConfiguration(AccessControlProperties properties) {</span>
+<span class="fc" id="L57">    this.properties = properties;</span>
+<span class="fc" id="L58">  }</span>
+
+  /**
+   * Init.
+   */
+  @EventListener(ApplicationReadyEvent.class)
+  public void init() {
+<span class="fc" id="L65">    log.info(&quot;\n&quot;</span>
+            + &quot;*********************************************************************************\n&quot;
+            + &quot;* {}\n&quot;
+            + &quot;*********************************************************************************\n&quot;
+            + &quot;* defaultPermissions = {}\n&quot;
+            + &quot;* adminRoles = {}\n&quot;
+            + &quot;* switchAdminAccess = {}\n&quot;
+            + &quot;* returnNull = {}\n&quot;
+            + &quot;*********************************************************************************&quot;,
+<span class="fc" id="L74">        ClassUtils.getUserClass(getClass()).getSimpleName(),</span>
+<span class="fc" id="L75">        properties.getDefaultPermissions(),</span>
+<span class="fc" id="L76">        properties.getAdminRoles(),</span>
+<span class="fc" id="L77">        properties.isSwitchAdminAccess(),</span>
+<span class="fc" id="L78">        properties.isReturnNull());</span>
+<span class="fc" id="L79">  }</span>
+
+  /**
+   * Creates acl mapper bean.
+   *
+   * @param &lt;T&gt; the acl entity type
+   * @param aclFactoryProvider the acl factory provider
+   * @return the acl mapper
+   */
+  @Bean
+  public &lt;T extends Acl&lt;? extends Ace&gt;&gt; AclMapper&lt;T&gt; aclMapper(
+      ObjectProvider&lt;AclFactory&lt;T&gt;&gt; aclFactoryProvider) {
+
+<span class="fc" id="L92">    AclFactory&lt;T&gt; aclFactory = aclFactoryProvider.getIfAvailable();</span>
+<span class="fc" id="L93">    Assert.notNull(aclFactory, &quot;Acl factory must be present.&quot;);</span>
+<span class="fc" id="L94">    log.info(&quot;Creating bean 'aclMapper' for acl entity '{}' ...&quot;,</span>
+<span class="fc" id="L95">        ClassUtils.getUserClass(aclFactory.getAccessControlListClass()));</span>
+<span class="fc" id="L96">    String[] defaultPermissions = properties.getDefaultPermissions().toArray(new String[0]);</span>
+<span class="fc" id="L97">    AclMapperImpl&lt;T&gt; aclMapper = new AclMapperImpl&lt;&gt;(</span>
+        aclFactory,
+        defaultPermissions,
+<span class="fc" id="L100">        properties.isSwitchAdminAccess(),</span>
+<span class="fc" id="L101">        properties.isReturnNull());</span>
+<span class="fc" id="L102">    aclMapper.setAdminRoles(properties.getAdminRoles());</span>
+<span class="fc" id="L103">    return aclMapper;</span>
+  }
+
+  /**
+   * Creates a model mapper configurer adapter for the acl entity of the acl factory.
+   *
+   * @param &lt;T&gt; the acl entity type
+   * @param aclMapperProvider the acl mapper provider
+   * @return the model mapper configurer adapter
+   */
+  @ConditionalOnClass(ModelMapper.class)
+  @Bean(name = &quot;aclModelMapperConfigurerAdapter&quot;)
+  @Order(-1000)
+  public &lt;T extends Acl&lt;? extends Ace&gt;&gt; ModelMapperConfigurerAdapter aclModelMapperConfigAdapter(
+      ObjectProvider&lt;AclMapper&lt;T&gt;&gt; aclMapperProvider) {
+
+<span class="fc" id="L119">    log.info(&quot;Creating bean 'aclModelMapperConfigurerAdapter' ...&quot;);</span>
+<span class="fc" id="L120">    return modelMapper -&gt; aclMapperProvider.ifAvailable(aclMapper -&gt; {</span>
+<span class="fc" id="L121">      Class&lt;T&gt; aclEntityClass = aclMapper.getAclFactory()</span>
+<span class="fc" id="L122">          .getAccessControlListClass();</span>
+<span class="fc" id="L123">      log.info(&quot;Model mapper for acl is using entity class '{}'.&quot;, aclEntityClass.getName());</span>
+<span class="fc" id="L124">      modelMapper</span>
+<span class="fc" id="L125">          .createTypeMap(AccessControlList.class, aclEntityClass)</span>
+<span class="fc" id="L126">          .setConverter(context -&gt; aclMapper.map(context.getSource()));</span>
+<span class="fc" id="L127">      modelMapper</span>
+<span class="fc" id="L128">          .createTypeMap(aclEntityClass, AccessControlList.class)</span>
+<span class="fc" id="L129">          .setConverter(context -&gt; aclMapper.map(context.getSource()));</span>
+<span class="fc" id="L130">    });</span>
+  }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

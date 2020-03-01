@@ -1,0 +1,285 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AuthenticationProperties.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">common-base-autoconfigure</a> &gt; <a href="index.source.html" class="el_package">org.bremersee.security.authentication</a> &gt; <span class="el_source">AuthenticationProperties.java</span></div><h1>AuthenticationProperties.java</h1><pre class="source lang-java linenums">/*
+ * Copyright 2019 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package org.bremersee.security.authentication;
+
+import java.io.Serializable;
+import java.security.Principal;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
+import org.bremersee.security.core.AuthorityConstants;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.factory.PasswordEncoderFactories;
+import org.springframework.security.crypto.password.PasswordEncoder;
+
+/**
+ * Authentication properties.
+ *
+ * @author Christian Bremer
+ */
+@ConfigurationProperties(prefix = &quot;bremersee.security.authentication&quot;)
+@Getter
+<span class="pc" id="L44">@Setter</span>
+<span class="fc" id="L45">@ToString</span>
+<span class="pc bpc" id="L46" title="56 of 78 branches missed.">@EqualsAndHashCode</span>
+<span class="fc" id="L47">public class AuthenticationProperties {</span>
+
+  /**
+   * Specifies whether JWT beans should be created or not. Default is {@code false}.
+   *
+   * @see AuthenticationSupportAutoConfiguration
+   * @see ReactiveAuthenticationSupportAutoConfiguration
+   */
+<span class="fc" id="L55">  private boolean enableJwtSupport = false;</span>
+
+  /**
+   * The json path in the JWT to the roles.
+   */
+<span class="fc" id="L60">  private String rolesJsonPath = &quot;$.realm_access.roles&quot;;</span>
+
+  /**
+   * Specifies whether the roles value is a list (json array) or a simple string.
+   */
+<span class="fc" id="L65">  private boolean rolesValueList = true;</span>
+
+  /**
+   * The role value separator to use if the role value is a simple string.
+   */
+<span class="fc" id="L70">  private String rolesValueSeparator = &quot; &quot;;</span>
+
+  /**
+   * The role prefix to add.
+   */
+<span class="fc" id="L75">  private String rolePrefix = &quot;ROLE_&quot;;</span>
+
+  /**
+   * The json path in the JWT to the user name.
+   */
+<span class="fc" id="L80">  private String nameJsonPath = &quot;$.preferred_username&quot;;</span>
+
+  /**
+   * Properties for actuator endpoints.
+   */
+<span class="fc" id="L85">  private ActuatorAccessProperties actuator = new ActuatorAccessProperties();</span>
+
+  /**
+   * The properties for the oauth2 password flow.
+   */
+<span class="fc" id="L90">  private PasswordFlow passwordFlow = new PasswordFlow();</span>
+
+  /**
+   * The properties for the client credentials flow.
+   */
+<span class="fc" id="L95">  private ClientCredentialFlow clientCredentialsFlow = new ClientCredentialFlow();</span>
+
+  /**
+   * A list of in-memory users, that can login with basic authentication for testing purposes.
+   */
+<span class="fc" id="L100">  private List&lt;SimpleUser&gt; basicAuthUsers = new ArrayList&lt;&gt;();</span>
+
+  /**
+   * Build basic auth user details.
+   *
+   * @return the user details
+   */
+  public UserDetails[] buildBasicAuthUserDetails() {
+<span class="fc" id="L108">    final PasswordEncoder encoder = PasswordEncoderFactories.createDelegatingPasswordEncoder();</span>
+<span class="fc" id="L109">    return getBasicAuthUsers().stream().map(</span>
+<span class="fc" id="L110">        simpleUser -&gt; User.builder()</span>
+<span class="fc" id="L111">            .username(simpleUser.getName())</span>
+<span class="fc" id="L112">            .password(simpleUser.getPassword())</span>
+<span class="fc" id="L113">            .authorities(simpleUser.buildAuthorities())</span>
+<span class="fc" id="L114">            .passwordEncoder(encoder::encode)</span>
+<span class="fc" id="L115">            .build())</span>
+<span class="fc" id="L116">        .toArray(UserDetails[]::new);</span>
+  }
+
+  /**
+   * The type Actuator access properties.
+   */
+  @Getter
+<span class="fc" id="L123">  @Setter</span>
+<span class="fc" id="L124">  @ToString</span>
+<span class="pc bpc" id="L125" title="14 of 22 branches missed.">  @EqualsAndHashCode</span>
+<span class="fc" id="L126">  @NoArgsConstructor</span>
+  public static class ActuatorAccessProperties implements Serializable {
+
+    private static final long serialVersionUID = 1L;
+
+    /**
+     * The roles which can access a protected actuator endpoint. The role names normally start with
+     * {@code ROLE_}.
+     */
+<span class="fc" id="L135">    private List&lt;String&gt; roles = new ArrayList&lt;&gt;();</span>
+
+    /**
+     * The IP addresses which can access protected actuator endpoints without authentication.
+     */
+<span class="fc" id="L140">    private List&lt;String&gt; ipAddresses = new ArrayList&lt;&gt;();</span>
+
+    /**
+     * Build access expression (SpEL) for actuator endpoints.
+     *
+     * @return the access expression (SpEL) for actuator endpoints
+     */
+    public String buildAccessExpression() {
+<span class="fc" id="L148">      Set&lt;String&gt; roleSet = new HashSet&lt;&gt;(roles);</span>
+<span class="fc bfc" id="L149" title="All 2 branches covered.">      if (roleSet.isEmpty()) {</span>
+<span class="fc" id="L150">        roleSet.add(AuthorityConstants.ACTUATOR_ROLE_NAME);</span>
+<span class="fc" id="L151">        roleSet.add(AuthorityConstants.ADMIN_ROLE_NAME);</span>
+      }
+<span class="fc" id="L153">      final StringBuilder sb = new StringBuilder();</span>
+<span class="fc" id="L154">      roleSet.forEach(</span>
+<span class="fc" id="L155">          role -&gt; sb.append(&quot; or &quot;).append(&quot;hasAuthority('&quot;).append(role).append(&quot;')&quot;));</span>
+<span class="fc" id="L156">      ipAddresses.forEach(</span>
+<span class="fc" id="L157">          ipAddress -&gt; sb.append(&quot; or &quot;).append(&quot;hasIpAddress('&quot;).append(ipAddress).append(&quot;')&quot;));</span>
+<span class="fc" id="L158">      return sb.toString().substring(&quot; or &quot;.length());</span>
+    }
+  }
+
+  /**
+   * The type Client credential flow.
+   */
+  @Getter
+<span class="fc" id="L166">  @Setter</span>
+<span class="fc" id="L167">  @ToString(exclude = {&quot;clientSecret&quot;})</span>
+<span class="pc bpc" id="L168" title="10 of 22 branches missed.">  @EqualsAndHashCode(exclude = {&quot;clientSecret&quot;})</span>
+<span class="fc" id="L169">  public static class ClientCredentialFlow implements Serializable {</span>
+
+    private static final long serialVersionUID = 1L;
+
+<span class="fc" id="L173">    private String tokenEndpoint;</span>
+
+<span class="fc" id="L175">    private String clientId;</span>
+
+<span class="fc" id="L177">    private String clientSecret;</span>
+
+    /**
+     * To properties client credentials flow properties.
+     *
+     * @return the client credentials flow properties
+     */
+    public ClientCredentialsFlowProperties toProperties() {
+<span class="fc" id="L185">      return ClientCredentialsFlowProperties.builder()</span>
+<span class="fc" id="L186">          .tokenEndpoint(tokenEndpoint)</span>
+<span class="fc" id="L187">          .clientId(clientId)</span>
+<span class="fc" id="L188">          .clientSecret(clientSecret)</span>
+<span class="fc" id="L189">          .build();</span>
+    }
+  }
+
+  /**
+   * OAuth2 password flow configuration properties.
+   */
+  @Getter
+<span class="fc" id="L197">  @Setter</span>
+<span class="fc" id="L198">  @ToString(exclude = {&quot;clientSecret&quot;, &quot;systemPassword&quot;})</span>
+<span class="pc bpc" id="L199" title="14 of 30 branches missed.">  @EqualsAndHashCode(exclude = {&quot;clientSecret&quot;, &quot;systemPassword&quot;})</span>
+<span class="fc" id="L200">  public static class PasswordFlow implements Serializable {</span>
+
+    private static final long serialVersionUID = 1L;
+
+<span class="fc" id="L204">    private String tokenEndpoint;</span>
+
+<span class="fc" id="L206">    private String clientId;</span>
+
+<span class="fc" id="L208">    private String clientSecret;</span>
+
+<span class="fc" id="L210">    private String systemUsername;</span>
+
+<span class="fc" id="L212">    private String systemPassword;</span>
+
+    /**
+     * Create password flow properties for the system user.
+     *
+     * @return the password flow properties
+     */
+    public PasswordFlowProperties toProperties() {
+<span class="fc" id="L220">      return this.toProperties(systemUsername, systemPassword);</span>
+    }
+
+    /**
+     * Create password flow properties for the given user.
+     *
+     * @param username the username
+     * @param password the password
+     * @return the password flow properties
+     */
+    public PasswordFlowProperties toProperties(String username, String password) {
+<span class="fc" id="L231">      return PasswordFlowProperties.builder()</span>
+<span class="fc" id="L232">          .username(username)</span>
+<span class="fc" id="L233">          .clientSecret(clientSecret)</span>
+<span class="fc" id="L234">          .clientId(clientId)</span>
+<span class="fc" id="L235">          .tokenEndpoint(tokenEndpoint)</span>
+<span class="fc" id="L236">          .password(password)</span>
+<span class="fc" id="L237">          .build();</span>
+    }
+  }
+
+  /**
+   * A simple user.
+   */
+  @Getter
+<span class="fc" id="L245">  @Setter</span>
+<span class="fc" id="L246">  @ToString(exclude = &quot;password&quot;)</span>
+<span class="pc bpc" id="L247" title="13 of 22 branches missed.">  @EqualsAndHashCode(exclude = &quot;password&quot;)</span>
+<span class="fc" id="L248">  @NoArgsConstructor</span>
+  public static class SimpleUser implements Serializable, Principal {
+
+    private static final long serialVersionUID = 1L;
+
+    /**
+     * The user name of the user.
+     */
+<span class="fc" id="L256">    private String name;</span>
+
+    /**
+     * The password of the user.
+     */
+<span class="fc" id="L261">    private String password;</span>
+
+    /**
+     * The granted authorities of the user. The names of the authorities starts with {@code ROLE_}.
+     */
+<span class="fc" id="L266">    private List&lt;String&gt; authorities = new ArrayList&lt;&gt;();</span>
+
+    /**
+     * Build authorities.
+     *
+     * @return the authorities
+     */
+    String[] buildAuthorities() {
+<span class="pc bpc" id="L274" title="2 of 4 branches missed.">      if (authorities == null || authorities.isEmpty()) {</span>
+<span class="nc" id="L275">        return new String[]{</span>
+            AuthorityConstants.USER_ROLE_NAME,
+            AuthorityConstants.LOCAL_USER_ROLE_NAME
+        };
+      }
+<span class="fc" id="L280">      return authorities.toArray(new String[0]);</span>
+    }
+  }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

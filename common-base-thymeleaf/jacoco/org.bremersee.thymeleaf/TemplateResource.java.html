@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>TemplateResource.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">common-base-thymeleaf</a> &gt; <a href="index.source.html" class="el_package">org.bremersee.thymeleaf</a> &gt; <span class="el_source">TemplateResource.java</span></div><h1>TemplateResource.java</h1><pre class="source lang-java linenums">/*
+ * Copyright 2019 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package org.bremersee.thymeleaf;
+
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.nio.charset.StandardCharsets;
+import java.util.Objects;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.io.DefaultResourceLoader;
+import org.springframework.core.io.ResourceLoader;
+import org.springframework.util.Assert;
+import org.thymeleaf.templateresource.ITemplateResource;
+
+/**
+ * The template resource.
+ *
+ * @author Christian Bremer
+ */
+<span class="fc" id="L37">@Slf4j</span>
+public class TemplateResource implements ITemplateResource {
+
+  private final ResourceLoader resourceLoader;
+
+  private final String path;
+
+  private final String characterEncoding;
+
+  /**
+   * Instantiates a new template resource.
+   *
+   * @param path the path
+   */
+  @SuppressWarnings(&quot;unused&quot;)
+  public TemplateResource(String path) {
+<span class="fc" id="L53">    this(path, null, null);</span>
+<span class="fc" id="L54">  }</span>
+
+  /**
+   * Instantiates a new template resource.
+   *
+   * @param path              the path
+   * @param characterEncoding the character encoding
+   */
+  @SuppressWarnings(&quot;unused&quot;)
+  public TemplateResource(
+      String path,
+      String characterEncoding) {
+<span class="fc" id="L66">    this(path, characterEncoding, null);</span>
+<span class="fc" id="L67">  }</span>
+
+  /**
+   * Instantiates a new template resource.
+   *
+   * @param path           the path
+   * @param resourceLoader the resource loader
+   */
+  @SuppressWarnings(&quot;unused&quot;)
+  public TemplateResource(
+      String path,
+      ResourceLoader resourceLoader) {
+<span class="fc" id="L79">    this(path, null, resourceLoader);</span>
+<span class="fc" id="L80">  }</span>
+
+  /**
+   * Instantiates a new template resource.
+   *
+   * @param path              the path
+   * @param characterEncoding the character encoding
+   * @param resourceLoader    the resource loader
+   */
+  public TemplateResource(
+      String path,
+      String characterEncoding,
+<span class="fc" id="L92">      ResourceLoader resourceLoader) {</span>
+<span class="fc" id="L93">    this.path = path;</span>
+<span class="fc" id="L94">    this.characterEncoding = Objects.requireNonNullElse(</span>
+<span class="fc" id="L95">        characterEncoding, StandardCharsets.UTF_8.name());</span>
+<span class="fc" id="L96">    this.resourceLoader = Objects.requireNonNullElseGet(</span>
+        resourceLoader, DefaultResourceLoader::new);
+<span class="fc" id="L98">    log.info(&quot;TemplateResource (path={}, characterEncoding={})&quot;,</span>
+        this.path, this.characterEncoding);
+<span class="fc" id="L100">  }</span>
+
+  @Override
+  public String getDescription() {
+<span class="fc" id="L104">    return path;</span>
+  }
+
+  @Override
+  public String getBaseName() {
+<span class="pc bpc" id="L109" title="2 of 4 branches missed.">    if (path == null || path.length() == 0) {</span>
+<span class="nc" id="L110">      return null;</span>
+    }
+<span class="pc bpc" id="L112" title="1 of 2 branches missed.">    final String basePath = (path.charAt(path.length() - 1) == '/'</span>
+<span class="nc" id="L113">        ? path.substring(0, path.length() - 1)</span>
+<span class="fc" id="L114">        : path);</span>
+<span class="fc" id="L115">    final int slashPos = basePath.lastIndexOf('/');</span>
+<span class="fc" id="L116">    final int dotPos = basePath.lastIndexOf('.');</span>
+<span class="pc bpc" id="L117" title="1 of 2 branches missed.">    if (slashPos != -1) {</span>
+<span class="pc bpc" id="L118" title="2 of 4 branches missed.">      if (dotPos != -1 &amp;&amp; dotPos &gt; slashPos + 1) {</span>
+<span class="fc" id="L119">        return basePath.substring(slashPos + 1, dotPos);</span>
+      }
+<span class="nc" id="L121">      return basePath.substring(slashPos + 1);</span>
+    } else {
+<span class="nc bnc" id="L123" title="All 2 branches missed.">      if (dotPos != -1) {</span>
+<span class="nc" id="L124">        return basePath.substring(0, dotPos);</span>
+      }
+    }
+<span class="nc bnc" id="L127" title="All 2 branches missed.">    return (basePath.length() &gt; 0 ? basePath : null);</span>
+  }
+
+  @Override
+  public boolean exists() {
+<span class="fc" id="L132">    return resourceLoader.getResource(path).exists();</span>
+  }
+
+  @Override
+  public Reader reader() throws IOException {
+<span class="fc" id="L137">    return new BufferedReader(</span>
+        new InputStreamReader(
+            new BufferedInputStream(
+<span class="fc" id="L140">                resourceLoader.getResource(path).getInputStream()), characterEncoding));</span>
+  }
+
+  @Override
+  public ITemplateResource relative(String relativeLocation) {
+<span class="fc" id="L145">    Assert.hasText(relativeLocation, &quot;Relative Path cannot be null or empty.&quot;);</span>
+<span class="fc" id="L146">    final String newPath = computeRelativeLocation(path, relativeLocation);</span>
+<span class="fc" id="L147">    return new TemplateResource(newPath, characterEncoding, resourceLoader);</span>
+  }
+
+  private static String computeRelativeLocation(
+      final String location,
+      final String relativeLocation) {
+
+<span class="fc" id="L154">    final int separatorPos = location.lastIndexOf('/');</span>
+<span class="pc bpc" id="L155" title="1 of 2 branches missed.">    if (separatorPos != -1) {</span>
+<span class="fc" id="L156">      final StringBuilder relativeBuilder = new StringBuilder(</span>
+<span class="fc" id="L157">          location.length() + relativeLocation.length());</span>
+<span class="fc" id="L158">      relativeBuilder.append(location, 0, separatorPos);</span>
+<span class="pc bpc" id="L159" title="1 of 2 branches missed.">      if (relativeLocation.charAt(0) != '/') {</span>
+<span class="fc" id="L160">        relativeBuilder.append('/');</span>
+      }
+<span class="fc" id="L162">      relativeBuilder.append(relativeLocation);</span>
+<span class="fc" id="L163">      return relativeBuilder.toString();</span>
+    }
+<span class="nc" id="L165">    return relativeLocation;</span>
+  }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

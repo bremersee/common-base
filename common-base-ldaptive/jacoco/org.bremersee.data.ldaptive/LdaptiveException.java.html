@@ -17,45 +17,51 @@
 package org.bremersee.data.ldaptive;
 
 import lombok.EqualsAndHashCode;
+import org.bremersee.exception.AbstractServiceExceptionBuilder;
+import org.bremersee.exception.ErrorCodeAware;
+import org.bremersee.exception.HttpStatusAware;
 import org.bremersee.exception.ServiceException;
+import org.bremersee.exception.ServiceExceptionBuilder;
 import org.ldaptive.LdapException;
 import org.ldaptive.ResultCode;
-import org.springframework.http.HttpStatus;
 
 /**
  * The ldaptive exception.
  *
  * @author Christian Bremer
  */
-<span class="nc bnc" id="L30" title="All 8 branches missed.">@EqualsAndHashCode(callSuper = true)</span>
-@SuppressWarnings({&quot;WeakerAccess&quot;, &quot;unused&quot;})
-public class LdaptiveException extends ServiceException {
+<span class="nc bnc" id="L33" title="All 8 branches missed.">@EqualsAndHashCode(callSuper = true)</span>
+public class LdaptiveException extends ServiceException implements HttpStatusAware, ErrorCodeAware {
+
+  private static final long serialVersionUID = 1L;
 
   /**
    * Instantiates a new ldaptive exception.
    */
-  public LdaptiveException() {
-<span class="nc" id="L38">    super(HttpStatus.INTERNAL_SERVER_ERROR);</span>
-<span class="nc" id="L39">  }</span>
-
-  /**
-   * Instantiates a new ldaptive exception.
-   *
-   * @param cause the cause
-   */
-  public LdaptiveException(Throwable cause) {
-<span class="nc" id="L47">    this(HttpStatus.INTERNAL_SERVER_ERROR, cause);</span>
-<span class="nc" id="L48">  }</span>
+  protected LdaptiveException() {
+<span class="fc" id="L42">    super();</span>
+<span class="fc" id="L43">  }</span>
 
   /**
    * Instantiates a new ldaptive exception.
    *
    * @param httpStatus the http status
-   * @param cause      the cause
+   * @param errorCode  the error code
    */
-  public LdaptiveException(HttpStatus httpStatus, Throwable cause) {
-<span class="nc bnc" id="L57" title="All 2 branches missed.">    super(httpStatus != null ? httpStatus : HttpStatus.INTERNAL_SERVER_ERROR, cause);</span>
-<span class="nc" id="L58">  }</span>
+  protected LdaptiveException(final int httpStatus, final String errorCode) {
+<span class="fc" id="L52">    super(httpStatus, errorCode);</span>
+<span class="fc" id="L53">  }</span>
+
+  /**
+   * Instantiates a new ldaptive exception.
+   *
+   * @param httpStatus the http status
+   * @param errorCode  the error code
+   * @param reason     the reason
+   */
+  protected LdaptiveException(final int httpStatus, final String errorCode, final String reason) {
+<span class="fc" id="L63">    super(httpStatus, errorCode, reason);</span>
+<span class="fc" id="L64">  }</span>
 
   /**
    * Instantiates a new ldaptive exception.
@@ -64,9 +70,26 @@ public class LdaptiveException extends ServiceException {
    * @param errorCode  the error code
    * @param cause      the cause
    */
-  public LdaptiveException(HttpStatus httpStatus, String errorCode, Throwable cause) {
-<span class="nc bnc" id="L68" title="All 2 branches missed.">    super(httpStatus != null ? httpStatus : HttpStatus.INTERNAL_SERVER_ERROR, errorCode, cause);</span>
-<span class="nc" id="L69">  }</span>
+  protected LdaptiveException(final int httpStatus, final String errorCode, final Throwable cause) {
+<span class="fc" id="L74">    super(httpStatus, errorCode, cause);</span>
+<span class="fc" id="L75">  }</span>
+
+  /**
+   * Instantiates a new ldaptive exception.
+   *
+   * @param httpStatus the http status
+   * @param errorCode  the error code
+   * @param reason     the reason
+   * @param cause      the cause
+   */
+  protected LdaptiveException(
+      final int httpStatus,
+      final String errorCode,
+      final String reason,
+      final Throwable cause) {
+<span class="fc" id="L90">    super(httpStatus, errorCode, reason, cause);</span>
+<span class="fc" id="L91">  }</span>
+
 
   /**
    * Gets ldap exception (can be {@code null}).
@@ -74,7 +97,7 @@ public class LdaptiveException extends ServiceException {
    * @return the ldap exception
    */
   public LdapException getLdapException() {
-<span class="nc bnc" id="L77" title="All 2 branches missed.">    return getCause() instanceof LdapException ? (LdapException) getCause() : null;</span>
+<span class="fc bfc" id="L100" title="All 2 branches covered.">    return getCause() instanceof LdapException ? (LdapException) getCause() : null;</span>
   }
 
   /**
@@ -82,10 +105,39 @@ public class LdaptiveException extends ServiceException {
    *
    * @return the result code
    */
+  @SuppressWarnings(&quot;unused&quot;)
   public ResultCode getResultCode() {
-<span class="nc" id="L86">    final LdapException ldapException = getLdapException();</span>
-<span class="nc bnc" id="L87" title="All 2 branches missed.">    return ldapException != null ? ldapException.getResultCode() : null;</span>
+<span class="fc" id="L110">    final LdapException ldapException = getLdapException();</span>
+<span class="fc bfc" id="L111" title="All 2 branches covered.">    return ldapException != null ? ldapException.getResultCode() : null;</span>
+  }
+
+  public static ServiceExceptionBuilder&lt;LdaptiveException&gt; builder() {
+<span class="fc" id="L115">    return new AbstractServiceExceptionBuilder&lt;&gt;() {</span>
+
+      private static final long serialVersionUID = 2L;
+
+      @Override
+      protected LdaptiveException buildWith(int httpStatus, String errorCode) {
+<span class="fc" id="L121">        return new LdaptiveException(httpStatus, errorCode);</span>
+      }
+
+      @Override
+      protected LdaptiveException buildWith(int httpStatus, String errorCode, String reason) {
+<span class="fc" id="L126">        return new LdaptiveException(httpStatus, errorCode, reason);</span>
+      }
+
+      @Override
+      protected LdaptiveException buildWith(int httpStatus, String errorCode, Throwable cause) {
+<span class="fc" id="L131">        return new LdaptiveException(httpStatus, errorCode, cause);</span>
+      }
+
+      @Override
+      protected LdaptiveException buildWith(int httpStatus, String errorCode, String reason,
+          Throwable cause) {
+<span class="fc" id="L137">        return new LdaptiveException(httpStatus, errorCode, reason, cause);</span>
+      }
+    };
   }
 
 }
-</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.3.201901230119</span></div></body></html>
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

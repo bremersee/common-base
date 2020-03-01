@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>JsonPathJwtConverter.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">common-base-security</a> &gt; <a href="index.source.html" class="el_package">org.bremersee.security.authentication</a> &gt; <span class="el_source">JsonPathJwtConverter.java</span></div><h1>JsonPathJwtConverter.java</h1><pre class="source lang-java linenums">/*
+ * Copyright 2020 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package org.bremersee.security.authentication;
+
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
+import org.springframework.core.convert.converter.Converter;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
+import org.springframework.util.StringUtils;
+
+/**
+ * The json path jwt converter.
+ *
+ * @author Christian Bremer
+ */
+<span class="fc" id="L37">public class JsonPathJwtConverter implements Converter&lt;Jwt, JwtAuthenticationToken&gt; {</span>
+
+<span class="fc" id="L39">  private String rolesJsonPath = &quot;$.scope&quot;;</span>
+
+<span class="fc" id="L41">  private boolean rolesValueList = false;</span>
+
+<span class="fc" id="L43">  private String rolesValueSeparator = &quot; &quot;;</span>
+
+<span class="fc" id="L45">  private String rolePrefix = &quot;SCOPE_&quot;;</span>
+
+<span class="fc" id="L47">  private String nameJsonPath = &quot;$.sub&quot;;</span>
+
+  /**
+   * Sets roles json path.
+   *
+   * @param rolesJsonPath the roles json path
+   */
+  public void setRolesJsonPath(String rolesJsonPath) {
+<span class="pc bpc" id="L55" title="1 of 2 branches missed.">    if (StringUtils.hasText(rolesJsonPath)) {</span>
+<span class="fc" id="L56">      this.rolesJsonPath = rolesJsonPath;</span>
+    }
+<span class="fc" id="L58">  }</span>
+
+  /**
+   * Sets roles value list.
+   *
+   * @param rolesValueList the roles value list
+   */
+  public void setRolesValueList(boolean rolesValueList) {
+<span class="fc" id="L66">    this.rolesValueList = rolesValueList;</span>
+<span class="fc" id="L67">  }</span>
+
+  /**
+   * Sets roles value separator.
+   *
+   * @param rolesValueSeparator the roles value separator
+   */
+  public void setRolesValueSeparator(String rolesValueSeparator) {
+<span class="pc bpc" id="L75" title="1 of 2 branches missed.">    if (rolesValueSeparator != null) {</span>
+<span class="fc" id="L76">      this.rolesValueSeparator = rolesValueSeparator;</span>
+    }
+<span class="fc" id="L78">  }</span>
+
+  /**
+   * Sets role prefix.
+   *
+   * @param rolePrefix the role prefix
+   */
+  public void setRolePrefix(String rolePrefix) {
+<span class="pc bpc" id="L86" title="1 of 2 branches missed.">    if (rolePrefix != null) {</span>
+<span class="fc" id="L87">      this.rolePrefix = rolePrefix;</span>
+    }
+<span class="fc" id="L89">  }</span>
+
+  /**
+   * Sets name json path.
+   *
+   * @param nameJsonPath the name json path
+   */
+  public void setNameJsonPath(String nameJsonPath) {
+<span class="pc bpc" id="L97" title="1 of 2 branches missed.">    if (StringUtils.hasText(nameJsonPath)) {</span>
+<span class="fc" id="L98">      this.nameJsonPath = nameJsonPath;</span>
+    }
+<span class="fc" id="L100">  }</span>
+
+  @Override
+  public JwtAuthenticationToken convert(final Jwt source) {
+<span class="fc" id="L104">    final JsonPathJwtParser parser = new JsonPathJwtParser(source);</span>
+    final List&lt;String&gt; roleValues;
+<span class="fc bfc" id="L106" title="All 2 branches covered.">    if (rolesValueList) {</span>
+<span class="fc" id="L107">      final List&lt;?&gt; rawList = parser.read(rolesJsonPath, List.class);</span>
+<span class="pc bpc" id="L108" title="1 of 2 branches missed.">      roleValues = rawList == null</span>
+<span class="nc" id="L109">          ? Collections.emptyList()</span>
+<span class="fc" id="L110">          : rawList.stream()</span>
+<span class="fc" id="L111">              .filter(Objects::nonNull)</span>
+<span class="fc" id="L112">              .map(Object::toString)</span>
+<span class="fc" id="L113">              .collect(Collectors.toList());</span>
+<span class="fc" id="L114">    } else {</span>
+<span class="fc" id="L115">      final String roleValue = parser.read(rolesJsonPath, String.class);</span>
+<span class="pc bpc" id="L116" title="1 of 2 branches missed.">      if (StringUtils.hasText(roleValue)) {</span>
+<span class="fc" id="L117">        roleValues = Arrays.asList(roleValue.split(rolesValueSeparator));</span>
+      } else {
+<span class="nc" id="L119">        roleValues = Collections.emptyList();</span>
+      }
+    }
+<span class="fc" id="L122">    final Set&lt;GrantedAuthority&gt; authorities = roleValues.stream()</span>
+<span class="pc bpc" id="L123" title="1 of 2 branches missed.">        .filter(roleName -&gt; roleName.trim().length() &gt; 0)</span>
+<span class="fc bfc" id="L124" title="All 2 branches covered.">        .map(roleName -&gt; roleName.startsWith(rolePrefix) ? roleName : rolePrefix + roleName)</span>
+<span class="fc" id="L125">        .map(SimpleGrantedAuthority::new)</span>
+<span class="fc" id="L126">        .collect(Collectors.toSet());</span>
+<span class="fc" id="L127">    final String name = parser.read(nameJsonPath, String.class);</span>
+<span class="fc" id="L128">    return new JwtAuthenticationToken(</span>
+        source,
+        authorities,
+<span class="fc bfc" id="L131" title="All 2 branches covered.">        StringUtils.hasText(name) ? name : source.getSubject());</span>
+  }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

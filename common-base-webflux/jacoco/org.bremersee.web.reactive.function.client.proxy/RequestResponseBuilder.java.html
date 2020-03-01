@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>RequestResponseBuilder.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">common-base-webflux</a> &gt; <a href="index.source.html" class="el_package">org.bremersee.web.reactive.function.client.proxy</a> &gt; <span class="el_source">RequestResponseBuilder.java</span></div><h1>RequestResponseBuilder.java</h1><pre class="source lang-java linenums">/*
+ * Copyright 2019 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package org.bremersee.web.reactive.function.client.proxy;
+
+import static org.springframework.core.GenericTypeResolver.resolveReturnTypeArgument;
+
+import java.lang.reflect.Method;
+import org.bremersee.exception.ServiceException;
+import org.springframework.web.reactive.function.client.WebClient.ResponseSpec;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+
+/**
+ * The request response builder.
+ *
+ * @author Christian Bremer
+ */
+public interface RequestResponseBuilder {
+
+  /**
+   * Build object.
+   *
+   * @param parameters the parameters
+   * @param responseSpec the response spec
+   * @return the object
+   */
+  Object build(final InvocationParameters parameters, final ResponseSpec responseSpec);
+
+  /**
+   * Default request response builder.
+   *
+   * @return the request response builder
+   */
+  static RequestResponseBuilder defaultBuilder() {
+<span class="fc" id="L49">    return new Default();</span>
+  }
+
+  /**
+   * The default request response builder.
+   */
+<span class="fc" id="L55">  class Default implements RequestResponseBuilder {</span>
+
+    @Override
+    public Object build(InvocationParameters parameters, ResponseSpec responseSpec) {
+<span class="fc" id="L59">      final Method method = parameters.getMethod();</span>
+<span class="fc" id="L60">      final Class&lt;?&gt; responseClass = method.getReturnType();</span>
+<span class="fc bfc" id="L61" title="All 2 branches covered.">      if (Mono.class.isAssignableFrom(responseClass)) {</span>
+<span class="fc" id="L62">        final Class&lt;?&gt; typeClass = resolveReturnTypeArgument(method, Mono.class);</span>
+        //noinspection ConstantConditions
+<span class="fc" id="L64">        return responseSpec.bodyToMono(typeClass);</span>
+      }
+<span class="pc bpc" id="L66" title="1 of 2 branches missed.">      if (Flux.class.isAssignableFrom(responseClass)) {</span>
+<span class="fc" id="L67">        final Class&lt;?&gt; typeClass = resolveReturnTypeArgument(method, Flux.class);</span>
+        //noinspection ConstantConditions
+<span class="fc" id="L69">        return responseSpec.bodyToFlux(typeClass);</span>
+      }
+<span class="nc" id="L71">      throw ServiceException.internalServerError(</span>
+          &quot;Response class must be Mono or Flux.&quot;,
+          &quot;org.bremersee:common-base-webflux:e3716a97-f1c9-4c70-9eac-d966284d528c&quot;);
+    }
+  }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

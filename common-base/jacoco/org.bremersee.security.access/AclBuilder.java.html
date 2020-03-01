@@ -17,9 +17,12 @@
 package org.bremersee.security.access;
 
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import javax.validation.constraints.NotNull;
 import org.bremersee.common.model.AccessControlList;
 import org.bremersee.security.core.AuthorityConstants;
@@ -41,7 +44,7 @@ public interface AclBuilder {
    * @return the acl builder
    */
   static AclBuilder builder() {
-<span class="fc" id="L44">    return new Impl();</span>
+<span class="fc" id="L47">    return new Impl();</span>
   }
 
   /**
@@ -73,7 +76,20 @@ public interface AclBuilder {
    * @param acl the acl (entity)
    * @return the acl builder
    */
-  AclBuilder from(@Nullable Acl acl);
+  default AclBuilder from(@Nullable Acl&lt;? extends Ace&gt; acl) {
+<span class="fc" id="L80">    return Optional.ofNullable(acl)</span>
+<span class="fc" id="L81">        .map(a -&gt; from(a.getOwner(), a.entryMap()))</span>
+<span class="fc" id="L82">        .orElse(this);</span>
+  }
+
+  /**
+   * From acl (entity) values.
+   *
+   * @param owner the owner
+   * @param map the acl (entity) entry map
+   * @return the acl builder
+   */
+  AclBuilder from(String owner, Map&lt;String, ? extends Ace&gt; map);
 
   /**
    * Sets owner.
@@ -86,7 +102,7 @@ public interface AclBuilder {
   /**
    * Sets guest.
    *
-   * @param isPublic    is public
+   * @param isPublic is public
    * @param permissions the permissions
    * @return the acl builder
    */
@@ -95,7 +111,7 @@ public interface AclBuilder {
   /**
    * Adds user.
    *
-   * @param user        the user
+   * @param user the user
    * @param permissions the permissions
    * @return the acl builder
    */
@@ -104,7 +120,7 @@ public interface AclBuilder {
   /**
    * Adds role.
    *
-   * @param role        the role
+   * @param role the role
    * @param permissions the permissions
    * @return the acl builder
    */
@@ -113,7 +129,7 @@ public interface AclBuilder {
   /**
    * Adds group.
    *
-   * @param group       the group
+   * @param group the group
    * @param permissions the permissions
    * @return the acl builder
    */
@@ -122,7 +138,7 @@ public interface AclBuilder {
   /**
    * Removes user.
    *
-   * @param user        the user
+   * @param user the user
    * @param permissions the permissions
    * @return the acl builder
    */
@@ -131,7 +147,7 @@ public interface AclBuilder {
   /**
    * Removes role.
    *
-   * @param role        the role
+   * @param role the role
    * @param permissions the permissions
    * @return the acl builder
    */
@@ -140,7 +156,7 @@ public interface AclBuilder {
   /**
    * Removes group.
    *
-   * @param group       the group
+   * @param group the group
    * @param permissions the permissions
    * @return the acl builder
    */
@@ -152,17 +168,34 @@ public interface AclBuilder {
    * @return the acl builder
    */
   default AclBuilder ensureAdminAccess() {
-<span class="fc" id="L155">    return ensureAdminAccess(AuthorityConstants.ADMIN_ROLE_NAME);</span>
+<span class="fc" id="L171">    return ensureAdminAccess(AuthorityConstants.ADMIN_ROLE_NAME);</span>
   }
 
   /**
-   * acl builder.
+   * Adds admin access.
    *
-   * @param adminRole   the admin role
+   * @param adminRole the admin role
    * @param permissions the permissions
    * @return the acl builder
    */
-  AclBuilder ensureAdminAccess(@Nullable String adminRole, @Nullable String... permissions);
+  default AclBuilder ensureAdminAccess(
+      @Nullable String adminRole,
+      @Nullable String... permissions) {
+
+<span class="fc" id="L185">    return ensureAdminAccess(</span>
+<span class="pc bpc" id="L186" title="1 of 2 branches missed.">        StringUtils.hasText(adminRole) ? Collections.singleton(adminRole) : null, permissions);</span>
+  }
+
+  /**
+   * Adds admin access.
+   *
+   * @param adminRoles the admin roles
+   * @param permissions the permissions
+   * @return the acl builder
+   */
+  AclBuilder ensureAdminAccess(
+      @Nullable Collection&lt;String&gt; adminRoles,
+      @Nullable String... permissions);
 
   /**
    * Removes admin access.
@@ -170,22 +203,39 @@ public interface AclBuilder {
    * @return the acl builder
    */
   default AclBuilder removeAdminAccess() {
-<span class="fc" id="L173">    return removeAdminAccess(AuthorityConstants.ADMIN_ROLE_NAME);</span>
+<span class="fc" id="L206">    return removeAdminAccess(AuthorityConstants.ADMIN_ROLE_NAME);</span>
   }
 
   /**
    * Removes admin access.
    *
-   * @param adminRole   the admin role
+   * @param adminRole the admin role
    * @param permissions the permissions
    * @return the acl builder
    */
-  AclBuilder removeAdminAccess(@Nullable String adminRole, @Nullable String... permissions);
+  default AclBuilder removeAdminAccess(
+      @Nullable String adminRole,
+      @Nullable String... permissions) {
+
+<span class="fc" id="L220">    return removeAdminAccess(</span>
+<span class="pc bpc" id="L221" title="1 of 2 branches missed.">        StringUtils.hasText(adminRole) ? Collections.singleton(adminRole) : null, permissions);</span>
+  }
+
+  /**
+   * Removes admin access.
+   *
+   * @param adminRoles the admin roles
+   * @param permissions the permissions
+   * @return the acl builder
+   */
+  AclBuilder removeAdminAccess(
+      @Nullable Collection&lt;String&gt; adminRoles,
+      @Nullable String... permissions);
 
   /**
    * Build acl.
    *
-   * @param &lt;T&gt;     the type of the acl
+   * @param &lt;T&gt; the type of the acl
    * @param factory the factory
    * @return the acl
    */
@@ -197,7 +247,7 @@ public interface AclBuilder {
    * @return the acl
    */
   default Acl&lt;? extends Ace&gt; buildAcl() {
-<span class="fc" id="L200">    return build((o, e) -&gt; new AclImpl(o, new HashMap&lt;&gt;(e)));</span>
+<span class="fc" id="L250">    return build((o, e) -&gt; new AclImpl(o, new HashMap&lt;&gt;(e)));</span>
   }
 
   /**
@@ -206,243 +256,247 @@ public interface AclBuilder {
    * @return the access control list
    */
   default AccessControlList buildAccessControlList() {
-<span class="fc" id="L209">    return build(AclFactory.dtoFactory());</span>
+<span class="fc" id="L259">    return build(AclFactory.dtoFactory());</span>
   }
 
   /**
    * The default access control list builder implementation.
    */
-<span class="fc" id="L215">  class Impl implements AclBuilder {</span>
+<span class="fc" id="L265">  class Impl implements AclBuilder {</span>
 
     private String owner;
 
-<span class="fc" id="L219">    private Map&lt;String, Ace&gt; entries = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L269">    private Map&lt;String, Ace&gt; entries = new HashMap&lt;&gt;();</span>
 
     @Override
     public AclBuilder reset() {
-<span class="fc" id="L223">      this.owner = null;</span>
-<span class="fc" id="L224">      this.entries = new HashMap&lt;&gt;();</span>
-<span class="fc" id="L225">      return this;</span>
+<span class="fc" id="L273">      this.owner = null;</span>
+<span class="fc" id="L274">      this.entries = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L275">      return this;</span>
     }
 
     @Override
     public AclBuilder defaults(final String... permissions) {
-<span class="fc bfc" id="L230" title="All 2 branches covered.">      if (permissions != null) {</span>
-<span class="fc" id="L231">        Arrays.stream(permissions).forEach(permission -&gt; {</span>
-<span class="fc bfc" id="L232" title="All 2 branches covered.">          if (!entries.containsKey(permission)) {</span>
-<span class="fc" id="L233">            entries.put(permission.toLowerCase(), new AceImpl());</span>
+<span class="fc bfc" id="L280" title="All 2 branches covered.">      if (permissions != null) {</span>
+<span class="fc" id="L281">        Arrays.stream(permissions).forEach(permission -&gt; {</span>
+<span class="fc bfc" id="L282" title="All 2 branches covered.">          if (!entries.containsKey(permission)) {</span>
+<span class="fc" id="L283">            entries.put(permission.toLowerCase(), new AceImpl());</span>
           }
-<span class="fc" id="L235">        });</span>
+<span class="fc" id="L285">        });</span>
       }
-<span class="fc" id="L237">      return this;</span>
+<span class="fc" id="L287">      return this;</span>
     }
 
     @Override
     public AclBuilder from(final AccessControlList acl) {
-<span class="fc bfc" id="L242" title="All 2 branches covered.">      if (acl != null) {</span>
-<span class="fc" id="L243">        this.owner = acl.getOwner();</span>
-<span class="pc bpc" id="L244" title="1 of 2 branches missed.">        if (acl.getEntries() != null) {</span>
-<span class="fc" id="L245">          acl.getEntries()</span>
-<span class="fc" id="L246">              .stream()</span>
-<span class="fc" id="L247">              .filter(Objects::nonNull)</span>
-<span class="fc" id="L248">              .filter(accessControlEntry -&gt; StringUtils.hasText(accessControlEntry.getPermission()))</span>
-<span class="fc" id="L249">              .forEach(accessControlEntry -&gt; {</span>
-<span class="fc" id="L250">                guest(accessControlEntry.getGuest(), accessControlEntry.getPermission());</span>
-<span class="pc bpc" id="L251" title="1 of 2 branches missed.">                if (accessControlEntry.getGroups() != null) {</span>
-<span class="fc" id="L252">                  accessControlEntry</span>
-<span class="fc" id="L253">                      .getGroups()</span>
-<span class="fc" id="L254">                      .forEach(group -&gt; addGroup(</span>
-<span class="fc" id="L255">                          group, accessControlEntry.getPermission().toLowerCase()));</span>
+<span class="fc bfc" id="L292" title="All 2 branches covered.">      if (acl != null) {</span>
+<span class="fc" id="L293">        this.owner = acl.getOwner();</span>
+<span class="pc bpc" id="L294" title="1 of 2 branches missed.">        if (acl.getEntries() != null) {</span>
+<span class="fc" id="L295">          acl.getEntries()</span>
+<span class="fc" id="L296">              .stream()</span>
+<span class="fc" id="L297">              .filter(Objects::nonNull)</span>
+<span class="fc" id="L298">              .filter(accessControlEntry -&gt; StringUtils.hasText(accessControlEntry.getPermission()))</span>
+<span class="fc" id="L299">              .forEach(accessControlEntry -&gt; {</span>
+<span class="fc" id="L300">                guest(accessControlEntry.getGuest(), accessControlEntry.getPermission());</span>
+<span class="pc bpc" id="L301" title="1 of 2 branches missed.">                if (accessControlEntry.getGroups() != null) {</span>
+<span class="fc" id="L302">                  accessControlEntry</span>
+<span class="fc" id="L303">                      .getGroups()</span>
+<span class="fc" id="L304">                      .forEach(group -&gt; addGroup(</span>
+<span class="fc" id="L305">                          group, accessControlEntry.getPermission().toLowerCase()));</span>
                 }
-<span class="pc bpc" id="L257" title="1 of 2 branches missed.">                if (accessControlEntry.getRoles() != null) {</span>
-<span class="fc" id="L258">                  accessControlEntry</span>
-<span class="fc" id="L259">                      .getRoles()</span>
-<span class="fc" id="L260">                      .forEach(role -&gt; addRole(</span>
-<span class="fc" id="L261">                          role, accessControlEntry.getPermission().toLowerCase()));</span>
+<span class="pc bpc" id="L307" title="1 of 2 branches missed.">                if (accessControlEntry.getRoles() != null) {</span>
+<span class="fc" id="L308">                  accessControlEntry</span>
+<span class="fc" id="L309">                      .getRoles()</span>
+<span class="fc" id="L310">                      .forEach(role -&gt; addRole(</span>
+<span class="fc" id="L311">                          role, accessControlEntry.getPermission().toLowerCase()));</span>
                 }
-<span class="pc bpc" id="L263" title="1 of 2 branches missed.">                if (accessControlEntry.getUsers() != null) {</span>
-<span class="fc" id="L264">                  accessControlEntry</span>
-<span class="fc" id="L265">                      .getUsers()</span>
-<span class="fc" id="L266">                      .forEach(user -&gt; addUser(</span>
-<span class="fc" id="L267">                          user, accessControlEntry.getPermission().toLowerCase()));</span>
+<span class="pc bpc" id="L313" title="1 of 2 branches missed.">                if (accessControlEntry.getUsers() != null) {</span>
+<span class="fc" id="L314">                  accessControlEntry</span>
+<span class="fc" id="L315">                      .getUsers()</span>
+<span class="fc" id="L316">                      .forEach(user -&gt; addUser(</span>
+<span class="fc" id="L317">                          user, accessControlEntry.getPermission().toLowerCase()));</span>
                 }
-<span class="fc" id="L269">              });</span>
+<span class="fc" id="L319">              });</span>
         }
       }
-<span class="fc" id="L272">      return this;</span>
+<span class="fc" id="L322">      return this;</span>
     }
 
     @Override
-    public AclBuilder from(final Acl acl) {
-<span class="fc bfc" id="L277" title="All 2 branches covered.">      if (acl != null) {</span>
-<span class="fc" id="L278">        this.owner = acl.getOwner();</span>
-        //noinspection unchecked
-<span class="fc" id="L280">        final Map&lt;String, ? extends Ace&gt; map = acl.entryMap();</span>
-<span class="pc bpc" id="L281" title="1 of 2 branches missed.">        if (map != null) {</span>
-<span class="fc" id="L282">          map.entrySet()</span>
-<span class="fc" id="L283">              .stream()</span>
-<span class="fc" id="L284">              .filter(Objects::nonNull)</span>
-<span class="fc" id="L285">              .filter(entry -&gt; StringUtils.hasText(entry.getKey()))</span>
-<span class="pc bpc" id="L286" title="1 of 2 branches missed.">              .filter(entry -&gt; entry.getValue() != null)</span>
-<span class="fc" id="L287">              .forEach(entry -&gt; {</span>
-<span class="fc" id="L288">                final String permission = entry.getKey().toLowerCase();</span>
-<span class="fc" id="L289">                final Ace ace = entry.getValue();</span>
-<span class="fc" id="L290">                guest(ace.isGuest(), permission);</span>
-<span class="fc" id="L291">                ace.getGroups().forEach(group -&gt; addGroup(group, permission));</span>
-<span class="fc" id="L292">                ace.getRoles().forEach(role -&gt; addRole(role, permission));</span>
-<span class="fc" id="L293">                ace.getUsers().forEach(user -&gt; addUser(user, permission));</span>
-<span class="fc" id="L294">              });</span>
-        }
+    public AclBuilder from(String owner, Map&lt;String, ? extends Ace&gt; map) {
+<span class="fc" id="L327">      this.owner = owner;</span>
+<span class="pc bpc" id="L328" title="1 of 2 branches missed.">      if (map != null) {</span>
+<span class="fc" id="L329">        map.entrySet()</span>
+<span class="fc" id="L330">            .stream()</span>
+<span class="fc" id="L331">            .filter(Objects::nonNull)</span>
+<span class="fc" id="L332">            .filter(entry -&gt; StringUtils.hasText(entry.getKey()))</span>
+<span class="pc bpc" id="L333" title="1 of 2 branches missed.">            .filter(entry -&gt; entry.getValue() != null)</span>
+<span class="fc" id="L334">            .forEach(entry -&gt; {</span>
+<span class="fc" id="L335">              final String permission = entry.getKey().toLowerCase();</span>
+<span class="fc" id="L336">              final Ace ace = entry.getValue();</span>
+<span class="fc" id="L337">              guest(ace.isGuest(), permission);</span>
+<span class="fc" id="L338">              ace.getGroups().forEach(group -&gt; addGroup(group, permission));</span>
+<span class="fc" id="L339">              ace.getRoles().forEach(role -&gt; addRole(role, permission));</span>
+<span class="fc" id="L340">              ace.getUsers().forEach(user -&gt; addUser(user, permission));</span>
+<span class="fc" id="L341">            });</span>
       }
-<span class="fc" id="L297">      return this;</span>
+<span class="fc" id="L343">      return this;</span>
     }
 
     @Override
     public AclBuilder owner(final String owner) {
-<span class="fc" id="L302">      this.owner = owner;</span>
-<span class="fc" id="L303">      return this;</span>
+<span class="fc" id="L348">      this.owner = owner;</span>
+<span class="fc" id="L349">      return this;</span>
     }
 
     @Override
     public AclBuilder guest(final Boolean isPublic, final String... permissions) {
-<span class="pc bpc" id="L308" title="1 of 2 branches missed.">      if (permissions != null) {</span>
-<span class="fc" id="L309">        final boolean guest = Boolean.TRUE.equals(isPublic);</span>
-<span class="fc bfc" id="L310" title="All 2 branches covered.">        if (guest) {</span>
-<span class="fc" id="L311">          Arrays.stream(permissions)</span>
-<span class="fc" id="L312">              .filter(StringUtils::hasText)</span>
-<span class="fc" id="L313">              .map(String::toLowerCase)</span>
-<span class="fc" id="L314">              .forEach(permission -&gt; entries</span>
-<span class="fc" id="L315">                  .computeIfAbsent(permission, p -&gt; new AceImpl())</span>
-<span class="fc" id="L316">                  .setGuest(true));</span>
+<span class="pc bpc" id="L354" title="1 of 2 branches missed.">      if (permissions != null) {</span>
+<span class="fc" id="L355">        final boolean guest = Boolean.TRUE.equals(isPublic);</span>
+<span class="fc bfc" id="L356" title="All 2 branches covered.">        if (guest) {</span>
+<span class="fc" id="L357">          Arrays.stream(permissions)</span>
+<span class="fc" id="L358">              .filter(StringUtils::hasText)</span>
+<span class="fc" id="L359">              .map(String::toLowerCase)</span>
+<span class="fc" id="L360">              .forEach(permission -&gt; entries</span>
+<span class="fc" id="L361">                  .computeIfAbsent(permission, p -&gt; new AceImpl())</span>
+<span class="fc" id="L362">                  .setGuest(true));</span>
         } else {
-<span class="fc" id="L318">          Arrays.stream(permissions)</span>
-<span class="fc" id="L319">              .filter(StringUtils::hasText)</span>
-<span class="fc" id="L320">              .map(String::toLowerCase)</span>
-<span class="fc" id="L321">              .forEach(permission -&gt; entries.computeIfPresent(permission,</span>
+<span class="fc" id="L364">          Arrays.stream(permissions)</span>
+<span class="fc" id="L365">              .filter(StringUtils::hasText)</span>
+<span class="fc" id="L366">              .map(String::toLowerCase)</span>
+<span class="fc" id="L367">              .forEach(permission -&gt; entries.computeIfPresent(permission,</span>
                   (p, mongoAccessControlEntry) -&gt; {
-<span class="fc" id="L323">                    mongoAccessControlEntry.setGuest(false);</span>
-<span class="fc" id="L324">                    return mongoAccessControlEntry;</span>
+<span class="fc" id="L369">                    mongoAccessControlEntry.setGuest(false);</span>
+<span class="fc" id="L370">                    return mongoAccessControlEntry;</span>
                   }));
         }
       }
-<span class="fc" id="L328">      return this;</span>
+<span class="fc" id="L374">      return this;</span>
     }
 
     @Override
     public AclBuilder addUser(final String user, final String... permissions) {
-<span class="pc bpc" id="L333" title="2 of 4 branches missed.">      if (StringUtils.hasText(user) &amp;&amp; permissions != null) {</span>
-<span class="fc" id="L334">        Arrays.stream(permissions)</span>
-<span class="fc" id="L335">            .filter(StringUtils::hasText)</span>
-<span class="fc" id="L336">            .map(String::toLowerCase)</span>
-<span class="fc" id="L337">            .forEach(permission -&gt; entries</span>
-<span class="fc" id="L338">                .computeIfAbsent(permission, p -&gt; new AceImpl())</span>
-<span class="fc" id="L339">                .getUsers()</span>
-<span class="fc" id="L340">                .add(user));</span>
+<span class="pc bpc" id="L379" title="2 of 4 branches missed.">      if (StringUtils.hasText(user) &amp;&amp; permissions != null) {</span>
+<span class="fc" id="L380">        Arrays.stream(permissions)</span>
+<span class="fc" id="L381">            .filter(StringUtils::hasText)</span>
+<span class="fc" id="L382">            .map(String::toLowerCase)</span>
+<span class="fc" id="L383">            .forEach(permission -&gt; entries</span>
+<span class="fc" id="L384">                .computeIfAbsent(permission, p -&gt; new AceImpl())</span>
+<span class="fc" id="L385">                .getUsers()</span>
+<span class="fc" id="L386">                .add(user));</span>
       }
-<span class="fc" id="L342">      return this;</span>
+<span class="fc" id="L388">      return this;</span>
     }
 
     @Override
     public AclBuilder addRole(final String role, final String... permissions) {
-<span class="pc bpc" id="L347" title="2 of 4 branches missed.">      if (StringUtils.hasText(role) &amp;&amp; permissions != null) {</span>
-<span class="fc" id="L348">        Arrays.stream(permissions)</span>
-<span class="fc" id="L349">            .filter(StringUtils::hasText)</span>
-<span class="fc" id="L350">            .map(String::toLowerCase)</span>
-<span class="fc" id="L351">            .forEach(permission -&gt; entries</span>
-<span class="fc" id="L352">                .computeIfAbsent(permission, p -&gt; new AceImpl())</span>
-<span class="fc" id="L353">                .getRoles()</span>
-<span class="fc" id="L354">                .add(role));</span>
+<span class="pc bpc" id="L393" title="2 of 4 branches missed.">      if (StringUtils.hasText(role) &amp;&amp; permissions != null) {</span>
+<span class="fc" id="L394">        Arrays.stream(permissions)</span>
+<span class="fc" id="L395">            .filter(StringUtils::hasText)</span>
+<span class="fc" id="L396">            .map(String::toLowerCase)</span>
+<span class="fc" id="L397">            .forEach(permission -&gt; entries</span>
+<span class="fc" id="L398">                .computeIfAbsent(permission, p -&gt; new AceImpl())</span>
+<span class="fc" id="L399">                .getRoles()</span>
+<span class="fc" id="L400">                .add(role));</span>
       }
-<span class="fc" id="L356">      return this;</span>
+<span class="fc" id="L402">      return this;</span>
     }
 
     @Override
     public AclBuilder addGroup(final String group, final String... permissions) {
-<span class="pc bpc" id="L361" title="2 of 4 branches missed.">      if (StringUtils.hasText(group) &amp;&amp; permissions != null) {</span>
-<span class="fc" id="L362">        Arrays.stream(permissions)</span>
-<span class="fc" id="L363">            .filter(StringUtils::hasText)</span>
-<span class="fc" id="L364">            .map(String::toLowerCase)</span>
-<span class="fc" id="L365">            .forEach(permission -&gt; entries</span>
-<span class="fc" id="L366">                .computeIfAbsent(permission, p -&gt; new AceImpl())</span>
-<span class="fc" id="L367">                .getGroups()</span>
-<span class="fc" id="L368">                .add(group));</span>
+<span class="pc bpc" id="L407" title="2 of 4 branches missed.">      if (StringUtils.hasText(group) &amp;&amp; permissions != null) {</span>
+<span class="fc" id="L408">        Arrays.stream(permissions)</span>
+<span class="fc" id="L409">            .filter(StringUtils::hasText)</span>
+<span class="fc" id="L410">            .map(String::toLowerCase)</span>
+<span class="fc" id="L411">            .forEach(permission -&gt; entries</span>
+<span class="fc" id="L412">                .computeIfAbsent(permission, p -&gt; new AceImpl())</span>
+<span class="fc" id="L413">                .getGroups()</span>
+<span class="fc" id="L414">                .add(group));</span>
       }
-<span class="fc" id="L370">      return this;</span>
+<span class="fc" id="L416">      return this;</span>
     }
 
     @Override
     public AclBuilder removeUser(final String user, final String... permissions) {
-<span class="pc bpc" id="L375" title="2 of 4 branches missed.">      if (StringUtils.hasText(user) &amp;&amp; permissions != null) {</span>
-<span class="fc" id="L376">        Arrays.stream(permissions)</span>
-<span class="fc" id="L377">            .filter(StringUtils::hasText)</span>
-<span class="fc" id="L378">            .map(String::toLowerCase)</span>
-<span class="fc" id="L379">            .forEach(permission -&gt; entries.computeIfPresent(permission,</span>
+<span class="pc bpc" id="L421" title="2 of 4 branches missed.">      if (StringUtils.hasText(user) &amp;&amp; permissions != null) {</span>
+<span class="fc" id="L422">        Arrays.stream(permissions)</span>
+<span class="fc" id="L423">            .filter(StringUtils::hasText)</span>
+<span class="fc" id="L424">            .map(String::toLowerCase)</span>
+<span class="fc" id="L425">            .forEach(permission -&gt; entries.computeIfPresent(permission,</span>
                 (p, mongoAccessControlEntry) -&gt; {
-<span class="fc" id="L381">                  mongoAccessControlEntry.getUsers().remove(user);</span>
-<span class="fc" id="L382">                  return mongoAccessControlEntry;</span>
+<span class="fc" id="L427">                  mongoAccessControlEntry.getUsers().remove(user);</span>
+<span class="fc" id="L428">                  return mongoAccessControlEntry;</span>
                 }));
       }
-<span class="fc" id="L385">      return this;</span>
+<span class="fc" id="L431">      return this;</span>
     }
 
     @Override
     public AclBuilder removeRole(final String role, final String... permissions) {
-<span class="pc bpc" id="L390" title="2 of 4 branches missed.">      if (StringUtils.hasText(role) &amp;&amp; permissions != null) {</span>
-<span class="fc" id="L391">        Arrays.stream(permissions)</span>
-<span class="fc" id="L392">            .filter(StringUtils::hasText)</span>
-<span class="fc" id="L393">            .map(String::toLowerCase)</span>
-<span class="fc" id="L394">            .forEach(permission -&gt; entries.computeIfPresent(permission,</span>
+<span class="pc bpc" id="L436" title="2 of 4 branches missed.">      if (StringUtils.hasText(role) &amp;&amp; permissions != null) {</span>
+<span class="fc" id="L437">        Arrays.stream(permissions)</span>
+<span class="fc" id="L438">            .filter(StringUtils::hasText)</span>
+<span class="fc" id="L439">            .map(String::toLowerCase)</span>
+<span class="fc" id="L440">            .forEach(permission -&gt; entries.computeIfPresent(permission,</span>
                 (p, mongoAccessControlEntry) -&gt; {
-<span class="fc" id="L396">                  mongoAccessControlEntry.getRoles().remove(role);</span>
-<span class="fc" id="L397">                  return mongoAccessControlEntry;</span>
+<span class="fc" id="L442">                  mongoAccessControlEntry.getRoles().remove(role);</span>
+<span class="fc" id="L443">                  return mongoAccessControlEntry;</span>
                 }));
       }
-<span class="fc" id="L400">      return this;</span>
+<span class="fc" id="L446">      return this;</span>
     }
 
     @Override
     public AclBuilder removeGroup(final String group, final String... permissions) {
-<span class="pc bpc" id="L405" title="2 of 4 branches missed.">      if (StringUtils.hasText(group) &amp;&amp; permissions != null) {</span>
-<span class="fc" id="L406">        Arrays.stream(permissions)</span>
-<span class="fc" id="L407">            .filter(StringUtils::hasText)</span>
-<span class="fc" id="L408">            .map(String::toLowerCase)</span>
-<span class="fc" id="L409">            .forEach(permission -&gt; entries.computeIfPresent(permission,</span>
+<span class="pc bpc" id="L451" title="2 of 4 branches missed.">      if (StringUtils.hasText(group) &amp;&amp; permissions != null) {</span>
+<span class="fc" id="L452">        Arrays.stream(permissions)</span>
+<span class="fc" id="L453">            .filter(StringUtils::hasText)</span>
+<span class="fc" id="L454">            .map(String::toLowerCase)</span>
+<span class="fc" id="L455">            .forEach(permission -&gt; entries.computeIfPresent(permission,</span>
                 (p, mongoAccessControlEntry) -&gt; {
-<span class="fc" id="L411">                  mongoAccessControlEntry.getGroups().remove(group);</span>
-<span class="fc" id="L412">                  return mongoAccessControlEntry;</span>
+<span class="fc" id="L457">                  mongoAccessControlEntry.getGroups().remove(group);</span>
+<span class="fc" id="L458">                  return mongoAccessControlEntry;</span>
                 }));
       }
-<span class="fc" id="L415">      return this;</span>
+<span class="fc" id="L461">      return this;</span>
     }
 
     @Override
-    public AclBuilder ensureAdminAccess(final String adminRole, final String... permissions) {
-<span class="pc bpc" id="L420" title="1 of 2 branches missed.">      if (adminRole != null) {</span>
-<span class="pc bpc" id="L421" title="1 of 4 branches missed.">        if (permissions == null || permissions.length == 0) {</span>
-<span class="fc" id="L422">          entries.keySet().forEach(permission -&gt; addRole(adminRole, permission));</span>
+    public AclBuilder ensureAdminAccess(
+        final Collection&lt;String&gt; adminRoles,
+        final String... permissions) {
+
+<span class="pc bpc" id="L469" title="2 of 4 branches missed.">      if (adminRoles != null &amp;&amp; !adminRoles.isEmpty()) {</span>
+<span class="pc bpc" id="L470" title="1 of 4 branches missed.">        if (permissions == null || permissions.length == 0) {</span>
+<span class="fc" id="L471">          adminRoles.forEach(adminRole -&gt; entries.keySet()</span>
+<span class="fc" id="L472">              .forEach(permission -&gt; addRole(adminRole, permission)));</span>
         } else {
-<span class="fc" id="L424">          addRole(adminRole, permissions);</span>
+<span class="fc" id="L474">          adminRoles.forEach(adminRole -&gt; addRole(adminRole, permissions));</span>
         }
       }
-<span class="fc" id="L427">      return this;</span>
+<span class="fc" id="L477">      return this;</span>
     }
 
     @Override
-    public AclBuilder removeAdminAccess(final String adminRole, final String... permissions) {
-<span class="pc bpc" id="L432" title="1 of 2 branches missed.">      if (adminRole != null) {</span>
-<span class="pc bpc" id="L433" title="1 of 4 branches missed.">        if (permissions == null || permissions.length == 0) {</span>
-<span class="fc" id="L434">          entries.keySet().forEach(permission -&gt; removeRole(adminRole, permission));</span>
+    public AclBuilder removeAdminAccess(
+        final Collection&lt;String&gt; adminRoles,
+        final String... permissions) {
+
+<span class="pc bpc" id="L485" title="2 of 4 branches missed.">      if (adminRoles != null &amp;&amp; !adminRoles.isEmpty()) {</span>
+<span class="pc bpc" id="L486" title="1 of 4 branches missed.">        if (permissions == null || permissions.length == 0) {</span>
+<span class="fc" id="L487">          adminRoles.forEach(adminRole -&gt; entries.keySet()</span>
+<span class="fc" id="L488">              .forEach(permission -&gt; removeRole(adminRole, permission)));</span>
         } else {
-<span class="fc" id="L436">          removeRole(adminRole, permissions);</span>
+<span class="fc" id="L490">          adminRoles.forEach(adminRole -&gt; removeRole(adminRole, permissions));</span>
         }
       }
-<span class="fc" id="L439">      return this;</span>
+<span class="fc" id="L493">      return this;</span>
     }
 
     @Override
     public &lt;T&gt; T build(AclFactory&lt;T&gt; factory) {
-<span class="fc" id="L444">      return factory.createAccessControlList(owner, entries);</span>
+<span class="fc" id="L498">      return factory.createAccessControlList(owner, entries);</span>
     }
   }
 }
-</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.3.201901230119</span></div></body></html>
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

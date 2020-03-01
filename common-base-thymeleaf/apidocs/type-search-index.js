@@ -1,0 +1,1 @@
+typeSearchIndex = [{"l":"All Classes","url":"allclasses-index.html"},{"p":"org.bremersee.thymeleaf","l":"TemplateResolver"},{"p":"org.bremersee.thymeleaf","l":"TemplateResource"}]

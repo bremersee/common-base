@@ -17,6 +17,7 @@
 package org.bremersee.converter;
 
 import java.util.Locale;
+import lombok.ToString;
 import org.bremersee.common.model.JavaLocale;
 import org.springframework.core.convert.converter.Converter;
 
@@ -25,12 +26,13 @@ import org.springframework.core.convert.converter.Converter;
  *
  * @author Christian Bremer
  */
-<span class="nc" id="L28">public class StringToLocaleConverter implements Converter&lt;String, Locale&gt; {</span>
+<span class="fc" id="L29">@ToString</span>
+<span class="fc" id="L30">public class StringToLocaleConverter implements Converter&lt;String, Locale&gt; {</span>
 
   @Override
   public Locale convert(String source) {
-<span class="nc" id="L32">    final JavaLocale javaLocale = JavaLocale.fromValue(source);</span>
-<span class="nc bnc" id="L33" title="All 2 branches missed.">    return javaLocale != null ? javaLocale.toLocale() : null;</span>
+<span class="fc" id="L34">    final JavaLocale javaLocale = JavaLocale.fromValue(source);</span>
+<span class="pc bpc" id="L35" title="1 of 2 branches missed.">    return javaLocale != null ? javaLocale.toLocale() : null;</span>
   }
 }
-</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.3.201901230119</span></div></body></html>
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

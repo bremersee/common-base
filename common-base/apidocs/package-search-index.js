@@ -1,0 +1,1 @@
+packageSearchIndex = [{"l":"All Packages","url":"allpackages-index.html"},{"l":"org.bremersee.converter"},{"l":"org.bremersee.exception"},{"l":"org.bremersee.exception.annotation"},{"l":"org.bremersee.security.access"},{"l":"org.bremersee.security.core"}]

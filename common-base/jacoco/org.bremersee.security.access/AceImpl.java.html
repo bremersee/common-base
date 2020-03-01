@@ -77,11 +77,11 @@ class AceImpl implements Ace {
 
   @Override
   public boolean equals(final Object o) {
-<span class="pc bpc" id="L80" title="1 of 2 branches missed.">    if (this == o) {</span>
-<span class="nc" id="L81">      return true;</span>
+<span class="fc bfc" id="L80" title="All 2 branches covered.">    if (this == o) {</span>
+<span class="fc" id="L81">      return true;</span>
     }
-<span class="pc bpc" id="L83" title="1 of 2 branches missed.">    if (!(o instanceof Ace)) {</span>
-<span class="nc" id="L84">      return false;</span>
+<span class="fc bfc" id="L83" title="All 2 branches covered.">    if (!(o instanceof Ace)) {</span>
+<span class="fc" id="L84">      return false;</span>
     }
 <span class="fc" id="L86">    Ace ace = (Ace) o;</span>
 <span class="pc bpc" id="L87" title="1 of 2 branches missed.">    return guest == ace.isGuest()</span>
@@ -92,17 +92,17 @@ class AceImpl implements Ace {
 
   @Override
   public int hashCode() {
-<span class="nc" id="L95">    return Objects.hash(guest, treeSet(users), treeSet(roles), treeSet(groups));</span>
+<span class="fc" id="L95">    return Objects.hash(guest, treeSet(users), treeSet(roles), treeSet(groups));</span>
   }
 
-  private TreeSet&lt;String&gt; treeSet(Collection&lt;String&gt; collection) {
-<span class="pc bpc" id="L99" title="1 of 2 branches missed.">    if (collection == null) {</span>
-<span class="nc" id="L100">      return new TreeSet&lt;&gt;();</span>
+  static TreeSet&lt;String&gt; treeSet(Collection&lt;String&gt; collection) {
+<span class="fc bfc" id="L99" title="All 2 branches covered.">    if (collection == null) {</span>
+<span class="fc" id="L100">      return new TreeSet&lt;&gt;();</span>
     }
-<span class="pc bpc" id="L102" title="1 of 2 branches missed.">    if (collection instanceof TreeSet) {</span>
+<span class="fc bfc" id="L102" title="All 2 branches covered.">    if (collection instanceof TreeSet) {</span>
 <span class="fc" id="L103">      return (TreeSet&lt;String&gt;) collection;</span>
     }
-<span class="nc" id="L105">    return new TreeSet&lt;&gt;(collection);</span>
+<span class="fc" id="L105">    return new TreeSet&lt;&gt;(collection);</span>
   }
 }
-</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.3.201901230119</span></div></body></html>
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

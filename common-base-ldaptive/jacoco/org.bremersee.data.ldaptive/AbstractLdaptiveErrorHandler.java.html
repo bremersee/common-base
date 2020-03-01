@@ -30,18 +30,16 @@ import org.ldaptive.LdapException;
   @Override
   public void handleError(final Throwable t) {
     final LdaptiveException ldaptiveException;
-<span class="nc bnc" id="L33" title="All 2 branches missed.">    if (t instanceof LdaptiveException) {</span>
-<span class="nc" id="L34">      ldaptiveException = (LdaptiveException) t;</span>
-<span class="nc bnc" id="L35" title="All 2 branches missed.">    } else if (t instanceof LdapException) {</span>
-<span class="nc" id="L36">      ldaptiveException = map((LdapException) t);</span>
-<span class="nc bnc" id="L37" title="All 2 branches missed.">    } else if (t != null) {</span>
-<span class="nc" id="L38">      ldaptiveException = new LdaptiveException(t);</span>
+<span class="fc bfc" id="L33" title="All 2 branches covered.">    if (t instanceof LdaptiveException) {</span>
+<span class="fc" id="L34">      ldaptiveException = (LdaptiveException) t;</span>
+<span class="fc bfc" id="L35" title="All 2 branches covered.">    } else if (t instanceof LdapException) {</span>
+<span class="fc" id="L36">      ldaptiveException = map((LdapException) t);</span>
     } else {
-<span class="nc" id="L40">      ldaptiveException = new LdaptiveException();</span>
+<span class="fc" id="L38">      ldaptiveException = LdaptiveException.builder().cause(t).build();</span>
     }
-<span class="nc" id="L42">    log.error(&quot;LDAP operation failed.&quot;, ldaptiveException);</span>
-<span class="nc" id="L43">    throw ldaptiveException;</span>
+<span class="fc" id="L40">    log.error(&quot;LDAP operation failed.&quot;, ldaptiveException);</span>
+<span class="fc" id="L41">    throw ldaptiveException;</span>
   }
 
 }
-</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.3.201901230119</span></div></body></html>
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

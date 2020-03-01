@@ -16,6 +16,7 @@
 
 package org.bremersee.converter;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.format.FormatterRegistry;
 
@@ -24,13 +25,13 @@ import org.springframework.format.FormatterRegistry;
  *
  * @author Christian Bremer
  */
-<span class="nc" id="L27">public class BaseCommonConverters {</span>
+<span class="fc" id="L28">@Slf4j</span>
+<span class="nc" id="L29">public class BaseCommonConverters {</span>
 
   /**
    * The constant CONVERTERS.
    */
-  @SuppressWarnings(&quot;WeakerAccess&quot;)
-<span class="nc" id="L33">  public static final Converter&lt;?, ?&gt;[] CONVERTERS = new Converter&lt;?, ?&gt;[]{</span>
+<span class="fc" id="L34">  public static final Converter&lt;?, ?&gt;[] CONVERTERS = new Converter&lt;?, ?&gt;[]{</span>
       new StringToJavaLocaleConverter(),
       new StringToLocaleConverter(),
       new StringToMongoSearchLanguageConverter(),
@@ -46,12 +47,12 @@ import org.springframework.format.FormatterRegistry;
    *
    * @param registry the registry
    */
-  @SuppressWarnings(&quot;unused&quot;)
   public static void registerAll(FormatterRegistry registry) {
-<span class="nc bnc" id="L51" title="All 2 branches missed.">    for (Converter&lt;?, ?&gt; converter : CONVERTERS) {</span>
-<span class="nc" id="L52">      registry.addConverter(converter);</span>
+<span class="fc bfc" id="L51" title="All 2 branches covered.">    for (Converter&lt;?, ?&gt; converter : CONVERTERS) {</span>
+<span class="fc" id="L52">      log.info(&quot;Adding convert {} to registry.&quot;, converter);</span>
+<span class="fc" id="L53">      registry.addConverter(converter);</span>
     }
-<span class="nc" id="L54">  }</span>
+<span class="fc" id="L55">  }</span>
 
 }
-</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.3.201901230119</span></div></body></html>
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

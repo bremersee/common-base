@@ -138,7 +138,7 @@
 <a class="jxr_linenumber" name="L130" href="#L130">130</a>     <strong class="jxr_keyword">try</strong> {
 <a class="jxr_linenumber" name="L131" href="#L131">131</a>       connection = getConnection();
 <a class="jxr_linenumber" name="L132" href="#L132">132</a>       <strong class="jxr_keyword">return</strong> callback.doWithConnection(connection);
-<a class="jxr_linenumber" name="L133" href="#L133">133</a>     } <strong class="jxr_keyword">catch</strong> (<strong class="jxr_keyword">final</strong> LdapException | LdaptiveException e) {
+<a class="jxr_linenumber" name="L133" href="#L133">133</a>     } <strong class="jxr_keyword">catch</strong> (<strong class="jxr_keyword">final</strong> LdapException | <a name="LdaptiveException" href="../../../../org/bremersee/data/ldaptive/LdaptiveException.html#LdaptiveException">LdaptiveException</a> e) {
 <a class="jxr_linenumber" name="L134" href="#L134">134</a>       errorHandler.handleError(e);
 <a class="jxr_linenumber" name="L135" href="#L135">135</a>       <strong class="jxr_keyword">return</strong> <strong class="jxr_keyword">null</strong>;
 <a class="jxr_linenumber" name="L136" href="#L136">136</a>     } <strong class="jxr_keyword">finally</strong> {
@@ -286,7 +286,7 @@
 <a class="jxr_linenumber" name="L278" href="#L278">278</a>   <strong class="jxr_keyword">private</strong> &lt;T&gt; T save(
 <a class="jxr_linenumber" name="L279" href="#L279">279</a>       <strong class="jxr_keyword">final</strong> T domainObject,
 <a class="jxr_linenumber" name="L280" href="#L280">280</a>       <strong class="jxr_keyword">final</strong> LdaptiveEntryMapper&lt;T&gt; entryMapper,
-<a class="jxr_linenumber" name="L281" href="#L281">281</a>       <strong class="jxr_keyword">final</strong> Connection connection) <strong class="jxr_keyword">throws</strong> LdaptiveException {
+<a class="jxr_linenumber" name="L281" href="#L281">281</a>       <strong class="jxr_keyword">final</strong> Connection connection) <strong class="jxr_keyword">throws</strong> <a name="LdaptiveException" href="../../../../org/bremersee/data/ldaptive/LdaptiveException.html#LdaptiveException">LdaptiveException</a> {
 <a class="jxr_linenumber" name="L282" href="#L282">282</a> 
 <a class="jxr_linenumber" name="L283" href="#L283">283</a>     <strong class="jxr_keyword">try</strong> {
 <a class="jxr_linenumber" name="L284" href="#L284">284</a>       <strong class="jxr_keyword">final</strong> LdapEntry destination;
@@ -323,7 +323,7 @@
 <a class="jxr_linenumber" name="L315" href="#L315">315</a>       <strong class="jxr_keyword">return</strong> entryMapper.map(destination);
 <a class="jxr_linenumber" name="L316" href="#L316">316</a> 
 <a class="jxr_linenumber" name="L317" href="#L317">317</a>     } <strong class="jxr_keyword">catch</strong> (LdapException e) {
-<a class="jxr_linenumber" name="L318" href="#L318">318</a>       <strong class="jxr_keyword">throw</strong> <strong class="jxr_keyword">new</strong> LdaptiveException(e);
+<a class="jxr_linenumber" name="L318" href="#L318">318</a>       <strong class="jxr_keyword">throw</strong> LdaptiveException.builder().cause(e).build();
 <a class="jxr_linenumber" name="L319" href="#L319">319</a>     }
 <a class="jxr_linenumber" name="L320" href="#L320">320</a>   }
 <a class="jxr_linenumber" name="L321" href="#L321">321</a> 
@@ -374,13 +374,13 @@
 <a class="jxr_linenumber" name="L366" href="#L366">366</a>   <strong class="jxr_keyword">private</strong> &lt;T&gt; <strong class="jxr_keyword">void</strong> delete(
 <a class="jxr_linenumber" name="L367" href="#L367">367</a>       <strong class="jxr_keyword">final</strong> T domainModel,
 <a class="jxr_linenumber" name="L368" href="#L368">368</a>       <strong class="jxr_keyword">final</strong> LdaptiveEntryMapper&lt;T&gt; entryMapper,
-<a class="jxr_linenumber" name="L369" href="#L369">369</a>       <strong class="jxr_keyword">final</strong> Connection connection) <strong class="jxr_keyword">throws</strong> LdaptiveException {
+<a class="jxr_linenumber" name="L369" href="#L369">369</a>       <strong class="jxr_keyword">final</strong> Connection connection) <strong class="jxr_keyword">throws</strong> <a name="LdaptiveException" href="../../../../org/bremersee/data/ldaptive/LdaptiveException.html#LdaptiveException">LdaptiveException</a> {
 <a class="jxr_linenumber" name="L370" href="#L370">370</a> 
 <a class="jxr_linenumber" name="L371" href="#L371">371</a>     <strong class="jxr_keyword">try</strong> {
 <a class="jxr_linenumber" name="L372" href="#L372">372</a>       <strong class="jxr_keyword">new</strong> DeleteOperation(connection).execute(<strong class="jxr_keyword">new</strong> DeleteRequest(entryMapper.mapDn(domainModel)));
 <a class="jxr_linenumber" name="L373" href="#L373">373</a> 
 <a class="jxr_linenumber" name="L374" href="#L374">374</a>     } <strong class="jxr_keyword">catch</strong> (LdapException e) {
-<a class="jxr_linenumber" name="L375" href="#L375">375</a>       <strong class="jxr_keyword">throw</strong> <strong class="jxr_keyword">new</strong> LdaptiveException(e);
+<a class="jxr_linenumber" name="L375" href="#L375">375</a>       <strong class="jxr_keyword">throw</strong> LdaptiveException.builder().cause(e).build();
 <a class="jxr_linenumber" name="L376" href="#L376">376</a>     }
 <a class="jxr_linenumber" name="L377" href="#L377">377</a>   }
 <a class="jxr_linenumber" name="L378" href="#L378">378</a> 
@@ -408,6 +408,6 @@
 <a class="jxr_linenumber" name="L400" href="#L400">400</a> }
 </pre>
 <hr/>
-<div id="footer">Copyright &#169; 2019 <a href="http://bremersee.org">bremersee.org</a>. All rights reserved.</div>
+<div id="footer">Copyright &#169; 2020 <a href="http://bremersee.org">bremersee.org</a>. All rights reserved.</div>
 </body>
 </html>

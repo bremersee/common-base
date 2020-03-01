@@ -185,10 +185,10 @@ public interface LdaptiveEntryMapper&lt;T&gt; extends LdapEntryMapper&lt;T&gt; {
       final ValueTranscoder&lt;T&gt; valueTranscoder,
       @NotNull final List&lt;AttributeModification&gt; modifications) {
 
-<span class="fc bfc" id="L188" title="All 2 branches covered.">    setAttributes(</span>
+<span class="fc" id="L188">    setAttributes(</span>
         ldapEntry,
         name,
-<span class="fc" id="L191">        value != null ? Collections.singleton(value) : null,</span>
+<span class="fc bfc" id="L191" title="All 2 branches covered.">        value != null ? Collections.singleton(value) : null,</span>
         isBinary,
         valueTranscoder,
         modifications);
@@ -263,10 +263,10 @@ public interface LdaptiveEntryMapper&lt;T&gt; extends LdapEntryMapper&lt;T&gt; {
       final boolean isBinary,
       @NotNull final ValueTranscoder&lt;T&gt; valueTranscoder,
       @NotNull final List&lt;AttributeModification&gt; modifications) {
-<span class="fc bfc" id="L266" title="All 2 branches covered.">    addAttributes(</span>
+<span class="fc" id="L266">    addAttributes(</span>
         ldapEntry,
         name,
-<span class="fc" id="L269">        value != null ? Collections.singleton(value) : null,</span>
+<span class="fc bfc" id="L269" title="All 2 branches covered.">        value != null ? Collections.singleton(value) : null,</span>
         isBinary,
         valueTranscoder,
         modifications);
@@ -434,4 +434,4 @@ public interface LdaptiveEntryMapper&lt;T&gt; extends LdapEntryMapper&lt;T&gt; {
   }
 
 }
-</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.3.201901230119</span></div></body></html>
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

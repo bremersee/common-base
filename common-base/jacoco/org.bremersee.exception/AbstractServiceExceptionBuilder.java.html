@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AbstractServiceExceptionBuilder.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">common-base</a> &gt; <a href="index.source.html" class="el_package">org.bremersee.exception</a> &gt; <span class="el_source">AbstractServiceExceptionBuilder.java</span></div><h1>AbstractServiceExceptionBuilder.java</h1><pre class="source lang-java linenums">/*
+ * Copyright 2019 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package org.bremersee.exception;
+
+import org.springframework.util.StringUtils;
+
+/**
+ * The abstract service exception builder.
+ *
+ * @param &lt;T&gt; the exception type
+ * @author Christian Bremer
+ */
+<span class="fc" id="L27">public abstract class AbstractServiceExceptionBuilder&lt;T extends ServiceException&gt;</span>
+    implements ServiceExceptionBuilder&lt;T&gt; {
+
+  private static final long serialVersionUID = 2L;
+
+  /**
+   * The http status.
+   */
+  protected int httpStatus;
+
+  /**
+   * The reason.
+   */
+  protected String reason;
+
+  /**
+   * The error code.
+   */
+  protected String errorCode;
+
+  /**
+   * The cause.
+   */
+  protected Throwable cause;
+
+  @Override
+  public ServiceExceptionBuilder&lt;T&gt; httpStatus(int httpStatus) {
+<span class="fc" id="L54">    this.httpStatus = httpStatus;</span>
+<span class="fc" id="L55">    return this;</span>
+  }
+
+  @Override
+  public ServiceExceptionBuilder&lt;T&gt; errorCode(String errorCode) {
+<span class="fc" id="L60">    this.errorCode = errorCode;</span>
+<span class="fc" id="L61">    return this;</span>
+  }
+
+  @Override
+  public ServiceExceptionBuilder&lt;T&gt; reason(String reason) {
+<span class="fc" id="L66">    this.reason = reason;</span>
+<span class="fc" id="L67">    return this;</span>
+  }
+
+  @Override
+  public ServiceExceptionBuilder&lt;T&gt; cause(Throwable cause) {
+<span class="fc" id="L72">    this.cause = cause;</span>
+<span class="fc" id="L73">    return this;</span>
+  }
+
+  @Override
+  public T build() {
+<span class="fc bfc" id="L78" title="All 4 branches covered.">    if (StringUtils.hasText(reason) &amp;&amp; cause != null) {</span>
+<span class="fc" id="L79">      return buildWith(httpStatus, errorCode, reason, cause);</span>
+    }
+<span class="fc bfc" id="L81" title="All 4 branches covered.">    if (!StringUtils.hasText(reason) &amp;&amp; cause != null) {</span>
+<span class="fc" id="L82">      return buildWith(httpStatus, errorCode, cause);</span>
+    }
+<span class="pc bpc" id="L84" title="1 of 4 branches missed.">    if (StringUtils.hasText(reason) &amp;&amp; cause == null) {</span>
+<span class="fc" id="L85">      return buildWith(httpStatus, errorCode, reason);</span>
+    }
+<span class="fc" id="L87">    return buildWith(httpStatus, errorCode);</span>
+  }
+
+  /**
+   * Build the service exception with the given values.
+   *
+   * @param httpStatus the http status
+   * @param errorCode  the error code
+   * @return the service exception
+   */
+  protected abstract T buildWith(int httpStatus, String errorCode);
+
+  /**
+   * Build the service exception with the given values.
+   *
+   * @param httpStatus the http status
+   * @param errorCode  the error code
+   * @param reason     the reason
+   * @return the service exception
+   */
+  protected abstract T buildWith(int httpStatus, String errorCode, String reason);
+
+  /**
+   * Build the service exception with the given values.
+   *
+   * @param httpStatus the http status
+   * @param errorCode  the error code
+   * @param cause      the cause
+   * @return the t
+   */
+  protected abstract T buildWith(int httpStatus, String errorCode, Throwable cause);
+
+  /**
+   * Build the service exception with the given values.
+   *
+   * @param httpStatus the http status
+   * @param errorCode  the error code
+   * @param reason     the reason
+   * @param cause      the cause
+   * @return the t
+   */
+  protected abstract T buildWith(int httpStatus, String errorCode, String reason, Throwable cause);
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

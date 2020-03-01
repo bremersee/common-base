@@ -1,0 +1,16 @@
+GROUP,PACKAGE,CLASS,INSTRUCTION_MISSED,INSTRUCTION_COVERED,BRANCH_MISSED,BRANCH_COVERED,LINE_MISSED,LINE_COVERED,COMPLEXITY_MISSED,COMPLEXITY_COVERED,METHOD_MISSED,METHOD_COVERED
+common-base-security,org.bremersee.security.authentication,ClientCredentialsFlowProperties.Builder,61,141,18,20,0,21,15,15,1,10
+common-base-security,org.bremersee.security.authentication,PasswordFlowProperties.Builder,78,177,22,24,0,27,18,18,1,12
+common-base-security,org.bremersee.security.authentication,BasicAuthProperties,0,4,0,0,0,1,0,1,0,1
+common-base-security,org.bremersee.security.authentication,ClientCredentialsFlowProperties.Builder.Impl,69,89,21,9,0,7,16,8,1,8
+common-base-security,org.bremersee.security.authentication,RestTemplateAccessTokenRetriever,7,64,0,2,2,17,1,3,1,2
+common-base-security,org.bremersee.security.authentication,PasswordFlowProperties,0,57,1,5,0,14,1,4,0,2
+common-base-security,org.bremersee.security.authentication,AccessTokenRetrieverProperties,0,2,0,0,0,1,0,1,0,1
+common-base-security,org.bremersee.security.authentication,PasswordFlowProperties.Builder.Impl,90,113,27,11,0,9,20,10,1,10
+common-base-security,org.bremersee.security.authentication,BasicAuthProperties.Builder.Impl,65,15,14,0,2,3,11,3,4,3
+common-base-security,org.bremersee.security.authentication,JsonPathJwtConverter,5,145,7,13,2,40,7,12,0,9
+common-base-security,org.bremersee.security.authentication,ClientCredentialsFlowProperties,0,31,1,1,0,10,1,3,0,3
+common-base-security,org.bremersee.security.authentication,RestTemplateAccessTokenRetriever.ErrorHandler,9,0,0,0,2,0,1,0,1,0
+common-base-security,org.bremersee.security.authentication,BasicAuthProperties.Builder,27,59,7,7,0,8,6,9,1,7
+common-base-security,org.bremersee.security.authentication,JsonPathJwtParser,0,31,0,0,0,7,0,3,0,3
+common-base-security,org.bremersee.exception,AccessTokenRetrieverAuthenticationException,0,70,2,12,0,16,2,8,0,3

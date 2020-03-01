@@ -1,8 +1,0 @@
-org.bremersee
-org.bremersee.exception
-org.bremersee.exception.feign
-org.bremersee.http
-org.bremersee.security
-org.bremersee.security.access
-org.bremersee.security.authentication
-org.bremersee.web

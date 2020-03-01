@@ -70,10 +70,10 @@ public class LdaptiveTemplate implements LdaptiveOperations, Cloneable {
    * @param errorHandler the error handler
    */
   public void setErrorHandler(final ErrorHandler errorHandler) {
-<span class="nc bnc" id="L73" title="All 2 branches missed.">    if (errorHandler != null) {</span>
-<span class="nc" id="L74">      this.errorHandler = errorHandler;</span>
+<span class="pc bpc" id="L73" title="1 of 2 branches missed.">    if (errorHandler != null) {</span>
+<span class="fc" id="L74">      this.errorHandler = errorHandler;</span>
     }
-<span class="nc" id="L76">  }</span>
+<span class="fc" id="L76">  }</span>
 
   /**
    * Returns a new instance of this ldaptive template with the same connection factory and error
@@ -84,7 +84,7 @@ public class LdaptiveTemplate implements LdaptiveOperations, Cloneable {
   @SuppressWarnings(&quot;MethodDoesntCallSuperMethod&quot;)
   @Override
   public LdaptiveTemplate clone() {
-<span class="nc" id="L87">    return clone(errorHandler);</span>
+<span class="fc" id="L87">    return clone(errorHandler);</span>
   }
 
   /**
@@ -95,9 +95,9 @@ public class LdaptiveTemplate implements LdaptiveOperations, Cloneable {
    * @return the new instance of the ldaptive template
    */
   public LdaptiveTemplate clone(final ErrorHandler errorHandler) {
-<span class="nc" id="L98">    final LdaptiveTemplate template = new LdaptiveTemplate(connectionFactory);</span>
-<span class="nc bnc" id="L99" title="All 2 branches missed.">    template.setErrorHandler(errorHandler != null ? errorHandler : this.errorHandler);</span>
-<span class="nc" id="L100">    return template;</span>
+<span class="fc" id="L98">    final LdaptiveTemplate template = new LdaptiveTemplate(connectionFactory);</span>
+<span class="pc bpc" id="L99" title="1 of 2 branches missed.">    template.setErrorHandler(errorHandler != null ? errorHandler : this.errorHandler);</span>
+<span class="fc" id="L100">    return template;</span>
   }
 
   private Connection getConnection() throws LdapException {
@@ -315,7 +315,7 @@ public class LdaptiveTemplate implements LdaptiveOperations, Cloneable {
 <span class="fc" id="L315">      return entryMapper.map(destination);</span>
 
 <span class="nc" id="L317">    } catch (LdapException e) {</span>
-<span class="nc" id="L318">      throw new LdaptiveException(e);</span>
+<span class="nc" id="L318">      throw LdaptiveException.builder().cause(e).build();</span>
     }
   }
 
@@ -372,7 +372,7 @@ public class LdaptiveTemplate implements LdaptiveOperations, Cloneable {
 <span class="fc" id="L372">      new DeleteOperation(connection).execute(new DeleteRequest(entryMapper.mapDn(domainModel)));</span>
 
 <span class="nc" id="L374">    } catch (LdapException e) {</span>
-<span class="nc" id="L375">      throw new LdaptiveException(e);</span>
+<span class="nc" id="L375">      throw LdaptiveException.builder().cause(e).build();</span>
 <span class="fc" id="L376">    }</span>
 <span class="fc" id="L377">  }</span>
 
@@ -398,4 +398,4 @@ public class LdaptiveTemplate implements LdaptiveOperations, Cloneable {
 <span class="fc" id="L398">  }</span>
 
 }
-</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.3.201901230119</span></div></body></html>
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AccessTokenRetrieverAuthenticationException.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">common-base-security</a> &gt; <a href="index.source.html" class="el_package">org.bremersee.exception</a> &gt; <span class="el_source">AccessTokenRetrieverAuthenticationException.java</span></div><h1>AccessTokenRetrieverAuthenticationException.java</h1><pre class="source lang-java linenums">package org.bremersee.exception;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.util.StringUtils;
+
+/**
+ * The access token retriever authentication exception.
+ *
+ * @author Christian Bremer
+ */
+public class AccessTokenRetrieverAuthenticationException extends AuthenticationException
+    implements HttpStatusAware {
+
+  private HttpStatus httpStatus;
+
+  /**
+   * Instantiates a new access token retriever authentication exception.
+   *
+   * @param httpStatus the http status
+   * @param body       the body
+   */
+  public AccessTokenRetrieverAuthenticationException(
+      final HttpStatus httpStatus, final String body) {
+<span class="fc" id="L25">    super(buildMessage(httpStatus, body));</span>
+<span class="fc" id="L26">    this.httpStatus = httpStatus;</span>
+<span class="fc" id="L27">  }</span>
+
+  @Override
+  public int status() {
+<span class="fc bfc" id="L31" title="All 2 branches covered.">    return httpStatus != null ? httpStatus.value() : HttpStatus.UNAUTHORIZED.value();</span>
+  }
+
+  private static String buildMessage(final HttpStatus httpStatus, final String body) {
+<span class="pc bpc" id="L35" title="1 of 4 branches missed.">    if ((httpStatus == null || !StringUtils.hasText(httpStatus.getReasonPhrase()))</span>
+<span class="fc bfc" id="L36" title="All 2 branches covered.">        &amp;&amp; !StringUtils.hasText(body)) {</span>
+<span class="fc" id="L37">      return RestApiExceptionUtils.NO_MESSAGE_VALUE;</span>
+    }
+<span class="fc bfc" id="L39" title="All 2 branches covered.">    if (httpStatus == null) {</span>
+<span class="fc" id="L40">      return body;</span>
+    }
+<span class="fc" id="L42">    final StringBuilder sb = new StringBuilder();</span>
+<span class="fc" id="L43">    sb.append(&quot;Server returned status code &quot;).append(httpStatus.value());</span>
+<span class="pc bpc" id="L44" title="1 of 2 branches missed.">    if (StringUtils.hasText(httpStatus.getReasonPhrase())) {</span>
+<span class="fc" id="L45">      sb.append(&quot; (&quot;).append(httpStatus.getReasonPhrase()).append(&quot;)&quot;);</span>
+    }
+<span class="fc bfc" id="L47" title="All 2 branches covered.">    if (StringUtils.hasText(body)) {</span>
+<span class="fc" id="L48">      sb.append(&quot;: &quot;).append(body);</span>
+    }
+<span class="fc" id="L50">    return sb.toString();</span>
+  }
+}
+
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>
