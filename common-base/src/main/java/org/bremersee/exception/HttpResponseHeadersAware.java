@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 the original author or authors.
+ * Copyright 2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -45,6 +45,8 @@ public interface HttpResponseHeadersAware {
     for (Entry<String, ? extends Collection<String>> entry : headers.entrySet()) {
       if (entry.getValue() != null && !entry.getValue().isEmpty()) {
         map.put(entry.getKey(), entry.getValue().iterator().next());
+      } else {
+        map.put(entry.getKey(), "");
       }
     }
     return map;

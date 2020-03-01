@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 the original author or authors.
+ * Copyright 2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
-import org.bremersee.exception.RestApiExceptionUtils;
+import org.bremersee.exception.ErrorCodeAware;
 
 /**
  * Marks an exception class or method with an error code {@link #value()} of the application.
@@ -37,10 +37,10 @@ public @interface ErrorCode {
 
   /**
    * The error code of the exception in addition to the HTTP status code. The default value is
-   * {@link RestApiExceptionUtils#NO_ERROR_CODE_VALUE}.
+   * {@link ErrorCodeAware#NO_ERROR_CODE_VALUE}.
    *
    * @return the error code
    */
-  String value() default RestApiExceptionUtils.NO_ERROR_CODE_VALUE;
+  String value() default ErrorCodeAware.NO_ERROR_CODE_VALUE;
 
 }

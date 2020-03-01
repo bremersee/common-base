@@ -16,6 +16,7 @@
 
 package org.bremersee.converter;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.format.FormatterRegistry;
 
@@ -24,12 +25,12 @@ import org.springframework.format.FormatterRegistry;
  *
  * @author Christian Bremer
  */
+@Slf4j
 public class BaseCommonConverters {
 
   /**
    * The constant CONVERTERS.
    */
-  @SuppressWarnings("WeakerAccess")
   public static final Converter<?, ?>[] CONVERTERS = new Converter<?, ?>[]{
       new StringToJavaLocaleConverter(),
       new StringToLocaleConverter(),
@@ -46,9 +47,9 @@ public class BaseCommonConverters {
    *
    * @param registry the registry
    */
-  @SuppressWarnings("unused")
   public static void registerAll(FormatterRegistry registry) {
     for (Converter<?, ?> converter : CONVERTERS) {
+      log.info("Adding convert {} to registry.", converter);
       registry.addConverter(converter);
     }
   }

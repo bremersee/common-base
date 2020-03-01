@@ -1,10 +1,26 @@
+/*
+ * Copyright 2019 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.bremersee.security.access;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -12,20 +28,90 @@ import java.util.Collections;
 import org.bremersee.common.model.AccessControlEntry;
 import org.bremersee.common.model.AccessControlList;
 import org.bremersee.security.core.AuthorityConstants;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * The acl mapper impl test.
  *
  * @author Christian Bremer
  */
-public class AclMapperImplTest {
+class AclMapperImplTest {
+
+  @Test
+  void testGetAclFactory() {
+    AclFactory<AclImpl> expected = AclImpl::new;
+    AclMapper<AclImpl> mapper = new AclMapperImpl<>(expected);
+    assertEquals(expected, mapper.getAclFactory());
+  }
+
+  /**
+   * Admin role.
+   */
+  @Test
+  void adminRole() {
+    AclMapperImpl<Acl<? extends Ace>> mapper = new AclMapperImpl<>(
+        AclImpl::new,
+        PermissionConstants.ALL,
+        true,
+        false
+    );
+    mapper.setAdminRole("ROLE_SUPER_USER");
+    assertEquals("ROLE_SUPER_USER", mapper.getAdminRole());
+  }
+
+  /**
+   * Admin role.
+   */
+  @Test
+  void adminRoles() {
+    AclMapperImpl<Acl<? extends Ace>> mapper = new AclMapperImpl<>(
+        AclImpl::new,
+        PermissionConstants.ALL,
+        true,
+        false
+    );
+    mapper.setAdminRoles(Collections.singleton("ROLE_SUPER_USER"));
+    assertNotNull(mapper.getAdminRoles());
+    assertTrue(mapper.getAdminRoles().contains("ROLE_SUPER_USER"));
+  }
+
+  /**
+   * Switch admin access.
+   */
+  @Test
+  void switchAdminAccess() {
+    AclMapperImpl<Acl<? extends Ace>> mapper = new AclMapperImpl<>(
+        AclImpl::new,
+        PermissionConstants.ALL,
+        true,
+        false
+    );
+    mapper.setAdminRoles(Collections.singleton("ROLE_ADMINISTRATOR"));
+    Acl<? extends Ace> acl = mapper.defaultAcl("someone");
+    assertEquals("someone", acl.getOwner());
+    for (String permission : PermissionConstants.ALL) {
+      assertTrue(acl.entryMap().get(permission).getRoles().contains("ROLE_ADMINISTRATOR"));
+    }
+
+    mapper = new AclMapperImpl<>(
+        AclImpl::new,
+        PermissionConstants.ALL,
+        false,
+        false
+    );
+    mapper.setAdminRoles(Collections.singleton("ROLE_ADMIN"));
+    acl = mapper.defaultAcl("somebody");
+    assertEquals("somebody", acl.getOwner());
+    for (String permission : PermissionConstants.ALL) {
+      assertFalse(acl.entryMap().get(permission).getRoles().contains("ROLE_ADMIN"));
+    }
+  }
 
   /**
    * Map with defaults and admin switch.
    */
   @Test
-  public void mapWithDefaultsAndAdminSwitch() {
+  void mapWithDefaultsAndAdminSwitch() {
     AclMapper<Acl<? extends Ace>> mapper = new AclMapperImpl<>(
         AclImpl::new,
         PermissionConstants.ALL,
@@ -104,7 +190,7 @@ public class AclMapperImplTest {
    * Map.
    */
   @Test
-  public void map() {
+  void map() {
     AclMapper<Acl<? extends Ace>> mapper = new AclMapperImpl<>(
         AclImpl::new,
         null,

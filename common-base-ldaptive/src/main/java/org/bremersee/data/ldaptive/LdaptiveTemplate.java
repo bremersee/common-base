@@ -315,7 +315,7 @@ public class LdaptiveTemplate implements LdaptiveOperations, Cloneable {
       return entryMapper.map(destination);
 
     } catch (LdapException e) {
-      throw new LdaptiveException(e);
+      throw LdaptiveException.builder().cause(e).build();
     }
   }
 
@@ -372,7 +372,7 @@ public class LdaptiveTemplate implements LdaptiveOperations, Cloneable {
       new DeleteOperation(connection).execute(new DeleteRequest(entryMapper.mapDn(domainModel)));
 
     } catch (LdapException e) {
-      throw new LdaptiveException(e);
+      throw LdaptiveException.builder().cause(e).build();
     }
   }
 

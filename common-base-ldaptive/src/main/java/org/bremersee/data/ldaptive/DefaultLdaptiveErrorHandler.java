@@ -18,7 +18,6 @@ package org.bremersee.data.ldaptive;
 
 import org.ldaptive.LdapException;
 import org.ldaptive.ResultCode;
-import org.springframework.http.HttpStatus;
 
 /**
  * The default ldaptive error handler.
@@ -32,10 +31,10 @@ public class DefaultLdaptiveErrorHandler extends AbstractLdaptiveErrorHandler {
     if (ldapException == null) {
       return new LdaptiveException();
     }
-    final HttpStatus httpStatus = ldapException.getResultCode() == ResultCode.NO_SUCH_OBJECT
-        ? HttpStatus.NOT_FOUND
-        : HttpStatus.INTERNAL_SERVER_ERROR;
-    return new LdaptiveException(httpStatus, ldapException);
+    if (ldapException.getResultCode() == ResultCode.NO_SUCH_OBJECT) {
+      return LdaptiveException.builder().httpStatus(404).cause(ldapException).build();
+    }
+    return LdaptiveException.builder().cause(ldapException).build();
   }
 
 }

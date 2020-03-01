@@ -31,6 +31,17 @@ import org.springframework.validation.annotation.Validated;
 public interface AclMapper<T extends Acl<? extends Ace>> {
 
   /**
+   * Gets acl factory.
+   *
+   * @return the acl factory
+   */
+  default AclFactory<T> getAclFactory() {
+    return (owner, entries) -> map(AclBuilder.builder()
+        .from(owner, entries)
+        .buildAccessControlList());
+  }
+
+  /**
    * Default access control list (dto).
    *
    * @param owner the owner
@@ -54,7 +65,7 @@ public interface AclMapper<T extends Acl<? extends Ace>> {
    * Map access control list dto to entity.
    *
    * @param accessControlList the access control list
-   * @param aclFactory        the acl factory
+   * @param aclFactory the acl factory
    * @return the acl of the specified type
    */
   default T map(@Nullable AccessControlList accessControlList, @NotNull AclFactory<T> aclFactory) {

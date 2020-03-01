@@ -6,12 +6,12 @@
   <parent>
     <groupId>org.bremersee</groupId>
     <artifactId>common-parent</artifactId>
-    <version>1.0.11</version>
+    <version>2.0.0</version>
     <relativePath/>
   </parent>
 
   <artifactId>common-base-parent</artifactId>
-  <version>1.3.3</version>
+  <version>2.0.0</version>
   <packaging>pom</packaging>
 
   <name>common-base-parent</name>
@@ -20,17 +20,32 @@
 
   <modules>
     <module>common-base</module>
+    <module>common-base-data</module>
+    <module>common-base-web</module>
+    <module>common-base-webmvc</module>
+    <module>common-base-security</module>
     <module>common-base-test</module>
-    <module>common-base-servlet</module>
-    <module>common-base-reactive</module>
+    <module>common-base-webflux</module>
+    <module>common-base-feign</module>
     <module>common-base-ldaptive</module>
+    <module>common-base-thymeleaf</module>
+
+    <module>common-base-autoconfigure</module>
+
+    <module>common-base-starter</module>
+    <module>common-base-ldaptive-starter</module>
+    <module>common-base-web-starter</module>
+    <module>common-base-webflux-starter</module>
+    <module>common-base-webmvc-starter</module>
+    <module>common-base-thymeleaf-starter</module>
+    <module>common-base-security-starter</module>
   </modules>
 
   <properties>
     <github.repo>common-base</github.repo>
     <!--suppress UnresolvedMavenProperty -->
     <gh-pages-staging-dir>${maven.multiModuleProjectDirectory}/target/staging</gh-pages-staging-dir>
-    <common-model.version>1.1.7</common-model.version>
+    <common-model.version>2.0.0</common-model.version>
   </properties>
 
   <scm>

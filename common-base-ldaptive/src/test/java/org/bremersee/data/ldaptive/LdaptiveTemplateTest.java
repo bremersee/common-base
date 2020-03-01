@@ -16,11 +16,11 @@
 
 package org.bremersee.data.ldaptive;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -30,12 +30,11 @@ import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
 import org.bremersee.data.ldaptive.app.Group;
 import org.bremersee.data.ldaptive.app.GroupMapper;
-import org.bremersee.data.ldaptive.app.LdapTemplateTestConfiguration;
 import org.bremersee.data.ldaptive.app.Person;
 import org.bremersee.data.ldaptive.app.PersonMapper;
+import org.bremersee.data.ldaptive.app.TestConfiguration;
 import org.bremersee.exception.ServiceException;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
 import org.ldaptive.AddRequest;
 import org.ldaptive.DeleteRequest;
 import org.ldaptive.LdapAttribute;
@@ -46,19 +45,16 @@ import org.ldaptive.SearchRequest;
 import org.ldaptive.SearchScope;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
-import org.springframework.test.context.junit4.SpringRunner;
 
 /**
  * The ldaptive template test.
  *
  * @author Christian Bremer
  */
-@RunWith(SpringRunner.class)
 @SpringBootTest(
-    classes = {LdapTemplateTestConfiguration.class},
+    classes = {TestConfiguration.class},
     webEnvironment = WebEnvironment.NONE,
     properties = {
         "security.basic.enabled=false",
@@ -69,9 +65,8 @@ import org.springframework.test.context.junit4.SpringRunner;
         "spring.ldap.embedded.port=12389",
         "spring.ldap.embedded.validation.enabled=false"
     })
-@AutoConfigureWebTestClient
 @Slf4j
-public class LdaptiveTemplateTest {
+class LdaptiveTemplateTest {
 
   @Value("${spring.ldap.embedded.base-dn}")
   private String baseDn;
@@ -89,7 +84,7 @@ public class LdaptiveTemplateTest {
    * Find existing persons.
    */
   @Test
-  public void findExistingPersons() {
+  void findExistingPersons() {
     SearchFilter searchFilter = new SearchFilter("(objectclass=inetOrgPerson)");
     SearchRequest searchRequest = new SearchRequest(
         "ou=people," + baseDn, searchFilter);
@@ -125,7 +120,7 @@ public class LdaptiveTemplateTest {
    * Find existing groups.
    */
   @Test
-  public void findExistingGroups() {
+  void findExistingGroups() {
     SearchFilter searchFilter = new SearchFilter("(objectclass=groupOfUniqueNames)");
     SearchRequest searchRequest = new SearchRequest(
         "ou=groups," + baseDn, searchFilter);
@@ -155,7 +150,7 @@ public class LdaptiveTemplateTest {
    * Find existing person.
    */
   @Test
-  public void findExistingPerson() {
+  void findExistingPerson() {
     SearchFilter searchFilter = new SearchFilter("(&(objectclass=inetOrgPerson)(uid={0}))");
     searchFilter.setParameter(0, "anna");
     SearchRequest searchRequest = new SearchRequest(
@@ -175,7 +170,7 @@ public class LdaptiveTemplateTest {
    * Exists group.
    */
   @Test
-  public void existsGroup() {
+  void existsGroup() {
     Group group = new Group();
     group.setCn("developers");
     assertTrue(ldaptiveTemplate.exists(group, groupMapper));
@@ -187,7 +182,7 @@ public class LdaptiveTemplateTest {
    * Add and modify and delete person.
    */
   @Test
-  public void addAndModifyAndDeletePerson() {
+  void addAndModifyAndDeletePerson() {
     Person person = new Person();
     person.setCn("A person");
     person.setSn("Person");
@@ -229,7 +224,7 @@ public class LdaptiveTemplateTest {
    * Save and delete group.
    */
   @Test
-  public void saveAndDeleteGroup() {
+  void saveAndDeleteGroup() {
     Group group = new Group();
     group.setCn("party");
     group.setOu("Party Guests");
@@ -286,7 +281,7 @@ public class LdaptiveTemplateTest {
    * Save and delete persons.
    */
   @Test
-  public void saveAndDeletePersons() {
+  void saveAndDeletePersons() {
     Person p0 = new Person();
     p0.setCn("Person Number 0");
     p0.setSn("Person 0");
@@ -310,6 +305,20 @@ public class LdaptiveTemplateTest {
     assertFalse(ldaptiveTemplate.exists(p0, personMapper));
     assertFalse(ldaptiveTemplate.exists(p1, personMapper));
     assertFalse(ldaptiveTemplate.exists(p2, personMapper));
+  }
+
+  /**
+   * Test clone.
+   */
+  @Test
+  void testClone() {
+    LdaptiveTemplate clone = ldaptiveTemplate.clone();
+    clone.setErrorHandler(new DefaultLdaptiveErrorHandler());
+    Group group = new Group();
+    group.setCn("developers");
+    assertTrue(clone.exists(group, groupMapper));
+    group.setCn("na");
+    assertFalse(clone.exists(group, groupMapper));
   }
 
 }

@@ -30,14 +30,6 @@ import org.springframework.security.test.context.support.WithSecurityContext;
 public @interface WithJwtAuthenticationToken {
 
   /**
-   * Jwt converter factory class.
-   *
-   * @return the class
-   */
-  Class<? extends JwtConverterFactory> jwtConverterFactory()
-      default KeycloakJwtConverterFactory.class;
-
-  /**
    * Audience.
    *
    * @return the audience
@@ -183,5 +175,12 @@ public @interface WithJwtAuthenticationToken {
    * @return the path
    */
   String rolesPath() default "realm_access.roles";
+
+  /**
+   * Json path jwt convert properties.
+   *
+   * @return the json path jwt convert properties
+   */
+  JsonPathJwtConverterProperties jwtConverter() default @JsonPathJwtConverterProperties;
 
 }
