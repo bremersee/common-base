@@ -267,7 +267,7 @@ public class ReactiveJaxbDecoder extends AbstractDecoder<Object> {
    *
    * @param xmlEventFlux the xml event as flux
    * @param desiredName the desired name
-   * @return the list of eml events as flux
+   * @return the list of xml events as flux
    */
   Flux<List<XMLEvent>> split(Flux<XMLEvent> xmlEventFlux, QName desiredName) {
     return xmlEventFlux.handle(new SplitHandler(desiredName));
