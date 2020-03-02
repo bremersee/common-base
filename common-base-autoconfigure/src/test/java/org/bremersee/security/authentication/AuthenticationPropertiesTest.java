@@ -209,6 +209,35 @@ class AuthenticationPropertiesTest {
   }
 
   /**
+   * Gets client credential flow.
+   */
+  @Test
+  void getClientCredentialFlow() {
+    AuthenticationProperties expected = new AuthenticationProperties();
+    expected.getClientCredentialsFlow().setClientId("1234");
+    expected.getClientCredentialsFlow().setClientSecret("5678");
+    expected.getClientCredentialsFlow().setTokenEndpoint("http://localhost/token");
+
+    AuthenticationProperties actual = new AuthenticationProperties();
+    actual.getClientCredentialsFlow().setClientId("1234");
+    actual.getClientCredentialsFlow().setClientSecret("5678");
+    actual.getClientCredentialsFlow().setTokenEndpoint("http://localhost/token");
+
+    assertEquals(expected, actual);
+    assertTrue(expected.toString().contains("1234"));
+    assertTrue(expected.toString().contains("http://localhost/token"));
+
+    assertNotEquals(expected.getClientCredentialsFlow(), null);
+    assertNotEquals(expected.getClientCredentialsFlow(), new Object());
+
+    ClientCredentialsFlowProperties properties = expected.getClientCredentialsFlow().toProperties();
+    assertNotNull(properties);
+    assertEquals(expected.getClientCredentialsFlow().getClientId(), properties.getClientId());
+    assertEquals(expected.getClientCredentialsFlow().getClientSecret(), properties.getClientSecret());
+    assertEquals(expected.getClientCredentialsFlow().getTokenEndpoint(), properties.getTokenEndpoint());
+  }
+
+  /**
    * Gets basic auth users.
    */
   @Test

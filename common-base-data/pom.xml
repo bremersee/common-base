@@ -7,7 +7,7 @@
   <parent>
     <artifactId>common-base-parent</artifactId>
     <groupId>org.bremersee</groupId>
-    <version>1.4.2</version>
+    <version>1.4.3</version>
   </parent>
 
   <artifactId>common-base-data</artifactId>

@@ -31,6 +31,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.event.EventListener;
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import org.springframework.util.Assert;
+import org.springframework.util.ClassUtils;
 import org.springframework.web.servlet.HandlerExceptionResolver;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
@@ -84,13 +85,13 @@ public class ApiExceptionResolverAutoConfiguration implements WebMvcConfigurer {
             + "*********************************************************************************\n"
             + "* {}\n"
             + "*********************************************************************************",
-        getClass().getSimpleName());
+        ClassUtils.getUserClass(getClass()).getSimpleName());
   }
 
   @Override
   public void extendHandlerExceptionResolvers(List<HandlerExceptionResolver> exceptionResolvers) {
     log.info("Adding exception resolver [{}] to registry.",
-        apiExceptionResolver.getClass().getSimpleName());
+        ClassUtils.getUserClass(apiExceptionResolver).getSimpleName());
     exceptionResolvers.add(0, apiExceptionResolver);
   }
 

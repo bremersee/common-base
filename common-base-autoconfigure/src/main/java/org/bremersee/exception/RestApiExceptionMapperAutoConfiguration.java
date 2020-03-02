@@ -9,6 +9,7 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.event.EventListener;
+import org.springframework.util.ClassUtils;
 
 @ConditionalOnWebApplication(type = Type.ANY)
 @Configuration
@@ -36,7 +37,7 @@ public class RestApiExceptionMapperAutoConfiguration {
             + "* applicationName = {}\n"
             + "* apiPaths = {}\n"
             + "*********************************************************************************",
-        getClass().getSimpleName(),
+        ClassUtils.getUserClass(getClass()).getSimpleName(),
         applicationName,
         properties.getApiPaths());
   }

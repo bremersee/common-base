@@ -21,7 +21,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
 /**
- * The type Person.
+ * The person.
  *
  * @author Christian Bremer
  */

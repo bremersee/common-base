@@ -17,11 +17,15 @@
 package org.bremersee.base;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.util.Locale;
 import lombok.extern.slf4j.Slf4j;
+import org.bremersee.base.app.AclEntity;
 import org.bremersee.base.app.TestConfiguration;
+import org.bremersee.security.access.AclMapper;
 import org.junit.jupiter.api.Test;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
@@ -49,6 +53,12 @@ public class AutoConfigureTest {
   @Autowired
   MessageSource messageSource;
 
+  @Autowired(required = false)
+  AclMapper<AclEntity> aclMapper;
+
+  @Autowired
+  ModelMapper modelMapper;
+
   /**
    * Test message source.
    */
@@ -72,4 +82,10 @@ public class AutoConfigureTest {
     actual = messageSource.getMessage("test1", new Object[]{"Anna"}, Locale.FRANCE);
     assertEquals("Bon jour Anna", actual);
   }
+
+  @Test
+  void testAclMapper() {
+    assertNotNull(modelMapper);
+  }
+
 }

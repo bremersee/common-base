@@ -24,6 +24,7 @@ import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.event.EventListener;
 import org.springframework.format.FormatterRegistry;
+import org.springframework.util.ClassUtils;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 /**
@@ -45,7 +46,7 @@ public class BaseCommonConvertersAutoConfiguration implements WebMvcConfigurer {
             + "*********************************************************************************\n"
             + "* {}\n"
             + "*********************************************************************************",
-        getClass().getSimpleName());
+        ClassUtils.getUserClass(getClass()).getSimpleName());
   }
 
   @Override

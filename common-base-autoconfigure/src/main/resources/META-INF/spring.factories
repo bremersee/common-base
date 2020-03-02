@@ -1,7 +1,11 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
 \
 org.bremersee.context.MessageSourceAutoConfiguration,\
+org.bremersee.converter.ModelMapperAutoConfiguration,\
 org.bremersee.exception.RestApiExceptionMapperAutoConfiguration,\
+org.bremersee.exception.RestApiExceptionParserAutoConfiguration,\
+\
+org.bremersee.security.access.AccessControlAutoConfiguration,\
 \
 org.bremersee.web.servlet.ApiExceptionResolverAutoConfiguration,\
 org.bremersee.web.servlet.BaseCommonConvertersAutoConfiguration,\

@@ -63,12 +63,16 @@ public class WebClientAccessTokenRetriever
   @Override
   public Mono<String> retrieveAccessToken(final AccessTokenRetrieverProperties properties) {
     if (log.isDebugEnabled()) {
-      log.debug("msg=[Retrieving access token with password flow.] {}", properties);
+      log.debug("Retrieving access token with password flow, properties = {}", properties);
     }
     return webClient
         .method(HttpMethod.POST)
         .uri(properties.getTokenEndpoint())
         .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+        .headers(headers -> properties.getBasicAuthProperties()
+            .ifPresent(basicAuthProperties -> headers.setBasicAuth(
+                basicAuthProperties.getUsername(),
+                basicAuthProperties.getPassword())))
         .body(BodyInserters.fromFormData(properties.createBody()))
         .retrieve()
         .onStatus(ErrorDetectors.DEFAULT, this)

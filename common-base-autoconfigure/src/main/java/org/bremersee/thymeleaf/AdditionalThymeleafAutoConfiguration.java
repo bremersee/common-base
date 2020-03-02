@@ -30,6 +30,7 @@ import org.springframework.context.event.EventListener;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.util.Assert;
+import org.springframework.util.ClassUtils;
 import org.springframework.util.StringUtils;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.templateresolver.ITemplateResolver;
@@ -96,7 +97,7 @@ public class AdditionalThymeleafAutoConfiguration {
             + "*********************************************************************************\n"
             + "* resolvers size = {}\n"
             + "*********************************************************************************",
-        getClass().getSimpleName(),
+        ClassUtils.getUserClass(getClass()).getSimpleName(),
         properties.getResolvers().size());
 
     Assert.notNull(templateEngine, "Template engine must be present.");

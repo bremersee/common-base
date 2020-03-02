@@ -34,6 +34,7 @@ import org.springframework.context.event.EventListener;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.codec.ServerCodecConfigurer;
 import org.springframework.util.Assert;
+import org.springframework.util.ClassUtils;
 
 /**
  * The api exception handler auto configuration.
@@ -63,7 +64,7 @@ public class ApiExceptionHandlerAutoConfiguration {
             + "*********************************************************************************\n"
             + "* {}\n"
             + "*********************************************************************************",
-        getClass().getSimpleName());
+        ClassUtils.getUserClass(getClass()).getSimpleName());
   }
 
   /**
@@ -98,7 +99,7 @@ public class ApiExceptionHandlerAutoConfiguration {
         restApiExceptionMapper.getIfAvailable(),
         "Rest api exception mapper must be present.");
     log.info("Creating api exception handler [{}].",
-        restApiExceptionMapper.getIfAvailable().getClass().getSimpleName());
+        ClassUtils.getUserClass(restApiExceptionMapper.getIfAvailable()).getSimpleName());
 
     return new ApiExceptionHandler(
         errorAttributes.getIfAvailable(),

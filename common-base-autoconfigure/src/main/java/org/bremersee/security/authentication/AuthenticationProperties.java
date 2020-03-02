@@ -90,6 +90,11 @@ public class AuthenticationProperties {
   private PasswordFlow passwordFlow = new PasswordFlow();
 
   /**
+   * The properties for the client credentials flow.
+   */
+  private ClientCredentialFlow clientCredentialsFlow = new ClientCredentialFlow();
+
+  /**
    * A list of in-memory users, that can login with basic authentication for testing purposes.
    */
   private List<SimpleUser> basicAuthUsers = new ArrayList<>();
@@ -155,6 +160,37 @@ public class AuthenticationProperties {
   }
 
   /**
+   * The type Client credential flow.
+   */
+  @Getter
+  @Setter
+  @ToString(exclude = {"clientSecret"})
+  @EqualsAndHashCode(exclude = {"clientSecret"})
+  public static class ClientCredentialFlow implements Serializable {
+
+    private static final long serialVersionUID = 1L;
+
+    private String tokenEndpoint;
+
+    private String clientId;
+
+    private String clientSecret;
+
+    /**
+     * To properties client credentials flow properties.
+     *
+     * @return the client credentials flow properties
+     */
+    public ClientCredentialsFlowProperties toProperties() {
+      return ClientCredentialsFlowProperties.builder()
+          .tokenEndpoint(tokenEndpoint)
+          .clientId(clientId)
+          .clientSecret(clientSecret)
+          .build();
+    }
+  }
+
+  /**
    * OAuth2 password flow configuration properties.
    */
   @Getter
@@ -180,7 +216,6 @@ public class AuthenticationProperties {
      *
      * @return the password flow properties
      */
-    @SuppressWarnings("unused")
     public PasswordFlowProperties toProperties() {
       return this.toProperties(systemUsername, systemPassword);
     }

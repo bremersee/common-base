@@ -110,6 +110,14 @@ class PasswordFlowPropertiesTest {
   }
 
   /**
+   * Gets basic auth properties.
+   */
+  @Test
+  void getBasicAuthProperties() {
+    assertFalse(PasswordFlowProperties.builder().build().getBasicAuthProperties().isPresent());
+  }
+
+  /**
    * From.
    */
   @Test

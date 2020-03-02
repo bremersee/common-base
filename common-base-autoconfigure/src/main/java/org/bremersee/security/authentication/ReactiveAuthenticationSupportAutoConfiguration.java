@@ -30,6 +30,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.event.EventListener;
 import org.springframework.security.oauth2.jwt.ReactiveJwtDecoder;
 import org.springframework.util.Assert;
+import org.springframework.util.ClassUtils;
 
 /**
  * The reactive authentication support auto configuration.
@@ -77,7 +78,7 @@ public class ReactiveAuthenticationSupportAutoConfiguration {
             + "* rolePrefix = {}\n"
             + "* nameJsonPath = {}\n"
             + "*********************************************************************************",
-        getClass().getSimpleName(),
+        ClassUtils.getUserClass(getClass()).getSimpleName(),
         properties.getRolesJsonPath(),
         properties.isRolesValueList(),
         properties.getRolesValueSeparator(),
