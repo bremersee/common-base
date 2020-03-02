@@ -37,10 +37,8 @@ import org.bremersee.security.access.PermissionConstants;
 @Setter
 @ToString
 @NoArgsConstructor
-// @TypeAlias("acl")
 public class AclEntity implements Acl<AceEntity> {
 
-  // @Indexed
   private String owner;
 
   private AceEntity administration = new AceEntity();

@@ -16,13 +16,15 @@
 
 package org.bremersee.converter;
 
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
-import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.event.EventListener;
 import org.springframework.util.ClassUtils;
 
 /**
@@ -36,25 +38,28 @@ import org.springframework.util.ClassUtils;
 public class ModelMapperAutoConfiguration {
 
   /**
-   * Init.
-   */
-  @EventListener(ApplicationReadyEvent.class)
-  public void init() {
-    log.info("\n"
-            + "*********************************************************************************\n"
-            + "* {}\n"
-            + "*********************************************************************************",
-        ClassUtils.getUserClass(getClass()).getSimpleName());
-  }
-
-  /**
    * Creates the model mapper bean.
    *
+   * @param adapters the configuration adapters
    * @return the model mapper
    */
   @Bean
-  public ModelMapper modelMapper() {
-    return new ModelMapper();
+  public ModelMapper modelMapper(ObjectProvider<List<ModelMapperConfigurerAdapter>> adapters) {
+    final List<ModelMapperConfigurerAdapter> adapterList = adapters
+        .getIfAvailable(Collections::emptyList);
+    log.info("\n"
+            + "*********************************************************************************\n"
+            + "* {}\n"
+            + "*********************************************************************************\n"
+            + "* adapters = {}\n"
+            + "*********************************************************************************",
+        ClassUtils.getUserClass(getClass()).getSimpleName(),
+        adapterList.stream()
+            .map(adapter -> ClassUtils.getUserClass(adapter.getClass()).getSimpleName())
+            .collect(Collectors.toList()));
+    final ModelMapper modelMapper = new ModelMapper();
+    adapterList.forEach(adapter -> adapter.configure(modelMapper));
+    return modelMapper;
   }
 
 }

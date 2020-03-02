@@ -25,7 +25,12 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.util.Collections;
+import java.util.LinkedHashSet;
+import java.util.Set;
 import java.util.function.Consumer;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.bremersee.common.model.AccessControlList;
 import org.bremersee.converter.ModelMapperConfigurerAdapter;
 import org.junit.jupiter.api.Test;
@@ -100,6 +105,28 @@ class AccessControlAutoConfigurationTest {
     // AccessControlList actualDto = aclMapper.map(entity);
     assertNotNull(actualDto);
     assertEquals(dto, actualDto);
+
+    testHolders(modelMapper);
+  }
+
+  private void testHolders(ModelMapper modelMapper) {
+    AclHolder aclHolder = new AclHolder();
+    aclHolder.setId("123");
+    aclHolder.setOrder(100);
+    aclHolder.setName("test");
+    aclHolder.setTranslations(Collections.singleton("item"));
+    aclHolder.setAcl(AclBuilder.builder()
+        .owner("anna")
+        .guest(true, PermissionConstants.READ)
+        .addUser("otto", PermissionConstants.WRITE)
+        .buildAccessControlList());
+
+    AclEntityHolder aclEntityHolder = modelMapper.map(aclHolder, AclEntityHolder.class);
+    assertNotNull(aclEntityHolder.getAcl());
+    assertEquals("anna", aclEntityHolder.getAcl().getOwner());
+
+    AclHolder newAclHolder = modelMapper.map(aclEntityHolder, AclHolder.class);
+    assertNotNull(newAclHolder.getAcl());
   }
 
   private static <T> ObjectProvider<T> objectProvider(T provides) {
@@ -112,5 +139,57 @@ class AccessControlAutoConfigurationTest {
       return null;
     }).when(provider).ifAvailable(any(Consumer.class));
     return provider;
+  }
+
+  @Getter
+  @Setter
+  @NoArgsConstructor
+  private static class AclHolder {
+
+    private String id;
+
+    private AccessControlList acl;
+
+    private int order;
+
+    private String name;
+
+    private Set<String> translations = new LinkedHashSet<>();
+
+    /**
+     * Is acl present boolean.
+     *
+     * @return the boolean
+     */
+    @SuppressWarnings("unused")
+    public boolean isAclPresent() {
+      return getAcl() != null;
+    }
+  }
+
+  @Getter
+  @Setter
+  @NoArgsConstructor
+  private static class AclEntityHolder {
+
+    private String id;
+
+    private AclEntity acl;
+
+    private int order;
+
+    private String name;
+
+    private Set<String> translations = new LinkedHashSet<>();
+
+    /**
+     * Is acl present boolean.
+     *
+     * @return the boolean
+     */
+    @SuppressWarnings("unused")
+    public boolean isAclPresent() {
+      return getAcl() != null;
+    }
   }
 }

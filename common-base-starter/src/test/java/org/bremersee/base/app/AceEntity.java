@@ -37,19 +37,14 @@ import org.bremersee.security.access.Ace;
 @Setter
 @ToString
 @NoArgsConstructor
-// @TypeAlias("ace")
 public class AceEntity implements Ace {
 
-  // @Indexed
   private boolean guest;
 
-  // @Indexed
   private Set<String> users = new LinkedHashSet<>();
 
-  // @Indexed
   private Set<String> roles = new LinkedHashSet<>();
 
-  // @Indexed
   private Set<String> groups = new LinkedHashSet<>();
 
   /**
