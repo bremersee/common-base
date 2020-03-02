@@ -114,7 +114,7 @@ class PasswordFlowPropertiesTest {
    */
   @Test
   void getBasicAuthProperties() {
-    assertTrue(PasswordFlowProperties.builder().build().getBasicAuthProperties().isEmpty());
+    assertFalse(PasswordFlowProperties.builder().build().getBasicAuthProperties().isPresent());
   }
 
   /**
