@@ -37,10 +37,18 @@ import org.junit.jupiter.api.Test;
  */
 class AclMapperImplTest {
 
+  @Test
+  void testGetAclFactory() {
+    AclFactory<AclImpl> expected = AclImpl::new;
+    AclMapper<AclImpl> mapper = new AclMapperImpl<>(expected);
+    assertEquals(expected, mapper.getAclFactory());
+  }
+
   /**
    * Admin role.
    */
   @Test
+  @SuppressWarnings("deprecation")
   void adminRole() {
     AclMapperImpl<Acl<? extends Ace>> mapper = new AclMapperImpl<>(
         AclImpl::new,
@@ -50,6 +58,22 @@ class AclMapperImplTest {
     );
     mapper.setAdminRole("ROLE_SUPER_USER");
     assertEquals("ROLE_SUPER_USER", mapper.getAdminRole());
+  }
+
+  /**
+   * Admin role.
+   */
+  @Test
+  void adminRoles() {
+    AclMapperImpl<Acl<? extends Ace>> mapper = new AclMapperImpl<>(
+        AclImpl::new,
+        PermissionConstants.ALL,
+        true,
+        false
+    );
+    mapper.setAdminRoles(Collections.singleton("ROLE_SUPER_USER"));
+    assertNotNull(mapper.getAdminRoles());
+    assertTrue(mapper.getAdminRoles().contains("ROLE_SUPER_USER"));
   }
 
   /**
@@ -63,7 +87,7 @@ class AclMapperImplTest {
         true,
         false
     );
-    mapper.setAdminRole("ROLE_ADMINISTRATOR");
+    mapper.setAdminRoles(Collections.singleton("ROLE_ADMINISTRATOR"));
     Acl<? extends Ace> acl = mapper.defaultAcl("someone");
     assertEquals("someone", acl.getOwner());
     for (String permission : PermissionConstants.ALL) {
@@ -76,7 +100,7 @@ class AclMapperImplTest {
         false,
         false
     );
-    mapper.setAdminRole("ROLE_ADMIN");
+    mapper.setAdminRoles(Collections.singleton("ROLE_ADMIN"));
     acl = mapper.defaultAcl("somebody");
     assertEquals("somebody", acl.getOwner());
     for (String permission : PermissionConstants.ALL) {

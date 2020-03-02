@@ -20,6 +20,8 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Objects;
 import java.util.TreeMap;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 /**
@@ -28,6 +30,7 @@ import lombok.ToString;
  * @author Christian Bremer
  */
 @ToString(callSuper = true)
+@NoArgsConstructor(access = AccessLevel.PACKAGE)
 class AclImpl extends TreeMap<String, Ace> implements Acl<Ace> {
 
   private String owner;
@@ -35,7 +38,7 @@ class AclImpl extends TreeMap<String, Ace> implements Acl<Ace> {
   /**
    * Instantiates a new internal acl.
    *
-   * @param owner   the owner
+   * @param owner the owner
    * @param entries the entries
    */
   AclImpl(
