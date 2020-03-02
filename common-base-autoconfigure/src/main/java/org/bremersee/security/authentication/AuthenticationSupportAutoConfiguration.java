@@ -31,6 +31,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.event.EventListener;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.util.Assert;
+import org.springframework.util.ClassUtils;
 
 /**
  * The authentication support auto configuration.
@@ -79,7 +80,7 @@ public class AuthenticationSupportAutoConfiguration {
             + "* rolePrefix = {}\n"
             + "* nameJsonPath = {}\n"
             + "*********************************************************************************",
-        getClass().getSimpleName(),
+        ClassUtils.getUserClass(getClass()).getSimpleName(),
         properties.getRolesJsonPath(),
         properties.isRolesValueList(),
         properties.getRolesValueSeparator(),

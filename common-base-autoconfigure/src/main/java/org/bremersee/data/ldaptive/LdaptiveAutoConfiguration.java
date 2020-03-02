@@ -32,6 +32,7 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.event.EventListener;
+import org.springframework.util.ClassUtils;
 
 /**
  * The ldaptive configuration.
@@ -87,10 +88,12 @@ public class LdaptiveAutoConfiguration {
             + "* connectionPoolFactory = {}\n"
             + "* ldaptiveProvider = {}\n"
             + "*********************************************************************************",
-        getClass().getSimpleName(),
-        connectionConfigFactory.getClass().getSimpleName(),
-        connectionConfigFactory.getClass().getSimpleName(),
-        ldaptiveProvider != null ? this.ldaptiveProvider.getClass().getSimpleName() : "null");
+        ClassUtils.getUserClass(getClass()).getSimpleName(),
+        ClassUtils.getUserClass(connectionConfigFactory).getSimpleName(),
+        ClassUtils.getUserClass(connectionConfigFactory).getSimpleName(),
+        ldaptiveProvider != null
+            ? ClassUtils.getUserClass(ldaptiveProvider).getSimpleName()
+            : "null");
 
     if (properties.isPooled()) {
       LdaptiveTemplate template = new LdaptiveTemplate(defaultConnectionFactory());
