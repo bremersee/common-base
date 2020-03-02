@@ -24,7 +24,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
 /**
- * The type Vehicle.
+ * The vehicle.
  *
  * @author Christian Bremer
  */

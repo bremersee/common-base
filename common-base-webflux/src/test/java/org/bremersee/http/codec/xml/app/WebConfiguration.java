@@ -56,11 +56,11 @@ public class WebConfiguration implements WebFluxConfigurer {
   @Override
   public void configureHttpMessageCodecs(ServerCodecConfigurer configurer) {
     configurer
-        .defaultCodecs()
-        .jaxb2Decoder(new ReactiveJaxbDecoder(jaxbContextBuilder));
+        .customCodecs()
+        .registerWithDefaultConfig(new ReactiveJaxbDecoder(jaxbContextBuilder));
     configurer
-        .defaultCodecs()
-        .jaxb2Encoder(new ReactiveJaxbEncoder(jaxbContextBuilder));
+        .customCodecs()
+        .registerWithDefaultConfig(new ReactiveJaxbEncoder(jaxbContextBuilder));
   }
 
 }

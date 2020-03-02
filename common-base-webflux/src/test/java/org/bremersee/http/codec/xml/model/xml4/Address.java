@@ -21,7 +21,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
 /**
- * The type Address.
+ * The address.
  *
  * @author Christian Bremer
  */
