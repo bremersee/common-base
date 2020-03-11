@@ -14,19 +14,24 @@
  * limitations under the License.
  */
 
-package org.bremersee.data.convert;
+package org.bremersee.converter;
 
+import java.util.TimeZone;
 import lombok.ToString;
-import org.bremersee.converter.StringToThreeLetterCountryCodeConverter;
-import org.springframework.data.convert.ReadingConverter;
+import org.bremersee.common.model.TimeZoneId;
+import org.springframework.core.convert.converter.Converter;
 
 /**
- * The three letter country code read converter.
+ * The string to time zone converter.
  *
  * @author Christian Bremer
  */
-@ReadingConverter
 @ToString
-public class ThreeLetterCountryCodeReadConverter extends StringToThreeLetterCountryCodeConverter {
+public class StringToTimeZoneConverter implements Converter<String, TimeZone> {
+
+  @Override
+  public TimeZone convert(String source) {
+    return TimeZone.getTimeZone(source);
+  }
 
 }

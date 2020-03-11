@@ -14,26 +14,37 @@
  * limitations under the License.
  */
 
-package org.bremersee.data.convert;
+package org.bremersee.converter;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import java.time.OffsetDateTime;
-import java.util.Date;
-import lombok.ToString;
-import org.springframework.core.convert.converter.Converter;
-import org.springframework.data.convert.WritingConverter;
+import java.time.ZoneOffset;
+import java.util.TimeZone;
+import org.junit.jupiter.api.Test;
 
 /**
- * The offset date time to data write converter.
- *
- * @author Christian Bremer
+ * The string to time zone converter test.
  */
-@WritingConverter
-@ToString
-public class OffsetDateTimeToDateWriteConverter implements Converter<OffsetDateTime, Date> {
+class StringToTimeZoneConverterTest {
 
-  @Override
-  public Date convert(OffsetDateTime offsetDateTime) {
-    return Date.from(offsetDateTime.toInstant());
+  /**
+   * Convert.
+   */
+  @Test
+  void convert() {
+    assertEquals(
+        TimeZone.getTimeZone(ZoneOffset.UTC),
+        new StringToTimeZoneConverter().convert("UTC"));
+  }
+
+
+  /**
+   * Test to string.
+   */
+  @Test
+  void testToString() {
+    assertEquals(
+        "StringToTimeZoneConverter()",
+        new StringToTimeZoneConverter().toString());
   }
 }

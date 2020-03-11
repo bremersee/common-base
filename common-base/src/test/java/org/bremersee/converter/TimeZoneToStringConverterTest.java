@@ -14,19 +14,36 @@
  * limitations under the License.
  */
 
-package org.bremersee.data.convert;
+package org.bremersee.converter;
 
-import lombok.ToString;
-import org.bremersee.converter.StringToThreeLetterCountryCodeConverter;
-import org.springframework.data.convert.ReadingConverter;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import java.time.ZoneOffset;
+import java.util.TimeZone;
+import org.junit.jupiter.api.Test;
 
 /**
- * The three letter country code read converter.
- *
- * @author Christian Bremer
+ * The time zone to string converter test.
  */
-@ReadingConverter
-@ToString
-public class ThreeLetterCountryCodeReadConverter extends StringToThreeLetterCountryCodeConverter {
+class TimeZoneToStringConverterTest {
 
+  /**
+   * Convert.
+   */
+  @Test
+  void convert() {
+    assertEquals(
+        "UTC",
+        new TimeZoneToStringConverter().convert(TimeZone.getTimeZone(ZoneOffset.UTC)));
+  }
+
+  /**
+   * Test to string.
+   */
+  @Test
+  void testToString() {
+    assertEquals(
+        "TimeZoneToStringConverter()",
+        new TimeZoneToStringConverter().toString());
+  }
 }

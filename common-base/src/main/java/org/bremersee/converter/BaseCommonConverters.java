@@ -37,9 +37,11 @@ public class BaseCommonConverters {
       new StringToMongoSearchLanguageConverter(),
       new StringToThreeLetterCountryCodeConverter(),
       new StringToThreeLetterLanguageCodeConverter(),
+      new StringToTimeZoneConverter(),
       new StringToTimeZoneIdConverter(),
       new StringToTwoLetterCountryCodeConverter(),
-      new StringToTwoLetterLanguageCodeConverter()
+      new StringToTwoLetterLanguageCodeConverter(),
+      new StringToTimeZoneConverter()
   };
 
   /**

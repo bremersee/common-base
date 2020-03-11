@@ -16,17 +16,21 @@
 
 package org.bremersee.data.convert;
 
-import lombok.ToString;
-import org.bremersee.converter.StringToThreeLetterCountryCodeConverter;
-import org.springframework.data.convert.ReadingConverter;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
+import org.junit.jupiter.api.Test;
 
 /**
- * The three letter country code read converter.
- *
- * @author Christian Bremer
+ * The base common conversions test.
  */
-@ReadingConverter
-@ToString
-public class ThreeLetterCountryCodeReadConverter extends StringToThreeLetterCountryCodeConverter {
+class BaseCommonConversionsTest {
+
+  /**
+   * Converters.
+   */
+  @Test
+  void converters() {
+    assertNotNull(BaseCommonConversions.CONVERTERS);
+  }
 
 }

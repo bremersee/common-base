@@ -36,7 +36,6 @@ class StringToTimeZoneIdConverterTest {
     assertEquals(
         TimeZoneId.UTC,
         new StringToTimeZoneIdConverter().convert("UTC"));
-
   }
 
   /**

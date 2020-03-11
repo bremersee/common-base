@@ -17,16 +17,16 @@
 package org.bremersee.data.convert;
 
 import lombok.ToString;
-import org.bremersee.converter.StringToThreeLetterCountryCodeConverter;
-import org.springframework.data.convert.ReadingConverter;
+import org.bremersee.converter.TimeZoneToStringConverter;
+import org.springframework.data.convert.WritingConverter;
 
 /**
- * The three letter country code read converter.
+ * The time zone write converter.
  *
  * @author Christian Bremer
  */
-@ReadingConverter
+@WritingConverter
 @ToString
-public class ThreeLetterCountryCodeReadConverter extends StringToThreeLetterCountryCodeConverter {
+public class TimeZoneWriteConverter extends TimeZoneToStringConverter {
 
 }
