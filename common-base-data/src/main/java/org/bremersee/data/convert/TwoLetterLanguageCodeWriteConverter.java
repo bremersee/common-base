@@ -18,12 +18,14 @@ package org.bremersee.data.convert;
 
 import org.bremersee.common.model.TwoLetterLanguageCode;
 import org.springframework.core.convert.converter.Converter;
+import org.springframework.data.convert.WritingConverter;
 
 /**
  * The two letter language code write converter.
  *
  * @author Christian Bremer
  */
+@WritingConverter
 public class TwoLetterLanguageCodeWriteConverter
     implements Converter<TwoLetterLanguageCode, String> {
 
