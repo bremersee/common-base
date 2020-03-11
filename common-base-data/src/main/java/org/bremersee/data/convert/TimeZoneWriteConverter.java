@@ -16,8 +16,10 @@
 
 package org.bremersee.data.convert;
 
+import java.util.TimeZone;
 import lombok.ToString;
 import org.bremersee.converter.TimeZoneToStringConverter;
+import org.springframework.core.convert.converter.Converter;
 import org.springframework.data.convert.WritingConverter;
 
 /**
@@ -27,6 +29,7 @@ import org.springframework.data.convert.WritingConverter;
  */
 @WritingConverter
 @ToString
-public class TimeZoneWriteConverter extends TimeZoneToStringConverter {
+public class TimeZoneWriteConverter extends TimeZoneToStringConverter
+    implements Converter<TimeZone, String> {
 
 }

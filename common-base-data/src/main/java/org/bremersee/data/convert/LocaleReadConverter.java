@@ -16,8 +16,10 @@
 
 package org.bremersee.data.convert;
 
+import java.util.Locale;
 import lombok.ToString;
 import org.bremersee.converter.StringToLocaleConverter;
+import org.springframework.core.convert.converter.Converter;
 import org.springframework.data.convert.ReadingConverter;
 
 /**
@@ -27,6 +29,7 @@ import org.springframework.data.convert.ReadingConverter;
  */
 @ReadingConverter
 @ToString
-public class LocaleReadConverter extends StringToLocaleConverter {
+public class LocaleReadConverter extends StringToLocaleConverter
+    implements Converter<String, Locale> {
 
 }

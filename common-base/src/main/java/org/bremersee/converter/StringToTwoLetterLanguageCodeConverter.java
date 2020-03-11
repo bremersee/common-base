@@ -26,8 +26,8 @@ import org.springframework.core.convert.converter.Converter;
  * @author Christian Bremer
  */
 @ToString
-public class StringToTwoLetterLanguageCodeConverter implements
-    Converter<String, TwoLetterLanguageCode> {
+public class StringToTwoLetterLanguageCodeConverter
+    implements Converter<String, TwoLetterLanguageCode> {
 
   @Override
   public TwoLetterLanguageCode convert(String source) {

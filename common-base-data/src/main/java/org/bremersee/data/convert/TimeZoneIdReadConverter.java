@@ -17,7 +17,9 @@
 package org.bremersee.data.convert;
 
 import lombok.ToString;
+import org.bremersee.common.model.TimeZoneId;
 import org.bremersee.converter.StringToTimeZoneIdConverter;
+import org.springframework.core.convert.converter.Converter;
 import org.springframework.data.convert.ReadingConverter;
 
 /**
@@ -27,6 +29,7 @@ import org.springframework.data.convert.ReadingConverter;
  */
 @ReadingConverter
 @ToString
-public class TimeZoneIdReadConverter extends StringToTimeZoneIdConverter {
+public class TimeZoneIdReadConverter extends StringToTimeZoneIdConverter
+    implements Converter<String, TimeZoneId> {
 
 }

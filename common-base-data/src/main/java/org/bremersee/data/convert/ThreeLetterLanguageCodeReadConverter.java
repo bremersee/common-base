@@ -17,7 +17,9 @@
 package org.bremersee.data.convert;
 
 import lombok.ToString;
+import org.bremersee.common.model.ThreeLetterLanguageCode;
 import org.bremersee.converter.StringToThreeLetterLanguageCodeConverter;
+import org.springframework.core.convert.converter.Converter;
 import org.springframework.data.convert.ReadingConverter;
 
 /**
@@ -27,6 +29,8 @@ import org.springframework.data.convert.ReadingConverter;
  */
 @ReadingConverter
 @ToString
-public class ThreeLetterLanguageCodeReadConverter extends StringToThreeLetterLanguageCodeConverter {
+public class ThreeLetterLanguageCodeReadConverter
+    extends StringToThreeLetterLanguageCodeConverter
+    implements Converter<String, ThreeLetterLanguageCode> {
 
 }
