@@ -48,7 +48,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
 /**
- * The type Auto configure test.
+ * The auto configure test.
  *
  * @author Christian Bremer
  */
@@ -59,8 +59,7 @@ import org.springframework.test.web.reactive.server.WebTestClient;
         "bremersee.messages.fallback-to-system-locale=false",
         "bremersee.messages.default-locale=en",
         "spring.application.name=common-base-security-test",
-        "bremersee.exception-mapping.api-paths=/api/**",
-        "security.basic.enabled=false"
+        "bremersee.exception-mapping.api-paths=/api/**"
     })
 @Slf4j
 public class AutoConfigureTest {
