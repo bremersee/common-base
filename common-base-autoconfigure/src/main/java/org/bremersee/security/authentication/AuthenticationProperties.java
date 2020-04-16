@@ -19,6 +19,7 @@ package org.bremersee.security.authentication;
 import java.io.Serializable;
 import java.security.Principal;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -80,6 +81,11 @@ public class AuthenticationProperties {
   private String nameJsonPath = "$.preferred_username";
 
   /**
+   * Properties for accessing the application.
+   */
+  private ApplicationAccessProperties application = new ApplicationAccessProperties();
+
+  /**
    * Properties for actuator endpoints.
    */
   private ActuatorAccessProperties actuator = new ActuatorAccessProperties();
@@ -117,7 +123,37 @@ public class AuthenticationProperties {
   }
 
   /**
-   * The type Actuator access properties.
+   * The application access properties.
+   */
+  @Getter
+  @Setter
+  @ToString
+  @EqualsAndHashCode
+  @NoArgsConstructor
+  public static class ApplicationAccessProperties implements Serializable {
+
+    private static final long serialVersionUID = 1L;
+
+    private List<String> userRoles = new ArrayList<>();
+
+    private List<String> adminRoles = new ArrayList<>();
+
+    public List<String> userRolesOrDefaults(String... defaultRoles) {
+      return !userRoles.isEmpty() || defaultRoles == null
+          ? userRoles
+          : Arrays.asList(defaultRoles);
+    }
+
+    public List<String> adminRolesOrDefaults(String... defaultRoles) {
+      return !adminRoles.isEmpty() || defaultRoles == null
+          ? adminRoles
+          : Arrays.asList(defaultRoles);
+    }
+
+  }
+
+  /**
+   * The actuator access properties.
    */
   @Getter
   @Setter

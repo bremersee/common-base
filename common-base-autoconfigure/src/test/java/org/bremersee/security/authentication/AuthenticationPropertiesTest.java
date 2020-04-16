@@ -17,10 +17,12 @@
 package org.bremersee.security.authentication;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Optional;
@@ -137,6 +139,43 @@ class AuthenticationPropertiesTest {
   }
 
   /**
+   * Gets application.
+   */
+  @Test
+  void getApplication() {
+    AuthenticationProperties expected = new AuthenticationProperties();
+    expected.getApplication().setAdminRoles(Arrays.asList("ROLE_ADMIN", "ROLE_SUPERUSER"));
+    expected.getApplication().setUserRoles(Arrays.asList("ROLE_USER", "ROLE_LOCAL_USER"));
+
+    AuthenticationProperties actual = new AuthenticationProperties();
+    actual.getApplication().setAdminRoles(Arrays.asList("ROLE_ADMIN", "ROLE_SUPERUSER"));
+    actual.getApplication().setUserRoles(Arrays.asList("ROLE_USER", "ROLE_LOCAL_USER"));
+
+    assertEquals(expected, actual);
+    assertTrue(expected.toString().contains("ROLE_USER"));
+
+    assertTrue(expected.getApplication().adminRolesOrDefaults("ADMIN")
+        .contains("ROLE_SUPERUSER"));
+    assertTrue(expected.getApplication().userRolesOrDefaults("USER")
+        .contains("ROLE_USER"));
+    assertFalse(expected.getApplication().adminRolesOrDefaults("ADMIN")
+        .contains("ADMIN"));
+    assertFalse(expected.getApplication().userRolesOrDefaults("USER")
+        .contains("USER"));
+
+    expected.getApplication().setAdminRoles(new ArrayList<>());
+    expected.getApplication().setUserRoles(new ArrayList<>());
+    assertTrue(expected.getApplication().adminRolesOrDefaults("ADMIN")
+        .contains("ADMIN"));
+    assertTrue(expected.getApplication().userRolesOrDefaults("USER")
+        .contains("USER"));
+    assertFalse(expected.getApplication().adminRolesOrDefaults("ADMIN")
+        .contains("ROLE_SUPERUSER"));
+    assertFalse(expected.getApplication().userRolesOrDefaults("USER")
+        .contains("ROLE_USER"));
+  }
+
+  /**
    * Gets actuator.
    */
   @Test
@@ -233,8 +272,10 @@ class AuthenticationPropertiesTest {
     ClientCredentialsFlowProperties properties = expected.getClientCredentialsFlow().toProperties();
     assertNotNull(properties);
     assertEquals(expected.getClientCredentialsFlow().getClientId(), properties.getClientId());
-    assertEquals(expected.getClientCredentialsFlow().getClientSecret(), properties.getClientSecret());
-    assertEquals(expected.getClientCredentialsFlow().getTokenEndpoint(), properties.getTokenEndpoint());
+    assertEquals(expected.getClientCredentialsFlow().getClientSecret(),
+        properties.getClientSecret());
+    assertEquals(expected.getClientCredentialsFlow().getTokenEndpoint(),
+        properties.getTokenEndpoint());
   }
 
   /**
