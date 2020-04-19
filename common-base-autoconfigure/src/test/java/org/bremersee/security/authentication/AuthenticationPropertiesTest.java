@@ -144,14 +144,20 @@ class AuthenticationPropertiesTest {
   @Test
   void getApplication() {
     AuthenticationProperties expected = new AuthenticationProperties();
+    expected.getApplication().setIpAddresses(Arrays.asList("127.0.0.1/32", "::1"));
     expected.getApplication().setAdminRoles(Arrays.asList("ROLE_ADMIN", "ROLE_SUPERUSER"));
     expected.getApplication().setUserRoles(Arrays.asList("ROLE_USER", "ROLE_LOCAL_USER"));
+    expected.getApplication().setDefaultAccessExpression("isFullyAuthenticated()");
 
     AuthenticationProperties actual = new AuthenticationProperties();
+    actual.getApplication().setIpAddresses(Arrays.asList("127.0.0.1/32", "::1"));
     actual.getApplication().setAdminRoles(Arrays.asList("ROLE_ADMIN", "ROLE_SUPERUSER"));
     actual.getApplication().setUserRoles(Arrays.asList("ROLE_USER", "ROLE_LOCAL_USER"));
+    actual.getApplication().setDefaultAccessExpression("isFullyAuthenticated()");
 
     assertEquals(expected, actual);
+    assertNotEquals(expected, null);
+    assertNotEquals(expected, new Object());
     assertTrue(expected.toString().contains("ROLE_USER"));
 
     assertTrue(expected.getApplication().adminRolesOrDefaults("ADMIN")
@@ -162,6 +168,37 @@ class AuthenticationPropertiesTest {
         .contains("ADMIN"));
     assertFalse(expected.getApplication().userRolesOrDefaults("USER")
         .contains("USER"));
+
+    String expectedExpr = "hasAuthority('ROLE_ADMIN')"
+        + " or hasAuthority('ROLE_SUPERUSER')"
+        + " or hasAuthority('ROLE_USER')"
+        + " or hasAuthority('ROLE_LOCAL_USER')"
+        + " or hasIpAddress('127.0.0.1/32')"
+        + " or hasIpAddress('::1')";
+    String expr = actual.getApplication().buildAccessExpression(false, true, true, true);
+    assertEquals(expectedExpr, expr);
+
+    expectedExpr = "hasAuthority('ROLE_ADMIN')"
+        + " or hasAuthority('ROLE_SUPERUSER')"
+        + " or hasAuthority('ROLE_USER')"
+        + " or hasAuthority('ROLE_LOCAL_USER')";
+    expr = actual.getApplication().buildAccessExpression(false, false, true, true);
+    assertEquals(expectedExpr, expr);
+
+    expectedExpr = "hasAuthority('ROLE_ADMIN')"
+        + " or hasAuthority('ROLE_SUPERUSER')";
+    expr = actual.getApplication().buildAccessExpression(false, false, false, true);
+    assertEquals(expectedExpr, expr);
+
+    expectedExpr = "hasIpAddress('127.0.0.1/32')"
+        + " or hasIpAddress('::1')"
+        + " or isFullyAuthenticated()";
+    expr = actual.getApplication().buildAccessExpression(true, true, false, false);
+    assertEquals(expectedExpr, expr);
+
+    expectedExpr = "isFullyAuthenticated()";
+    expr = actual.getApplication().buildAccessExpression(false, false, false, false);
+    assertEquals(expectedExpr, expr);
 
     expected.getApplication().setAdminRoles(new ArrayList<>());
     expected.getApplication().setUserRoles(new ArrayList<>());

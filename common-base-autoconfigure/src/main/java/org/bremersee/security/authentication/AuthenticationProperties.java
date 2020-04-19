@@ -20,7 +20,9 @@ import java.io.Serializable;
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import lombok.EqualsAndHashCode;
@@ -34,6 +36,7 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.util.StringUtils;
 
 /**
  * Authentication properties.
@@ -134,20 +137,88 @@ public class AuthenticationProperties {
 
     private static final long serialVersionUID = 1L;
 
+    private static final String IS_AUTHENTICATED = "isAuthenticated()";
+
+    private String defaultAccessExpression = IS_AUTHENTICATED;
+
+    private List<String> ipAddresses = new ArrayList<>();
+
     private List<String> userRoles = new ArrayList<>();
 
     private List<String> adminRoles = new ArrayList<>();
 
+    /**
+     * Gets default access expression.
+     *
+     * @return the default access expression
+     */
+    public String getDefaultAccessExpression() {
+      return StringUtils.hasText(defaultAccessExpression)
+          ? defaultAccessExpression
+          : IS_AUTHENTICATED;
+    }
+
+    /**
+     * User roles or defaults list.
+     *
+     * @param defaultRoles the default roles
+     * @return the list
+     */
     public List<String> userRolesOrDefaults(String... defaultRoles) {
       return !userRoles.isEmpty() || defaultRoles == null
           ? userRoles
           : Arrays.asList(defaultRoles);
     }
 
+    /**
+     * Admin roles or defaults list.
+     *
+     * @param defaultRoles the default roles
+     * @return the list
+     */
     public List<String> adminRolesOrDefaults(String... defaultRoles) {
       return !adminRoles.isEmpty() || defaultRoles == null
           ? adminRoles
           : Arrays.asList(defaultRoles);
+    }
+
+    /**
+     * Build access expression string.
+     *
+     * @param withDefaultExpression the default expression
+     * @param withIpAddresses the with ip addresses
+     * @param withUserRoles the with user roles
+     * @param withAdminRoles the with admin roles
+     * @param defaultRoles the default roles
+     * @return the string
+     */
+    public String buildAccessExpression(
+        boolean withDefaultExpression,
+        boolean withIpAddresses,
+        boolean withUserRoles,
+        boolean withAdminRoles,
+        String... defaultRoles) {
+
+      Set<String> ips = withIpAddresses ? new LinkedHashSet<>(ipAddresses) : Collections.emptySet();
+      Set<String> roles = withAdminRoles
+          ? new LinkedHashSet<>(adminRolesOrDefaults(defaultRoles))
+          : new LinkedHashSet<>();
+      if (withUserRoles) {
+        roles.addAll(userRolesOrDefaults(defaultRoles));
+      }
+      if (ips.isEmpty() && roles.isEmpty()) {
+        return getDefaultAccessExpression();
+      }
+      StringBuilder sb = new StringBuilder();
+      roles.forEach(
+          role -> sb.append(" or ").append("hasAuthority('").append(role).append("')"));
+      ips.forEach(
+          ipAddress -> sb.append(" or ").append("hasIpAddress('").append(ipAddress).append("')"));
+      String expr = sb.toString().substring(" or ".length());
+      if (withDefaultExpression && !expr.contains(getDefaultAccessExpression())) {
+        expr = expr + " or " + getDefaultAccessExpression();
+      }
+      return expr;
     }
 
   }
@@ -196,7 +267,7 @@ public class AuthenticationProperties {
   }
 
   /**
-   * The type Client credential flow.
+   * The client credential flow.
    */
   @Getter
   @Setter
