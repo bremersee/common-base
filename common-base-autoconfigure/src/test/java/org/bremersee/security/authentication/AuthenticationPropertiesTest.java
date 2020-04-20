@@ -28,6 +28,7 @@ import java.util.Collections;
 import java.util.Optional;
 import java.util.UUID;
 import org.bremersee.security.authentication.AuthenticationProperties.SimpleUser;
+import org.bremersee.security.core.AuthorityConstants;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -244,6 +245,45 @@ class AuthenticationPropertiesTest {
     value = "hasAuthority('ROLE_ACTUATOR') or hasAuthority('ROLE_ADMIN')"
         + " or hasIpAddress('127.0.0.1/32') or hasIpAddress('::1')";
     assertEquals(value, expected.getActuator().buildAccessExpression());
+  }
+
+  /**
+   * Gets eureka.
+   */
+  @Test
+  void getEureka() {
+    AuthenticationProperties expected = new AuthenticationProperties();
+    String pass = UUID.randomUUID().toString();
+    expected.getEureka().setUsername("qwertz");
+    expected.getEureka().setPassword(pass);
+    AuthenticationProperties actual = new AuthenticationProperties();
+    actual.getEureka().setUsername("qwertz");
+    actual.getEureka().setPassword(pass);
+    assertEquals(expected, actual);
+    assertTrue(expected.toString().contains("qwertz"));
+    assertFalse(expected.toString().contains(pass));
+    assertEquals("qwertz", expected.getEureka().getUsername());
+    assertEquals(pass, expected.getEureka().getPassword());
+    assertEquals(AuthorityConstants.EUREKA_ROLE_NAME, expected.getEureka().getRole());
+    assertEquals(
+        "hasAuthority('" + AuthorityConstants.EUREKA_ROLE_NAME + "')",
+        expected.getEureka().buildAccessExpression());
+
+    UserDetails[] userDetails = expected.getEureka().buildBasicAuthUserDetails();
+    assertNotNull(userDetails);
+    assertEquals(1, userDetails.length);
+    UserDetails user = userDetails[0];
+    assertEquals("qwertz", user.getUsername());
+    assertNotNull(user.getPassword());
+    assertTrue(user.getAuthorities().stream()
+        .map(GrantedAuthority::getAuthority)
+        .anyMatch(AuthorityConstants.EUREKA_ROLE_NAME::equals));
+
+    expected.getEureka().setRole("");
+    expected.getEureka().setIpAddresses(Collections.singletonList("127.0.0.1"));
+    assertEquals(
+        "isAuthenticated() or hasIpAddress('127.0.0.1')",
+        expected.getEureka().buildAccessExpression());
   }
 
   /**
