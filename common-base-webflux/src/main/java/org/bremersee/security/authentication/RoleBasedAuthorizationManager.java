@@ -16,6 +16,8 @@
 
 package org.bremersee.security.authentication;
 
+import static org.springframework.util.StringUtils.hasText;
+
 import java.util.Collection;
 import java.util.Objects;
 import java.util.Optional;
@@ -24,7 +26,6 @@ import org.springframework.security.authorization.AuthorizationDecision;
 import org.springframework.security.authorization.ReactiveAuthorizationManager;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.server.authorization.AuthorizationContext;
-import org.springframework.util.StringUtils;
 import reactor.core.publisher.Mono;
 
 /**
@@ -57,11 +58,11 @@ public class RoleBasedAuthorizationManager
   public RoleBasedAuthorizationManager(
       Collection<String> roles,
       String rolePrefix) {
-    final String prefix = StringUtils.hasText(rolePrefix) ? rolePrefix : DEFAULT_ROLE_PREFIX;
+    final String prefix = hasText(rolePrefix) ? rolePrefix : "";
     this.roles = Optional.ofNullable(roles)
         .map(col -> col.stream()
             .filter(Objects::nonNull)
-            .map(role -> role.startsWith(prefix) ? role : prefix + role)
+            .map(role -> hasText(prefix) && role.startsWith(prefix) ? role : prefix + role)
             .toArray(String[]::new))
         .orElseGet(() -> new String[0]);
   }

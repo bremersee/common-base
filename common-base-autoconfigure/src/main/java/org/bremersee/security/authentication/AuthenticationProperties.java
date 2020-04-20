@@ -20,12 +20,15 @@ import java.io.Serializable;
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.TreeSet;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -37,6 +40,7 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
 /**
@@ -54,6 +58,12 @@ public class AuthenticationProperties implements Serializable {
   private static final long serialVersionUID = 1L;
 
   private static final String IS_AUTHENTICATED = "isAuthenticated()";
+
+  private static final String HAS_AUTHORITY_TEMPLATE = "hasAuthority('%s')";
+
+  private static final String HAS_ANY_AUTHORITY_TEMPLATE = "hasAnyAuthority(%s)";
+
+  private static final String HAS_IP_ADDRESS_TEMPLATE = "hasIpAddress('%s')";
 
   /**
    * Specifies whether JWT beans should be created or not. Default is {@code false}.
@@ -119,6 +129,15 @@ public class AuthenticationProperties implements Serializable {
   private List<SimpleUser> basicAuthUsers = new ArrayList<>();
 
   /**
+   * Gets role prefix.
+   *
+   * @return the role prefix
+   */
+  public String getRolePrefix() {
+    return rolePrefix != null ? rolePrefix.trim() : "";
+  }
+
+  /**
    * Build basic auth user details.
    *
    * @return the user details
@@ -133,6 +152,116 @@ public class AuthenticationProperties implements Serializable {
             .passwordEncoder(encoder::encode)
             .build())
         .toArray(UserDetails[]::new);
+  }
+
+  /**
+   * Ensure role prefix.
+   *
+   * @param role the role
+   * @return the role with prefix
+   */
+  public String ensureRolePrefix(String role) {
+    Assert.hasText(role, "Role must be present.");
+    final String prefix = getRolePrefix();
+    return StringUtils.hasText(prefix) && role.startsWith(prefix) ? role : prefix + role;
+  }
+
+  /**
+   * Has authority expr string.
+   *
+   * @param role the role
+   * @param ensurePrefixFunction the ensure prefix function
+   * @return the string
+   */
+  public static String hasAuthorityExpr(String role,
+      Function<String, String> ensurePrefixFunction) {
+    return String.format(
+        HAS_AUTHORITY_TEMPLATE,
+        Optional.ofNullable(ensurePrefixFunction)
+            .map(f -> f.apply(role))
+            .orElse(role));
+  }
+
+  /**
+   * Has any authority expr string.
+   *
+   * @param roles the roles
+   * @param ensurePrefixFunction the ensure prefix function
+   * @return the string
+   */
+  public static String hasAnyAuthorityExpr(
+      Collection<String> roles,
+      Function<String, String> ensurePrefixFunction) {
+
+    return Optional.ofNullable(roles)
+        .filter(list -> !list.isEmpty())
+        .map(list -> list.stream()
+            .map(role -> Optional.ofNullable(ensurePrefixFunction)
+                .map(f -> f.apply(role))
+                .orElse(role))
+            .map(role -> "'" + role + "'")
+            .collect(Collectors.joining(",")))
+        .map(value -> String.format(HAS_ANY_AUTHORITY_TEMPLATE, value))
+        .orElse("");
+  }
+
+  /**
+   * Has ip address expr string.
+   *
+   * @param ip the ip
+   * @return the string
+   */
+  public static String hasIpAddressExpr(String ip) {
+    Assert.hasText(ip, "IP address must be present.");
+    return String.format(HAS_IP_ADDRESS_TEMPLATE, ip);
+  }
+
+  /**
+   * Has ip address expr string.
+   *
+   * @param ips the ips
+   * @return the string
+   */
+  public static String hasIpAddressExpr(Collection<String> ips) {
+    return Optional.ofNullable(ips)
+        .map(list -> list.stream()
+            .map(AuthenticationProperties::hasIpAddressExpr)
+            .collect(Collectors.joining(" or ")))
+        .orElse("");
+  }
+
+  /**
+   * Has authority or ip address expr string.
+   *
+   * @param roles the roles
+   * @param ips the ips
+   * @param ensurePrefixFunction the ensure prefix function
+   * @return the string
+   */
+  public static String hasAuthorityOrIpAddressExpr(
+      Collection<String> roles,
+      Collection<String> ips,
+      Function<String, String> ensurePrefixFunction) {
+
+    TreeSet<String> roleSet = roles instanceof TreeSet
+        ? (TreeSet<String>) roles
+        : (roles == null ? new TreeSet<>() : new TreeSet<>(roles));
+    StringBuilder sb = new StringBuilder();
+    if (roleSet.size() > 1) {
+      sb.append(hasAnyAuthorityExpr(roleSet, ensurePrefixFunction));
+    } else if (roleSet.size() == 1) {
+      sb.append(hasAuthorityExpr(roleSet.first(), ensurePrefixFunction));
+    }
+    Set<String> ipSet = ips instanceof Set
+        ? (Set<String>) ips
+        : (ips == null ? Collections.emptySet() : new LinkedHashSet<>(ips));
+    if (!ipSet.isEmpty()) {
+      if (sb.length() > 0) {
+        sb.append(" or ");
+      }
+      sb.append(hasIpAddressExpr(ipSet));
+    }
+    return sb.toString();
   }
 
   /**
@@ -197,6 +326,7 @@ public class AuthenticationProperties implements Serializable {
      * @param withIpAddresses the with ip addresses
      * @param withUserRoles the with user roles
      * @param withAdminRoles the with admin roles
+     * @param ensurePrefixFunction function to ensure role prefix
      * @param defaultRoles the default roles
      * @return the string
      */
@@ -205,30 +335,25 @@ public class AuthenticationProperties implements Serializable {
         boolean withIpAddresses,
         boolean withUserRoles,
         boolean withAdminRoles,
+        Function<String, String> ensurePrefixFunction,
         String... defaultRoles) {
 
       Set<String> ips = withIpAddresses ? new LinkedHashSet<>(ipAddresses) : Collections.emptySet();
-      Set<String> roles = withAdminRoles
-          ? new LinkedHashSet<>(adminRolesOrDefaults(defaultRoles))
-          : new LinkedHashSet<>();
+      TreeSet<String> roles = withAdminRoles
+          ? new TreeSet<>(adminRolesOrDefaults(defaultRoles))
+          : new TreeSet<>();
       if (withUserRoles) {
         roles.addAll(userRolesOrDefaults(defaultRoles));
       }
       if (ips.isEmpty() && roles.isEmpty()) {
         return getDefaultAccessExpression();
       }
-      StringBuilder sb = new StringBuilder();
-      roles.forEach(
-          role -> sb.append(" or ").append("hasAuthority('").append(role).append("')"));
-      ips.forEach(
-          ipAddress -> sb.append(" or ").append("hasIpAddress('").append(ipAddress).append("')"));
-      String expr = sb.toString().substring(" or ".length());
+      String expr = hasAuthorityOrIpAddressExpr(roles, ips, ensurePrefixFunction);
       if (withDefaultExpression && !expr.contains(getDefaultAccessExpression())) {
         expr = expr + " or " + getDefaultAccessExpression();
       }
       return expr;
     }
-
   }
 
   /**
@@ -263,37 +388,31 @@ public class AuthenticationProperties implements Serializable {
     /**
      * Build access expression (SpEL) for actuator endpoints.
      *
+     * @param ensurePrefixFunction function to ensure role prefix
      * @return the access expression (SpEL) for actuator endpoints
      */
-    public String buildAccessExpression() {
-      final Set<String> roleSet = new HashSet<>(roles);
+    public String buildAccessExpression(Function<String, String> ensurePrefixFunction) {
+      final TreeSet<String> roleSet = new TreeSet<>(roles);
       if (roleSet.isEmpty()) {
         roleSet.add(AuthorityConstants.ACTUATOR_ROLE_NAME);
         roleSet.add(AuthorityConstants.ADMIN_ROLE_NAME);
       }
-      final StringBuilder sb = new StringBuilder();
-      roleSet.forEach(
-          role -> sb.append(" or ").append("hasAuthority('").append(role).append("')"));
-      ipAddresses.forEach(
-          ipAddress -> sb.append(" or ").append("hasIpAddress('").append(ipAddress).append("')"));
-      return sb.toString().substring(" or ".length());
+      return hasAuthorityOrIpAddressExpr(roleSet, ipAddresses, ensurePrefixFunction);
     }
 
     /**
      * Build access expression (SpEL) for admin actuator endpoints.
      *
+     * @param ensurePrefixFunction function to ensure role prefix
      * @return the access expression (SpEL) for admin actuator endpoints
      */
-    public String buildAdminAccessExpression() {
-      final Set<String> roleSet = new HashSet<>(adminRoles);
+    public String buildAdminAccessExpression(Function<String, String> ensurePrefixFunction) {
+      final Set<String> roleSet = new TreeSet<>(adminRoles);
       if (roleSet.isEmpty()) {
         roleSet.add(AuthorityConstants.ACTUATOR_ADMIN_ROLE_NAME);
         roleSet.add(AuthorityConstants.ADMIN_ROLE_NAME);
       }
-      final StringBuilder sb = new StringBuilder();
-      roleSet.forEach(
-          role -> sb.append(" or ").append("hasAuthority('").append(role).append("')"));
-      return sb.toString().substring(" or ".length());
+      return hasAuthorityOrIpAddressExpr(roleSet, null, ensurePrefixFunction);
     }
 
   }
@@ -324,18 +443,18 @@ public class AuthenticationProperties implements Serializable {
     /**
      * Build access expression.
      *
+     * @param ensurePrefixFunction function to ensure role prefix
      * @return the access expression
      */
-    public String buildAccessExpression() {
-      final StringBuilder sb = new StringBuilder();
+    public String buildAccessExpression(Function<String, String> ensurePrefixFunction) {
       if (StringUtils.hasText(role)) {
-        sb.append("hasAuthority('").append(role).append("')");
-      } else {
-        sb.append(IS_AUTHENTICATED);
+        return hasAuthorityOrIpAddressExpr(
+            Collections.singleton(role),
+            ipAddresses,
+            ensurePrefixFunction);
       }
-      ipAddresses.forEach(
-          ipAddress -> sb.append(" or ").append("hasIpAddress('").append(ipAddress).append("')"));
-      return sb.toString();
+      String ipsExpr = hasIpAddressExpr(ipAddresses);
+      return StringUtils.hasText(ipsExpr) ? IS_AUTHENTICATED + " or " + ipsExpr : IS_AUTHENTICATED;
     }
 
     /**
@@ -484,8 +603,7 @@ public class AuthenticationProperties implements Serializable {
     String[] buildAuthorities() {
       if (authorities == null || authorities.isEmpty()) {
         return new String[]{
-            AuthorityConstants.USER_ROLE_NAME,
-            AuthorityConstants.LOCAL_USER_ROLE_NAME
+            AuthorityConstants.USER_ROLE_NAME
         };
       }
       return authorities.toArray(new String[0]);

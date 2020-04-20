@@ -170,35 +170,35 @@ class AuthenticationPropertiesTest {
     assertFalse(expected.getApplication().userRolesOrDefaults("USER")
         .contains("USER"));
 
-    String expectedExpr = "hasAuthority('ROLE_ADMIN')"
-        + " or hasAuthority('ROLE_SUPERUSER')"
-        + " or hasAuthority('ROLE_USER')"
-        + " or hasAuthority('ROLE_LOCAL_USER')"
+    String expectedExpr
+        = "hasAnyAuthority('ROLE_ADMIN','ROLE_LOCAL_USER','ROLE_SUPERUSER','ROLE_USER')"
         + " or hasIpAddress('127.0.0.1/32')"
         + " or hasIpAddress('::1')";
-    String expr = actual.getApplication().buildAccessExpression(false, true, true, true);
+    String expr = actual.getApplication().buildAccessExpression(
+        false, true, true, true,
+        actual::ensureRolePrefix);
     assertEquals(expectedExpr, expr);
 
-    expectedExpr = "hasAuthority('ROLE_ADMIN')"
-        + " or hasAuthority('ROLE_SUPERUSER')"
-        + " or hasAuthority('ROLE_USER')"
-        + " or hasAuthority('ROLE_LOCAL_USER')";
-    expr = actual.getApplication().buildAccessExpression(false, false, true, true);
+    expectedExpr = "hasAnyAuthority('ROLE_ADMIN','ROLE_LOCAL_USER','ROLE_SUPERUSER','ROLE_USER')";
+    expr = actual.getApplication().buildAccessExpression(
+        false, false, true, true, null);
     assertEquals(expectedExpr, expr);
 
-    expectedExpr = "hasAuthority('ROLE_ADMIN')"
-        + " or hasAuthority('ROLE_SUPERUSER')";
-    expr = actual.getApplication().buildAccessExpression(false, false, false, true);
+    expectedExpr = "hasAnyAuthority('ROLE_ADMIN','ROLE_SUPERUSER')";
+    expr = actual.getApplication().buildAccessExpression(
+        false, false, false, true, null);
     assertEquals(expectedExpr, expr);
 
     expectedExpr = "hasIpAddress('127.0.0.1/32')"
         + " or hasIpAddress('::1')"
         + " or isFullyAuthenticated()";
-    expr = actual.getApplication().buildAccessExpression(true, true, false, false);
+    expr = actual.getApplication().buildAccessExpression(
+        true, true, false, false, null);
     assertEquals(expectedExpr, expr);
 
     expectedExpr = "isFullyAuthenticated()";
-    expr = actual.getApplication().buildAccessExpression(false, false, false, false);
+    expr = actual.getApplication().buildAccessExpression(
+        false, false, false, false, null);
     assertEquals(expectedExpr, expr);
 
     expected.getApplication().setAdminRoles(new ArrayList<>());
@@ -236,9 +236,9 @@ class AuthenticationPropertiesTest {
     assertTrue(actual.getActuator().getAdminRoles().contains("ROLE_A"));
     assertTrue(actual.getActuator().getAdminRoles().contains("ROLE_B"));
 
-    String value = "hasAuthority('ROLE_ACTUATOR') or hasAuthority('ROLE_SUPER_USER')"
+    String value = "hasAnyAuthority('ROLE_ACTUATOR','ROLE_SUPER_USER')"
         + " or hasIpAddress('127.0.0.1/32') or hasIpAddress('::1')";
-    assertEquals(value, expected.getActuator().buildAccessExpression());
+    assertEquals(value, expected.getActuator().buildAccessExpression(null));
     assertNotEquals(expected.getActuator(), null);
     assertNotEquals(expected.getActuator(), new Object());
 
@@ -246,13 +246,13 @@ class AuthenticationPropertiesTest {
     expected.getActuator().setIpAddresses(Arrays.asList("127.0.0.1/32", "::1"));
     expected.getActuator().setRoles(Collections.emptyList());
 
-    value = "hasAuthority('ROLE_ACTUATOR') or hasAuthority('ROLE_ADMIN')"
+    value = "hasAnyAuthority('ROLE_ACTUATOR','ROLE_ADMIN')"
         + " or hasIpAddress('127.0.0.1/32') or hasIpAddress('::1')";
-    assertEquals(value, expected.getActuator().buildAccessExpression());
+    assertEquals(value, expected.getActuator().buildAccessExpression(actual::ensureRolePrefix));
 
     assertEquals(
-        "hasAuthority('ROLE_A') or hasAuthority('ROLE_B')",
-        actual.getActuator().buildAdminAccessExpression());
+        "hasAnyAuthority('ROLE_A','ROLE_B')",
+        actual.getActuator().buildAdminAccessExpression(actual::ensureRolePrefix));
   }
 
   /**
@@ -275,7 +275,7 @@ class AuthenticationPropertiesTest {
     assertEquals(AuthorityConstants.EUREKA_ROLE_NAME, expected.getEureka().getRole());
     assertEquals(
         "hasAuthority('" + AuthorityConstants.EUREKA_ROLE_NAME + "')",
-        expected.getEureka().buildAccessExpression());
+        expected.getEureka().buildAccessExpression(null));
 
     UserDetails[] userDetails = expected.getEureka().buildBasicAuthUserDetails();
     assertNotNull(userDetails);
@@ -291,7 +291,7 @@ class AuthenticationPropertiesTest {
     expected.getEureka().setIpAddresses(Collections.singletonList("127.0.0.1"));
     assertEquals(
         "isAuthenticated() or hasIpAddress('127.0.0.1')",
-        expected.getEureka().buildAccessExpression());
+        expected.getEureka().buildAccessExpression(expected::ensureRolePrefix));
   }
 
   /**
