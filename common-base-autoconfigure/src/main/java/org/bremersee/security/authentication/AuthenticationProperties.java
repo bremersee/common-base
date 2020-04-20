@@ -244,7 +244,13 @@ public class AuthenticationProperties implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /**
-     * The roles which can access a protected actuator endpoint. The role names normally start with
+     * The roles which can write to protected actuator endpoints. The role names normally start with
+     * {@code ROLE_}.
+     */
+    private List<String> adminRoles = new ArrayList<>();
+
+    /**
+     * The roles which can read protected actuator endpoints. The role names normally start with
      * {@code ROLE_}.
      */
     private List<String> roles = new ArrayList<>();
@@ -260,7 +266,7 @@ public class AuthenticationProperties implements Serializable {
      * @return the access expression (SpEL) for actuator endpoints
      */
     public String buildAccessExpression() {
-      Set<String> roleSet = new HashSet<>(roles);
+      final Set<String> roleSet = new HashSet<>(roles);
       if (roleSet.isEmpty()) {
         roleSet.add(AuthorityConstants.ACTUATOR_ROLE_NAME);
         roleSet.add(AuthorityConstants.ADMIN_ROLE_NAME);
@@ -272,6 +278,24 @@ public class AuthenticationProperties implements Serializable {
           ipAddress -> sb.append(" or ").append("hasIpAddress('").append(ipAddress).append("')"));
       return sb.toString().substring(" or ".length());
     }
+
+    /**
+     * Build access expression (SpEL) for admin actuator endpoints.
+     *
+     * @return the access expression (SpEL) for admin actuator endpoints
+     */
+    public String buildAdminAccessExpression() {
+      final Set<String> roleSet = new HashSet<>(adminRoles);
+      if (roleSet.isEmpty()) {
+        roleSet.add(AuthorityConstants.ACTUATOR_ADMIN_ROLE_NAME);
+        roleSet.add(AuthorityConstants.ADMIN_ROLE_NAME);
+      }
+      final StringBuilder sb = new StringBuilder();
+      roleSet.forEach(
+          role -> sb.append(" or ").append("hasAuthority('").append(role).append("')"));
+      return sb.toString().substring(" or ".length());
+    }
+
   }
 
   /**

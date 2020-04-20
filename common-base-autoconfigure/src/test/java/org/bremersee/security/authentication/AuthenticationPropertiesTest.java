@@ -221,16 +221,20 @@ class AuthenticationPropertiesTest {
     AuthenticationProperties expected = new AuthenticationProperties();
     expected.getActuator().setIpAddresses(Arrays.asList("127.0.0.1/32", "::1"));
     expected.getActuator().setRoles(Arrays.asList("ROLE_SUPER_USER", "ROLE_ACTUATOR"));
+    expected.getActuator().setAdminRoles(Arrays.asList("ROLE_A", "ROLE_B"));
 
     AuthenticationProperties actual = new AuthenticationProperties();
     actual.getActuator().setIpAddresses(Arrays.asList("127.0.0.1/32", "::1"));
     actual.getActuator().setRoles(Arrays.asList("ROLE_SUPER_USER", "ROLE_ACTUATOR"));
+    actual.getActuator().setAdminRoles(Arrays.asList("ROLE_A", "ROLE_B"));
 
     assertEquals(expected, actual);
     assertTrue(expected.toString().contains("127.0.0.1/32"));
     assertTrue(expected.toString().contains("::1"));
     assertTrue(expected.toString().contains("ROLE_SUPER_USER"));
     assertTrue(expected.toString().contains("ROLE_ACTUATOR"));
+    assertTrue(actual.getActuator().getAdminRoles().contains("ROLE_A"));
+    assertTrue(actual.getActuator().getAdminRoles().contains("ROLE_B"));
 
     String value = "hasAuthority('ROLE_ACTUATOR') or hasAuthority('ROLE_SUPER_USER')"
         + " or hasIpAddress('127.0.0.1/32') or hasIpAddress('::1')";
@@ -245,6 +249,10 @@ class AuthenticationPropertiesTest {
     value = "hasAuthority('ROLE_ACTUATOR') or hasAuthority('ROLE_ADMIN')"
         + " or hasIpAddress('127.0.0.1/32') or hasIpAddress('::1')";
     assertEquals(value, expected.getActuator().buildAccessExpression());
+
+    assertEquals(
+        "hasAuthority('ROLE_A') or hasAuthority('ROLE_B')",
+        actual.getActuator().buildAdminAccessExpression());
   }
 
   /**
