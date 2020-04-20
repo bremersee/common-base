@@ -24,6 +24,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -48,7 +49,11 @@ import org.springframework.util.StringUtils;
 @Setter
 @ToString
 @EqualsAndHashCode
-public class AuthenticationProperties {
+public class AuthenticationProperties implements Serializable {
+
+  private static final long serialVersionUID = 1L;
+
+  private static final String IS_AUTHENTICATED = "isAuthenticated()";
 
   /**
    * Specifies whether JWT beans should be created or not. Default is {@code false}.
@@ -94,6 +99,11 @@ public class AuthenticationProperties {
   private ActuatorAccessProperties actuator = new ActuatorAccessProperties();
 
   /**
+   * Properties for eureka endpoints.
+   */
+  private EurekaAccessProperties eureka = new EurekaAccessProperties();
+
+  /**
    * The properties for the oauth2 password flow.
    */
   private PasswordFlow passwordFlow = new PasswordFlow();
@@ -136,8 +146,6 @@ public class AuthenticationProperties {
   public static class ApplicationAccessProperties implements Serializable {
 
     private static final long serialVersionUID = 1L;
-
-    private static final String IS_AUTHENTICATED = "isAuthenticated()";
 
     private String defaultAccessExpression = IS_AUTHENTICATED;
 
@@ -263,6 +271,78 @@ public class AuthenticationProperties {
       ipAddresses.forEach(
           ipAddress -> sb.append(" or ").append("hasIpAddress('").append(ipAddress).append("')"));
       return sb.toString().substring(" or ".length());
+    }
+  }
+
+  /**
+   * The eureka access properties.
+   */
+  @Getter
+  @Setter
+  @ToString(exclude = {"password"})
+  @EqualsAndHashCode
+  @NoArgsConstructor
+  public static class EurekaAccessProperties implements Serializable {
+
+    private static final long serialVersionUID = 1L;
+
+    private String username;
+
+    private String password;
+
+    private String role = AuthorityConstants.EUREKA_ROLE_NAME;
+
+    /**
+     * The IP addresses which can access protected eureka endpoints without authentication.
+     */
+    private List<String> ipAddresses = new ArrayList<>();
+
+    /**
+     * Build access expression.
+     *
+     * @return the access expression
+     */
+    public String buildAccessExpression() {
+      final StringBuilder sb = new StringBuilder();
+      if (StringUtils.hasText(role)) {
+        sb.append("hasAuthority('").append(role).append("')");
+      } else {
+        sb.append(IS_AUTHENTICATED);
+      }
+      ipAddresses.forEach(
+          ipAddress -> sb.append(" or ").append("hasIpAddress('").append(ipAddress).append("')"));
+      return sb.toString();
+    }
+
+    /**
+     * Build basic auth user details.
+     *
+     * @param otherUserDetails the other user details
+     * @return the user details
+     */
+    public UserDetails[] buildBasicAuthUserDetails(UserDetails... otherUserDetails) {
+      if (!StringUtils.hasText(username)) {
+        return Optional.ofNullable(otherUserDetails).orElse(new UserDetails[0]);
+      }
+      final PasswordEncoder encoder = PasswordEncoderFactories.createDelegatingPasswordEncoder();
+      final SimpleUser user = new SimpleUser();
+      user.setName(username);
+      user.setPassword(StringUtils.hasText(password) ? password : "");
+      if (StringUtils.hasText(role)) {
+        user.setAuthorities(Collections.singletonList(role));
+      }
+      final UserDetails userDetails = User.builder()
+          .username(user.getName())
+          .password(user.getPassword())
+          .authorities(user.buildAuthorities())
+          .passwordEncoder(encoder::encode)
+          .build();
+      List<UserDetails> users = new ArrayList<>();
+      if (otherUserDetails != null) {
+        users.addAll(Arrays.asList(otherUserDetails));
+      }
+      users.add(userDetails);
+      return users.toArray(new UserDetails[0]);
     }
   }
 
