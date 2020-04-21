@@ -22,12 +22,14 @@ common-base-autoconfigure,org.bremersee.security.access,AccessControlProperties,
 common-base-autoconfigure,org.bremersee.security.access,AccessControlAutoConfiguration,0,138,0,0,0,33,0,9,0,9
 common-base-autoconfigure,org.bremersee.security.authentication,AuthenticationProperties.ClientCredentialFlow,44,90,10,12,0,12,9,14,1,11
 common-base-autoconfigure,org.bremersee.security.authentication,AuthenticationProperties.PasswordFlow,61,131,14,16,0,17,12,20,1,16
-common-base-autoconfigure,org.bremersee.security.authentication,AuthenticationProperties.SimpleUser,57,95,15,11,1,9,12,13,1,11
-common-base-autoconfigure,org.bremersee.security.authentication,AuthenticationProperties.ActuatorAccessProperties,48,135,14,10,0,16,11,13,1,11
+common-base-autoconfigure,org.bremersee.security.authentication,AuthenticationProperties.EurekaAccessProperties,93,211,28,22,1,31,23,17,1,14
+common-base-autoconfigure,org.bremersee.security.authentication,AuthenticationProperties.ApplicationAccessProperties,89,213,31,31,1,28,24,23,1,15
+common-base-autoconfigure,org.bremersee.security.authentication,AuthenticationProperties.SimpleUser,53,95,15,11,1,9,12,13,1,11
+common-base-autoconfigure,org.bremersee.security.authentication,AuthenticationProperties.ActuatorAccessProperties,75,140,21,13,2,15,16,14,1,12
 common-base-autoconfigure,org.bremersee.security.authentication,PasswordFlowAuthenticationManager,3,77,0,0,2,21,0,5,0,5
 common-base-autoconfigure,org.bremersee.security.authentication,AuthenticationSupportAutoConfiguration,0,127,0,0,0,29,0,6,0,6
 common-base-autoconfigure,org.bremersee.security.authentication,ReactiveAuthenticationSupportAutoConfiguration,0,122,0,0,0,26,0,6,0,6
-common-base-autoconfigure,org.bremersee.security.authentication,AuthenticationProperties,196,284,56,22,0,23,41,26,3,25
+common-base-autoconfigure,org.bremersee.security.authentication,AuthenticationProperties,256,523,73,45,0,66,57,48,6,40
 common-base-autoconfigure,org.bremersee.security.authentication,PasswordFlowReactiveAuthenticationManager,9,97,2,0,3,20,2,6,1,6
 common-base-autoconfigure,org.bremersee.web.reactive,CorsAutoConfiguration,0,66,0,2,0,16,0,5,0,4
 common-base-autoconfigure,org.bremersee.web.reactive,BaseCommonConvertersAutoConfiguration,0,18,0,0,0,7,0,4,0,4

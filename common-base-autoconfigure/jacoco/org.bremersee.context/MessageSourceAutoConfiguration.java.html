@@ -62,9 +62,12 @@ public class MessageSourceAutoConfiguration {
 <span class="fc" id="L62">    this.properties = properties;</span>
 <span class="fc" id="L63">  }</span>
 
+  /**
+   * Init.
+   */
   @EventListener(ApplicationReadyEvent.class)
   public void init() {
-<span class="fc" id="L67">    log.info(&quot;\n&quot;</span>
+<span class="fc" id="L70">    log.info(&quot;\n&quot;</span>
             + &quot;*********************************************************************************\n&quot;
             + &quot;* {}\n&quot;
             + &quot;*********************************************************************************\n&quot;
@@ -73,12 +76,12 @@ public class MessageSourceAutoConfiguration {
             + &quot;* fallbackToSystemLocale = {}\n&quot;
             + &quot;* defaultEncoding = {}\n&quot;
             + &quot;*********************************************************************************&quot;,
-<span class="fc" id="L76">        ClassUtils.getUserClass(getClass()).getSimpleName(),</span>
-<span class="fc" id="L77">        getBaseNames(),</span>
-<span class="fc" id="L78">        properties.getDefaultLocale(),</span>
-<span class="fc" id="L79">        properties.isFallbackToSystemLocale(),</span>
-<span class="fc" id="L80">        properties.getDefaultEncoding());</span>
-<span class="fc" id="L81">  }</span>
+<span class="fc" id="L79">        ClassUtils.getUserClass(getClass()).getSimpleName(),</span>
+<span class="fc" id="L80">        getBaseNames(),</span>
+<span class="fc" id="L81">        properties.getDefaultLocale(),</span>
+<span class="fc" id="L82">        properties.isFallbackToSystemLocale(),</span>
+<span class="fc" id="L83">        properties.getDefaultEncoding());</span>
+<span class="fc" id="L84">  }</span>
 
   /**
    * Creates message source bean.
@@ -87,48 +90,48 @@ public class MessageSourceAutoConfiguration {
    */
   @Bean
   public MessageSource messageSource() {
-<span class="fc bfc" id="L90" title="All 2 branches covered.">    AbstractResourceBasedMessageSource messageSource = properties.isUseReloadableMessageSource()</span>
-<span class="fc" id="L91">        ? createReloadableMessageSource()</span>
-<span class="fc" id="L92">        : createMessageSource();</span>
-<span class="fc" id="L93">    configure(messageSource);</span>
-<span class="fc" id="L94">    return messageSource;</span>
+<span class="fc bfc" id="L93" title="All 2 branches covered.">    AbstractResourceBasedMessageSource messageSource = properties.isUseReloadableMessageSource()</span>
+<span class="fc" id="L94">        ? createReloadableMessageSource()</span>
+<span class="fc" id="L95">        : createMessageSource();</span>
+<span class="fc" id="L96">    configure(messageSource);</span>
+<span class="fc" id="L97">    return messageSource;</span>
   }
 
   private AbstractResourceBasedMessageSource createReloadableMessageSource() {
-<span class="fc" id="L98">    final ReloadableResourceBundleMessageSource messageSource</span>
+<span class="fc" id="L101">    final ReloadableResourceBundleMessageSource messageSource</span>
         = new ReloadableResourceBundleMessageSource();
-<span class="pc bpc" id="L100" title="1 of 2 branches missed.">    if (!properties.getFileEncodings().isEmpty()) {</span>
-<span class="nc" id="L101">      final Properties fileEncodings = new Properties();</span>
-<span class="nc" id="L102">      fileEncodings.putAll(properties.getFileEncodings());</span>
-<span class="nc" id="L103">      messageSource.setFileEncodings(fileEncodings);</span>
+<span class="pc bpc" id="L103" title="1 of 2 branches missed.">    if (!properties.getFileEncodings().isEmpty()) {</span>
+<span class="nc" id="L104">      final Properties fileEncodings = new Properties();</span>
+<span class="nc" id="L105">      fileEncodings.putAll(properties.getFileEncodings());</span>
+<span class="nc" id="L106">      messageSource.setFileEncodings(fileEncodings);</span>
     }
-<span class="fc" id="L105">    return messageSource;</span>
+<span class="fc" id="L108">    return messageSource;</span>
   }
 
   private AbstractResourceBasedMessageSource createMessageSource() {
-<span class="fc" id="L109">    return new ResourceBundleMessageSource();</span>
+<span class="fc" id="L112">    return new ResourceBundleMessageSource();</span>
   }
 
   private void configure(AbstractResourceBasedMessageSource messageSource) {
-<span class="pc bpc" id="L113" title="1 of 2 branches missed.">    if (StringUtils.hasText(properties.getDefaultLocale())) {</span>
-<span class="nc" id="L114">      JavaLocale javaLocale = JavaLocale.fromValue(properties.getDefaultLocale());</span>
-<span class="nc" id="L115">      messageSource.setDefaultLocale(javaLocale.toLocale());</span>
+<span class="pc bpc" id="L116" title="1 of 2 branches missed.">    if (StringUtils.hasText(properties.getDefaultLocale())) {</span>
+<span class="nc" id="L117">      JavaLocale javaLocale = JavaLocale.fromValue(properties.getDefaultLocale());</span>
+<span class="nc" id="L118">      messageSource.setDefaultLocale(javaLocale.toLocale());</span>
     }
-<span class="fc" id="L117">    messageSource.setFallbackToSystemLocale(properties.isFallbackToSystemLocale());</span>
-<span class="fc" id="L118">    messageSource.setDefaultEncoding(properties.getDefaultEncoding());</span>
-<span class="fc" id="L119">    final List&lt;String&gt; baseNames = getBaseNames();</span>
-<span class="fc" id="L120">    messageSource.setBasenames(baseNames.toArray(new String[0]));</span>
-<span class="fc" id="L121">    messageSource.setCacheSeconds(properties.getCacheSeconds());</span>
-<span class="fc" id="L122">    messageSource.setAlwaysUseMessageFormat(properties.isAlwaysUseMessageFormat());</span>
-<span class="fc" id="L123">    messageSource.setUseCodeAsDefaultMessage(properties.isUseCodeAsDefaultMessage());</span>
-<span class="fc" id="L124">  }</span>
+<span class="fc" id="L120">    messageSource.setFallbackToSystemLocale(properties.isFallbackToSystemLocale());</span>
+<span class="fc" id="L121">    messageSource.setDefaultEncoding(properties.getDefaultEncoding());</span>
+<span class="fc" id="L122">    final List&lt;String&gt; baseNames = getBaseNames();</span>
+<span class="fc" id="L123">    messageSource.setBasenames(baseNames.toArray(new String[0]));</span>
+<span class="fc" id="L124">    messageSource.setCacheSeconds(properties.getCacheSeconds());</span>
+<span class="fc" id="L125">    messageSource.setAlwaysUseMessageFormat(properties.isAlwaysUseMessageFormat());</span>
+<span class="fc" id="L126">    messageSource.setUseCodeAsDefaultMessage(properties.isUseCodeAsDefaultMessage());</span>
+<span class="fc" id="L127">  }</span>
 
   private List&lt;String&gt; getBaseNames() {
-<span class="fc" id="L127">    final List&lt;String&gt; baseNames = new ArrayList&lt;&gt;(properties.getBaseNames());</span>
-<span class="pc bpc" id="L128" title="1 of 2 branches missed.">    if (baseNames.isEmpty()) {</span>
-<span class="fc" id="L129">      baseNames.add(DEFAULT_MESSAGES_BASE_NAME);</span>
+<span class="fc" id="L130">    final List&lt;String&gt; baseNames = new ArrayList&lt;&gt;(properties.getBaseNames());</span>
+<span class="pc bpc" id="L131" title="1 of 2 branches missed.">    if (baseNames.isEmpty()) {</span>
+<span class="fc" id="L132">      baseNames.add(DEFAULT_MESSAGES_BASE_NAME);</span>
     }
-<span class="fc" id="L131">    return baseNames;</span>
+<span class="fc" id="L134">    return baseNames;</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

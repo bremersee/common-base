@@ -91,7 +91,7 @@
 <a class="jxr_linenumber" name="L83" href="#L83">83</a>      <strong class="jxr_keyword">if</strong> (exception instanceof <a name="HttpStatusAware" href="../../../org/bremersee/exception/HttpStatusAware.html#HttpStatusAware">HttpStatusAware</a>) {
 <a class="jxr_linenumber" name="L84" href="#L84">84</a>        httpStatus = fromStatus(((<a name="HttpStatusAware" href="../../../org/bremersee/exception/HttpStatusAware.html#HttpStatusAware">HttpStatusAware</a>) exception).status());
 <a class="jxr_linenumber" name="L85" href="#L85">85</a>      }
-<a class="jxr_linenumber" name="L86" href="#L86">86</a>      <strong class="jxr_keyword">if</strong> (httpStatus == <strong class="jxr_keyword">null</strong> &amp;&amp; (exception instanceof ResponseStatusException)) {
+<a class="jxr_linenumber" name="L86" href="#L86">86</a>      <strong class="jxr_keyword">if</strong> (httpStatus == <strong class="jxr_keyword">null</strong> &amp;&amp; exception instanceof ResponseStatusException) {
 <a class="jxr_linenumber" name="L87" href="#L87">87</a>        httpStatus = ((ResponseStatusException) exception).getStatus();
 <a class="jxr_linenumber" name="L88" href="#L88">88</a>      }
 <a class="jxr_linenumber" name="L89" href="#L89">89</a>      <strong class="jxr_keyword">if</strong> (httpStatus == <strong class="jxr_keyword">null</strong>) {
@@ -296,7 +296,7 @@
 <a class="jxr_linenumber" name="L288" href="#L288">288</a>       <strong class="jxr_keyword">final</strong> @Nullable Object handler,
 <a class="jxr_linenumber" name="L289" href="#L289">289</a>       <strong class="jxr_keyword">final</strong> @NotNull ExceptionMappingConfig config) {
 <a class="jxr_linenumber" name="L290" href="#L290">290</a> 
-<a class="jxr_linenumber" name="L291" href="#L291">291</a>     String code = (exception instanceof <a name="ErrorCodeAware" href="../../../org/bremersee/exception/ErrorCodeAware.html#ErrorCodeAware">ErrorCodeAware</a>)
+<a class="jxr_linenumber" name="L291" href="#L291">291</a>     String code = exception instanceof <a name="ErrorCodeAware" href="../../../org/bremersee/exception/ErrorCodeAware.html#ErrorCodeAware">ErrorCodeAware</a>
 <a class="jxr_linenumber" name="L292" href="#L292">292</a>         ? ((<a name="ErrorCodeAware" href="../../../org/bremersee/exception/ErrorCodeAware.html#ErrorCodeAware">ErrorCodeAware</a>) exception).getErrorCode()
 <a class="jxr_linenumber" name="L293" href="#L293">293</a>         : <strong class="jxr_keyword">null</strong>;
 <a class="jxr_linenumber" name="L294" href="#L294">294</a>     <strong class="jxr_keyword">if</strong> (StringUtils.hasText(code) &amp;&amp; !config.isEvaluateAnnotationFirst()) {

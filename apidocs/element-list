@@ -8,6 +8,7 @@ org.bremersee.exception.feign
 org.bremersee.http
 org.bremersee.http.codec.xml
 org.bremersee.http.converter
+org.bremersee.security
 org.bremersee.security.access
 org.bremersee.security.authentication
 org.bremersee.security.core

@@ -77,7 +77,7 @@ public class FeignClientException extends FeignException implements HttpStatusAw
 <span class="fc" id="L77">            ? message</span>
 <span class="fc" id="L78">            : RestApiExceptionUtils.NO_MESSAGE_VALUE,</span>
 <span class="fc bfc" id="L79" title="All 2 branches covered.">        request != null</span>
-<span class="fc" id="L80">            ? request.requestBody().asBytes()</span>
+<span class="fc" id="L80">            ? request.body()</span>
 <span class="fc" id="L81">            : null);</span>
 <span class="fc" id="L82">    this.request = request;</span>
 <span class="fc bfc" id="L83" title="All 2 branches covered.">    this.headers = headers != null ? headers : Collections.emptyMap();</span>

@@ -37,9 +37,11 @@ import org.springframework.format.FormatterRegistry;
       new StringToMongoSearchLanguageConverter(),
       new StringToThreeLetterCountryCodeConverter(),
       new StringToThreeLetterLanguageCodeConverter(),
+      new StringToTimeZoneConverter(),
       new StringToTimeZoneIdConverter(),
       new StringToTwoLetterCountryCodeConverter(),
-      new StringToTwoLetterLanguageCodeConverter()
+      new StringToTwoLetterLanguageCodeConverter(),
+      new StringToTimeZoneConverter()
   };
 
   /**
@@ -48,11 +50,11 @@ import org.springframework.format.FormatterRegistry;
    * @param registry the registry
    */
   public static void registerAll(FormatterRegistry registry) {
-<span class="fc bfc" id="L51" title="All 2 branches covered.">    for (Converter&lt;?, ?&gt; converter : CONVERTERS) {</span>
-<span class="fc" id="L52">      log.info(&quot;Adding convert {} to registry.&quot;, converter);</span>
-<span class="fc" id="L53">      registry.addConverter(converter);</span>
+<span class="fc bfc" id="L53" title="All 2 branches covered.">    for (Converter&lt;?, ?&gt; converter : CONVERTERS) {</span>
+<span class="fc" id="L54">      log.info(&quot;Adding convert {} to registry.&quot;, converter);</span>
+<span class="fc" id="L55">      registry.addConverter(converter);</span>
     }
-<span class="fc" id="L55">  }</span>
+<span class="fc" id="L57">  }</span>
 
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

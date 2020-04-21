@@ -83,7 +83,7 @@ public class RestApiExceptionMapperImpl implements RestApiExceptionMapper {
 <span class="fc bfc" id="L83" title="All 2 branches covered.">    if (exception instanceof HttpStatusAware) {</span>
 <span class="fc" id="L84">      httpStatus = fromStatus(((HttpStatusAware) exception).status());</span>
     }
-<span class="fc bfc" id="L86" title="All 4 branches covered.">    if (httpStatus == null &amp;&amp; (exception instanceof ResponseStatusException)) {</span>
+<span class="fc bfc" id="L86" title="All 4 branches covered.">    if (httpStatus == null &amp;&amp; exception instanceof ResponseStatusException) {</span>
 <span class="fc" id="L87">      httpStatus = ((ResponseStatusException) exception).getStatus();</span>
     }
 <span class="fc bfc" id="L89" title="All 2 branches covered.">    if (httpStatus == null) {</span>
@@ -288,7 +288,7 @@ public class RestApiExceptionMapperImpl implements RestApiExceptionMapper {
       final @Nullable Object handler,
       final @NotNull ExceptionMappingConfig config) {
 
-<span class="fc bfc" id="L291" title="All 2 branches covered.">    String code = (exception instanceof ErrorCodeAware)</span>
+<span class="fc bfc" id="L291" title="All 2 branches covered.">    String code = exception instanceof ErrorCodeAware</span>
 <span class="fc" id="L292">        ? ((ErrorCodeAware) exception).getErrorCode()</span>
 <span class="fc" id="L293">        : null;</span>
 <span class="pc bpc" id="L294" title="1 of 4 branches missed.">    if (StringUtils.hasText(code) &amp;&amp; !config.isEvaluateAnnotationFirst()) {</span>

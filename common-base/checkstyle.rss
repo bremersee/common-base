@@ -1,0 +1,796 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+Licensed to the Apache Software Foundation (ASF) under one
+or more contributor license agreements.  See the NOTICE file
+distributed with this work for additional information
+regarding copyright ownership.  The ASF licenses this file
+to you under the Apache License, Version 2.0 (the
+"License"); you may not use this file except in compliance
+with the License.  You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing,
+software distributed under the License is distributed on an
+"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+KIND, either express or implied.  See the License for the
+specific language governing permissions and limitations
+under the License.
+-->
+<rss version="0.91">
+  <channel>
+    <title>common-base - Checkstyle report</title>
+    <link>https://github.com/bremersee/common-base/common-base</link>
+    <description>common-base - Checkstyle report</description>
+    <language>en-us</language>
+    <copyright>&#169;2020 bremersee.org</copyright>
+    <item>
+      <title>File: 53,
+             Errors: 0,
+             Warnings: 0,
+             Infos: 0
+      </title>
+            <link>https://github.com/bremersee/common-base/common-base/checkstyle.html</link>
+      <description>
+        <p>Click <a href="https://github.com/bremersee/common-base/common-base/checkstyle.html">here</a> for the full Checkstyle report.</p>
+
+        <table summary="Files" boder="1">
+          <thead>
+            <tr>
+              <th>Files</th>
+              <th style="width:30px;"><abbr title="Info">I</abbr></th>
+              <th style="width:30px;"><abbr title="Warning">W</abbr></th>
+              <th style="width:30px;"><abbr title="Error">E</abbr></th>
+            </tr>
+          </thead>
+          <tbody>
+                          <tr>
+                <td>
+                  <a href="https://github.com/bremersee/common-base/common-base/checkstyle.html#org.bremersee.security.access.PermissionConstants.java">org/bremersee/security/access/PermissionConstants.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/bremersee/common-base/common-base/checkstyle.html#org.bremersee.security.access.Acl.java">org/bremersee/security/access/Acl.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/bremersee/common-base/common-base/checkstyle.html#org.bremersee.exception.ErrorCodeAware.java">org/bremersee/exception/ErrorCodeAware.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/bremersee/common-base/common-base/checkstyle.html#org.bremersee.security.access.AclMapper.java">org/bremersee/security/access/AclMapper.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/bremersee/common-base/common-base/checkstyle.html#org.bremersee.converter.StringToTwoLetterCountryCodeConverter.java">org/bremersee/converter/StringToTwoLetterCountryCodeConverter.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/bremersee/common-base/common-base/checkstyle.html#org.bremersee.converter.StringToTwoLetterLanguageCodeConverter.java">org/bremersee/converter/StringToTwoLetterLanguageCodeConverter.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/bremersee/common-base/common-base/checkstyle.html#org.bremersee.security.access.AceImplTest.java">org/bremersee/security/access/AceImplTest.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/bremersee/common-base/common-base/checkstyle.html#org.bremersee.security.access.AclMapperImplTest.java">org/bremersee/security/access/AclMapperImplTest.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/bremersee/common-base/common-base/checkstyle.html#org.bremersee.security.access.AccessControllerTest.java">org/bremersee/security/access/AccessControllerTest.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/bremersee/common-base/common-base/checkstyle.html#org.bremersee.converter.StringToJavaLocaleConverter.java">org/bremersee/converter/StringToJavaLocaleConverter.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/bremersee/common-base/common-base/checkstyle.html#org.bremersee.converter.StringToJavaLocaleConverterTest.java">org/bremersee/converter/StringToJavaLocaleConverterTest.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/bremersee/common-base/common-base/checkstyle.html#org.bremersee.converter.StringToTimeZoneConverter.java">org/bremersee/converter/StringToTimeZoneConverter.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/bremersee/common-base/common-base/checkstyle.html#org.bremersee.exception.ExceptionParser.java">org/bremersee/exception/ExceptionParser.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/bremersee/common-base/common-base/checkstyle.html#org.bremersee.converter.TimeZoneToStringConverter.java">org/bremersee/converter/TimeZoneToStringConverter.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/bremersee/common-base/common-base/checkstyle.html#org.bremersee.security.access.Ace.java">org/bremersee/security/access/Ace.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/bremersee/common-base/common-base/checkstyle.html#org.bremersee.security.core.AuthorityConstants.java">org/bremersee/security/core/AuthorityConstants.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/bremersee/common-base/common-base/checkstyle.html#org.bremersee.converter.BaseCommonConvertersTest.java">org/bremersee/converter/BaseCommonConvertersTest.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/bremersee/common-base/common-base/checkstyle.html#org.bremersee.converter.StringToThreeLetterCountryCodeConverterTest.java">org/bremersee/converter/StringToThreeLetterCountryCodeConverterTest.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/bremersee/common-base/common-base/checkstyle.html#org.bremersee.exception.ServiceExceptionBuilder.java">org/bremersee/exception/ServiceExceptionBuilder.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/bremersee/common-base/common-base/checkstyle.html#org.bremersee.exception.ServiceExceptionTest.java">org/bremersee/exception/ServiceExceptionTest.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/bremersee/common-base/common-base/checkstyle.html#org.bremersee.converter.StringToMongoSearchLanguageConverter.java">org/bremersee/converter/StringToMongoSearchLanguageConverter.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/bremersee/common-base/common-base/checkstyle.html#org.bremersee.converter.BaseCommonConverters.java">org/bremersee/converter/BaseCommonConverters.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/bremersee/common-base/common-base/checkstyle.html#org.bremersee.security.access.AccessControlEntryComparator.java">org/bremersee/security/access/AccessControlEntryComparator.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/bremersee/common-base/common-base/checkstyle.html#org.bremersee.security.access.AclImplTest.java">org/bremersee/security/access/AclImplTest.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/bremersee/common-base/common-base/checkstyle.html#org.bremersee.exception.HttpResponseHeadersAware.java">org/bremersee/exception/HttpResponseHeadersAware.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/bremersee/common-base/common-base/checkstyle.html#org.bremersee.converter.StringToTwoLetterLanguageCodeConverterTest.java">org/bremersee/converter/StringToTwoLetterLanguageCodeConverterTest.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/bremersee/common-base/common-base/checkstyle.html#org.bremersee.security.access.AccessController.java">org/bremersee/security/access/AccessController.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/bremersee/common-base/common-base/checkstyle.html#org.bremersee.converter.StringToLocaleConverter.java">org/bremersee/converter/StringToLocaleConverter.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/bremersee/common-base/common-base/checkstyle.html#org.bremersee.security.access.AclFactory.java">org/bremersee/security/access/AclFactory.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/bremersee/common-base/common-base/checkstyle.html#org.bremersee.converter.StringToTimeZoneIdConverter.java">org/bremersee/converter/StringToTimeZoneIdConverter.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/bremersee/common-base/common-base/checkstyle.html#org.bremersee.security.access.AceImpl.java">org/bremersee/security/access/AceImpl.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/bremersee/common-base/common-base/checkstyle.html#org.bremersee.exception.HttpStatusAware.java">org/bremersee/exception/HttpStatusAware.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/bremersee/common-base/common-base/checkstyle.html#org.bremersee.converter.TimeZoneToStringConverterTest.java">org/bremersee/converter/TimeZoneToStringConverterTest.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/bremersee/common-base/common-base/checkstyle.html#org.bremersee.converter.StringToTimeZoneConverterTest.java">org/bremersee/converter/StringToTimeZoneConverterTest.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/bremersee/common-base/common-base/checkstyle.html#org.bremersee.exception.annotation.ErrorCode.java">org/bremersee/exception/annotation/ErrorCode.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/bremersee/common-base/common-base/checkstyle.html#org.bremersee.converter.StringToThreeLetterCountryCodeConverter.java">org/bremersee/converter/StringToThreeLetterCountryCodeConverter.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/bremersee/common-base/common-base/checkstyle.html#org.bremersee.converter.StringToThreeLetterLanguageCodeConverter.java">org/bremersee/converter/StringToThreeLetterLanguageCodeConverter.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/bremersee/common-base/common-base/checkstyle.html#org.bremersee.exception.MessageExceptionParserTest.java">org/bremersee/exception/MessageExceptionParserTest.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/bremersee/common-base/common-base/checkstyle.html#org.bremersee.exception.HttpResponseHeadersAwareTest.java">org/bremersee/exception/HttpResponseHeadersAwareTest.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/bremersee/common-base/common-base/checkstyle.html#org.bremersee.security.access.AclMapperImpl.java">org/bremersee/security/access/AclMapperImpl.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/bremersee/common-base/common-base/checkstyle.html#org.bremersee.exception.MessageExceptionParser.java">org/bremersee/exception/MessageExceptionParser.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/bremersee/common-base/common-base/checkstyle.html#org.bremersee.converter.StringToTimeZoneIdConverterTest.java">org/bremersee/converter/StringToTimeZoneIdConverterTest.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/bremersee/common-base/common-base/checkstyle.html#org.bremersee.converter.StringToMongoSearchLanguageConverterTest.java">org/bremersee/converter/StringToMongoSearchLanguageConverterTest.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/bremersee/common-base/common-base/checkstyle.html#org.bremersee.exception.ServiceException.java">org/bremersee/exception/ServiceException.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/bremersee/common-base/common-base/checkstyle.html#org.bremersee.security.access.AclMapperTest.java">org/bremersee/security/access/AclMapperTest.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/bremersee/common-base/common-base/checkstyle.html#org.bremersee.exception.ServiceExceptionBuilderTest.java">org/bremersee/exception/ServiceExceptionBuilderTest.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/bremersee/common-base/common-base/checkstyle.html#org.bremersee.security.access.AclBuilderTest.java">org/bremersee/security/access/AclBuilderTest.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/bremersee/common-base/common-base/checkstyle.html#org.bremersee.converter.StringToThreeLetterLanguageCodeConverterTest.java">org/bremersee/converter/StringToThreeLetterLanguageCodeConverterTest.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/bremersee/common-base/common-base/checkstyle.html#org.bremersee.converter.StringToLocaleConverterTest.java">org/bremersee/converter/StringToLocaleConverterTest.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/bremersee/common-base/common-base/checkstyle.html#org.bremersee.security.access.AclImpl.java">org/bremersee/security/access/AclImpl.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/bremersee/common-base/common-base/checkstyle.html#org.bremersee.security.access.AclBuilder.java">org/bremersee/security/access/AclBuilder.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/bremersee/common-base/common-base/checkstyle.html#org.bremersee.exception.AbstractServiceExceptionBuilder.java">org/bremersee/exception/AbstractServiceExceptionBuilder.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/bremersee/common-base/common-base/checkstyle.html#org.bremersee.converter.StringToTwoLetterCountryCodeConverterTest.java">org/bremersee/converter/StringToTwoLetterCountryCodeConverterTest.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                      </tbody>
+        </table>
+        
+      </description>
+    </item>
+  </channel>
+</rss>
+

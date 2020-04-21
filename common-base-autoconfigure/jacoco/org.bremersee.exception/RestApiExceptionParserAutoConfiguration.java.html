@@ -37,14 +37,17 @@ import org.springframework.util.ClassUtils;
 <span class="fc" id="L37">@Slf4j</span>
 <span class="fc" id="L38">public class RestApiExceptionParserAutoConfiguration {</span>
 
+  /**
+   * Init.
+   */
   @EventListener(ApplicationReadyEvent.class)
   public void init() {
-<span class="fc" id="L42">    log.info(&quot;\n&quot;</span>
+<span class="fc" id="L45">    log.info(&quot;\n&quot;</span>
             + &quot;*********************************************************************************\n&quot;
             + &quot;* {}\n&quot;
             + &quot;*********************************************************************************&quot;,
-<span class="fc" id="L46">        ClassUtils.getUserClass(getClass()).getSimpleName());</span>
-<span class="fc" id="L47">  }</span>
+<span class="fc" id="L49">        ClassUtils.getUserClass(getClass()).getSimpleName());</span>
+<span class="fc" id="L50">  }</span>
 
   /**
    * Rest api exception parser rest api exception parser.
@@ -55,10 +58,10 @@ import org.springframework.util.ClassUtils;
   @Bean
   public RestApiExceptionParser restApiExceptionParser(
       ObjectProvider&lt;Jackson2ObjectMapperBuilder&gt; objectMapperBuilderProvider) {
-<span class="fc" id="L58">    Jackson2ObjectMapperBuilder objectMapperBuilder = objectMapperBuilderProvider.getIfAvailable();</span>
-<span class="fc" id="L59">    return Optional.ofNullable(objectMapperBuilder)</span>
-<span class="fc" id="L60">        .map(RestApiExceptionParserImpl::new)</span>
-<span class="fc" id="L61">        .orElseGet(RestApiExceptionParserImpl::new);</span>
+<span class="fc" id="L61">    Jackson2ObjectMapperBuilder objectMapperBuilder = objectMapperBuilderProvider.getIfAvailable();</span>
+<span class="fc" id="L62">    return Optional.ofNullable(objectMapperBuilder)</span>
+<span class="fc" id="L63">        .map(RestApiExceptionParserImpl::new)</span>
+<span class="fc" id="L64">        .orElseGet(RestApiExceptionParserImpl::new);</span>
   }
 
 }

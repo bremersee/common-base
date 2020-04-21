@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>IpAddressMatcher.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">common-base-security</a> &gt; <a href="index.source.html" class="el_package">org.bremersee.security</a> &gt; <span class="el_source">IpAddressMatcher.java</span></div><h1>IpAddressMatcher.java</h1><pre class="source lang-java linenums">/*
+ * Copyright 2002-2020 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package org.bremersee.security;
+
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import org.springframework.util.Assert;
+import org.springframework.util.StringUtils;
+
+/**
+ * Matches a request based on IP Address or subnet mask matching against the remote address.
+ *
+ * &lt;p&gt;Both IPv6 and IPv4 addresses are supported, but a matcher which is configured with an IPv4
+ * address will never match a request which returns an IPv6 address, and vice-versa.
+ *
+ * &lt;p&gt;The original Spring {@code org.springframework.security.web.util.matcher.IpAddressMatcher}
+ * imports {@code javax.servlet.http.HttpServletRequest}, that is not available in a reactive
+ * environment. Here is the method {@code boolean matches(HttpServletRequest request)} skipped and
+ * ths class does not implements {@code org.springframework.security.web.util.matcher.RequestMatcher},
+ *
+ * @author Luke Taylor
+ */
+public class IpAddressMatcher {
+
+  private final int numMaskBits;
+  private final InetAddress requiredAddress;
+
+  /**
+   * Takes a specific IP address or a range specified using the IP/Netmask (e.g. 192.168.1.0/24 or
+   * 202.24.0.0/14).
+   *
+   * @param ipAddress the address or range of addresses from which the request must come.
+   */
+<span class="fc" id="L48">  public IpAddressMatcher(String ipAddress) {</span>
+
+<span class="fc bfc" id="L50" title="All 2 branches covered.">    if (ipAddress.indexOf('/') &gt; 0) {</span>
+<span class="fc" id="L51">      String[] addressAndMask = StringUtils.split(ipAddress, &quot;/&quot;);</span>
+      //noinspection ConstantConditions
+<span class="fc" id="L53">      ipAddress = addressAndMask[0];</span>
+<span class="fc" id="L54">      numMaskBits = Integer.parseInt(addressAndMask[1]);</span>
+<span class="fc" id="L55">    } else {</span>
+<span class="fc" id="L56">      numMaskBits = -1;</span>
+    }
+<span class="fc" id="L58">    requiredAddress = parseAddress(ipAddress);</span>
+<span class="pc bpc" id="L59" title="1 of 2 branches missed.">    Assert.isTrue(requiredAddress.getAddress().length * 8 &gt;= numMaskBits,</span>
+<span class="fc" id="L60">        String.format(&quot;IP address %s is too short for bitmask of length %d&quot;,</span>
+<span class="fc" id="L61">            ipAddress, numMaskBits));</span>
+<span class="fc" id="L62">  }</span>
+
+  /**
+   * Matches an IPv6 and IPv4 address.
+   *
+   * @param address the address
+   * @return the {@code true} id the given address matches an IPv6 and IPv4 address, otherwise
+   *     {@code false}
+   */
+  public boolean matches(String address) {
+<span class="fc" id="L72">    InetAddress remoteAddress = parseAddress(address);</span>
+
+<span class="pc bpc" id="L74" title="1 of 2 branches missed.">    if (!requiredAddress.getClass().equals(remoteAddress.getClass())) {</span>
+<span class="nc" id="L75">      return false;</span>
+    }
+
+<span class="fc bfc" id="L78" title="All 2 branches covered.">    if (numMaskBits &lt; 0) {</span>
+<span class="fc" id="L79">      return remoteAddress.equals(requiredAddress);</span>
+    }
+
+<span class="fc" id="L82">    byte[] remAddr = remoteAddress.getAddress();</span>
+<span class="fc" id="L83">    byte[] reqAddr = requiredAddress.getAddress();</span>
+
+<span class="fc" id="L85">    int numMaskFullBytes = numMaskBits / 8;</span>
+<span class="fc" id="L86">    byte finalByte = (byte) (0xFF00 &gt;&gt; (numMaskBits &amp; 0x07));</span>
+
+    // System.out.println(&quot;Mask is &quot; + new sun.misc.HexDumpEncoder().encode(mask));
+
+<span class="fc bfc" id="L90" title="All 2 branches covered.">    for (int i = 0; i &lt; numMaskFullBytes; i++) {</span>
+<span class="fc bfc" id="L91" title="All 2 branches covered.">      if (remAddr[i] != reqAddr[i]) {</span>
+<span class="fc" id="L92">        return false;</span>
+      }
+    }
+
+<span class="pc bpc" id="L96" title="1 of 2 branches missed.">    if (finalByte != 0) {</span>
+<span class="nc bnc" id="L97" title="All 2 branches missed.">      return (remAddr[numMaskFullBytes] &amp; finalByte) == (reqAddr[numMaskFullBytes] &amp; finalByte);</span>
+    }
+
+<span class="fc" id="L100">    return true;</span>
+  }
+
+  private InetAddress parseAddress(String address) {
+    try {
+<span class="fc" id="L105">      return InetAddress.getByName(address);</span>
+<span class="nc" id="L106">    } catch (UnknownHostException e) {</span>
+<span class="nc" id="L107">      throw new IllegalArgumentException(&quot;Failed to parse address&quot; + address, e);</span>
+    }
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

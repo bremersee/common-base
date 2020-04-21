@@ -1,0 +1,320 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+Licensed to the Apache Software Foundation (ASF) under one
+or more contributor license agreements.  See the NOTICE file
+distributed with this work for additional information
+regarding copyright ownership.  The ASF licenses this file
+to you under the Apache License, Version 2.0 (the
+"License"); you may not use this file except in compliance
+with the License.  You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing,
+software distributed under the License is distributed on an
+"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+KIND, either express or implied.  See the License for the
+specific language governing permissions and limitations
+under the License.
+-->
+<rss version="0.91">
+  <channel>
+    <title>common-base-ldaptive - Checkstyle report</title>
+    <link>https://github.com/bremersee/common-base/common-base-ldaptive</link>
+    <description>common-base-ldaptive - Checkstyle report</description>
+    <language>en-us</language>
+    <copyright>&#169;2020 bremersee.org</copyright>
+    <item>
+      <title>File: 19,
+             Errors: 0,
+             Warnings: 0,
+             Infos: 0
+      </title>
+            <link>https://github.com/bremersee/common-base/common-base-ldaptive/checkstyle.html</link>
+      <description>
+        <p>Click <a href="https://github.com/bremersee/common-base/common-base-ldaptive/checkstyle.html">here</a> for the full Checkstyle report.</p>
+
+        <table summary="Files" boder="1">
+          <thead>
+            <tr>
+              <th>Files</th>
+              <th style="width:30px;"><abbr title="Info">I</abbr></th>
+              <th style="width:30px;"><abbr title="Warning">W</abbr></th>
+              <th style="width:30px;"><abbr title="Error">E</abbr></th>
+            </tr>
+          </thead>
+          <tbody>
+                          <tr>
+                <td>
+                  <a href="https://github.com/bremersee/common-base/common-base-ldaptive/checkstyle.html#org.bremersee.data.ldaptive.LdaptiveExceptionTest.java">org/bremersee/data/ldaptive/LdaptiveExceptionTest.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/bremersee/common-base/common-base-ldaptive/checkstyle.html#org.bremersee.data.ldaptive.LdaptiveException.java">org/bremersee/data/ldaptive/LdaptiveException.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/bremersee/common-base/common-base-ldaptive/checkstyle.html#org.bremersee.data.ldaptive.app.TestConfiguration.java">org/bremersee/data/ldaptive/app/TestConfiguration.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/bremersee/common-base/common-base-ldaptive/checkstyle.html#org.bremersee.data.ldaptive.LdaptiveErrorHandler.java">org/bremersee/data/ldaptive/LdaptiveErrorHandler.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/bremersee/common-base/common-base-ldaptive/checkstyle.html#org.bremersee.data.ldaptive.LdaptiveOperations.java">org/bremersee/data/ldaptive/LdaptiveOperations.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/bremersee/common-base/common-base-ldaptive/checkstyle.html#org.bremersee.data.ldaptive.app.PersonMapper.java">org/bremersee/data/ldaptive/app/PersonMapper.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/bremersee/common-base/common-base-ldaptive/checkstyle.html#org.bremersee.data.ldaptive.package-info.java">org/bremersee/data/ldaptive/package-info.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/bremersee/common-base/common-base-ldaptive/checkstyle.html#org.bremersee.data.ldaptive.LdaptiveTemplate.java">org/bremersee/data/ldaptive/LdaptiveTemplate.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/bremersee/common-base/common-base-ldaptive/checkstyle.html#org.bremersee.data.ldaptive.LdaptiveEntryMapper.java">org/bremersee/data/ldaptive/LdaptiveEntryMapper.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/bremersee/common-base/common-base-ldaptive/checkstyle.html#org.bremersee.data.ldaptive.AbstractLdaptiveErrorHandler.java">org/bremersee/data/ldaptive/AbstractLdaptiveErrorHandler.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/bremersee/common-base/common-base-ldaptive/checkstyle.html#org.bremersee.data.ldaptive.DefaultLdaptiveErrorHandlerTest.java">org/bremersee/data/ldaptive/DefaultLdaptiveErrorHandlerTest.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/bremersee/common-base/common-base-ldaptive/checkstyle.html#org.bremersee.data.ldaptive.LdaptiveTemplateTest.java">org/bremersee/data/ldaptive/LdaptiveTemplateTest.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/bremersee/common-base/common-base-ldaptive/checkstyle.html#org.bremersee.data.ldaptive.LdaptiveConnectionCallbackWithoutResult.java">org/bremersee/data/ldaptive/LdaptiveConnectionCallbackWithoutResult.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/bremersee/common-base/common-base-ldaptive/checkstyle.html#org.bremersee.data.ldaptive.DefaultLdaptiveErrorHandler.java">org/bremersee/data/ldaptive/DefaultLdaptiveErrorHandler.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/bremersee/common-base/common-base-ldaptive/checkstyle.html#org.bremersee.data.ldaptive.LdaptiveEntryMapperTest.java">org/bremersee/data/ldaptive/LdaptiveEntryMapperTest.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/bremersee/common-base/common-base-ldaptive/checkstyle.html#org.bremersee.data.ldaptive.app.Group.java">org/bremersee/data/ldaptive/app/Group.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/bremersee/common-base/common-base-ldaptive/checkstyle.html#org.bremersee.data.ldaptive.LdaptiveConnectionCallback.java">org/bremersee/data/ldaptive/LdaptiveConnectionCallback.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/bremersee/common-base/common-base-ldaptive/checkstyle.html#org.bremersee.data.ldaptive.app.GroupMapper.java">org/bremersee/data/ldaptive/app/GroupMapper.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/bremersee/common-base/common-base-ldaptive/checkstyle.html#org.bremersee.data.ldaptive.app.Person.java">org/bremersee/data/ldaptive/app/Person.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                      </tbody>
+        </table>
+        
+      </description>
+    </item>
+  </channel>
+</rss>
+

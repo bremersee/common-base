@@ -107,8 +107,8 @@ public class ReactiveJaxbDecoder extends AbstractDecoder&lt;Object&gt; {
   /**
    * Set the max number of bytes that can be buffered by this decoder. This is either the size of
    * the entire input when decoding as a whole, or when using async parsing with Aalto XML, it is
-   * the size of one top-level XML tree. When the limit is exceeded,
-   * {@link DataBufferLimitException} is raised.
+   * the size of one top-level XML tree. When the limit is exceeded, {@link
+   * DataBufferLimitException} is raised.
    *
    * &lt;p&gt;By default this is set to 256K.
    *
@@ -161,30 +161,30 @@ public class ReactiveJaxbDecoder extends AbstractDecoder&lt;Object&gt; {
   }
 
   @Override
-  public Mono&lt;Object&gt; decodeToMono(Publisher&lt;DataBuffer&gt; input, ResolvableType elementType,
-      @Nullable MimeType mimeType, @Nullable Map&lt;String, Object&gt; hints) {
-
-    //noinspection NullableInLambdaInTransform
-<span class="fc" id="L168">    return DataBufferUtils.join(input, this.maxInMemorySize)</span>
-<span class="fc" id="L169">        .map(dataBuffer -&gt; decode(dataBuffer, elementType, mimeType, hints));</span>
-  }
-
-  @Override
   @SuppressWarnings({&quot;rawtypes&quot;, &quot;unchecked&quot;, &quot;cast&quot;})
   // XMLEventReader is Iterator&lt;Object&gt; on JDK 9
   public Object decode(DataBuffer dataBuffer, ResolvableType targetType,
       @Nullable MimeType mimeType, @Nullable Map&lt;String, Object&gt; hints) throws DecodingException {
 
     try {
-<span class="fc" id="L179">      Iterator eventReader = inputFactory.createXMLEventReader(dataBuffer.asInputStream());</span>
-<span class="fc" id="L180">      List&lt;XMLEvent&gt; events = new ArrayList&lt;&gt;();</span>
-<span class="fc" id="L181">      eventReader.forEachRemaining(event -&gt; events.add((XMLEvent) event));</span>
-<span class="fc" id="L182">      return unmarshal(events, targetType.toClass());</span>
-<span class="nc" id="L183">    } catch (XMLStreamException ex) {</span>
-<span class="nc" id="L184">      throw Exceptions.propagate(ex);</span>
+<span class="fc" id="L170">      Iterator eventReader = inputFactory.createXMLEventReader(dataBuffer.asInputStream());</span>
+<span class="fc" id="L171">      List&lt;XMLEvent&gt; events = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L172">      eventReader.forEachRemaining(event -&gt; events.add((XMLEvent) event));</span>
+<span class="fc" id="L173">      return unmarshal(events, targetType.toClass());</span>
+<span class="nc" id="L174">    } catch (XMLStreamException ex) {</span>
+<span class="nc" id="L175">      throw Exceptions.propagate(ex);</span>
     } finally {
-<span class="fc" id="L186">      DataBufferUtils.release(dataBuffer);</span>
+<span class="fc" id="L177">      DataBufferUtils.release(dataBuffer);</span>
     }
+  }
+
+  @Override
+  public Mono&lt;Object&gt; decodeToMono(Publisher&lt;DataBuffer&gt; input, ResolvableType elementType,
+      @Nullable MimeType mimeType, @Nullable Map&lt;String, Object&gt; hints) {
+
+    //noinspection NullableInLambdaInTransform
+<span class="fc" id="L186">    return DataBufferUtils.join(input, this.maxInMemorySize)</span>
+<span class="fc" id="L187">        .map(dataBuffer -&gt; decode(dataBuffer, elementType, mimeType, hints));</span>
   }
 
   private Object unmarshal(List&lt;XMLEvent&gt; events, Class&lt;?&gt; outputClass) {
@@ -224,8 +224,8 @@ public class ReactiveJaxbDecoder extends AbstractDecoder&lt;Object&gt; {
 <span class="nc" id="L224">      localPart = annotation.name();</span>
 <span class="nc" id="L225">      namespaceUri = annotation.namespace();</span>
 <span class="nc" id="L226">    } else {</span>
-<span class="nc" id="L227">      throw new IllegalArgumentException(&quot;Output class [&quot; + outputClass.getName() +</span>
-          &quot;] is neither annotated with @XmlRootElement nor @XmlType&quot;);
+<span class="nc" id="L227">      throw new IllegalArgumentException(&quot;Output class [&quot; + outputClass.getName()</span>
+          + &quot;] is neither annotated with @XmlRootElement nor @XmlType&quot;);
     }
 
 <span class="nc bnc" id="L231" title="All 2 branches missed.">    if (JAXB_DEFAULT_ANNOTATION_VALUE.equals(localPart)) {</span>
@@ -267,7 +267,7 @@ public class ReactiveJaxbDecoder extends AbstractDecoder&lt;Object&gt; {
    *
    * @param xmlEventFlux the xml event as flux
    * @param desiredName the desired name
-   * @return the list of eml events as flux
+   * @return the list of xml events as flux
    */
   Flux&lt;List&lt;XMLEvent&gt;&gt; split(Flux&lt;XMLEvent&gt; xmlEventFlux, QName desiredName) {
 <span class="nc" id="L273">    return xmlEventFlux.handle(new SplitHandler(desiredName));</span>

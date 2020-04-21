@@ -16,7 +16,10 @@
 
 package org.bremersee.data.convert;
 
+import lombok.ToString;
+import org.bremersee.common.model.TimeZoneId;
 import org.bremersee.converter.StringToTimeZoneIdConverter;
+import org.springframework.core.convert.converter.Converter;
 import org.springframework.data.convert.ReadingConverter;
 
 /**
@@ -25,7 +28,9 @@ import org.springframework.data.convert.ReadingConverter;
  * @author Christian Bremer
  */
 @ReadingConverter
-<span class="fc" id="L28">public class TimeZoneIdReadConverter extends StringToTimeZoneIdConverter {</span>
+<span class="nc" id="L31">@ToString</span>
+<span class="fc" id="L32">public class TimeZoneIdReadConverter extends StringToTimeZoneIdConverter</span>
+    implements Converter&lt;String, TimeZoneId&gt; {
 
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

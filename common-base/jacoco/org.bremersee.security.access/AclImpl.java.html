@@ -75,7 +75,7 @@ class AclImpl extends TreeMap&lt;String, Ace&gt; implements Acl&lt;Ace&gt; {
     }
 <span class="fc" id="L76">    Acl&lt;? extends Ace&gt; acl = (Acl&lt;? extends Ace&gt;) o;</span>
 <span class="pc bpc" id="L77" title="1 of 2 branches missed.">    return Objects.equals(owner, acl.getOwner())</span>
-<span class="pc bpc" id="L78" title="1 of 2 branches missed.">        &amp;&amp; (new TreeMap&lt;&gt;(this)).equals(new TreeMap&lt;&gt;(acl.entryMap()));</span>
+<span class="pc bpc" id="L78" title="1 of 2 branches missed.">        &amp;&amp; new TreeMap&lt;&gt;(this).equals(new TreeMap&lt;&gt;(acl.entryMap()));</span>
   }
 
   @Override

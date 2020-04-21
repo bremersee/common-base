@@ -1,0 +1,936 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+Licensed to the Apache Software Foundation (ASF) under one
+or more contributor license agreements.  See the NOTICE file
+distributed with this work for additional information
+regarding copyright ownership.  The ASF licenses this file
+to you under the Apache License, Version 2.0 (the
+"License"); you may not use this file except in compliance
+with the License.  You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing,
+software distributed under the License is distributed on an
+"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+KIND, either express or implied.  See the License for the
+specific language governing permissions and limitations
+under the License.
+-->
+<rss version="0.91">
+  <channel>
+    <title>common-base-autoconfigure - Checkstyle report</title>
+    <link>https://github.com/bremersee/common-base/common-base-autoconfigure</link>
+    <description>common-base-autoconfigure - Checkstyle report</description>
+    <language>en-us</language>
+    <copyright>&#169;2020 bremersee.org</copyright>
+    <item>
+      <title>File: 63,
+             Errors: 0,
+             Warnings: 0,
+             Infos: 0
+      </title>
+            <link>https://github.com/bremersee/common-base/common-base-autoconfigure/checkstyle.html</link>
+      <description>
+        <p>Click <a href="https://github.com/bremersee/common-base/common-base-autoconfigure/checkstyle.html">here</a> for the full Checkstyle report.</p>
+
+        <table summary="Files" boder="1">
+          <thead>
+            <tr>
+              <th>Files</th>
+              <th style="width:30px;"><abbr title="Info">I</abbr></th>
+              <th style="width:30px;"><abbr title="Warning">W</abbr></th>
+              <th style="width:30px;"><abbr title="Error">E</abbr></th>
+            </tr>
+          </thead>
+          <tbody>
+                          <tr>
+                <td>
+                  <a href="https://github.com/bremersee/common-base/common-base-autoconfigure/checkstyle.html#org.bremersee.converter.ModelMapperAutoConfiguration.java">org/bremersee/converter/ModelMapperAutoConfiguration.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/bremersee/common-base/common-base-autoconfigure/checkstyle.html#org.bremersee.web.reactive.BaseCommonConvertersAutoConfigurationTest.java">org/bremersee/web/reactive/BaseCommonConvertersAutoConfigurationTest.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/bremersee/common-base/common-base-autoconfigure/checkstyle.html#org.bremersee.web.servlet.CorsAutoConfigurationTest.java">org/bremersee/web/servlet/CorsAutoConfigurationTest.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/bremersee/common-base/common-base-autoconfigure/checkstyle.html#org.bremersee.security.authentication.AuthenticationSupportAutoConfiguration.java">org/bremersee/security/authentication/AuthenticationSupportAutoConfiguration.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/bremersee/common-base/common-base-autoconfigure/checkstyle.html#org.bremersee.web.reactive.CorsAutoConfiguration.java">org/bremersee/web/reactive/CorsAutoConfiguration.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/bremersee/common-base/common-base-autoconfigure/checkstyle.html#org.bremersee.http.converter.ObjectMapperHelper.java">org/bremersee/http/converter/ObjectMapperHelper.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/bremersee/common-base/common-base-autoconfigure/checkstyle.html#org.bremersee.security.access.AccessControlAutoConfiguration.java">org/bremersee/security/access/AccessControlAutoConfiguration.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/bremersee/common-base/common-base-autoconfigure/checkstyle.html#org.bremersee.security.authentication.ReactiveAuthenticationSupportAutoConfigurationTest.java">org/bremersee/security/authentication/ReactiveAuthenticationSupportAutoConfigurationTest.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/bremersee/common-base/common-base-autoconfigure/checkstyle.html#org.bremersee.data.ldaptive.LdaptiveAutoConfigurationTest.java">org/bremersee/data/ldaptive/LdaptiveAutoConfigurationTest.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/bremersee/common-base/common-base-autoconfigure/checkstyle.html#org.bremersee.web.reactive.ApiExceptionHandler.java">org/bremersee/web/reactive/ApiExceptionHandler.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/bremersee/common-base/common-base-autoconfigure/checkstyle.html#org.bremersee.security.authentication.ReactiveAuthenticationSupportAutoConfiguration.java">org/bremersee/security/authentication/ReactiveAuthenticationSupportAutoConfiguration.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/bremersee/common-base/common-base-autoconfigure/checkstyle.html#org.bremersee.exception.RestApiExceptionMapperProperties.java">org/bremersee/exception/RestApiExceptionMapperProperties.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/bremersee/common-base/common-base-autoconfigure/checkstyle.html#org.bremersee.web.CorsPropertiesTest.java">org/bremersee/web/CorsPropertiesTest.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/bremersee/common-base/common-base-autoconfigure/checkstyle.html#org.bremersee.exception.RestApiExceptionMapperPropertiesTest.java">org/bremersee/exception/RestApiExceptionMapperPropertiesTest.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/bremersee/common-base/common-base-autoconfigure/checkstyle.html#org.bremersee.web.reactive.ApiExceptionHandlerAutoConfiguration.java">org/bremersee/web/reactive/ApiExceptionHandlerAutoConfiguration.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/bremersee/common-base/common-base-autoconfigure/checkstyle.html#org.bremersee.data.ldaptive.LdaptiveConnectionPoolFactoryTest.java">org/bremersee/data/ldaptive/LdaptiveConnectionPoolFactoryTest.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/bremersee/common-base/common-base-autoconfigure/checkstyle.html#org.bremersee.converter.ModelMapperAutoConfigurationTest.java">org/bremersee/converter/ModelMapperAutoConfigurationTest.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/bremersee/common-base/common-base-autoconfigure/checkstyle.html#org.bremersee.security.access.AccessControlAutoConfigurationTest.java">org/bremersee/security/access/AccessControlAutoConfigurationTest.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/bremersee/common-base/common-base-autoconfigure/checkstyle.html#org.bremersee.exception.RestApiExceptionMapperAutoConfigurationTest.java">org/bremersee/exception/RestApiExceptionMapperAutoConfigurationTest.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/bremersee/common-base/common-base-autoconfigure/checkstyle.html#org.bremersee.security.authentication.AuthenticationProperties.java">org/bremersee/security/authentication/AuthenticationProperties.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/bremersee/common-base/common-base-autoconfigure/checkstyle.html#org.bremersee.web.reactive.ApiExceptionHandlerAutoConfigurationTest.java">org/bremersee/web/reactive/ApiExceptionHandlerAutoConfigurationTest.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/bremersee/common-base/common-base-autoconfigure/checkstyle.html#org.bremersee.security.authentication.PasswordFlowAuthenticationManagerTest.java">org/bremersee/security/authentication/PasswordFlowAuthenticationManagerTest.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/bremersee/common-base/common-base-autoconfigure/checkstyle.html#org.bremersee.exception.RestApiExceptionMapperImplTest.java">org/bremersee/exception/RestApiExceptionMapperImplTest.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/bremersee/common-base/common-base-autoconfigure/checkstyle.html#org.bremersee.exception.RestApiExceptionMapperImpl.java">org/bremersee/exception/RestApiExceptionMapperImpl.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/bremersee/common-base/common-base-autoconfigure/checkstyle.html#org.bremersee.security.access.AccessControlProperties.java">org/bremersee/security/access/AccessControlProperties.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/bremersee/common-base/common-base-autoconfigure/checkstyle.html#org.bremersee.thymeleaf.AdditionalThymeleafAutoConfigurationTest.java">org/bremersee/thymeleaf/AdditionalThymeleafAutoConfigurationTest.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/bremersee/common-base/common-base-autoconfigure/checkstyle.html#org.bremersee.thymeleaf.AdditionalThymeleafAutoConfiguration.java">org/bremersee/thymeleaf/AdditionalThymeleafAutoConfiguration.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/bremersee/common-base/common-base-autoconfigure/checkstyle.html#org.bremersee.data.ldaptive.LdaptiveConnectionConfigFactoryTest.java">org/bremersee/data/ldaptive/LdaptiveConnectionConfigFactoryTest.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/bremersee/common-base/common-base-autoconfigure/checkstyle.html#org.bremersee.data.ldaptive.LdaptiveAutoConfiguration.java">org/bremersee/data/ldaptive/LdaptiveAutoConfiguration.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/bremersee/common-base/common-base-autoconfigure/checkstyle.html#org.bremersee.web.CorsProperties.java">org/bremersee/web/CorsProperties.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/bremersee/common-base/common-base-autoconfigure/checkstyle.html#org.bremersee.data.ldaptive.UnboundIdProviderAutoConfiguration.java">org/bremersee/data/ldaptive/UnboundIdProviderAutoConfiguration.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/bremersee/common-base/common-base-autoconfigure/checkstyle.html#org.bremersee.security.authentication.PasswordFlowAuthenticationManager.java">org/bremersee/security/authentication/PasswordFlowAuthenticationManager.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/bremersee/common-base/common-base-autoconfigure/checkstyle.html#org.bremersee.thymeleaf.AdditionalThymeleafPropertiesTest.java">org/bremersee/thymeleaf/AdditionalThymeleafPropertiesTest.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/bremersee/common-base/common-base-autoconfigure/checkstyle.html#org.bremersee.data.ldaptive.LdaptivePropertiesTest.java">org/bremersee/data/ldaptive/LdaptivePropertiesTest.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/bremersee/common-base/common-base-autoconfigure/checkstyle.html#org.bremersee.thymeleaf.AdditionalThymeleafProperties.java">org/bremersee/thymeleaf/AdditionalThymeleafProperties.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/bremersee/common-base/common-base-autoconfigure/checkstyle.html#org.bremersee.data.ldaptive.LdaptiveConnectionPoolFactory.java">org/bremersee/data/ldaptive/LdaptiveConnectionPoolFactory.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/bremersee/common-base/common-base-autoconfigure/checkstyle.html#org.bremersee.security.access.AclEntity.java">org/bremersee/security/access/AclEntity.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/bremersee/common-base/common-base-autoconfigure/checkstyle.html#org.bremersee.security.authentication.AuthenticationSupportAutoConfigurationTest.java">org/bremersee/security/authentication/AuthenticationSupportAutoConfigurationTest.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/bremersee/common-base/common-base-autoconfigure/checkstyle.html#org.bremersee.web.servlet.BaseCommonConvertersAutoConfiguration.java">org/bremersee/web/servlet/BaseCommonConvertersAutoConfiguration.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/bremersee/common-base/common-base-autoconfigure/checkstyle.html#org.bremersee.converter.ModelMapperConfigurerAdapter.java">org/bremersee/converter/ModelMapperConfigurerAdapter.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/bremersee/common-base/common-base-autoconfigure/checkstyle.html#org.bremersee.security.authentication.PasswordFlowReactiveAuthenticationManager.java">org/bremersee/security/authentication/PasswordFlowReactiveAuthenticationManager.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/bremersee/common-base/common-base-autoconfigure/checkstyle.html#org.bremersee.web.reactive.ApiExceptionHandlerTest.java">org/bremersee/web/reactive/ApiExceptionHandlerTest.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/bremersee/common-base/common-base-autoconfigure/checkstyle.html#org.bremersee.web.reactive.BaseCommonConvertersAutoConfiguration.java">org/bremersee/web/reactive/BaseCommonConvertersAutoConfiguration.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/bremersee/common-base/common-base-autoconfigure/checkstyle.html#org.bremersee.web.servlet.CorsAutoConfiguration.java">org/bremersee/web/servlet/CorsAutoConfiguration.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/bremersee/common-base/common-base-autoconfigure/checkstyle.html#org.bremersee.data.ldaptive.UnboundIdProviderAutoConfigurationTest.java">org/bremersee/data/ldaptive/UnboundIdProviderAutoConfigurationTest.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/bremersee/common-base/common-base-autoconfigure/checkstyle.html#org.bremersee.security.authentication.AuthenticationPropertiesTest.java">org/bremersee/security/authentication/AuthenticationPropertiesTest.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/bremersee/common-base/common-base-autoconfigure/checkstyle.html#org.bremersee.web.servlet.ApiExceptionResolverAutoConfiguration.java">org/bremersee/web/servlet/ApiExceptionResolverAutoConfiguration.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/bremersee/common-base/common-base-autoconfigure/checkstyle.html#org.bremersee.security.authentication.PasswordFlowReactiveAuthenticationManagerTest.java">org/bremersee/security/authentication/PasswordFlowReactiveAuthenticationManagerTest.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/bremersee/common-base/common-base-autoconfigure/checkstyle.html#org.bremersee.exception.RestApiExceptionParserAutoConfiguration.java">org/bremersee/exception/RestApiExceptionParserAutoConfiguration.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/bremersee/common-base/common-base-autoconfigure/checkstyle.html#org.bremersee.web.reactive.CorsAutoConfigurationTest.java">org/bremersee/web/reactive/CorsAutoConfigurationTest.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/bremersee/common-base/common-base-autoconfigure/checkstyle.html#org.bremersee.security.access.AccessControlPropertiesTest.java">org/bremersee/security/access/AccessControlPropertiesTest.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/bremersee/common-base/common-base-autoconfigure/checkstyle.html#org.bremersee.context.MessageSourceAutoConfiguration.java">org/bremersee/context/MessageSourceAutoConfiguration.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/bremersee/common-base/common-base-autoconfigure/checkstyle.html#org.bremersee.web.servlet.BaseCommonConvertersAutoConfigurationTest.java">org/bremersee/web/servlet/BaseCommonConvertersAutoConfigurationTest.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/bremersee/common-base/common-base-autoconfigure/checkstyle.html#org.bremersee.data.ldaptive.LdaptiveProperties.java">org/bremersee/data/ldaptive/LdaptiveProperties.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/bremersee/common-base/common-base-autoconfigure/checkstyle.html#org.bremersee.thymeleaf.ThymeleafResolverPropertiesTest.java">org/bremersee/thymeleaf/ThymeleafResolverPropertiesTest.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/bremersee/common-base/common-base-autoconfigure/checkstyle.html#org.bremersee.exception.RestApiExceptionParserAutoConfigurationTest.java">org/bremersee/exception/RestApiExceptionParserAutoConfigurationTest.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/bremersee/common-base/common-base-autoconfigure/checkstyle.html#org.bremersee.context.MessageSourcePropertiesTest.java">org/bremersee/context/MessageSourcePropertiesTest.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/bremersee/common-base/common-base-autoconfigure/checkstyle.html#org.bremersee.context.MessageSourceProperties.java">org/bremersee/context/MessageSourceProperties.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/bremersee/common-base/common-base-autoconfigure/checkstyle.html#org.bremersee.exception.RestApiExceptionMapperAutoConfiguration.java">org/bremersee/exception/RestApiExceptionMapperAutoConfiguration.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/bremersee/common-base/common-base-autoconfigure/checkstyle.html#org.bremersee.http.converter.ObjectMapperHelperTest.java">org/bremersee/http/converter/ObjectMapperHelperTest.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/bremersee/common-base/common-base-autoconfigure/checkstyle.html#org.bremersee.data.ldaptive.LdaptiveConnectionConfigFactory.java">org/bremersee/data/ldaptive/LdaptiveConnectionConfigFactory.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/bremersee/common-base/common-base-autoconfigure/checkstyle.html#org.bremersee.context.MessageSourceAutoConfigurationTest.java">org/bremersee/context/MessageSourceAutoConfigurationTest.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/bremersee/common-base/common-base-autoconfigure/checkstyle.html#org.bremersee.web.servlet.ApiExceptionResolverAutoConfigurationTest.java">org/bremersee/web/servlet/ApiExceptionResolverAutoConfigurationTest.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                      </tbody>
+        </table>
+        
+      </description>
+    </item>
+  </channel>
+</rss>
+

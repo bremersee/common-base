@@ -16,6 +16,7 @@
 
 package org.bremersee.data.convert;
 
+import lombok.ToString;
 import org.bremersee.common.model.JavaLocale;
 import org.bremersee.common.model.JavaLocale.Separator;
 import org.springframework.core.convert.converter.Converter;
@@ -27,11 +28,12 @@ import org.springframework.data.convert.WritingConverter;
  * @author Christian Bremer
  */
 @WritingConverter
-<span class="fc" id="L30">public class JavaLocaleWriteConverter implements Converter&lt;JavaLocale, String&gt; {</span>
+<span class="nc" id="L31">@ToString</span>
+<span class="fc" id="L32">public class JavaLocaleWriteConverter implements Converter&lt;JavaLocale, String&gt; {</span>
 
   @Override
   public String convert(JavaLocale source) {
-<span class="fc" id="L34">    return source.toString(Separator.HYPHEN);</span>
+<span class="fc" id="L36">    return source.toString(Separator.HYPHEN);</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

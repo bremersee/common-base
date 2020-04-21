@@ -11,36 +11,50 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.event.EventListener;
 import org.springframework.util.ClassUtils;
 
+/**
+ * The rest api exception mapper auto configuration.
+ *
+ * @author Christian Bremer
+ */
 @ConditionalOnWebApplication(type = Type.ANY)
 @Configuration
 @EnableConfigurationProperties({RestApiExceptionMapperProperties.class})
-<span class="fc" id="L17">@Slf4j</span>
+<span class="fc" id="L22">@Slf4j</span>
 public class RestApiExceptionMapperAutoConfiguration {
 
   private final String applicationName;
 
   private final RestApiExceptionMapperProperties properties;
 
+  /**
+   * Instantiates a new rest api exception mapper auto configuration.
+   *
+   * @param applicationName the application name
+   * @param properties the properties
+   */
   public RestApiExceptionMapperAutoConfiguration(
       @Value(&quot;${spring.application.name:application}&quot;) String applicationName,
-<span class="fc" id="L26">      RestApiExceptionMapperProperties properties) {</span>
-<span class="fc" id="L27">    this.applicationName = applicationName;</span>
-<span class="fc" id="L28">    this.properties = properties;</span>
-<span class="fc" id="L29">  }</span>
+<span class="fc" id="L37">      RestApiExceptionMapperProperties properties) {</span>
+<span class="fc" id="L38">    this.applicationName = applicationName;</span>
+<span class="fc" id="L39">    this.properties = properties;</span>
+<span class="fc" id="L40">  }</span>
 
+  /**
+   * Init.
+   */
   @EventListener(ApplicationReadyEvent.class)
   public void init() {
-<span class="fc" id="L33">    log.info(&quot;\n&quot;</span>
+<span class="fc" id="L47">    log.info(&quot;\n&quot;</span>
             + &quot;*********************************************************************************\n&quot;
             + &quot;* {}\n&quot;
             + &quot;*********************************************************************************\n&quot;
             + &quot;* applicationName = {}\n&quot;
             + &quot;* apiPaths = {}\n&quot;
             + &quot;*********************************************************************************&quot;,
-<span class="fc" id="L40">        ClassUtils.getUserClass(getClass()).getSimpleName(),</span>
+<span class="fc" id="L54">        ClassUtils.getUserClass(getClass()).getSimpleName(),</span>
         applicationName,
-<span class="fc" id="L42">        properties.getApiPaths());</span>
-<span class="fc" id="L43">  }</span>
+<span class="fc" id="L56">        properties.getApiPaths());</span>
+<span class="fc" id="L57">  }</span>
 
   /**
    * Builds the rest api exception mapper bean.
@@ -49,7 +63,7 @@ public class RestApiExceptionMapperAutoConfiguration {
    */
   @Bean
   public RestApiExceptionMapper restApiExceptionMapper() {
-<span class="fc" id="L52">    return new RestApiExceptionMapperImpl(properties, applicationName);</span>
+<span class="fc" id="L66">    return new RestApiExceptionMapperImpl(properties, applicationName);</span>
   }
 
 }

@@ -16,20 +16,24 @@
 
 package org.bremersee.data.convert;
 
+import lombok.ToString;
 import org.bremersee.common.model.TwoLetterLanguageCode;
 import org.springframework.core.convert.converter.Converter;
+import org.springframework.data.convert.WritingConverter;
 
 /**
  * The two letter language code write converter.
  *
  * @author Christian Bremer
  */
-<span class="fc" id="L27">public class TwoLetterLanguageCodeWriteConverter</span>
+@WritingConverter
+<span class="nc" id="L30">@ToString</span>
+<span class="fc" id="L31">public class TwoLetterLanguageCodeWriteConverter</span>
     implements Converter&lt;TwoLetterLanguageCode, String&gt; {
 
   @Override
   public String convert(TwoLetterLanguageCode source) {
-<span class="fc" id="L32">    return source.toString();</span>
+<span class="fc" id="L36">    return source.toString();</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

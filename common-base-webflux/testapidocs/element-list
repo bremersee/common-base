@@ -5,6 +5,7 @@ org.bremersee.http.codec.xml.model.xml1
 org.bremersee.http.codec.xml.model.xml2
 org.bremersee.http.codec.xml.model.xml3
 org.bremersee.http.codec.xml.model.xml4
+org.bremersee.security
 org.bremersee.security.authentication
 org.bremersee.web.reactive.function.client
 org.bremersee.web.reactive.function.client.proxy
