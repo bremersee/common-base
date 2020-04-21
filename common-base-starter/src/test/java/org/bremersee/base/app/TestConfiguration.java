@@ -38,12 +38,22 @@ import org.springframework.context.annotation.ComponentScan;
 @Slf4j
 public class TestConfiguration {
 
+  /**
+   * Acl factory acl factory.
+   *
+   * @return the acl factory
+   */
   @Bean
   public AclFactory<AclEntity> aclFactory() {
     log.info("Creating bean 'aclFactory' ...");
     return AclEntity::new;
   }
 
+  /**
+   * Custom model mapper config adapter.
+   *
+   * @return the model mapper config adapter
+   */
   @Bean
   public ModelMapperConfigurerAdapter customModelMapperConfig() {
     log.info("Creating custom model mapper config ...");

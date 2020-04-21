@@ -62,6 +62,9 @@ public class MessageSourceAutoConfiguration {
     this.properties = properties;
   }
 
+  /**
+   * Init.
+   */
   @EventListener(ApplicationReadyEvent.class)
   public void init() {
     log.info("\n"

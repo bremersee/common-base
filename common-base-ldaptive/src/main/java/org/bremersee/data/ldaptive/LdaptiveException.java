@@ -46,7 +46,7 @@ public class LdaptiveException extends ServiceException implements HttpStatusAwa
    * Instantiates a new ldaptive exception.
    *
    * @param httpStatus the http status
-   * @param errorCode  the error code
+   * @param errorCode the error code
    */
   protected LdaptiveException(final int httpStatus, final String errorCode) {
     super(httpStatus, errorCode);
@@ -56,8 +56,8 @@ public class LdaptiveException extends ServiceException implements HttpStatusAwa
    * Instantiates a new ldaptive exception.
    *
    * @param httpStatus the http status
-   * @param errorCode  the error code
-   * @param reason     the reason
+   * @param errorCode the error code
+   * @param reason the reason
    */
   protected LdaptiveException(final int httpStatus, final String errorCode, final String reason) {
     super(httpStatus, errorCode, reason);
@@ -67,8 +67,8 @@ public class LdaptiveException extends ServiceException implements HttpStatusAwa
    * Instantiates a new ldaptive exception.
    *
    * @param httpStatus the http status
-   * @param errorCode  the error code
-   * @param cause      the cause
+   * @param errorCode the error code
+   * @param cause the cause
    */
   protected LdaptiveException(final int httpStatus, final String errorCode, final Throwable cause) {
     super(httpStatus, errorCode, cause);
@@ -78,9 +78,9 @@ public class LdaptiveException extends ServiceException implements HttpStatusAwa
    * Instantiates a new ldaptive exception.
    *
    * @param httpStatus the http status
-   * @param errorCode  the error code
-   * @param reason     the reason
-   * @param cause      the cause
+   * @param errorCode the error code
+   * @param reason the reason
+   * @param cause the cause
    */
   protected LdaptiveException(
       final int httpStatus,
@@ -111,6 +111,11 @@ public class LdaptiveException extends ServiceException implements HttpStatusAwa
     return ldapException != null ? ldapException.getResultCode() : null;
   }
 
+  /**
+   * Creates a new service exception builder.
+   *
+   * @return the service exception builder
+   */
   public static ServiceExceptionBuilder<LdaptiveException> builder() {
     return new AbstractServiceExceptionBuilder<>() {
 

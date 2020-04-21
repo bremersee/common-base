@@ -245,7 +245,7 @@ public class AuthenticationProperties implements Serializable {
 
     TreeSet<String> roleSet = roles instanceof TreeSet
         ? (TreeSet<String>) roles
-        : (roles == null ? new TreeSet<>() : new TreeSet<>(roles));
+        : roles == null ? new TreeSet<>() : new TreeSet<>(roles);
     StringBuilder sb = new StringBuilder();
     if (roleSet.size() > 1) {
       sb.append(hasAnyAuthorityExpr(roleSet, ensurePrefixFunction));
@@ -254,7 +254,7 @@ public class AuthenticationProperties implements Serializable {
     }
     Set<String> ipSet = ips instanceof Set
         ? (Set<String>) ips
-        : (ips == null ? Collections.emptySet() : new LinkedHashSet<>(ips));
+        : ips == null ? Collections.emptySet() : new LinkedHashSet<>(ips);
     if (!ipSet.isEmpty()) {
       if (sb.length() > 0) {
         sb.append(" or ");

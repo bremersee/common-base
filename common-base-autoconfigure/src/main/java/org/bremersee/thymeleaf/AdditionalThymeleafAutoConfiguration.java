@@ -41,8 +41,8 @@ import org.thymeleaf.templateresolver.ITemplateResolver;
  * @author Christian Bremer
  */
 @ConditionalOnClass({
-    org.bremersee.thymeleaf.TemplateResolver.class,
-    org.thymeleaf.TemplateEngine.class
+    TemplateResolver.class,
+    TemplateEngine.class
 })
 @ConditionalOnBean({
     TemplateEngine.class

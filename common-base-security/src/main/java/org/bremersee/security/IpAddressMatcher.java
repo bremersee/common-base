@@ -23,21 +23,20 @@ import org.springframework.util.StringUtils;
 
 /**
  * Matches a request based on IP Address or subnet mask matching against the remote address.
- * <p>
- * Both IPv6 and IPv4 addresses are supported, but a matcher which is configured with an IPv4
+ *
+ * <p>Both IPv6 and IPv4 addresses are supported, but a matcher which is configured with an IPv4
  * address will never match a request which returns an IPv6 address, and vice-versa.
- * <p>
- * The original Spring {@code org.springframework.security.web.util.matcher.IpAddressMatcher}
+ *
+ * <p>The original Spring {@code org.springframework.security.web.util.matcher.IpAddressMatcher}
  * imports {@code javax.servlet.http.HttpServletRequest}, that is not available in a reactive
- * environment. Here is the method {@code boolean matches(HttpServletRequest request)} skipped
- * and ths class does not implements
- * {@code org.springframework.security.web.util.matcher.RequestMatcher},
+ * environment. Here is the method {@code boolean matches(HttpServletRequest request)} skipped and
+ * ths class does not implements {@code org.springframework.security.web.util.matcher.RequestMatcher},
  *
  * @author Luke Taylor
  */
 public class IpAddressMatcher {
 
-  private final int nMaskBits;
+  private final int numMaskBits;
   private final InetAddress requiredAddress;
 
   /**
@@ -52,16 +51,23 @@ public class IpAddressMatcher {
       String[] addressAndMask = StringUtils.split(ipAddress, "/");
       //noinspection ConstantConditions
       ipAddress = addressAndMask[0];
-      nMaskBits = Integer.parseInt(addressAndMask[1]);
+      numMaskBits = Integer.parseInt(addressAndMask[1]);
     } else {
-      nMaskBits = -1;
+      numMaskBits = -1;
     }
     requiredAddress = parseAddress(ipAddress);
-    Assert.isTrue(requiredAddress.getAddress().length * 8 >= nMaskBits,
+    Assert.isTrue(requiredAddress.getAddress().length * 8 >= numMaskBits,
         String.format("IP address %s is too short for bitmask of length %d",
-            ipAddress, nMaskBits));
+            ipAddress, numMaskBits));
   }
 
+  /**
+   * Matches an IPv6 and IPv4 address.
+   *
+   * @param address the address
+   * @return the {@code true} id the given address matches an IPv6 and IPv4 address, otherwise
+   *     {@code false}
+   */
   public boolean matches(String address) {
     InetAddress remoteAddress = parseAddress(address);
 
@@ -69,26 +75,26 @@ public class IpAddressMatcher {
       return false;
     }
 
-    if (nMaskBits < 0) {
+    if (numMaskBits < 0) {
       return remoteAddress.equals(requiredAddress);
     }
 
     byte[] remAddr = remoteAddress.getAddress();
     byte[] reqAddr = requiredAddress.getAddress();
 
-    int nMaskFullBytes = nMaskBits / 8;
-    byte finalByte = (byte) (0xFF00 >> (nMaskBits & 0x07));
+    int numMaskFullBytes = numMaskBits / 8;
+    byte finalByte = (byte) (0xFF00 >> (numMaskBits & 0x07));
 
     // System.out.println("Mask is " + new sun.misc.HexDumpEncoder().encode(mask));
 
-    for (int i = 0; i < nMaskFullBytes; i++) {
+    for (int i = 0; i < numMaskFullBytes; i++) {
       if (remAddr[i] != reqAddr[i]) {
         return false;
       }
     }
 
     if (finalByte != 0) {
-      return (remAddr[nMaskFullBytes] & finalByte) == (reqAddr[nMaskFullBytes] & finalByte);
+      return (remAddr[numMaskFullBytes] & finalByte) == (reqAddr[numMaskFullBytes] & finalByte);
     }
 
     return true;

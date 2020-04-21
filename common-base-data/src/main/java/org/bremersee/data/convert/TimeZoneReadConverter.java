@@ -19,7 +19,6 @@ package org.bremersee.data.convert;
 import java.util.TimeZone;
 import lombok.ToString;
 import org.bremersee.converter.StringToTimeZoneConverter;
-import org.bremersee.converter.StringToTimeZoneIdConverter;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.data.convert.ReadingConverter;
 

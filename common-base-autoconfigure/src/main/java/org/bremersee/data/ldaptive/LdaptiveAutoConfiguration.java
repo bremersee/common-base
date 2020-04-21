@@ -41,8 +41,8 @@ import org.springframework.util.ClassUtils;
  */
 @Configuration
 @ConditionalOnClass({
-    org.ldaptive.DefaultConnectionFactory.class,
-    org.bremersee.data.ldaptive.LdaptiveTemplate.class
+    DefaultConnectionFactory.class,
+    LdaptiveTemplate.class
 })
 @ConditionalOnProperty(prefix = "bremersee.ldaptive", name = "enabled", havingValue = "true")
 @EnableConfigurationProperties(LdaptiveProperties.class)
@@ -78,6 +78,9 @@ public class LdaptiveAutoConfiguration {
     this.ldaptiveProvider = ldaptiveProvider.getIfAvailable();
   }
 
+  /**
+   * Init.
+   */
   @EventListener(ApplicationReadyEvent.class)
   public void init() {
     log.info("\n"

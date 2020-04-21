@@ -107,8 +107,8 @@ public class ReactiveJaxbDecoder extends AbstractDecoder<Object> {
   /**
    * Set the max number of bytes that can be buffered by this decoder. This is either the size of
    * the entire input when decoding as a whole, or when using async parsing with Aalto XML, it is
-   * the size of one top-level XML tree. When the limit is exceeded,
-   * {@link DataBufferLimitException} is raised.
+   * the size of one top-level XML tree. When the limit is exceeded, {@link
+   * DataBufferLimitException} is raised.
    *
    * <p>By default this is set to 256K.
    *
@@ -161,15 +161,6 @@ public class ReactiveJaxbDecoder extends AbstractDecoder<Object> {
   }
 
   @Override
-  public Mono<Object> decodeToMono(Publisher<DataBuffer> input, ResolvableType elementType,
-      @Nullable MimeType mimeType, @Nullable Map<String, Object> hints) {
-
-    //noinspection NullableInLambdaInTransform
-    return DataBufferUtils.join(input, this.maxInMemorySize)
-        .map(dataBuffer -> decode(dataBuffer, elementType, mimeType, hints));
-  }
-
-  @Override
   @SuppressWarnings({"rawtypes", "unchecked", "cast"})
   // XMLEventReader is Iterator<Object> on JDK 9
   public Object decode(DataBuffer dataBuffer, ResolvableType targetType,
@@ -185,6 +176,15 @@ public class ReactiveJaxbDecoder extends AbstractDecoder<Object> {
     } finally {
       DataBufferUtils.release(dataBuffer);
     }
+  }
+
+  @Override
+  public Mono<Object> decodeToMono(Publisher<DataBuffer> input, ResolvableType elementType,
+      @Nullable MimeType mimeType, @Nullable Map<String, Object> hints) {
+
+    //noinspection NullableInLambdaInTransform
+    return DataBufferUtils.join(input, this.maxInMemorySize)
+        .map(dataBuffer -> decode(dataBuffer, elementType, mimeType, hints));
   }
 
   private Object unmarshal(List<XMLEvent> events, Class<?> outputClass) {
@@ -224,8 +224,8 @@ public class ReactiveJaxbDecoder extends AbstractDecoder<Object> {
       localPart = annotation.name();
       namespaceUri = annotation.namespace();
     } else {
-      throw new IllegalArgumentException("Output class [" + outputClass.getName() +
-          "] is neither annotated with @XmlRootElement nor @XmlType");
+      throw new IllegalArgumentException("Output class [" + outputClass.getName()
+          + "] is neither annotated with @XmlRootElement nor @XmlType");
     }
 
     if (JAXB_DEFAULT_ANNOTATION_VALUE.equals(localPart)) {

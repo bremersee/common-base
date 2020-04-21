@@ -37,19 +37,14 @@ import org.bremersee.security.access.Ace;
 @Setter
 @ToString
 @NoArgsConstructor
-// @TypeAlias("ace")
 public class AceEntity implements Ace {
 
-  // @Indexed
   private boolean guest;
 
-  // @Indexed
   private Set<String> users = new LinkedHashSet<>();
 
-  // @Indexed
   private Set<String> roles = new LinkedHashSet<>();
 
-  // @Indexed
   private Set<String> groups = new LinkedHashSet<>();
 
   /**
@@ -89,10 +84,10 @@ public class AceEntity implements Ace {
       return false;
     }
     Ace ace = (Ace) o;
-    return guest == ace.isGuest() &&
-        treeSet(groups).equals(treeSet(ace.getGroups())) &&
-        treeSet(roles).equals(treeSet(ace.getRoles())) &&
-        treeSet(users).equals(treeSet(ace.getUsers()));
+    return guest == ace.isGuest()
+        && treeSet(groups).equals(treeSet(ace.getGroups()))
+        && treeSet(roles).equals(treeSet(ace.getRoles()))
+        && treeSet(users).equals(treeSet(ace.getUsers()));
   }
 
   @Override

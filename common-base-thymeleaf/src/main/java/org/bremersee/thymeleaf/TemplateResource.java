@@ -56,7 +56,7 @@ public class TemplateResource implements ITemplateResource {
   /**
    * Instantiates a new template resource.
    *
-   * @param path              the path
+   * @param path the path
    * @param characterEncoding the character encoding
    */
   @SuppressWarnings("unused")
@@ -69,7 +69,7 @@ public class TemplateResource implements ITemplateResource {
   /**
    * Instantiates a new template resource.
    *
-   * @param path           the path
+   * @param path the path
    * @param resourceLoader the resource loader
    */
   @SuppressWarnings("unused")
@@ -82,9 +82,9 @@ public class TemplateResource implements ITemplateResource {
   /**
    * Instantiates a new template resource.
    *
-   * @param path              the path
+   * @param path the path
    * @param characterEncoding the character encoding
-   * @param resourceLoader    the resource loader
+   * @param resourceLoader the resource loader
    */
   public TemplateResource(
       String path,
@@ -109,9 +109,9 @@ public class TemplateResource implements ITemplateResource {
     if (path == null || path.length() == 0) {
       return null;
     }
-    final String basePath = (path.charAt(path.length() - 1) == '/'
+    final String basePath = path.charAt(path.length() - 1) == '/'
         ? path.substring(0, path.length() - 1)
-        : path);
+        : path;
     final int slashPos = basePath.lastIndexOf('/');
     final int dotPos = basePath.lastIndexOf('.');
     if (slashPos != -1) {
@@ -124,7 +124,7 @@ public class TemplateResource implements ITemplateResource {
         return basePath.substring(0, dotPos);
       }
     }
-    return (basePath.length() > 0 ? basePath : null);
+    return basePath.length() > 0 ? basePath : null;
   }
 
   @Override

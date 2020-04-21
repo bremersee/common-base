@@ -34,6 +34,12 @@ import org.springframework.security.web.server.util.matcher.ServerWebExchangeMat
 @ComponentScan(basePackageClasses = {TestConfiguration.class})
 public class TestConfiguration {
 
+  /**
+   * Actuator filter chain.
+   *
+   * @param http the http
+   * @return the security web filter chain
+   */
   @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
   @Bean
   public SecurityWebFilterChain actuatorFilterChain(ServerHttpSecurity http) {

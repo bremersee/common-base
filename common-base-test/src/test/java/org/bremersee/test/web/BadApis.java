@@ -185,7 +185,8 @@ public class BadApis {
         produces = {"application/json"},
         method = RequestMethod.GET)
     ResponseEntity<List<Geometry>> getGeometries(
-        @Parameter(description = "The query.") @RequestParam(name = "q", required = false) String query);
+        @Parameter(description = "The query.")
+        @RequestParam(name = "q", required = false) String query);
   }
 
   /**
