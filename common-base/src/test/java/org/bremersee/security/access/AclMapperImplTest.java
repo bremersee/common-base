@@ -47,8 +47,8 @@ class AclMapperImplTest {
   /**
    * Admin role.
    */
-  @Test
   @SuppressWarnings("deprecation")
+  @Test
   void adminRole() {
     AclMapperImpl<Acl<? extends Ace>> mapper = new AclMapperImpl<>(
         AclImpl::new,

@@ -43,7 +43,7 @@ public class FormDataControllerImpl { // Can't implement FormDataController
   /**
    * The constant OK_RESPONSE.
    */
-  String OK_RESPONSE = "OK";
+  static final String OK_RESPONSE = "OK";
 
   /**
    * Post form data.

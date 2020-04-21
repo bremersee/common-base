@@ -16,7 +16,10 @@
 
 package org.bremersee.data.convert;
 
+import lombok.ToString;
+import org.bremersee.common.model.ThreeLetterCountryCode;
 import org.bremersee.converter.StringToThreeLetterCountryCodeConverter;
+import org.springframework.core.convert.converter.Converter;
 import org.springframework.data.convert.ReadingConverter;
 
 /**
@@ -25,6 +28,9 @@ import org.springframework.data.convert.ReadingConverter;
  * @author Christian Bremer
  */
 @ReadingConverter
-public class ThreeLetterCountryCodeReadConverter extends StringToThreeLetterCountryCodeConverter {
+@ToString
+public class ThreeLetterCountryCodeReadConverter
+    extends StringToThreeLetterCountryCodeConverter
+    implements Converter<String, ThreeLetterCountryCode> {
 
 }

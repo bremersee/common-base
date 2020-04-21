@@ -16,13 +16,13 @@
 
 package org.bremersee.converter;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.bremersee.common.model.ThreeLetterLanguageCode;
 import org.junit.jupiter.api.Test;
 
 /**
- * The type String to three letter language code converter test.
+ * The string to three letter language code converter test.
  *
  * @author Christian Bremer
  */
