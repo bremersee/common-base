@@ -43,8 +43,8 @@ import org.springframework.util.ClassUtils;
     name = "enable-jwt-support",
     havingValue = "true")
 @ConditionalOnClass({
-    org.bremersee.security.authentication.JsonPathReactiveJwtConverter.class,
-    org.bremersee.security.authentication.WebClientAccessTokenRetriever.class
+    JsonPathReactiveJwtConverter.class,
+    WebClientAccessTokenRetriever.class
 })
 @EnableConfigurationProperties(AuthenticationProperties.class)
 @Configuration

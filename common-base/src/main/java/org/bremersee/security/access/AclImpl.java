@@ -75,7 +75,7 @@ class AclImpl extends TreeMap<String, Ace> implements Acl<Ace> {
     }
     Acl<? extends Ace> acl = (Acl<? extends Ace>) o;
     return Objects.equals(owner, acl.getOwner())
-        && (new TreeMap<>(this)).equals(new TreeMap<>(acl.entryMap()));
+        && new TreeMap<>(this).equals(new TreeMap<>(acl.entryMap()));
   }
 
   @Override

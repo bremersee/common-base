@@ -132,7 +132,6 @@ class WebClientProxyBuilderTest {
   /**
    * Do post.
    */
-// @Disabled
   @Test
   void doPost() {
     MultiValueMap<String, String> form = new LinkedMultiValueMap<>();

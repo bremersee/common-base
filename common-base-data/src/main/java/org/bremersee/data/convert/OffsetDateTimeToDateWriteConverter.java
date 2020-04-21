@@ -19,6 +19,7 @@ package org.bremersee.data.convert;
 
 import java.time.OffsetDateTime;
 import java.util.Date;
+import lombok.ToString;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.data.convert.WritingConverter;
 
@@ -28,7 +29,8 @@ import org.springframework.data.convert.WritingConverter;
  * @author Christian Bremer
  */
 @WritingConverter
-class OffsetDateTimeToDateWriteConverter implements Converter<OffsetDateTime, Date> {
+@ToString
+public class OffsetDateTimeToDateWriteConverter implements Converter<OffsetDateTime, Date> {
 
   @Override
   public Date convert(OffsetDateTime offsetDateTime) {

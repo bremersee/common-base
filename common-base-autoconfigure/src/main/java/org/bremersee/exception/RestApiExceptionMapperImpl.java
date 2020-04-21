@@ -83,7 +83,7 @@ public class RestApiExceptionMapperImpl implements RestApiExceptionMapper {
     if (exception instanceof HttpStatusAware) {
       httpStatus = fromStatus(((HttpStatusAware) exception).status());
     }
-    if (httpStatus == null && (exception instanceof ResponseStatusException)) {
+    if (httpStatus == null && exception instanceof ResponseStatusException) {
       httpStatus = ((ResponseStatusException) exception).getStatus();
     }
     if (httpStatus == null) {
@@ -288,7 +288,7 @@ public class RestApiExceptionMapperImpl implements RestApiExceptionMapper {
       final @Nullable Object handler,
       final @NotNull ExceptionMappingConfig config) {
 
-    String code = (exception instanceof ErrorCodeAware)
+    String code = exception instanceof ErrorCodeAware
         ? ((ErrorCodeAware) exception).getErrorCode()
         : null;
     if (StringUtils.hasText(code) && !config.isEvaluateAnnotationFirst()) {

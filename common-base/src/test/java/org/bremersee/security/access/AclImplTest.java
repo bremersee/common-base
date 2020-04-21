@@ -1,6 +1,8 @@
 package org.bremersee.security.access;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Collections;
 import java.util.Map;
@@ -26,9 +28,9 @@ class AclImplTest {
     AclImpl actual = new AclImpl("value", Collections.emptyMap());
     assertNotEquals(model, null);
     assertNotEquals(model, new Object());
-    assertEquals(model, model);
     assertEquals(model, actual);
     assertEquals(model.hashCode(), actual.hashCode());
+    assertEquals(model, model);
 
     assertTrue(model.toString().contains("value"));
   }

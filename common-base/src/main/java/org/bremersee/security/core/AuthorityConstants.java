@@ -40,6 +40,11 @@ public abstract class AuthorityConstants {
   public static final String ACTUATOR_ROLE_NAME = "ROLE_ACTUATOR";
 
   /**
+   * The constant EUREKA_ROLE_NAME.
+   */
+  public static final String EUREKA_ROLE_NAME = "ROLE_EUREKA";
+
+  /**
    * The constant USER_ROLE_NAME.
    */
   public static final String USER_ROLE_NAME = "ROLE_USER";

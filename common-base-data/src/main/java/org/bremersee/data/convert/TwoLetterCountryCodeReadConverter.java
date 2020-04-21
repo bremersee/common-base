@@ -16,7 +16,10 @@
 
 package org.bremersee.data.convert;
 
+import lombok.ToString;
+import org.bremersee.common.model.TwoLetterCountryCode;
 import org.bremersee.converter.StringToTwoLetterCountryCodeConverter;
+import org.springframework.core.convert.converter.Converter;
 import org.springframework.data.convert.ReadingConverter;
 
 /**
@@ -25,6 +28,8 @@ import org.springframework.data.convert.ReadingConverter;
  * @author Christian Bremer
  */
 @ReadingConverter
-public class TwoLetterCountryCodeReadConverter extends StringToTwoLetterCountryCodeConverter {
+@ToString
+public class TwoLetterCountryCodeReadConverter extends StringToTwoLetterCountryCodeConverter
+    implements Converter<String, TwoLetterCountryCode> {
 
 }

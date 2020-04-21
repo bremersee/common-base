@@ -80,7 +80,7 @@ public class ApiExceptionResolver implements HandlerExceptionResolver {
   private final XmlMapper xmlMapper;
 
   /**
-   * Instantiates a new Api exception resolver.
+   * Instantiates a new api exception resolver.
    *
    * @param exceptionMapper the exception mapper
    */
@@ -91,6 +91,12 @@ public class ApiExceptionResolver implements HandlerExceptionResolver {
     this.xmlMapper = Jackson2ObjectMapperBuilder.xml().createXmlMapper(true).build();
   }
 
+  /**
+   * Instantiates a new api exception resolver.
+   *
+   * @param exceptionMapper the exception mapper
+   * @param objectMapperBuilder the object mapper builder
+   */
   public ApiExceptionResolver(
       final RestApiExceptionMapper exceptionMapper,
       final Jackson2ObjectMapperBuilder objectMapperBuilder) {
@@ -99,6 +105,13 @@ public class ApiExceptionResolver implements HandlerExceptionResolver {
     this.xmlMapper = objectMapperBuilder.createXmlMapper(true).build();
   }
 
+  /**
+   * Instantiates a new api exception resolver.
+   *
+   * @param exceptionMapper the exception mapper
+   * @param objectMapper the object mapper
+   * @param xmlMapper the xml mapper
+   */
   public ApiExceptionResolver(
       final RestApiExceptionMapper exceptionMapper,
       ObjectMapper objectMapper,
@@ -185,8 +198,8 @@ public class ApiExceptionResolver implements HandlerExceptionResolver {
   /**
    * Apply status code if possible.
    *
-   * @param request    the request
-   * @param response   the response
+   * @param request the request
+   * @param response the response
    * @param statusCode the status code
    */
   @SuppressWarnings("WeakerAccess")
@@ -275,7 +288,7 @@ public class ApiExceptionResolver implements HandlerExceptionResolver {
     /**
      * Instantiates a new empty view.
      *
-     * @param payload     the payload
+     * @param payload the payload
      * @param contentType the content type
      */
     EmptyView(final @NotNull RestApiException payload, final String contentType) {
