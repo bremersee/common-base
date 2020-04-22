@@ -16,13 +16,14 @@
 
 package org.bremersee.exception;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 import java.util.HashMap;
 import org.junit.jupiter.api.Test;
 
 /**
- * The type Message exception parser test.
+ * The message exception parser test.
  *
  * @author Christian Bremer
  */

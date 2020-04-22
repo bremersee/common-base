@@ -141,7 +141,7 @@ public class TestConfiguration {
           .requestMatchers(EndpointRequest.to(HealthEndpoint.class)).permitAll()
           // .requestMatchers(EndpointRequest.to(InfoEndpoint.class)).permitAll()
           .anyRequest()
-          .access(properties.getActuator().buildAccessExpression())
+          .access(properties.getActuator().buildAccessExpression(null))
           .and()
           .sessionManagement()
           .sessionCreationPolicy(SessionCreationPolicy.STATELESS);

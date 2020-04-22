@@ -11,6 +11,11 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.event.EventListener;
 import org.springframework.util.ClassUtils;
 
+/**
+ * The rest api exception mapper auto configuration.
+ *
+ * @author Christian Bremer
+ */
 @ConditionalOnWebApplication(type = Type.ANY)
 @Configuration
 @EnableConfigurationProperties({RestApiExceptionMapperProperties.class})
@@ -21,6 +26,12 @@ public class RestApiExceptionMapperAutoConfiguration {
 
   private final RestApiExceptionMapperProperties properties;
 
+  /**
+   * Instantiates a new rest api exception mapper auto configuration.
+   *
+   * @param applicationName the application name
+   * @param properties the properties
+   */
   public RestApiExceptionMapperAutoConfiguration(
       @Value("${spring.application.name:application}") String applicationName,
       RestApiExceptionMapperProperties properties) {
@@ -28,6 +39,9 @@ public class RestApiExceptionMapperAutoConfiguration {
     this.properties = properties;
   }
 
+  /**
+   * Init.
+   */
   @EventListener(ApplicationReadyEvent.class)
   public void init() {
     log.info("\n"

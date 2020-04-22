@@ -16,7 +16,7 @@
 
 package org.bremersee.converter;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.bremersee.common.model.TimeZoneId;
 import org.junit.jupiter.api.Test;
@@ -36,7 +36,6 @@ class StringToTimeZoneIdConverterTest {
     assertEquals(
         TimeZoneId.UTC,
         new StringToTimeZoneIdConverter().convert("UTC"));
-
   }
 
   /**

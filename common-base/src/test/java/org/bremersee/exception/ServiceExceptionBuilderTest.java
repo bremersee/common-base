@@ -16,12 +16,13 @@
 
 package org.bremersee.exception;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 import org.junit.jupiter.api.Test;
 
 /**
- * The type Service exception builder test.
+ * The service exception builder test.
  *
  * @author Christian Bremer
  */

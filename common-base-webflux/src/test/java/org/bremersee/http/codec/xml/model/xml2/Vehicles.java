@@ -138,10 +138,10 @@ public class Vehicles {
 
   @Override
   public String toString() {
-    return "Vehicles{" +
-        "series='" + series + '\'' +
-        ", year=" + year +
-        ", month=" + month +
-        '}';
+    return "Vehicles{"
+        + "series='" + series + '\''
+        + ", year=" + year
+        + ", month=" + month
+        + '}';
   }
 }

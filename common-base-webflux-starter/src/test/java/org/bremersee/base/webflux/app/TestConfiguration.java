@@ -48,6 +48,12 @@ public class TestConfiguration {
 
   private PasswordFlowReactiveAuthenticationManager passwordFlowAuthenticationManager;
 
+  /**
+   * Instantiates a new test configuration.
+   *
+   * @param jwtConverter the jwt converter
+   * @param passwordFlowAuthenticationManager the password flow authentication manager
+   */
   public TestConfiguration(
       ObjectProvider<JsonPathReactiveJwtConverter> jwtConverter,
       ObjectProvider<PasswordFlowReactiveAuthenticationManager> passwordFlowAuthenticationManager) {

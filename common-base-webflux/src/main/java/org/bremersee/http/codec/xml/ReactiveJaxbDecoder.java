@@ -161,15 +161,6 @@ public class ReactiveJaxbDecoder extends AbstractDecoder<Object> {
   }
 
   @Override
-  public Mono<Object> decodeToMono(Publisher<DataBuffer> input, ResolvableType elementType,
-      @Nullable MimeType mimeType, @Nullable Map<String, Object> hints) {
-
-    //noinspection NullableInLambdaInTransform
-    return DataBufferUtils.join(input, this.maxInMemorySize)
-        .map(dataBuffer -> decode(dataBuffer, elementType, mimeType, hints));
-  }
-
-  @Override
   @SuppressWarnings({"rawtypes", "unchecked", "cast"})
   // XMLEventReader is Iterator<Object> on JDK 9
   public Object decode(DataBuffer dataBuffer, ResolvableType targetType,
@@ -185,6 +176,15 @@ public class ReactiveJaxbDecoder extends AbstractDecoder<Object> {
     } finally {
       DataBufferUtils.release(dataBuffer);
     }
+  }
+
+  @Override
+  public Mono<Object> decodeToMono(Publisher<DataBuffer> input, ResolvableType elementType,
+      @Nullable MimeType mimeType, @Nullable Map<String, Object> hints) {
+
+    //noinspection NullableInLambdaInTransform
+    return DataBufferUtils.join(input, this.maxInMemorySize)
+        .map(dataBuffer -> decode(dataBuffer, elementType, mimeType, hints));
   }
 
   private Object unmarshal(List<XMLEvent> events, Class<?> outputClass) {
@@ -224,8 +224,8 @@ public class ReactiveJaxbDecoder extends AbstractDecoder<Object> {
       localPart = annotation.name();
       namespaceUri = annotation.namespace();
     } else {
-      throw new IllegalArgumentException("Output class [" + outputClass.getName() +
-          "] is neither annotated with @XmlRootElement nor @XmlType");
+      throw new IllegalArgumentException("Output class [" + outputClass.getName()
+          + "] is neither annotated with @XmlRootElement nor @XmlType");
     }
 
     if (JAXB_DEFAULT_ANNOTATION_VALUE.equals(localPart)) {

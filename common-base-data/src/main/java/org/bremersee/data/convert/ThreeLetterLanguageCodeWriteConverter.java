@@ -16,6 +16,7 @@
 
 package org.bremersee.data.convert;
 
+import lombok.ToString;
 import org.bremersee.common.model.ThreeLetterLanguageCode;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.data.convert.WritingConverter;
@@ -26,6 +27,7 @@ import org.springframework.data.convert.WritingConverter;
  * @author Christian Bremer
  */
 @WritingConverter
+@ToString
 public class ThreeLetterLanguageCodeWriteConverter
     implements Converter<ThreeLetterLanguageCode, String> {
 

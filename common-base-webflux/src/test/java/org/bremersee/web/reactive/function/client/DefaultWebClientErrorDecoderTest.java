@@ -189,7 +189,7 @@ class DefaultWebClientErrorDecoderTest {
   }
 
   /**
-   * Returns xml mapper
+   * Returns xml mapper.
    *
    * @return the xml mapper
    */

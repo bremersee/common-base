@@ -37,6 +37,9 @@ import org.springframework.util.ClassUtils;
 @Slf4j
 public class RestApiExceptionParserAutoConfiguration {
 
+  /**
+   * Init.
+   */
   @EventListener(ApplicationReadyEvent.class)
   public void init() {
     log.info("\n"

@@ -17,6 +17,7 @@
 package org.bremersee.data.convert;
 
 import java.util.Locale;
+import lombok.ToString;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.data.convert.WritingConverter;
 import org.springframework.util.StringUtils;
@@ -27,6 +28,7 @@ import org.springframework.util.StringUtils;
  * @author Christian Bremer
  */
 @WritingConverter
+@ToString
 public class LocaleWriteConverter implements Converter<Locale, String> {
 
   @Override

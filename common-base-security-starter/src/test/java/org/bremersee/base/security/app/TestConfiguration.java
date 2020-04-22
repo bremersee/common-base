@@ -18,7 +18,11 @@ package org.bremersee.base.security.app;
 
 import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.security.config.web.server.ServerHttpSecurity;
+import org.springframework.security.web.server.SecurityWebFilterChain;
+import org.springframework.security.web.server.util.matcher.ServerWebExchangeMatchers;
 
 /**
  * The test configuration.
@@ -29,5 +33,24 @@ import org.springframework.context.annotation.ComponentScan;
 @EnableAutoConfiguration
 @ComponentScan(basePackageClasses = {TestConfiguration.class})
 public class TestConfiguration {
+
+  /**
+   * Actuator filter chain.
+   *
+   * @param http the http
+   * @return the security web filter chain
+   */
+  @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
+  @Bean
+  public SecurityWebFilterChain actuatorFilterChain(ServerHttpSecurity http) {
+    return http
+        .securityMatcher(ServerWebExchangeMatchers.anyExchange())
+        .csrf().disable()
+        .authorizeExchange()
+        .anyExchange().permitAll()
+        .and()
+        .httpBasic().disable()
+        .build();
+  }
 
 }
