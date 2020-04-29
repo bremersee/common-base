@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 the original author or authors.
+ * Copyright 2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.bremersee.security.authentication;
+package org.bremersee.security;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -27,17 +27,15 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Optional;
 import java.util.UUID;
-import org.bremersee.security.authentication.AuthenticationProperties.SimpleUser;
+import org.bremersee.security.SecurityProperties.AuthenticationProperties;
+import org.bremersee.security.SecurityProperties.AuthenticationProperties.SimpleUser;
+import org.bremersee.security.authentication.ClientCredentialsFlowProperties;
+import org.bremersee.security.authentication.PasswordFlowProperties;
 import org.bremersee.security.core.AuthorityConstants;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-/**
- * The authentication properties test.
- *
- * @author Christian Bremer
- */
 class AuthenticationPropertiesTest {
 
   /**
@@ -161,98 +159,82 @@ class AuthenticationPropertiesTest {
     assertNotEquals(expected, new Object());
     assertTrue(expected.toString().contains("ROLE_USER"));
 
-    assertTrue(expected.getApplication().adminRolesOrDefaults("ADMIN")
+    assertTrue(expected.getApplication()
+        .adminRolesOrDefaults(null, "ADMIN")
         .contains("ROLE_SUPERUSER"));
-    assertTrue(expected.getApplication().userRolesOrDefaults("USER")
+    assertTrue(expected.getApplication()
+        .userRolesOrDefaults(null, "USER")
         .contains("ROLE_USER"));
-    assertFalse(expected.getApplication().adminRolesOrDefaults("ADMIN")
+    assertFalse(expected.getApplication()
+        .adminRolesOrDefaults(null, "ADMIN")
         .contains("ADMIN"));
-    assertFalse(expected.getApplication().userRolesOrDefaults("USER")
+    assertFalse(expected.getApplication()
+        .userRolesOrDefaults(null, "USER")
         .contains("USER"));
+    assertFalse(expected.getApplication()
+        .adminRolesOrDefaults(expected::ensureRolePrefix, "TEST")
+        .contains("ROLE_TEST"));
+    assertFalse(expected.getApplication()
+        .userRolesOrDefaults(expected::ensureRolePrefix, "TEST")
+        .contains("ROLE_TEST"));
 
     String expectedExpr
-        = "hasAnyAuthority('ROLE_ADMIN','ROLE_LOCAL_USER','ROLE_SUPERUSER','ROLE_USER')"
+        = "hasAnyAuthority('ROLE_ADMIN','ROLE_SUPERUSER')"
         + " or hasIpAddress('127.0.0.1/32')"
         + " or hasIpAddress('::1')";
     String expr = actual.getApplication().buildAccessExpression(
-        false, true, true, true,
-        actual::ensureRolePrefix);
+        actual.getApplication().adminRolesOrDefaults(actual::ensureRolePrefix),
+        actual.getApplication().getIpAddresses(),
+        false,
+        null);
     assertEquals(expectedExpr, expr);
 
-    expectedExpr = "hasAnyAuthority('ROLE_ADMIN','ROLE_LOCAL_USER','ROLE_SUPERUSER','ROLE_USER')";
+    expectedExpr = "hasAnyAuthority('ROLE_LOCAL_USER','ROLE_USER')";
     expr = actual.getApplication().buildAccessExpression(
-        false, false, true, true, null);
-    assertEquals(expectedExpr, expr);
-
-    expectedExpr = "hasAnyAuthority('ROLE_ADMIN','ROLE_SUPERUSER')";
-    expr = actual.getApplication().buildAccessExpression(
-        false, false, false, true, null);
+        actual.getApplication().userRolesOrDefaults(actual::ensureRolePrefix),
+        null,
+        false,
+        null);
     assertEquals(expectedExpr, expr);
 
     expectedExpr = "hasIpAddress('127.0.0.1/32')"
         + " or hasIpAddress('::1')"
         + " or isFullyAuthenticated()";
     expr = actual.getApplication().buildAccessExpression(
-        true, true, false, false, null);
+        null,
+        actual.getApplication().getIpAddresses(),
+        false,
+        null);
     assertEquals(expectedExpr, expr);
 
     expectedExpr = "isFullyAuthenticated()";
     expr = actual.getApplication().buildAccessExpression(
-        false, false, false, false, null);
+        null,
+        null,
+        false,
+        null);
     assertEquals(expectedExpr, expr);
 
     expected.getApplication().setAdminRoles(new ArrayList<>());
     expected.getApplication().setUserRoles(new ArrayList<>());
-    assertTrue(expected.getApplication().adminRolesOrDefaults("ADMIN")
+    assertTrue(expected.getApplication()
+        .adminRolesOrDefaults(null, "ADMIN")
         .contains("ADMIN"));
-    assertTrue(expected.getApplication().userRolesOrDefaults("USER")
+    assertTrue(expected.getApplication()
+        .userRolesOrDefaults(null, "USER")
         .contains("USER"));
-    assertFalse(expected.getApplication().adminRolesOrDefaults("ADMIN")
+    assertFalse(expected.getApplication()
+        .adminRolesOrDefaults(null, "ADMIN")
         .contains("ROLE_SUPERUSER"));
-    assertFalse(expected.getApplication().userRolesOrDefaults("USER")
+    assertFalse(expected.getApplication()
+        .userRolesOrDefaults(null, "USER")
         .contains("ROLE_USER"));
-  }
-
-  /**
-   * Gets actuator.
-   */
-  @Test
-  void getActuator() {
-    AuthenticationProperties expected = new AuthenticationProperties();
-    expected.getActuator().setIpAddresses(Arrays.asList("127.0.0.1/32", "::1"));
-    expected.getActuator().setRoles(Arrays.asList("ROLE_SUPER_USER", "ROLE_ACTUATOR"));
-    expected.getActuator().setAdminRoles(Arrays.asList("ROLE_A", "ROLE_B"));
-
-    AuthenticationProperties actual = new AuthenticationProperties();
-    actual.getActuator().setIpAddresses(Arrays.asList("127.0.0.1/32", "::1"));
-    actual.getActuator().setRoles(Arrays.asList("ROLE_SUPER_USER", "ROLE_ACTUATOR"));
-    actual.getActuator().setAdminRoles(Arrays.asList("ROLE_A", "ROLE_B"));
-
-    assertEquals(expected, actual);
-    assertTrue(expected.toString().contains("127.0.0.1/32"));
-    assertTrue(expected.toString().contains("::1"));
-    assertTrue(expected.toString().contains("ROLE_SUPER_USER"));
-    assertTrue(expected.toString().contains("ROLE_ACTUATOR"));
-    assertTrue(actual.getActuator().getAdminRoles().contains("ROLE_A"));
-    assertTrue(actual.getActuator().getAdminRoles().contains("ROLE_B"));
-
-    String value = "hasAnyAuthority('ROLE_ACTUATOR','ROLE_SUPER_USER')"
-        + " or hasIpAddress('127.0.0.1/32') or hasIpAddress('::1')";
-    assertEquals(value, expected.getActuator().buildAccessExpression(null));
-    assertNotEquals(expected.getActuator(), null);
-    assertNotEquals(expected.getActuator(), new Object());
-
-    expected = new AuthenticationProperties();
-    expected.getActuator().setIpAddresses(Arrays.asList("127.0.0.1/32", "::1"));
-    expected.getActuator().setRoles(Collections.emptyList());
-
-    value = "hasAnyAuthority('ROLE_ACTUATOR','ROLE_ADMIN')"
-        + " or hasIpAddress('127.0.0.1/32') or hasIpAddress('::1')";
-    assertEquals(value, expected.getActuator().buildAccessExpression(actual::ensureRolePrefix));
-
-    assertEquals(
-        "hasAnyAuthority('ROLE_A','ROLE_B')",
-        actual.getActuator().buildAdminAccessExpression(actual::ensureRolePrefix));
+    assertTrue(expected.getApplication()
+        .adminRolesOrDefaults(expected::ensureRolePrefix, "ADMIN")
+        .contains("ROLE_ADMIN"));
+    assertTrue(expected.getApplication()
+        .userRolesOrDefaults(expected::ensureRolePrefix, "USER")
+        .contains("ROLE_USER"));
   }
 
   /**
@@ -323,7 +305,7 @@ class AuthenticationPropertiesTest {
     assertNotEquals(expected.getPasswordFlow(), null);
     assertNotEquals(expected.getPasswordFlow(), new Object());
 
-    PasswordFlowProperties passwordFlow = expected.getPasswordFlow().toProperties();
+    PasswordFlowProperties passwordFlow = expected.getPasswordFlow().toPasswordFlowProperties();
     assertNotNull(passwordFlow);
     assertEquals(expected.getPasswordFlow().getClientId(), passwordFlow.getClientId());
     assertEquals(expected.getPasswordFlow().getClientSecret(), passwordFlow.getClientSecret());
@@ -354,7 +336,8 @@ class AuthenticationPropertiesTest {
     assertNotEquals(expected.getClientCredentialsFlow(), null);
     assertNotEquals(expected.getClientCredentialsFlow(), new Object());
 
-    ClientCredentialsFlowProperties properties = expected.getClientCredentialsFlow().toProperties();
+    ClientCredentialsFlowProperties properties = expected.getClientCredentialsFlow()
+        .toClientCredentialsFlowProperties();
     assertNotNull(properties);
     assertEquals(expected.getClientCredentialsFlow().getClientId(), properties.getClientId());
     assertEquals(expected.getClientCredentialsFlow().getClientSecret(),

@@ -10,11 +10,13 @@ org.bremersee.security.access.AccessControlAutoConfiguration,\
 org.bremersee.web.servlet.ApiExceptionResolverAutoConfiguration,\
 org.bremersee.web.servlet.BaseCommonConvertersAutoConfiguration,\
 org.bremersee.web.servlet.CorsAutoConfiguration,\
+org.bremersee.web.servlet.ResourceServerSecurityAutoConfiguration,\
 org.bremersee.security.authentication.AuthenticationSupportAutoConfiguration,\
 \
 org.bremersee.web.reactive.ApiExceptionHandlerAutoConfiguration,\
 org.bremersee.web.reactive.BaseCommonConvertersAutoConfiguration,\
 org.bremersee.web.reactive.CorsAutoConfiguration,\
+org.bremersee.web.reactive.ReactiveResourceServerSecurityAutoConfiguration,\
 org.bremersee.security.authentication.ReactiveAuthenticationSupportAutoConfiguration,\
 \
 org.bremersee.thymeleaf.AdditionalThymeleafAutoConfiguration,\

@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 the original author or authors.
+ * Copyright 2019-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,13 +17,17 @@
 package org.bremersee.web.reactive;
 
 import lombok.extern.slf4j.Slf4j;
-import org.bremersee.web.CorsProperties;
+import org.bremersee.security.SecurityProperties;
+import org.bremersee.security.SecurityProperties.CorsProperties.CorsConfiguration;
+import org.bremersee.security.authentication.PasswordFlowPropertiesProvider;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication.Type;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.event.EventListener;
+import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.util.ClassUtils;
 import org.springframework.web.reactive.config.CorsRegistry;
 import org.springframework.web.reactive.config.WebFluxConfigurer;
@@ -34,19 +38,23 @@ import org.springframework.web.reactive.config.WebFluxConfigurer;
  * @author Christian Bremer
  */
 @ConditionalOnWebApplication(type = Type.REACTIVE)
-@EnableConfigurationProperties(CorsProperties.class)
+@ConditionalOnClass({
+    PasswordFlowPropertiesProvider.class,
+    PasswordEncoderFactories.class
+})
+@EnableConfigurationProperties(SecurityProperties.class)
 @Configuration
 @Slf4j
 public class CorsAutoConfiguration implements WebFluxConfigurer {
 
-  private CorsProperties properties;
+  private SecurityProperties properties;
 
   /**
    * Instantiates a new cors auto configuration.
    *
    * @param properties the properties
    */
-  public CorsAutoConfiguration(CorsProperties properties) {
+  public CorsAutoConfiguration(SecurityProperties properties) {
     this.properties = properties;
   }
 
@@ -61,16 +69,21 @@ public class CorsAutoConfiguration implements WebFluxConfigurer {
             + "*********************************************************************************\n"
             + "* corsProperties = {}\n"
             + "*********************************************************************************",
-        ClassUtils.getUserClass(getClass()).getSimpleName(), properties);
+        ClassUtils.getUserClass(getClass()).getSimpleName(), properties.getCors());
   }
 
+  @SuppressWarnings("DuplicatedCode")
   @Override
   public void addCorsMappings(CorsRegistry corsRegistry) {
-    for (CorsProperties.CorsConfiguration config : properties.getConfigs()) {
+    if (properties.getCors().isDisabled()) {
+      return;
+    }
+    for (CorsConfiguration config : properties.getCors().getConfigs()) {
       corsRegistry.addMapping(config.getPathPattern())
           .allowedOrigins(config.getAllowedOrigins().toArray(new String[0]))
           .allowedMethods(config.getAllowedMethods().toArray(new String[0]))
           .allowedHeaders(config.getAllowedHeaders().toArray(new String[0]))
+          .exposedHeaders(config.getExposedHeaders().toArray(new String[0]))
           .maxAge(config.getMaxAge())
           .allowCredentials(config.isAllowCredentials());
     }

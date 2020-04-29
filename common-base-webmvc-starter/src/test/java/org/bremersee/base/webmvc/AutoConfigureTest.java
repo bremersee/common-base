@@ -59,7 +59,7 @@ import org.springframework.web.context.WebApplicationContext;
     })
 @TestInstance(Lifecycle.PER_CLASS)
 @Slf4j
-public class AutoConfigureTest {
+class AutoConfigureTest {
 
   /**
    * The Context.

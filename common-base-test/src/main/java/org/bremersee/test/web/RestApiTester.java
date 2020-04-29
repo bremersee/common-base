@@ -31,11 +31,11 @@ import static org.bremersee.test.web.RestApiTesterPath.PathType.CLASS;
 import static org.bremersee.test.web.RestApiTesterPath.PathType.METHOD;
 import static org.bremersee.test.web.RestApiTesterPath.PathType.METHOD_PARAMETER;
 import static org.bremersee.test.web.RestApiTesterPath.pathBuilder;
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedElement;
@@ -76,8 +76,8 @@ public class RestApiTester {
 
     log.info("Assert same api: expected = {}, actual = {}", name(expected),
         name(actual));
-    assertNotNull("Expected api class must not be null.", expected);
-    assertNotNull("Actual api class must not be null.", actual);
+    assertNotNull(expected, "Expected api class must not be null.");
+    assertNotNull(actual, "Actual api class must not be null.");
 
     RestApiTesterPath path = pathBuilder().add(CLASS, expected.getSimpleName()).build();
     if (!isExcluded(path, CLASS_MUST_BE_INTERFACE, exclusions)) {
@@ -85,7 +85,7 @@ public class RestApiTester {
               + "\n  - path = {}"
               + "\n  - type = {}",
           path, CLASS_MUST_BE_INTERFACE);
-      assertTrue("Expected api class must be an interface.", expected.isInterface());
+      assertTrue(expected.isInterface(), "Expected api class must be an interface.");
     }
 
     path = pathBuilder().add(CLASS, actual.getSimpleName()).build();
@@ -94,7 +94,7 @@ public class RestApiTester {
               + "\n  - path = {}"
               + "\n  - type = {}",
           path, CLASS_MUST_BE_INTERFACE);
-      assertTrue("Actual api class must be an interface.", actual.isInterface());
+      assertTrue(actual.isInterface(), "Actual api class must be an interface.");
     }
 
     assertSameClassAnnotations(expected, actual, exclusions);
@@ -130,9 +130,11 @@ public class RestApiTester {
               + "\n  - path = {}"
               + "\n  - type = {}",
           classPath, SAME_METHOD_SIZE);
-      assertEquals(format("Methods must have the same size on %s and %s.",
-          expected.getSimpleName(), actual.getSimpleName()),
-          expectedMethods.length, actualMethods.length);
+      assertEquals(
+          expectedMethods.length,
+          actualMethods.length,
+          format("Methods must have the same size on %s and %s.",
+              expected.getSimpleName(), actual.getSimpleName()));
     }
 
     for (final Method expectedMethod : expectedMethods) {
@@ -147,9 +149,9 @@ public class RestApiTester {
                 + "\n  - type = {}",
             methodPath, METHOD_MUST_NOT_BE_NULL);
         assertNotNull(
+            actualMethod,
             format("Method %s (%s) is missing on %s", expectedMethod.getName(),
-                parameters(expectedMethod.getParameterTypes()), name(actual)),
-            actualMethod);
+                parameters(expectedMethod.getParameterTypes()), name(actual)));
       } else if (actualMethod == null) {
         continue;
       }
@@ -196,8 +198,9 @@ public class RestApiTester {
               + "\n  - type = {}",
           path, SAME_ANNOTATION_SIZE);
       assertEquals(
-          format("Annotations must have the same size on %s.", path),
-          expectedAnnotations.length, actualAnnotations.length);
+          expectedAnnotations.length,
+          actualAnnotations.length,
+          format("Annotations must have the same size on %s.", path));
     }
     for (final Annotation expectedAnnotation : expectedAnnotations) {
       final Annotation actualAnnotation = AnnotationUtils.getAnnotation(
@@ -225,8 +228,8 @@ public class RestApiTester {
               + "\n  - type = {}",
           annotationPath, ANNOTATION_MUST_NOT_BE_NULL);
       assertNotNull(
-          format("Annotation %s is missing on %s.", name(expected), path),
-          actual);
+          actual,
+          format("Annotation %s is missing on %s.", name(expected), path));
     }
     if (actual == null) {
       return;
@@ -254,8 +257,9 @@ public class RestApiTester {
               + "\n  - type = {}",
           annotationPath, SAME_ANNOTATION_ATTRIBUTES_SIZE);
       assertEquals(
-          format("Attributes of annotation (%s) must have the same size.", annotationPath),
-          expected.size(), actual.size());
+          expected.size(),
+          actual.size(),
+          format("Attributes of annotation (%s) must have the same size.", annotationPath));
     }
     for (final Map.Entry<String, Object> expectedAttribute : expected.entrySet()) {
       final Object expectedAttributeValue = expectedAttribute.getValue();
@@ -284,8 +288,8 @@ public class RestApiTester {
 
       if (expected == null) {
         assertNull(
-            format("Attribute (%s) must be null.", attributePath),
-            actual);
+            actual,
+            format("Attribute (%s) must be null.", attributePath));
       } else if (expected instanceof Annotation[]) {
         assertTrue(actual instanceof Annotation[]);
         final Annotation[] expectedAnnotations = (Annotation[]) expected;

@@ -52,8 +52,9 @@ class RoleBasedAuthorizationManagerTest {
         .thenAnswer((Answer<Collection<? extends GrantedAuthority>>) invocation -> Collections
             .singletonList(new SimpleGrantedAuthority("ROLE_ADMIN")));
     AuthorizationContext authorizationContext = mock(AuthorizationContext.class);
+
     RoleBasedAuthorizationManager manager = new RoleBasedAuthorizationManager(
-        Arrays.asList("ROLE_USER", "ADMIN"));
+        Arrays.asList("ROLE_USER", "ROLE_ADMIN"));
     StepVerifier
         .create(manager.check(Mono.just(authentication), authorizationContext))
         .assertNext(decision -> assertTrue(decision.isGranted()))
@@ -62,6 +63,98 @@ class RoleBasedAuthorizationManagerTest {
 
     manager = new RoleBasedAuthorizationManager(
         Arrays.asList("ROLE_USER", "ROLE_LOCAL_USER"));
+    StepVerifier
+        .create(manager.check(Mono.just(authentication), authorizationContext))
+        .assertNext(decision -> assertFalse(decision.isGranted()))
+        .expectNextCount(0)
+        .verifyComplete();
+
+    manager = new RoleBasedAuthorizationManager(
+        Arrays.asList("ROLE_USER", "ROLE_ADMIN"), false);
+    StepVerifier
+        .create(manager.check(Mono.just(authentication), authorizationContext))
+        .assertNext(decision -> assertTrue(decision.isGranted()))
+        .expectNextCount(0)
+        .verifyComplete();
+
+    manager = new RoleBasedAuthorizationManager(
+        Arrays.asList("ROLE_USER", "ROLE_LOCAL_USER"), false);
+    StepVerifier
+        .create(manager.check(Mono.just(authentication), authorizationContext))
+        .assertNext(decision -> assertFalse(decision.isGranted()))
+        .expectNextCount(0)
+        .verifyComplete();
+  }
+
+  /**
+   * Check with no roles and authenticated.
+   */
+  @Test
+  void checkWithNoRolesAndAuthenticated() {
+    Authentication authentication = mock(Authentication.class);
+    when(authentication.isAuthenticated())
+        .thenReturn(true);
+    when(authentication.getAuthorities())
+        .thenAnswer((Answer<Collection<? extends GrantedAuthority>>) invocation -> Collections
+            .singletonList(new SimpleGrantedAuthority("ROLE_ADMIN")));
+    AuthorizationContext authorizationContext = mock(AuthorizationContext.class);
+
+    RoleBasedAuthorizationManager manager = new RoleBasedAuthorizationManager(
+        Collections.emptyList());
+    StepVerifier
+        .create(manager.check(Mono.just(authentication), authorizationContext))
+        .assertNext(decision -> assertTrue(decision.isGranted()))
+        .expectNextCount(0)
+        .verifyComplete();
+
+    manager = new RoleBasedAuthorizationManager(
+        Collections.emptyList(), true);
+    StepVerifier
+        .create(manager.check(Mono.just(authentication), authorizationContext))
+        .assertNext(decision -> assertTrue(decision.isGranted()))
+        .expectNextCount(0)
+        .verifyComplete();
+
+    manager = new RoleBasedAuthorizationManager(
+        Collections.emptyList(), false);
+    StepVerifier
+        .create(manager.check(Mono.just(authentication), authorizationContext))
+        .assertNext(decision -> assertFalse(decision.isGranted()))
+        .expectNextCount(0)
+        .verifyComplete();
+  }
+
+  /**
+   * Check with no roles and not authenticated.
+   */
+  @Test
+  void checkWithNoRolesAndNotAuthenticated() {
+    Authentication authentication = mock(Authentication.class);
+    when(authentication.isAuthenticated())
+        .thenReturn(false);
+    when(authentication.getAuthorities())
+        .thenAnswer((Answer<Collection<? extends GrantedAuthority>>) invocation -> Collections
+            .emptyList());
+    AuthorizationContext authorizationContext = mock(AuthorizationContext.class);
+
+    RoleBasedAuthorizationManager manager = new RoleBasedAuthorizationManager(
+        Collections.emptyList());
+    StepVerifier
+        .create(manager.check(Mono.just(authentication), authorizationContext))
+        .assertNext(decision -> assertFalse(decision.isGranted()))
+        .expectNextCount(0)
+        .verifyComplete();
+
+    manager = new RoleBasedAuthorizationManager(
+        Collections.emptyList(), true);
+    StepVerifier
+        .create(manager.check(Mono.just(authentication), authorizationContext))
+        .assertNext(decision -> assertFalse(decision.isGranted()))
+        .expectNextCount(0)
+        .verifyComplete();
+
+    manager = new RoleBasedAuthorizationManager(
+        Collections.emptyList(), false);
     StepVerifier
         .create(manager.check(Mono.just(authentication), authorizationContext))
         .assertNext(decision -> assertFalse(decision.isGranted()))

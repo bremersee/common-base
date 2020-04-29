@@ -16,7 +16,7 @@
 
 package org.bremersee.data.ldaptive;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Collection;
 import lombok.extern.slf4j.Slf4j;
@@ -54,7 +54,7 @@ import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
         "bremersee.ldaptive.use-ssl=false",
         "bremersee.ldaptive.use-start-tls=false",
         "bremersee.ldaptive.bind-dn=uid=admin",
-        "bremersee.ldaptive.bind-credential=secret",
+        "bremersee.ldaptive.bind-credentials=secret",
         "bremersee.ldaptive.pooled=false"
     })
 @Slf4j

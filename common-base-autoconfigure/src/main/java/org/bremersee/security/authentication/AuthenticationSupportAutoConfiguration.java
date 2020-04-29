@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 the original author or authors.
+ * Copyright 2019-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
 package org.bremersee.security.authentication;
 
 import lombok.extern.slf4j.Slf4j;
+import org.bremersee.security.SecurityProperties;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -48,12 +49,12 @@ import org.springframework.util.ClassUtils;
     JsonPathJwtConverter.class,
     RestTemplateAccessTokenRetriever.class
 })
-@EnableConfigurationProperties(AuthenticationProperties.class)
+@EnableConfigurationProperties(SecurityProperties.class)
 @Configuration
 @Slf4j
 public class AuthenticationSupportAutoConfiguration {
 
-  private AuthenticationProperties properties;
+  private SecurityProperties properties;
 
   /**
    * Instantiates a new authentication support auto configuration.
@@ -61,7 +62,7 @@ public class AuthenticationSupportAutoConfiguration {
    * @param properties the properties
    */
   public AuthenticationSupportAutoConfiguration(
-      AuthenticationProperties properties) {
+      SecurityProperties properties) {
     this.properties = properties;
   }
 
@@ -81,11 +82,11 @@ public class AuthenticationSupportAutoConfiguration {
             + "* nameJsonPath = {}\n"
             + "*********************************************************************************",
         ClassUtils.getUserClass(getClass()).getSimpleName(),
-        properties.getRolesJsonPath(),
-        properties.isRolesValueList(),
-        properties.getRolesValueSeparator(),
-        properties.getRolePrefix(),
-        properties.getNameJsonPath());
+        properties.getAuthentication().getRolesJsonPath(),
+        properties.getAuthentication().isRolesValueList(),
+        properties.getAuthentication().getRolesValueSeparator(),
+        properties.getAuthentication().getRolePrefix(),
+        properties.getAuthentication().getNameJsonPath());
   }
 
   /**
@@ -95,14 +96,15 @@ public class AuthenticationSupportAutoConfiguration {
    */
   @ConditionalOnMissingBean
   @Bean
+  @SuppressWarnings("DuplicatedCode")
   public JsonPathJwtConverter jsonPathJwtConverter() {
     log.info("Creating {} ...", JsonPathJwtConverter.class.getSimpleName());
     JsonPathJwtConverter converter = new JsonPathJwtConverter();
-    converter.setNameJsonPath(properties.getNameJsonPath());
-    converter.setRolePrefix(properties.getRolePrefix());
-    converter.setRolesJsonPath(properties.getRolesJsonPath());
-    converter.setRolesValueList(properties.isRolesValueList());
-    converter.setRolesValueSeparator(properties.getRolesValueSeparator());
+    converter.setNameJsonPath(properties.getAuthentication().getNameJsonPath());
+    converter.setRolePrefix(properties.getAuthentication().getRolePrefix());
+    converter.setRolesJsonPath(properties.getAuthentication().getRolesJsonPath());
+    converter.setRolesValueList(properties.getAuthentication().isRolesValueList());
+    converter.setRolesValueSeparator(properties.getAuthentication().getRolesValueSeparator());
     return converter;
   }
 
@@ -145,7 +147,7 @@ public class AuthenticationSupportAutoConfiguration {
 
     log.info("Creating {} ...", PasswordFlowAuthenticationManager.class.getSimpleName());
     return new PasswordFlowAuthenticationManager(
-        properties,
+        properties.getAuthentication().getPasswordFlow(),
         jwtDecoder.getIfAvailable(),
         jwtConverter,
         tokenRetriever);

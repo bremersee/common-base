@@ -11,7 +11,7 @@
   </parent>
 
   <artifactId>common-base-parent</artifactId>
-  <version>2.0.2-SNAPSHOT</version>
+  <version>2.1.0-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <name>common-base-parent</name>
@@ -31,6 +31,7 @@
     <module>common-base-thymeleaf</module>
 
     <module>common-base-autoconfigure</module>
+    <module>common-base-actuator-autoconfigure</module>
 
     <module>common-base-starter</module>
     <module>common-base-ldaptive-starter</module>
@@ -39,6 +40,7 @@
     <module>common-base-webmvc-starter</module>
     <module>common-base-thymeleaf-starter</module>
     <module>common-base-security-starter</module>
+    <module>common-base-actuator-starter</module>
   </modules>
 
   <properties>

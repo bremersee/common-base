@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.bremersee.web;
+package org.bremersee.security;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -23,7 +23,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Arrays;
 import java.util.List;
-import org.bremersee.web.CorsProperties.CorsConfiguration;
+import org.bremersee.security.SecurityProperties.CorsProperties;
+import org.bremersee.security.SecurityProperties.CorsProperties.CorsConfiguration;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -88,9 +89,7 @@ class CorsPropertiesTest {
     c1.setPathPattern("/foo/**");
 
     assertTrue(c1.getAllowedHeaders().contains("*"));
-    assertTrue(c1.getAllowedMethods().contains("GET"));
-    assertTrue(c1.getAllowedMethods().contains("POST"));
-    assertTrue(c1.getAllowedMethods().contains("HEAD"));
+    assertTrue(c1.getAllowedMethods().contains("*"));
     assertTrue(c1.getAllowedOrigins().contains("*"));
 
     CorsConfiguration c2 = new CorsConfiguration();

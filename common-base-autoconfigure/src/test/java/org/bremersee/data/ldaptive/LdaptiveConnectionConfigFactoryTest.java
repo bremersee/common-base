@@ -25,7 +25,7 @@ class LdaptiveConnectionConfigFactoryTest {
     properties.setAuthenticationCertificate("authcert");
     properties.setAuthenticationKey("authkey");
     properties.setBindDn("ou=admin");
-    properties.setBindCredential("changeit");
+    properties.setBindCredentials("changeit");
     ConnectionConfig config = LdaptiveConnectionConfigFactory
         .defaultFactory()
         .createConnectionConfig(properties);

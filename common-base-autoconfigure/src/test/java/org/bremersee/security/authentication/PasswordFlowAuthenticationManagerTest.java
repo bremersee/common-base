@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 the original author or authors.
+ * Copyright 2019-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,10 +16,11 @@
 
 package org.bremersee.security.authentication;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
@@ -29,8 +30,9 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
 import java.util.Map;
-import org.bremersee.security.authentication.AuthenticationProperties.PasswordFlow;
-import org.junit.Test;
+import org.bremersee.security.SecurityProperties;
+import org.bremersee.security.SecurityProperties.AuthenticationProperties.PasswordFlow;
+import org.junit.jupiter.api.Test;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
@@ -44,18 +46,16 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtAut
  *
  * @author Christian Bremer
  */
-public class PasswordFlowAuthenticationManagerTest {
+class PasswordFlowAuthenticationManagerTest {
 
-  private static AuthenticationProperties authenticationProperties() {
+  private static PasswordFlow properties() {
     PasswordFlow passwordFlow = new PasswordFlow();
     passwordFlow.setClientId("abc");
     passwordFlow.setClientSecret("xyz");
     passwordFlow.setSystemPassword("XYZ");
     passwordFlow.setSystemUsername("ABC");
     passwordFlow.setTokenEndpoint("http://localhost/token");
-    AuthenticationProperties properties = new AuthenticationProperties();
-    properties.setPasswordFlow(passwordFlow);
-    return properties;
+    return passwordFlow;
   }
 
   private static AccessTokenRetriever<String> tokenRetriever() {
@@ -81,7 +81,7 @@ public class PasswordFlowAuthenticationManagerTest {
 
   private static PasswordFlowAuthenticationManager workingManager(Jwt jwt) {
     return new PasswordFlowAuthenticationManager(
-        authenticationProperties(),
+        properties(),
         workingJwtDecoder(jwt),
         null,
         tokenRetriever());
@@ -95,7 +95,7 @@ public class PasswordFlowAuthenticationManagerTest {
 
   private static PasswordFlowAuthenticationManager notWorkingManager() {
     return new PasswordFlowAuthenticationManager(
-        authenticationProperties(),
+        properties(),
         notWorkingJwtDecoder(),
         null,
         tokenRetriever());
@@ -105,7 +105,7 @@ public class PasswordFlowAuthenticationManagerTest {
    * Tests authenticate.
    */
   @Test
-  public void authenticate() {
+  void authenticate() {
     Map<String, Object> headers = new HashMap<>();
     headers.put("test-key", "test-value");
     Map<String, Object> claims = new HashMap<>();
@@ -131,22 +131,24 @@ public class PasswordFlowAuthenticationManagerTest {
   /**
    * Tests authenticate fails.
    */
-  @Test(expected = OAuth2AuthenticationException.class)
-  public void authenticateFails() {
+  @Test
+  void authenticateFails() {
     PasswordFlowAuthenticationManager manager = notWorkingManager();
 
     Authentication loginAuthentication = mock(Authentication.class);
     when(loginAuthentication.getName()).thenReturn("an_username");
     when(loginAuthentication.getCredentials()).thenReturn("a_password");
 
-    manager.authenticate(loginAuthentication);
+    assertThrows(
+        OAuth2AuthenticationException.class,
+        () -> manager.authenticate(loginAuthentication));
   }
 
   /**
    * Tests supports.
    */
   @Test
-  public void supports() {
+  void supports() {
     Map<String, Object> headers = new HashMap<>();
     headers.put("test-key", "test-value");
     Map<String, Object> claims = new HashMap<>();
@@ -154,6 +156,6 @@ public class PasswordFlowAuthenticationManagerTest {
     Jwt jwt = jwt(headers, claims);
     PasswordFlowAuthenticationManager manager = workingManager(jwt);
     assertTrue(manager.supports(UsernamePasswordAuthenticationToken.class));
-    assertFalse(manager.supports(AuthenticationProperties.class));
+    assertFalse(manager.supports(SecurityProperties.class));
   }
 }

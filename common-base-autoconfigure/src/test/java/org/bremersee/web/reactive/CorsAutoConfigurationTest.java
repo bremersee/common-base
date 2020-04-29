@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 the original author or authors.
+ * Copyright 2019-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,8 @@
 
 package org.bremersee.web.reactive;
 
-import org.bremersee.web.CorsProperties;
+import org.bremersee.security.SecurityProperties;
+import org.bremersee.security.SecurityProperties.CorsProperties;
 import org.junit.jupiter.api.Test;
 import org.springframework.web.reactive.config.CorsRegistry;
 
@@ -34,7 +35,9 @@ class CorsAutoConfigurationTest {
   void addCorsMappings() {
     CorsProperties properties = new CorsProperties();
     properties.setAllowAll(true);
-    CorsAutoConfiguration configuration = new CorsAutoConfiguration(properties);
+    SecurityProperties securityProperties = new SecurityProperties();
+    securityProperties.setCors(properties);
+    CorsAutoConfiguration configuration = new CorsAutoConfiguration(securityProperties);
     configuration.init();
     CorsRegistry corsRegistry = new CorsRegistry();
     configuration.addCorsMappings(corsRegistry);

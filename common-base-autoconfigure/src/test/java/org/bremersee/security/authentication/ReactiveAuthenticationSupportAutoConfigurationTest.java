@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 the original author or authors.
+ * Copyright 2019-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import org.bremersee.security.SecurityProperties;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.ObjectProvider;
@@ -39,7 +40,7 @@ class ReactiveAuthenticationSupportAutoConfigurationTest {
    */
   @BeforeAll
   static void init() {
-    AuthenticationProperties properties = new AuthenticationProperties();
+    SecurityProperties properties = new SecurityProperties();
     configuration = new ReactiveAuthenticationSupportAutoConfiguration(properties);
     configuration.init();
   }

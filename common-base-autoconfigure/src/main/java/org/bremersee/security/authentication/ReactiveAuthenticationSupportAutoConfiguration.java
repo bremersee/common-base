@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 the original author or authors.
+ * Copyright 2019-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
 package org.bremersee.security.authentication;
 
 import lombok.extern.slf4j.Slf4j;
+import org.bremersee.security.SecurityProperties;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -46,12 +47,12 @@ import org.springframework.util.ClassUtils;
     JsonPathReactiveJwtConverter.class,
     WebClientAccessTokenRetriever.class
 })
-@EnableConfigurationProperties(AuthenticationProperties.class)
+@EnableConfigurationProperties(SecurityProperties.class)
 @Configuration
 @Slf4j
 public class ReactiveAuthenticationSupportAutoConfiguration {
 
-  private AuthenticationProperties properties;
+  private SecurityProperties properties;
 
   /**
    * Instantiates a reactive authentication support auto configuration.
@@ -59,7 +60,7 @@ public class ReactiveAuthenticationSupportAutoConfiguration {
    * @param properties the properties
    */
   public ReactiveAuthenticationSupportAutoConfiguration(
-      AuthenticationProperties properties) {
+      SecurityProperties properties) {
     this.properties = properties;
   }
 
@@ -79,11 +80,11 @@ public class ReactiveAuthenticationSupportAutoConfiguration {
             + "* nameJsonPath = {}\n"
             + "*********************************************************************************",
         ClassUtils.getUserClass(getClass()).getSimpleName(),
-        properties.getRolesJsonPath(),
-        properties.isRolesValueList(),
-        properties.getRolesValueSeparator(),
-        properties.getRolePrefix(),
-        properties.getNameJsonPath());
+        properties.getAuthentication().getRolesJsonPath(),
+        properties.getAuthentication().isRolesValueList(),
+        properties.getAuthentication().getRolesValueSeparator(),
+        properties.getAuthentication().getRolePrefix(),
+        properties.getAuthentication().getNameJsonPath());
   }
 
   /**
@@ -93,14 +94,15 @@ public class ReactiveAuthenticationSupportAutoConfiguration {
    */
   @ConditionalOnMissingBean
   @Bean
+  @SuppressWarnings("DuplicatedCode")
   public JsonPathReactiveJwtConverter jsonPathReactiveJwtConverter() {
     log.info("Creating {} ...", JsonPathReactiveJwtConverter.class.getSimpleName());
     JsonPathJwtConverter converter = new JsonPathJwtConverter();
-    converter.setNameJsonPath(properties.getNameJsonPath());
-    converter.setRolePrefix(properties.getRolePrefix());
-    converter.setRolesJsonPath(properties.getRolesJsonPath());
-    converter.setRolesValueList(properties.isRolesValueList());
-    converter.setRolesValueSeparator(properties.getRolesValueSeparator());
+    converter.setNameJsonPath(properties.getAuthentication().getNameJsonPath());
+    converter.setRolePrefix(properties.getAuthentication().getRolePrefix());
+    converter.setRolesJsonPath(properties.getAuthentication().getRolesJsonPath());
+    converter.setRolesValueList(properties.getAuthentication().isRolesValueList());
+    converter.setRolesValueSeparator(properties.getAuthentication().getRolesValueSeparator());
     return new JsonPathReactiveJwtConverter(converter);
   }
 
@@ -134,7 +136,7 @@ public class ReactiveAuthenticationSupportAutoConfiguration {
     Assert.notNull(jwtDecoder.getIfAvailable(), "Jwt decoder must be present.");
     log.info("Creating {} ...", PasswordFlowReactiveAuthenticationManager.class.getSimpleName());
     return new PasswordFlowReactiveAuthenticationManager(
-        properties,
+        properties.getAuthentication().getPasswordFlow(),
         jwtDecoder.getIfAvailable(),
         jwtConverter,
         tokenRetriever);

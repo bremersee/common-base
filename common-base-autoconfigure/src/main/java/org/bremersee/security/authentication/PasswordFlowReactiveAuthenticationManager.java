@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 the original author or authors.
+ * Copyright 2019-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,7 +43,7 @@ import reactor.core.publisher.Mono;
 @Slf4j
 public class PasswordFlowReactiveAuthenticationManager implements ReactiveAuthenticationManager {
 
-  private AuthenticationProperties properties;
+  private PasswordFlowPropertiesProvider passwordFlowPropertiesProvider;
 
   private ReactiveJwtDecoder jwtDecoder;
 
@@ -54,17 +54,17 @@ public class PasswordFlowReactiveAuthenticationManager implements ReactiveAuthen
   /**
    * Instantiates a new password flow reactive authentication manager.
    *
-   * @param properties the properties
+   * @param passwordFlowPropertiesProvider the password flow properties provider
    * @param jwtDecoder the jwt decoder
    * @param jwtConverter the jwt converter
    * @param retriever the retriever
    */
   public PasswordFlowReactiveAuthenticationManager(
-      AuthenticationProperties properties,
+      PasswordFlowPropertiesProvider passwordFlowPropertiesProvider,
       ReactiveJwtDecoder jwtDecoder,
       @Nullable Converter<Jwt, ? extends Mono<? extends AbstractAuthenticationToken>> jwtConverter,
       @Nullable AccessTokenRetriever<Mono<String>> retriever) {
-    this.properties = properties;
+    this.passwordFlowPropertiesProvider = passwordFlowPropertiesProvider;
     this.jwtDecoder = jwtDecoder;
     this.jwtConverter = Objects.requireNonNullElseGet(
         jwtConverter,
@@ -95,7 +95,7 @@ public class PasswordFlowReactiveAuthenticationManager implements ReactiveAuthen
     final String username = authentication.getName();
     final String password = (String) authentication.getCredentials();
     //noinspection NullableInLambdaInTransform
-    return Mono.just(properties.getPasswordFlow().toProperties(username, password))
+    return Mono.just(passwordFlowPropertiesProvider.toPasswordFlowProperties(username, password))
         .flatMap(retriever::retrieveAccessToken)
         .flatMap(jwtDecoder::decode)
         .flatMap(jwtConverter::convert)

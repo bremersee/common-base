@@ -62,7 +62,7 @@ import org.springframework.http.HttpStatus;
         "bremersee.exception-mapping.api-paths=/api/**"
     })
 @Slf4j
-public class AutoConfigureTest {
+class AutoConfigureTest {
 
   /**
    * The Rest template.

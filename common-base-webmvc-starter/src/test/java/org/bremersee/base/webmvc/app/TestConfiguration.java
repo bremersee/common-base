@@ -18,7 +18,7 @@ package org.bremersee.base.webmvc.app;
 
 import javax.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
-import org.bremersee.security.authentication.AuthenticationProperties;
+import org.bremersee.security.SecurityProperties;
 import org.bremersee.security.authentication.JsonPathJwtConverter;
 import org.bremersee.security.authentication.PasswordFlowAuthenticationManager;
 import org.bremersee.security.core.AuthorityConstants;
@@ -104,24 +104,19 @@ public class TestConfiguration {
   @Order(52)
   @Configuration
   @Slf4j
-  @EnableConfigurationProperties(AuthenticationProperties.class)
+  @EnableConfigurationProperties(SecurityProperties.class)
   static class Actuator extends WebSecurityConfigurerAdapter {
-
-    private final AuthenticationProperties properties;
 
     private final PasswordFlowAuthenticationManager passwordFlowAuthenticationManager;
 
     /**
      * Instantiates a new actuator security configuration.
      *
-     * @param properties the properties
      * @param passwordFlowAuthenticationManager the password flow authentication manager
      */
     @Autowired
     public Actuator(
-        final AuthenticationProperties properties,
         final ObjectProvider<PasswordFlowAuthenticationManager> passwordFlowAuthenticationManager) {
-      this.properties = properties;
       this.passwordFlowAuthenticationManager = passwordFlowAuthenticationManager.getIfAvailable();
     }
 
@@ -139,9 +134,8 @@ public class TestConfiguration {
           .authorizeRequests()
           .antMatchers(HttpMethod.OPTIONS).permitAll()
           .requestMatchers(EndpointRequest.to(HealthEndpoint.class)).permitAll()
-          // .requestMatchers(EndpointRequest.to(InfoEndpoint.class)).permitAll()
           .anyRequest()
-          .access(properties.getActuator().buildAccessExpression(null))
+          .hasAuthority(AuthorityConstants.ACTUATOR_ROLE_NAME)
           .and()
           .sessionManagement()
           .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
