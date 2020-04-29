@@ -143,6 +143,11 @@ public class ReactiveActuatorSecurityAutoConfiguration {
         .and()
         .formLogin().disable()
         .csrf().disable()
+        .cors(customizer -> {
+          if (actuatorSecurityProperties.isCorsDisabled()) {
+            customizer.disable();
+          }
+        })
         .build();
   }
 

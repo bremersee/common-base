@@ -53,6 +53,11 @@ public class ActuatorSecurityProperties {
   private boolean enableAutoConfiguration = true;
 
   /**
+   * Specifies whether cors should be disabled for the actuator endpoints or not.
+   */
+  private boolean corsDisabled = false;
+
+  /**
    * A list with unauthenticated actuator endpoints.
    */
   private List<Class<?>> unauthenticatedEndpoints = new ArrayList<>();

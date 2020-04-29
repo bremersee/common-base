@@ -120,6 +120,11 @@ public class ActuatorSecurityAutoConfiguration extends WebSecurityConfigurerAdap
         .access(actuatorSecurityProperties.buildAdminAccessExpression())
         .and()
         .csrf().disable()
+        .cors(customizer -> {
+          if (actuatorSecurityProperties.isCorsDisabled()) {
+            customizer.disable();
+          }
+        })
         .authenticationProvider(authenticationProvider())
         .httpBasic()
         .realmName("actuator")
