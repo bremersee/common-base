@@ -16,6 +16,8 @@
 
 package org.bremersee.security.authentication;
 
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
@@ -26,6 +28,8 @@ import reactor.core.publisher.Mono;
  *
  * @author Christian Bremer
  */
+@ToString(doNotUseGetters = true)
+@EqualsAndHashCode(doNotUseGetters = true)
 public class JsonPathReactiveJwtConverter implements Converter<Jwt, Mono<JwtAuthenticationToken>> {
 
   private final JsonPathJwtConverter converter;

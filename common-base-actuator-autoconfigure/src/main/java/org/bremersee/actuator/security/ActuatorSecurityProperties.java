@@ -139,11 +139,11 @@ public class ActuatorSecurityProperties {
   }
 
   /**
-   * Gets unauthenticated endpoints.
+   * Gets unauthenticated endpoints or defaults (these are the healt and info endpoints).
    *
    * @return the unauthenticated endpoints
    */
-  public List<Class<?>> getUnauthenticatedEndpoints() {
+  public List<Class<?>> unauthenticatedEndpointsOrDefaults() {
     if (unauthenticatedEndpoints.isEmpty()) {
       unauthenticatedEndpoints.add(
           org.springframework.boot.actuate.health.HealthEndpoint.class);

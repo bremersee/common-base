@@ -39,8 +39,8 @@
     <module>common-base-webflux-starter</module>
     <module>common-base-webmvc-starter</module>
     <module>common-base-thymeleaf-starter</module>
-    <module>common-base-security-starter</module>
-    <module>common-base-actuator-starter</module>
+    <module>common-base-security-starter</module><!-- Test webflux -->
+    <module>common-base-actuator-starter</module><!-- Test webmvc -->
   </modules>
 
   <properties>

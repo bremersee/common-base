@@ -24,6 +24,7 @@ import org.bremersee.security.authentication.PasswordFlowAuthenticationManager;
 import org.bremersee.security.authentication.RestTemplateAccessTokenRetriever;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.actuate.autoconfigure.security.servlet.EndpointRequest;
+import org.springframework.boot.actuate.info.Info;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
@@ -39,11 +40,13 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.oauth2.jose.jws.SignatureAlgorithm;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtValidators;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.util.matcher.AndRequestMatcher;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestTemplate;
@@ -60,7 +63,8 @@ import org.springframework.web.client.RestTemplate;
     havingValue = "true",
     matchIfMissing = true)
 @ConditionalOnClass({
-    HttpSecurity.class
+    HttpSecurity.class,
+    Info.class
 })
 @EnableConfigurationProperties({
     SecurityProperties.class,
@@ -74,6 +78,10 @@ public class ActuatorSecurityAutoConfiguration extends WebSecurityConfigurerAdap
 
   private ActuatorSecurityProperties actuatorSecurityProperties;
 
+  private ObjectProvider<JwtDecoder> jwtDecoderProvider;
+
+  private ObjectProvider<JsonPathJwtConverter> jsonPathJwtConverterProvider;
+
   private ObjectProvider<RestTemplateAccessTokenRetriever> tokenRetrieverProvider;
 
   /**
@@ -81,15 +89,21 @@ public class ActuatorSecurityAutoConfiguration extends WebSecurityConfigurerAdap
    *
    * @param securityProperties the security properties
    * @param actuatorSecurityProperties the actuator security properties
+   * @param jwtDecoderProvider the jwt decoder provider
+   * @param jsonPathJwtConverterProvider the json path jwt converter provider
    * @param tokenRetrieverProvider the token retriever provider
    */
   public ActuatorSecurityAutoConfiguration(
       SecurityProperties securityProperties,
       ActuatorSecurityProperties actuatorSecurityProperties,
+      ObjectProvider<JwtDecoder> jwtDecoderProvider,
+      ObjectProvider<JsonPathJwtConverter> jsonPathJwtConverterProvider,
       ObjectProvider<RestTemplateAccessTokenRetriever> tokenRetrieverProvider) {
 
     this.securityProperties = securityProperties;
     this.actuatorSecurityProperties = actuatorSecurityProperties;
+    this.jwtDecoderProvider = jwtDecoderProvider;
+    this.jsonPathJwtConverterProvider = jsonPathJwtConverterProvider;
     this.tokenRetrieverProvider = tokenRetrieverProvider;
   }
 
@@ -134,7 +148,7 @@ public class ActuatorSecurityAutoConfiguration extends WebSecurityConfigurerAdap
   }
 
   private EndpointRequest.EndpointRequestMatcher[] unauthenticatedEndpointMatchers() {
-    return actuatorSecurityProperties.getUnauthenticatedEndpoints().stream()
+    return actuatorSecurityProperties.unauthenticatedEndpointsOrDefaults().stream()
         .map(EndpointRequest::to)
         .toArray(EndpointRequest.EndpointRequestMatcher[]::new);
   }
@@ -149,20 +163,37 @@ public class ActuatorSecurityAutoConfiguration extends WebSecurityConfigurerAdap
   @SuppressWarnings("DuplicatedCode")
   private PasswordFlowAuthenticationManager passwordFlowAuthenticationProvider() {
 
-    NimbusJwtDecoder jwtDecoder = NimbusJwtDecoder
-        .withJwkSetUri(actuatorSecurityProperties.getJwkUriSet())
-        .jwsAlgorithm(SignatureAlgorithm.from(actuatorSecurityProperties.getJwsAlgorithm()))
-        .build();
-    if (StringUtils.hasText(actuatorSecurityProperties.getIssuerUri())) {
-      jwtDecoder.setJwtValidator(
-          JwtValidators.createDefaultWithIssuer(actuatorSecurityProperties.getIssuerUri()));
+    JwtDecoder jwtDecoder;
+    if (StringUtils.hasText(actuatorSecurityProperties.getJwkUriSet())) {
+      NimbusJwtDecoder nimbusJwtDecoder = NimbusJwtDecoder
+          .withJwkSetUri(actuatorSecurityProperties.getJwkUriSet())
+          .jwsAlgorithm(SignatureAlgorithm.from(actuatorSecurityProperties.getJwsAlgorithm()))
+          .build();
+      if (StringUtils.hasText(actuatorSecurityProperties.getIssuerUri())) {
+        nimbusJwtDecoder.setJwtValidator(
+            JwtValidators.createDefaultWithIssuer(actuatorSecurityProperties.getIssuerUri()));
+      }
+      jwtDecoder = nimbusJwtDecoder;
+    } else {
+      jwtDecoder = jwtDecoderProvider.getIfAvailable();
+      Assert.notNull(jwtDecoder, "JWT decoder must be present.");
     }
-    JsonPathJwtConverter jwtConverter = new JsonPathJwtConverter();
-    jwtConverter.setNameJsonPath(actuatorSecurityProperties.getNameJsonPath());
-    jwtConverter.setRolePrefix(actuatorSecurityProperties.getRolePrefix());
-    jwtConverter.setRolesJsonPath(actuatorSecurityProperties.getRolesJsonPath());
-    jwtConverter.setRolesValueList(actuatorSecurityProperties.isRolesValueList());
-    jwtConverter.setRolesValueSeparator(actuatorSecurityProperties.getRolesValueSeparator());
+
+    JsonPathJwtConverter internalJwtConverter = new JsonPathJwtConverter();
+    internalJwtConverter.setNameJsonPath(actuatorSecurityProperties.getNameJsonPath());
+    internalJwtConverter.setRolePrefix(actuatorSecurityProperties.getRolePrefix());
+    internalJwtConverter.setRolesJsonPath(actuatorSecurityProperties.getRolesJsonPath());
+    internalJwtConverter.setRolesValueList(actuatorSecurityProperties.isRolesValueList());
+    internalJwtConverter.setRolesValueSeparator(
+        actuatorSecurityProperties.getRolesValueSeparator());
+    JsonPathJwtConverter externalJwtConverter = jsonPathJwtConverterProvider.getIfAvailable();
+    JsonPathJwtConverter jwtConverter;
+    if (internalJwtConverter.equals(externalJwtConverter)) {
+      jwtConverter = externalJwtConverter;
+    } else {
+      jwtConverter = internalJwtConverter;
+    }
+
     return new PasswordFlowAuthenticationManager(
         actuatorSecurityProperties.getPasswordFlow(),
         jwtDecoder,
