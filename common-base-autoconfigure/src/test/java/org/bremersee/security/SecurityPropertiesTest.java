@@ -24,8 +24,16 @@ import org.bremersee.security.SecurityProperties.AuthenticationProperties;
 import org.bremersee.security.SecurityProperties.CorsProperties;
 import org.junit.jupiter.api.Test;
 
+/**
+ * The security properties test.
+ *
+ * @author Christian Bremer
+ */
 class SecurityPropertiesTest {
 
+  /**
+   * Gets cors.
+   */
   @Test
   void getCors() {
     CorsProperties corsProperties = new CorsProperties();
@@ -40,6 +48,9 @@ class SecurityPropertiesTest {
     assertTrue(a.toString().contains(corsProperties.toString()));
   }
 
+  /**
+   * Gets authentication.
+   */
   @Test
   void getAuthentication() {
     AuthenticationProperties authenticationProperties = new AuthenticationProperties();

@@ -17,26 +17,52 @@
 package org.bremersee.security;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import org.bremersee.security.SecurityProperties.AuthenticationProperties;
+import org.bremersee.security.SecurityProperties.AuthenticationProperties.AccessMode;
+import org.bremersee.security.SecurityProperties.AuthenticationProperties.ClientCredentialsFlow;
+import org.bremersee.security.SecurityProperties.AuthenticationProperties.EurekaAccessProperties;
+import org.bremersee.security.SecurityProperties.AuthenticationProperties.PasswordFlow;
+import org.bremersee.security.SecurityProperties.AuthenticationProperties.PathMatcherProperties;
 import org.bremersee.security.SecurityProperties.AuthenticationProperties.SimpleUser;
-import org.bremersee.security.authentication.ClientCredentialsFlowProperties;
-import org.bremersee.security.authentication.PasswordFlowProperties;
-import org.bremersee.security.core.AuthorityConstants;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+/**
+ * The authentication properties test.
+ *
+ * @author Christian Bremer
+ */
 class AuthenticationPropertiesTest {
+
+  /**
+   * Is resource server auto configuration.
+   */
+  @Test
+  void isResourceServerAutoConfiguration() {
+    AuthenticationProperties expected = new AuthenticationProperties();
+    expected.setResourceServerAutoConfiguration(true);
+    assertTrue(expected.isResourceServerAutoConfiguration());
+
+    AuthenticationProperties actual = new AuthenticationProperties();
+    actual.setResourceServerAutoConfiguration(true);
+
+    assertEquals(expected, actual);
+    assertTrue(expected.toString().contains("true"));
+
+    assertNotEquals(expected, null);
+    assertNotEquals(expected, new Object());
+  }
 
   /**
    * Is enable jwt support.
@@ -51,10 +77,38 @@ class AuthenticationPropertiesTest {
     actual.setEnableJwtSupport(true);
 
     assertEquals(expected, actual);
-    assertTrue(expected.toString().contains("true"));
+  }
 
-    assertNotEquals(expected, null);
-    assertNotEquals(expected, new Object());
+  /**
+   * Gets role prefix.
+   */
+  @Test
+  void getRolePrefix() {
+    String value = UUID.randomUUID().toString();
+    AuthenticationProperties expected = new AuthenticationProperties();
+    expected.setRolePrefix(value);
+
+    AuthenticationProperties actual = new AuthenticationProperties();
+    actual.setRolePrefix(value);
+
+    assertEquals(value, actual.getRolePrefix());
+    assertEquals(expected, actual);
+    assertTrue(expected.toString().contains(value));
+  }
+
+  /**
+   * Ensure role prefix.
+   */
+  @Test
+  void ensureRolePrefix() {
+    AuthenticationProperties properties = new AuthenticationProperties();
+    properties.setRolePrefix("FOO_");
+    assertEquals("FOO_BAR", properties.ensureRolePrefix("BAR"));
+    assertEquals("FOO_BAR", properties.ensureRolePrefix("FOO_BAR"));
+
+    properties.setRolePrefix("");
+    assertEquals("BAR", properties.ensureRolePrefix("BAR"));
+    assertEquals("FOO_BAR", properties.ensureRolePrefix("FOO_BAR"));
   }
 
   /**
@@ -106,22 +160,6 @@ class AuthenticationPropertiesTest {
   }
 
   /**
-   * Gets role prefix.
-   */
-  @Test
-  void getRolePrefix() {
-    String value = UUID.randomUUID().toString();
-    AuthenticationProperties expected = new AuthenticationProperties();
-    expected.setRolePrefix(value);
-
-    AuthenticationProperties actual = new AuthenticationProperties();
-    actual.setRolePrefix(value);
-
-    assertEquals(expected, actual);
-    assertTrue(expected.toString().contains(value));
-  }
-
-  /**
    * Gets name json path.
    */
   @Test
@@ -138,103 +176,91 @@ class AuthenticationPropertiesTest {
   }
 
   /**
-   * Gets application.
+   * Gets role definitions.
    */
   @Test
-  void getApplication() {
+  void getRoleDefinitions() {
+    String key = UUID.randomUUID().toString();
+    List<String> value = Collections.singletonList(UUID.randomUUID().toString());
     AuthenticationProperties expected = new AuthenticationProperties();
-    expected.getApplication().setIpAddresses(Arrays.asList("127.0.0.1/32", "::1"));
-    expected.getApplication().setAdminRoles(Arrays.asList("ROLE_ADMIN", "ROLE_SUPERUSER"));
-    expected.getApplication().setUserRoles(Arrays.asList("ROLE_USER", "ROLE_LOCAL_USER"));
-    expected.getApplication().setDefaultAccessExpression("isFullyAuthenticated()");
+    expected.setRoleDefinitions(Collections.singletonMap(key, value));
 
     AuthenticationProperties actual = new AuthenticationProperties();
-    actual.getApplication().setIpAddresses(Arrays.asList("127.0.0.1/32", "::1"));
-    actual.getApplication().setAdminRoles(Arrays.asList("ROLE_ADMIN", "ROLE_SUPERUSER"));
-    actual.getApplication().setUserRoles(Arrays.asList("ROLE_USER", "ROLE_LOCAL_USER"));
-    actual.getApplication().setDefaultAccessExpression("isFullyAuthenticated()");
+    actual.setRoleDefinitions(Collections.singletonMap(key, value));
+    assertEquals(Collections.singletonMap(key, value), actual.getRoleDefinitions());
 
     assertEquals(expected, actual);
-    assertNotEquals(expected, null);
-    assertNotEquals(expected, new Object());
-    assertTrue(expected.toString().contains("ROLE_USER"));
+  }
 
-    assertTrue(expected.getApplication()
-        .adminRolesOrDefaults(null, "ADMIN")
-        .contains("ROLE_SUPERUSER"));
-    assertTrue(expected.getApplication()
-        .userRolesOrDefaults(null, "USER")
-        .contains("ROLE_USER"));
-    assertFalse(expected.getApplication()
-        .adminRolesOrDefaults(null, "ADMIN")
-        .contains("ADMIN"));
-    assertFalse(expected.getApplication()
-        .userRolesOrDefaults(null, "USER")
-        .contains("USER"));
-    assertFalse(expected.getApplication()
-        .adminRolesOrDefaults(expected::ensureRolePrefix, "TEST")
-        .contains("ROLE_TEST"));
-    assertFalse(expected.getApplication()
-        .userRolesOrDefaults(expected::ensureRolePrefix, "TEST")
-        .contains("ROLE_TEST"));
+  /**
+   * Gets ip definitions.
+   */
+  @Test
+  void getIpDefinitions() {
+    String key = UUID.randomUUID().toString();
+    List<String> value = Collections.singletonList(UUID.randomUUID().toString());
+    AuthenticationProperties expected = new AuthenticationProperties();
+    expected.setIpDefinitions(Collections.singletonMap(key, value));
 
-    String expectedExpr
-        = "hasAnyAuthority('ROLE_ADMIN','ROLE_SUPERUSER')"
-        + " or hasIpAddress('127.0.0.1/32')"
-        + " or hasIpAddress('::1')";
-    String expr = actual.getApplication().buildAccessExpression(
-        actual.getApplication().adminRolesOrDefaults(actual::ensureRolePrefix),
-        actual.getApplication().getIpAddresses(),
-        false,
-        null);
-    assertEquals(expectedExpr, expr);
+    AuthenticationProperties actual = new AuthenticationProperties();
+    actual.setIpDefinitions(Collections.singletonMap(key, value));
+    assertEquals(Collections.singletonMap(key, value), actual.getIpDefinitions());
 
-    expectedExpr = "hasAnyAuthority('ROLE_LOCAL_USER','ROLE_USER')";
-    expr = actual.getApplication().buildAccessExpression(
-        actual.getApplication().userRolesOrDefaults(actual::ensureRolePrefix),
-        null,
-        false,
-        null);
-    assertEquals(expectedExpr, expr);
+    assertEquals(expected, actual);
+  }
 
-    expectedExpr = "hasIpAddress('127.0.0.1/32')"
-        + " or hasIpAddress('::1')"
-        + " or isFullyAuthenticated()";
-    expr = actual.getApplication().buildAccessExpression(
-        null,
-        actual.getApplication().getIpAddresses(),
-        false,
-        null);
-    assertEquals(expectedExpr, expr);
+  /**
+   * Gets path matchers.
+   */
+  @Test
+  void getPathMatchers() {
+    List<PathMatcherProperties> value = Collections.singletonList(new PathMatcherProperties());
+    AuthenticationProperties expected = new AuthenticationProperties();
+    expected.setPathMatchers(value);
 
-    expectedExpr = "isFullyAuthenticated()";
-    expr = actual.getApplication().buildAccessExpression(
-        null,
-        null,
-        false,
-        null);
-    assertEquals(expectedExpr, expr);
+    AuthenticationProperties actual = new AuthenticationProperties();
+    actual.setPathMatchers(value);
+    assertEquals(value, actual.getPathMatchers());
 
-    expected.getApplication().setAdminRoles(new ArrayList<>());
-    expected.getApplication().setUserRoles(new ArrayList<>());
-    assertTrue(expected.getApplication()
-        .adminRolesOrDefaults(null, "ADMIN")
-        .contains("ADMIN"));
-    assertTrue(expected.getApplication()
-        .userRolesOrDefaults(null, "USER")
-        .contains("USER"));
-    assertFalse(expected.getApplication()
-        .adminRolesOrDefaults(null, "ADMIN")
-        .contains("ROLE_SUPERUSER"));
-    assertFalse(expected.getApplication()
-        .userRolesOrDefaults(null, "USER")
-        .contains("ROLE_USER"));
-    assertTrue(expected.getApplication()
-        .adminRolesOrDefaults(expected::ensureRolePrefix, "ADMIN")
-        .contains("ROLE_ADMIN"));
-    assertTrue(expected.getApplication()
-        .userRolesOrDefaults(expected::ensureRolePrefix, "USER")
-        .contains("ROLE_USER"));
+    assertEquals(expected, actual);
+  }
+
+  /**
+   * Path matchers.
+   */
+  @Test
+  void pathMatchers() {
+    AuthenticationProperties properties = new AuthenticationProperties();
+    PathMatcherProperties defaults = new PathMatcherProperties();
+    defaults.setAccessMode(properties.getAnyAccessMode());
+    Set<PathMatcherProperties> actual = properties.pathMatchers();
+    assertNotNull(actual);
+    assertEquals(1, actual.size());
+    assertTrue(actual.contains(defaults));
+
+    properties.setPathMatchers(Collections.singletonList(defaults));
+    actual = properties.pathMatchers();
+    assertNotNull(actual);
+    assertEquals(1, actual.size());
+    assertTrue(actual.contains(defaults));
+  }
+
+  /**
+   * Gets any access mode.
+   */
+  @Test
+  void getAnyAccessMode() {
+    AccessMode value = AccessMode.PERMIT_ALL;
+    AuthenticationProperties expected = new AuthenticationProperties();
+    expected.setAnyAccessMode(value);
+
+    AuthenticationProperties actual = new AuthenticationProperties();
+    actual.setAnyAccessMode(value);
+    assertEquals(value, actual.getAnyAccessMode());
+
+    assertEquals(expected, actual);
+
+    assertTrue(actual.toString().contains(value.name()));
   }
 
   /**
@@ -242,38 +268,15 @@ class AuthenticationPropertiesTest {
    */
   @Test
   void getEureka() {
+    EurekaAccessProperties value = new EurekaAccessProperties();
     AuthenticationProperties expected = new AuthenticationProperties();
-    String pass = UUID.randomUUID().toString();
-    expected.getEureka().setUsername("qwertz");
-    expected.getEureka().setPassword(pass);
+    expected.setEureka(value);
+
     AuthenticationProperties actual = new AuthenticationProperties();
-    actual.getEureka().setUsername("qwertz");
-    actual.getEureka().setPassword(pass);
+    actual.setEureka(value);
+
+    assertEquals(value, actual.getEureka());
     assertEquals(expected, actual);
-    assertTrue(expected.toString().contains("qwertz"));
-    assertFalse(expected.toString().contains(pass));
-    assertEquals("qwertz", expected.getEureka().getUsername());
-    assertEquals(pass, expected.getEureka().getPassword());
-    assertEquals(AuthorityConstants.EUREKA_ROLE_NAME, expected.getEureka().getRole());
-    assertEquals(
-        "hasAuthority('" + AuthorityConstants.EUREKA_ROLE_NAME + "')",
-        expected.getEureka().buildAccessExpression(null));
-
-    UserDetails[] userDetails = expected.getEureka().buildBasicAuthUserDetails();
-    assertNotNull(userDetails);
-    assertEquals(1, userDetails.length);
-    UserDetails user = userDetails[0];
-    assertEquals("qwertz", user.getUsername());
-    assertNotNull(user.getPassword());
-    assertTrue(user.getAuthorities().stream()
-        .map(GrantedAuthority::getAuthority)
-        .anyMatch(AuthorityConstants.EUREKA_ROLE_NAME::equals));
-
-    expected.getEureka().setRole("");
-    expected.getEureka().setIpAddresses(Collections.singletonList("127.0.0.1"));
-    assertEquals(
-        "isAuthenticated() or hasIpAddress('127.0.0.1')",
-        expected.getEureka().buildAccessExpression(expected::ensureRolePrefix));
   }
 
   /**
@@ -281,37 +284,15 @@ class AuthenticationPropertiesTest {
    */
   @Test
   void getPasswordFlow() {
+    PasswordFlow value = new PasswordFlow();
     AuthenticationProperties expected = new AuthenticationProperties();
-    expected.getPasswordFlow().setClientId("1234");
-    expected.getPasswordFlow().setClientSecret("5678");
-    expected.getPasswordFlow().setSystemPassword("9012");
-    expected.getPasswordFlow().setSystemUsername("3456");
-    expected.getPasswordFlow().setTokenEndpoint("http://localhost/token");
+    expected.setPasswordFlow(value);
 
     AuthenticationProperties actual = new AuthenticationProperties();
-    actual.getPasswordFlow().setClientId("1234");
-    actual.getPasswordFlow().setClientSecret("5678");
-    actual.getPasswordFlow().setSystemPassword("9012");
-    actual.getPasswordFlow().setSystemUsername("3456");
-    actual.getPasswordFlow().setTokenEndpoint("http://localhost/token");
+    actual.setPasswordFlow(value);
 
+    assertEquals(value, actual.getPasswordFlow());
     assertEquals(expected, actual);
-    assertTrue(expected.toString().contains("1234"));
-    // assertTrue(expected.toString().contains("5678"));
-    // assertTrue(expected.toString().contains("9012"));
-    assertTrue(expected.toString().contains("3456"));
-    assertTrue(expected.toString().contains("http://localhost/token"));
-
-    assertNotEquals(expected.getPasswordFlow(), null);
-    assertNotEquals(expected.getPasswordFlow(), new Object());
-
-    PasswordFlowProperties passwordFlow = expected.getPasswordFlow().toPasswordFlowProperties();
-    assertNotNull(passwordFlow);
-    assertEquals(expected.getPasswordFlow().getClientId(), passwordFlow.getClientId());
-    assertEquals(expected.getPasswordFlow().getClientSecret(), passwordFlow.getClientSecret());
-    assertEquals(expected.getPasswordFlow().getSystemPassword(), passwordFlow.getPassword());
-    assertEquals(expected.getPasswordFlow().getSystemUsername(), passwordFlow.getUsername());
-    assertEquals(expected.getPasswordFlow().getTokenEndpoint(), passwordFlow.getTokenEndpoint());
   }
 
   /**
@@ -319,31 +300,15 @@ class AuthenticationPropertiesTest {
    */
   @Test
   void getClientCredentialFlow() {
+    ClientCredentialsFlow value = new ClientCredentialsFlow();
     AuthenticationProperties expected = new AuthenticationProperties();
-    expected.getClientCredentialsFlow().setClientId("1234");
-    expected.getClientCredentialsFlow().setClientSecret("5678");
-    expected.getClientCredentialsFlow().setTokenEndpoint("http://localhost/token");
+    expected.setClientCredentialsFlow(value);
 
     AuthenticationProperties actual = new AuthenticationProperties();
-    actual.getClientCredentialsFlow().setClientId("1234");
-    actual.getClientCredentialsFlow().setClientSecret("5678");
-    actual.getClientCredentialsFlow().setTokenEndpoint("http://localhost/token");
+    actual.setClientCredentialsFlow(value);
 
+    assertEquals(value, actual.getClientCredentialsFlow());
     assertEquals(expected, actual);
-    assertTrue(expected.toString().contains("1234"));
-    assertTrue(expected.toString().contains("http://localhost/token"));
-
-    assertNotEquals(expected.getClientCredentialsFlow(), null);
-    assertNotEquals(expected.getClientCredentialsFlow(), new Object());
-
-    ClientCredentialsFlowProperties properties = expected.getClientCredentialsFlow()
-        .toClientCredentialsFlowProperties();
-    assertNotNull(properties);
-    assertEquals(expected.getClientCredentialsFlow().getClientId(), properties.getClientId());
-    assertEquals(expected.getClientCredentialsFlow().getClientSecret(),
-        properties.getClientSecret());
-    assertEquals(expected.getClientCredentialsFlow().getTokenEndpoint(),
-        properties.getTokenEndpoint());
   }
 
   /**
@@ -410,6 +375,15 @@ class AuthenticationPropertiesTest {
             .anyMatch(a -> a.equals(authority)));
       }
     }
+  }
+
+  /**
+   * Password encoder.
+   */
+  @Test
+  void passwordEncoder() {
+    AuthenticationProperties properties = new AuthenticationProperties();
+    assertNotNull(properties.passwordEncoder());
   }
 
 }

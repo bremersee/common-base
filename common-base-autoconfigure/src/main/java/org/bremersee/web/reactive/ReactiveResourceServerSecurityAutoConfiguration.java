@@ -16,21 +16,13 @@
 
 package org.bremersee.web.reactive;
 
-import static org.bremersee.security.SecurityProperties.AuthenticationProperties.ApplicationAccessProperties.ALL_HTTP_METHODS;
-
-import java.util.Collection;
-import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
 import org.bremersee.security.SecurityProperties;
 import org.bremersee.security.SecurityProperties.AuthenticationProperties;
-import org.bremersee.security.SecurityProperties.AuthenticationProperties.ApplicationAccessProperties;
-import org.bremersee.security.SecurityProperties.AuthenticationProperties.ApplicationAccessProperties.PathMatcherProperties;
+import org.bremersee.security.SecurityProperties.AuthenticationProperties.PathMatcherProperties;
 import org.bremersee.security.authentication.JsonPathReactiveJwtConverter;
-import org.bremersee.security.authentication.RoleBasedAuthorizationManager;
 import org.bremersee.security.authentication.RoleOrIpBasedAuthorizationManager;
-import org.bremersee.security.core.AuthorityConstants;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.actuate.autoconfigure.security.reactive.EndpointRequest;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
@@ -64,7 +56,7 @@ import org.springframework.util.ClassUtils;
  */
 @ConditionalOnWebApplication(type = Type.REACTIVE)
 @ConditionalOnProperty(
-    prefix = "bremersee.security",
+    prefix = "bremersee.security.authentication",
     name = "resource-server-auto-configuration",
     havingValue = "true")
 @ConditionalOnClass({
@@ -121,15 +113,39 @@ public class ReactiveResourceServerSecurityAutoConfiguration {
     AuthorizeExchangeSpec spec = http
         .securityMatcher(new NegatedServerWebExchangeMatcher(EndpointRequest.toAnyEndpoint()))
         .authorizeExchange();
-    spec = configurePermitAll(spec);
-    spec = configureAdminAccess(spec);
-    spec = configureUserAccess(spec);
+    spec = configurePathMatchers(spec);
     http = configureAuthenticationManager(spec.and());
     http = http.csrf().disable();
-    if (securityProperties.getCors().isDisabled()) {
+    if (!securityProperties.getCors().isEnable()) {
       http = http.cors().disable();
     }
     return http.build();
+  }
+
+  private AuthorizeExchangeSpec configurePathMatchers(AuthorizeExchangeSpec spec) {
+
+    for (PathMatcherProperties props : securityProperties.getAuthentication().pathMatchers()) {
+      log.info("Securing requests to {}", props);
+      switch (props.getAccessMode()) {
+        case DENY_ALL:
+          spec = spec.matchers(matcher(props)).denyAll();
+          break;
+        case PERMIT_ALL:
+          spec = spec.matchers(matcher(props)).permitAll();
+          break;
+        default:
+          spec = spec.matchers(matcher(props)).access(new RoleOrIpBasedAuthorizationManager(
+              props.roles(securityProperties.getAuthentication()::ensureRolePrefix),
+              props.getIpAddresses()));
+      }
+    }
+    return spec;
+  }
+
+  private ServerWebExchangeMatcher matcher(PathMatcherProperties props) {
+    return Optional.ofNullable(props.httpMethod())
+        .map(method -> ServerWebExchangeMatchers.pathMatchers(method, props.getAntPattern()))
+        .orElseGet(() -> ServerWebExchangeMatchers.pathMatchers(props.getAntPattern()));
   }
 
   private ServerHttpSecurity configureAuthenticationManager(ServerHttpSecurity http) {
@@ -150,65 +166,6 @@ public class ReactiveResourceServerSecurityAutoConfiguration {
         .httpBasic()
         .and()
         .formLogin().disable();
-  }
-
-  private AuthorizeExchangeSpec configureUserAccess(AuthorizeExchangeSpec spec) {
-
-    log.info("Configure user access ...");
-    ApplicationAccessProperties props = securityProperties.getAuthentication().getApplication();
-    ServerWebExchangeMatcher[] matchers = matchers(props.getUserMatchers());
-    Set<String> roles = props.userRolesOrDefaults(
-        securityProperties.getAuthentication()::ensureRolePrefix);
-    List<String> ipAddresses = props.getIpAddresses();
-    log.info("Configure user access with roles {} and ip addresses {}.", roles, ipAddresses);
-    RoleOrIpBasedAuthorizationManager manager = new RoleOrIpBasedAuthorizationManager(
-        roles, ipAddresses);
-    if (matchers.length > 0) {
-      return spec.matchers(matchers).access(manager);
-    }
-    return spec.anyExchange().access(manager);
-  }
-
-  private AuthorizeExchangeSpec configureAdminAccess(AuthorizeExchangeSpec spec) {
-
-    log.info("Configure admin access ...");
-    ApplicationAccessProperties props = securityProperties.getAuthentication().getApplication();
-    ServerWebExchangeMatcher[] matchers = matchers(props.getAdminMatchers());
-    if (matchers.length > 0) {
-      Set<String> roles = props.adminRolesOrDefaults(
-          securityProperties.getAuthentication()::ensureRolePrefix,
-          AuthorityConstants.ADMIN_ROLE_NAME);
-      log.info("Configure admin access with roles {}.", roles);
-      return spec.matchers(matchers).access(new RoleBasedAuthorizationManager(roles, false));
-    } else {
-      log.info("Configure admin access: Nothing to do because there are no path matchers.");
-      return spec;
-    }
-  }
-
-  private AuthorizeExchangeSpec configurePermitAll(AuthorizeExchangeSpec spec) {
-
-    log.info("Configure permit all ...");
-    ApplicationAccessProperties props = securityProperties.getAuthentication().getApplication();
-    return Optional.of(matchers(props.getPermitAllMatchers()))
-        .filter(matchers -> matchers.length > 0)
-        .map(matchers -> spec.matchers(matchers).permitAll())
-        .orElse(spec);
-  }
-
-  private ServerWebExchangeMatcher[] matchers(
-      Collection<? extends PathMatcherProperties> properties) {
-
-    return Optional.ofNullable(properties)
-        .map(col -> col.stream()
-            .sorted()
-            .peek(props -> log.info("Using request matcher {}.", props))
-            .map(props -> ALL_HTTP_METHODS.equals(props.getHttpMethod())
-                ? ServerWebExchangeMatchers.pathMatchers(props.getAntPattern())
-                : ServerWebExchangeMatchers
-                    .pathMatchers(props.httpMethod(), props.getAntPattern()))
-            .toArray(ServerWebExchangeMatcher[]::new))
-        .orElseGet(() -> new ServerWebExchangeMatcher[0]);
   }
 
   private ReactiveAuthenticationManager inMemoryAuthenticationManager() {

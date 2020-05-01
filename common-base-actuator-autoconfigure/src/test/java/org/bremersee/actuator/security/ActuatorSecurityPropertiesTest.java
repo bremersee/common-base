@@ -139,10 +139,14 @@ class ActuatorSecurityPropertiesTest {
    */
   @Test
   void ensureRolePrefix() {
-    ActuatorSecurityProperties actual = new ActuatorSecurityProperties();
-    actual.setRolePrefix("FOO_");
-    assertEquals("FOO_BAR", actual.ensureRolePrefix("BAR"));
-    assertEquals("FOO_BAR", actual.ensureRolePrefix("FOO_BAR"));
+    ActuatorSecurityProperties properties = new ActuatorSecurityProperties();
+    properties.setRolePrefix("FOO_");
+    assertEquals("FOO_BAR", properties.ensureRolePrefix("BAR"));
+    assertEquals("FOO_BAR", properties.ensureRolePrefix("FOO_BAR"));
+
+    properties.setRolePrefix("");
+    assertEquals("BAR", properties.ensureRolePrefix("BAR"));
+    assertEquals("FOO_BAR", properties.ensureRolePrefix("FOO_BAR"));
   }
 
   /**
@@ -160,11 +164,12 @@ class ActuatorSecurityPropertiesTest {
    * Is cors disabled.
    */
   @Test
-  void isCorsDisabled() {
+  void isCorsEnabled() {
     ActuatorSecurityProperties actual = new ActuatorSecurityProperties();
-    assertFalse(actual.isCorsDisabled());
-    actual.setCorsDisabled(true);
-    assertTrue(actual.isCorsDisabled());
+    actual.setEnableCors(true);
+    assertTrue(actual.isEnableCors());
+    actual.setEnableCors(false);
+    assertFalse(actual.isEnableCors());
   }
 
   /**

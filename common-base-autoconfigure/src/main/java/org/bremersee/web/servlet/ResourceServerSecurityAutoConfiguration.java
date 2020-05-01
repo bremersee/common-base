@@ -16,17 +16,10 @@
 
 package org.bremersee.web.servlet;
 
-import static org.bremersee.security.SecurityProperties.AuthenticationProperties.ApplicationAccessProperties.ALL_HTTP_METHODS;
-
-import java.util.Collection;
-import java.util.Optional;
-import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
 import org.bremersee.security.SecurityProperties;
-import org.bremersee.security.SecurityProperties.AuthenticationProperties.ApplicationAccessProperties;
-import org.bremersee.security.SecurityProperties.AuthenticationProperties.ApplicationAccessProperties.PathMatcherProperties;
+import org.bremersee.security.SecurityProperties.AuthenticationProperties.PathMatcherProperties;
 import org.bremersee.security.authentication.JsonPathJwtConverter;
-import org.bremersee.security.core.AuthorityConstants;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.actuate.autoconfigure.security.servlet.EndpointRequest;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
@@ -39,6 +32,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.event.EventListener;
 import org.springframework.core.annotation.Order;
 import org.springframework.core.env.Environment;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -46,9 +40,7 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.annotation.web.configurers.ExpressionUrlAuthorizationConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.security.web.util.matcher.NegatedRequestMatcher;
-import org.springframework.security.web.util.matcher.RequestMatcher;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 
@@ -59,7 +51,7 @@ import org.springframework.util.ClassUtils;
  */
 @ConditionalOnWebApplication(type = Type.SERVLET)
 @ConditionalOnProperty(
-    prefix = "bremersee.security",
+    prefix = "bremersee.security.authentication",
     name = "resource-server-auto-configuration",
     havingValue = "true")
 @ConditionalOnClass({
@@ -112,14 +104,32 @@ public class ResourceServerSecurityAutoConfiguration extends WebSecurityConfigur
     ExpressionUrlAuthorizationConfigurer<HttpSecurity>.ExpressionInterceptUrlRegistry reg = http
         .requestMatcher(new NegatedRequestMatcher(EndpointRequest.toAnyEndpoint()))
         .authorizeRequests();
-    reg = configurePermitAll(reg);
-    reg = configureAdminAccess(reg);
-    reg = configureUserAccess(reg);
+    reg = configurePathMatchers(reg);
     http = configureAuthenticationProvider(reg.and());
     http = http.csrf().disable();
-    if (securityProperties.getCors().isDisabled()) {
+    if (!securityProperties.getCors().isEnable()) {
       http.cors().disable();
     }
+  }
+
+  private ExpressionUrlAuthorizationConfigurer<HttpSecurity>.ExpressionInterceptUrlRegistry
+  configurePathMatchers(
+      ExpressionUrlAuthorizationConfigurer<HttpSecurity>.ExpressionInterceptUrlRegistry reg) {
+
+    for (PathMatcherProperties props : securityProperties.getAuthentication().pathMatchers()) {
+      log.info("Securing requests to {}", props);
+      HttpMethod httpMethod = props.httpMethod();
+      if (httpMethod == null) {
+        reg = reg.antMatchers(props.getAntPattern())
+            .access(props.accessExpression(
+                securityProperties.getAuthentication()::ensureRolePrefix));
+      } else {
+        reg = reg.antMatchers(httpMethod, props.getAntPattern())
+            .access(props.accessExpression(
+                securityProperties.getAuthentication()::ensureRolePrefix));
+      }
+    }
+    return reg;
   }
 
   private HttpSecurity configureAuthenticationProvider(HttpSecurity http) throws Exception {
@@ -143,78 +153,6 @@ public class ResourceServerSecurityAutoConfiguration extends WebSecurityConfigur
         .and()
         .formLogin().disable()
         .sessionManagement((sm) -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
-  }
-
-  private ExpressionUrlAuthorizationConfigurer<HttpSecurity>.ExpressionInterceptUrlRegistry
-  configureUserAccess(
-      ExpressionUrlAuthorizationConfigurer<HttpSecurity>.ExpressionInterceptUrlRegistry reg) {
-
-    log.info("Configure user access ...");
-    ApplicationAccessProperties props = securityProperties.getAuthentication().getApplication();
-    RequestMatcher[] matchers = matchers(props.getUserMatchers());
-    Set<String> roles = props.userRolesOrDefaults(
-        securityProperties.getAuthentication()::ensureRolePrefix);
-    String accessExpr = props.buildAccessExpression(
-        roles,
-        null,
-        false,
-        null);
-    log.info("Configure user access with expression {}.", accessExpr);
-    if (matchers.length > 0) {
-      return reg.requestMatchers(matchers).access(accessExpr)
-          .anyRequest().denyAll();
-    }
-    return reg.anyRequest().access(accessExpr);
-  }
-
-  private ExpressionUrlAuthorizationConfigurer<HttpSecurity>.ExpressionInterceptUrlRegistry
-  configureAdminAccess(
-      ExpressionUrlAuthorizationConfigurer<HttpSecurity>.ExpressionInterceptUrlRegistry reg) {
-
-    log.info("Configure admin access ...");
-    ApplicationAccessProperties props = securityProperties.getAuthentication().getApplication();
-    RequestMatcher[] matchers = matchers(props.getAdminMatchers());
-    if (matchers.length > 0) {
-      Set<String> roles = props.adminRolesOrDefaults(
-          securityProperties.getAuthentication()::ensureRolePrefix,
-          AuthorityConstants.ADMIN_ROLE_NAME);
-      String accessExpr = props.buildAccessExpression(
-          roles,
-          null,
-          false,
-          null);
-      log.info("Configure admin access with expression {}.", accessExpr);
-      return reg.requestMatchers(matchers).access(accessExpr);
-    } else {
-      log.info("Configure admin access: Nothing to do because there are no path matchers.");
-      return reg;
-    }
-  }
-
-  private ExpressionUrlAuthorizationConfigurer<HttpSecurity>.ExpressionInterceptUrlRegistry
-  configurePermitAll(
-      ExpressionUrlAuthorizationConfigurer<HttpSecurity>.ExpressionInterceptUrlRegistry reg) {
-
-    log.info("Configure permit all ...");
-    ApplicationAccessProperties props = securityProperties.getAuthentication().getApplication();
-    return Optional.of(matchers(props.getPermitAllMatchers()))
-        .filter(matchers -> matchers.length > 0)
-        .map(matchers -> reg.requestMatchers(matchers).permitAll())
-        .orElse(reg);
-  }
-
-  private RequestMatcher[] matchers(
-      Collection<? extends PathMatcherProperties> properties) {
-
-    return Optional.ofNullable(properties)
-        .map(col -> col.stream()
-            .sorted()
-            .peek(props -> log.info("Using request matcher {}.", props))
-            .map(props -> ALL_HTTP_METHODS.equals(props.getHttpMethod())
-                ? new AntPathRequestMatcher(props.getAntPattern())
-                : new AntPathRequestMatcher(props.getAntPattern(), props.getHttpMethod()))
-            .toArray(RequestMatcher[]::new))
-        .orElseGet(() -> new RequestMatcher[0]);
   }
 
   private AuthenticationProvider inMemoryAuthenticationProvider() {

@@ -16,8 +16,6 @@
 
 package org.bremersee.actuator.security;
 
-import static org.bremersee.security.SecurityProperties.AuthenticationProperties.hasAuthorityOrIpAddressExpr;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -27,6 +25,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+import org.bremersee.security.AccessExpressionUtils;
 import org.bremersee.security.authentication.PasswordFlowProperties;
 import org.bremersee.security.authentication.PasswordFlowPropertiesProvider;
 import org.bremersee.security.core.AuthorityConstants;
@@ -53,9 +52,9 @@ public class ActuatorSecurityProperties {
   private boolean enableAutoConfiguration = true;
 
   /**
-   * Specifies whether cors should be disabled for the actuator endpoints or not.
+   * Specifies whether cors should be enabled for the actuator endpoints or not.
    */
-  private boolean corsDisabled = false;
+  private boolean enableCors = true;
 
   /**
    * A list with unauthenticated actuator endpoints.
@@ -192,7 +191,8 @@ public class ActuatorSecurityProperties {
    * @return the access expression (SpEL) for actuator endpoints
    */
   public String buildAccessExpression() {
-    return hasAuthorityOrIpAddressExpr(rolesOrDefaults(), ipAddresses, null);
+    return AccessExpressionUtils.hasAuthorityOrIpAddressExpr(
+        rolesOrDefaults(), null, ipAddresses);
   }
 
   /**
@@ -201,7 +201,7 @@ public class ActuatorSecurityProperties {
    * @return the access expression (SpEL) for admin actuator endpoints
    */
   public String buildAdminAccessExpression() {
-    return hasAuthorityOrIpAddressExpr(adminRolesOrDefaults(), null, null);
+    return AccessExpressionUtils.hasAuthorityOrIpAddressExpr(adminRolesOrDefaults(), null, null);
   }
 
   /**

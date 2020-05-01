@@ -75,7 +75,7 @@ public class CorsAutoConfiguration implements WebFluxConfigurer {
   @SuppressWarnings("DuplicatedCode")
   @Override
   public void addCorsMappings(CorsRegistry corsRegistry) {
-    if (properties.getCors().isDisabled()) {
+    if (!properties.getCors().isEnable()) {
       return;
     }
     for (CorsConfiguration config : properties.getCors().getConfigs()) {

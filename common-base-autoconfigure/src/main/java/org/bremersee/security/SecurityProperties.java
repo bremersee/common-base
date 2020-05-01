@@ -20,12 +20,13 @@ import java.io.Serializable;
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
-import java.util.LinkedHashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.StringTokenizer;
 import java.util.TreeSet;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -79,20 +80,18 @@ public class SecurityProperties {
    */
   @Getter
   @Setter
-  @ToString
+  @ToString(exclude = {"roleDefinitions", "ipDefinitions"})
   @EqualsAndHashCode
   public static class AuthenticationProperties {
 
-    private static final String IS_AUTHENTICATED = "isAuthenticated()";
-
-    private static final String HAS_AUTHORITY_TEMPLATE = "hasAuthority('%s')";
-
-    private static final String HAS_ANY_AUTHORITY_TEMPLATE = "hasAnyAuthority(%s)";
-
-    private static final String HAS_IP_ADDRESS_TEMPLATE = "hasIpAddress('%s')";
-
     private static final PasswordEncoder passwordEncoder = PasswordEncoderFactories
         .createDelegatingPasswordEncoder();
+
+    /**
+     * Specifies whether the security of a resource server should be done automatically or not.
+     * Default is {@code false}.
+     */
+    private boolean resourceServerAutoConfiguration = false;
 
     /**
      * Specifies whether JWT beans should be created or not. Default is {@code false}.
@@ -102,7 +101,10 @@ public class SecurityProperties {
      */
     private boolean enableJwtSupport = false;
 
-    private boolean resourceServerAutoConfiguration = false;
+    /**
+     * The role prefix to add.
+     */
+    private String rolePrefix = "ROLE_";
 
     /**
      * The json path in the JWT to the roles.
@@ -120,19 +122,17 @@ public class SecurityProperties {
     private String rolesValueSeparator = " ";
 
     /**
-     * The role prefix to add.
-     */
-    private String rolePrefix = "ROLE_";
-
-    /**
      * The json path in the JWT to the user name.
      */
     private String nameJsonPath = "$.preferred_username";
 
-    /**
-     * Properties for accessing the application.
-     */
-    private ApplicationAccessProperties application = new ApplicationAccessProperties();
+    private Map<String, List<String>> roleDefinitions = new LinkedHashMap<>();
+
+    private Map<String, List<String>> ipDefinitions = new LinkedHashMap<>();
+
+    private List<PathMatcherProperties> pathMatchers = new ArrayList<>();
+
+    private AccessMode anyAccessMode = AccessMode.AUTHENTICATED;
 
     /**
      * Properties for eureka endpoints.
@@ -147,12 +147,33 @@ public class SecurityProperties {
     /**
      * The properties for the client credentials flow.
      */
-    private ClientCredentialFlow clientCredentialsFlow = new ClientCredentialFlow();
+    private ClientCredentialsFlow clientCredentialsFlow = new ClientCredentialsFlow();
 
     /**
      * A list of in-memory users, that can login with basic authentication for testing purposes.
      */
     private List<SimpleUser> basicAuthUsers = new ArrayList<>();
+
+    /**
+     * Path matchers set.
+     *
+     * @return the set
+     */
+    public Set<PathMatcherProperties> pathMatchers() {
+      boolean containsAny = false;
+      TreeSet<PathMatcherProperties> pathMatcherSet = new TreeSet<>();
+      for (PathMatcherProperties props : pathMatchers) {
+        pathMatcherSet.add(props);
+        containsAny = containsAny || (PathMatcherProperties.ANY_PATH.equals(props.getAntPattern())
+            && PathMatcherProperties.ALL_HTTP_METHODS.equals(props.getHttpMethod()));
+      }
+      if (!containsAny) {
+        PathMatcherProperties any = new PathMatcherProperties();
+        any.setAccessMode(anyAccessMode);
+        pathMatcherSet.add(any);
+      }
+      return pathMatcherSet;
+    }
 
     /**
      * Gets role prefix.
@@ -201,270 +222,171 @@ public class SecurityProperties {
     }
 
     /**
-     * Builds the {@code hasAuthority} expression.
-     *
-     * @param role the role
-     * @param ensurePrefixFunction the ensure prefix function
-     * @return the {@code hasAuthority} expression
+     * The access mode.
      */
-    public static String hasAuthorityExpr(
-        String role,
-        Function<String, String> ensurePrefixFunction) {
+    public enum AccessMode {
 
-      return String.format(
-          HAS_AUTHORITY_TEMPLATE,
-          Optional.ofNullable(ensurePrefixFunction)
-              .map(f -> f.apply(role))
-              .orElse(role));
-    }
+      /**
+       * Permit all access mode.
+       */
+      PERMIT_ALL(AccessExpressionUtils.PERMIT_ALL),
 
-    /**
-     * Builds the {@code hasAnyAuthority} expression.
-     *
-     * @param roles the roles
-     * @param ensurePrefixFunction the ensure prefix function
-     * @return the {@code hasAnyAuthority} expression
-     */
-    public static String hasAnyAuthorityExpr(
-        Collection<String> roles,
-        Function<String, String> ensurePrefixFunction) {
+      /**
+       * Authenticated access mode.
+       */
+      AUTHENTICATED(AccessExpressionUtils.IS_AUTHENTICATED),
 
-      return Optional.ofNullable(roles)
-          .filter(list -> !list.isEmpty())
-          .map(list -> list.stream()
-              .map(role -> Optional.ofNullable(ensurePrefixFunction)
-                  .map(f -> f.apply(role))
-                  .orElse(role))
-              .map(role -> "'" + role + "'")
-              .collect(Collectors.joining(",")))
-          .map(value -> String.format(HAS_ANY_AUTHORITY_TEMPLATE, value))
-          .orElse("");
-    }
+      /**
+       * Deny all access mode.
+       */
+      DENY_ALL(AccessExpressionUtils.DENY_ALL);
 
-    /**
-     * Builds the {@code hasIpAddress} expression.
-     *
-     * @param ip the ip
-     * @return the {@code hasIpAddress} expression
-     */
-    public static String hasIpAddressExpr(String ip) {
-      Assert.hasText(ip, "IP address must be present.");
-      return String.format(HAS_IP_ADDRESS_TEMPLATE, ip);
-    }
+      @Getter
+      private String expressionValue;
 
-    /**
-     * Builds the {@code hasIpAddress} expression.
-     *
-     * @param ips the ips
-     * @return the {@code hasIpAddress} expression
-     */
-    public static String hasIpAddressExpr(Collection<String> ips) {
-      return Optional.ofNullable(ips)
-          .map(list -> list.stream()
-              .map(AuthenticationProperties::hasIpAddressExpr)
-              .collect(Collectors.joining(" or ")))
-          .orElse("");
-    }
-
-    /**
-     * Builds an access expression from the given roles and ip addresses.
-     *
-     * @param roles the roles
-     * @param ips the ips
-     * @param ensurePrefixFunction the ensure prefix function
-     * @return the access expression
-     */
-    public static String hasAuthorityOrIpAddressExpr(
-        Collection<String> roles,
-        Collection<String> ips,
-        Function<String, String> ensurePrefixFunction) {
-
-      TreeSet<String> roleSet = roles instanceof TreeSet
-          ? (TreeSet<String>) roles
-          : roles == null ? new TreeSet<>() : new TreeSet<>(roles);
-      StringBuilder sb = new StringBuilder();
-      if (roleSet.size() > 1) {
-        sb.append(hasAnyAuthorityExpr(roleSet, ensurePrefixFunction));
-      } else if (roleSet.size() == 1) {
-        sb.append(hasAuthorityExpr(roleSet.first(), ensurePrefixFunction));
+      AccessMode(String expressionValue) {
+        this.expressionValue = expressionValue;
       }
-      Set<String> ipSet = ips instanceof Set
-          ? (Set<String>) ips
-          : ips == null ? Collections.emptySet() : new LinkedHashSet<>(ips);
-      if (!ipSet.isEmpty()) {
-        if (sb.length() > 0) {
-          sb.append(" or ");
-        }
-        sb.append(hasIpAddressExpr(ipSet));
-      }
-      return sb.toString();
     }
 
     /**
-     * The application access properties.
+     * The type Path matcher properties.
      */
-    @Getter
     @Setter
-    @ToString
-    @EqualsAndHashCode
+    @EqualsAndHashCode(exclude = {"accessMode", "roles", "ipAddresses"})
     @NoArgsConstructor
-    public static class ApplicationAccessProperties {
+    public static class PathMatcherProperties implements Comparable<PathMatcherProperties> {
 
+      /**
+       * The constant ALL_HTTP_METHODS.
+       */
       public static final String ALL_HTTP_METHODS = "*";
 
-      private String defaultAccessExpression = IS_AUTHENTICATED;
+      /**
+       * The constant ANY_PATH.
+       */
+      public static final String ANY_PATH = "/**";
 
+      private String httpMethod = ALL_HTTP_METHODS;
+
+      private String antPattern = ANY_PATH;
+
+      @Getter
+      private AccessMode accessMode = AccessMode.AUTHENTICATED;
+
+      @Getter
+      private List<String> roles = new ArrayList<>();
+
+      @Getter
       private List<String> ipAddresses = new ArrayList<>();
 
-      private List<String> userRoles = new ArrayList<>();
-
-      private List<String> adminRoles = new ArrayList<>();
-
-      private List<PathMatcherProperties> permitAllMatchers = new ArrayList<>();
-
-      private List<PathMatcherProperties> adminMatchers = new ArrayList<>();
-
-      private List<PathMatcherProperties> userMatchers = new ArrayList<>();
-
       /**
-       * Gets default access expression.
+       * Gets http method.
        *
-       * @return the default access expression
+       * @return the http method
        */
-      public String getDefaultAccessExpression() {
-        return StringUtils.hasText(defaultAccessExpression)
-            ? defaultAccessExpression
-            : IS_AUTHENTICATED;
-      }
-
-      private Set<String> rolesOrDefaults(
-          Collection<String> roleNames,
-          Function<String, String> ensureRolePrefixFunction,
-          String... defaultRoles) {
-
-        TreeSet<String> roles = new TreeSet<>(roleNames);
-        if (roles.isEmpty() && defaultRoles != null) {
-          roles.addAll(Arrays.asList(defaultRoles));
+      public String getHttpMethod() {
+        if (StringUtils.hasText(httpMethod)
+            && HttpMethod.resolve(httpMethod.toUpperCase()) != null) {
+          return httpMethod.toUpperCase();
         }
-        if (ensureRolePrefixFunction != null) {
-          return roles.stream()
-              .map(ensureRolePrefixFunction)
-              .collect(Collectors.toSet());
-        }
-        return roles;
+        return ALL_HTTP_METHODS;
       }
 
       /**
-       * User roles or defaults.
+       * Gets ant pattern.
+       *
+       * @return the ant pattern
+       */
+      public String getAntPattern() {
+        return StringUtils.hasText(antPattern) ? antPattern : ANY_PATH;
+      }
+
+      /**
+       * Http method http method.
+       *
+       * @return the http method
+       */
+      public HttpMethod httpMethod() {
+        return HttpMethod.resolve(getHttpMethod());
+      }
+
+      private int countPathSegments() {
+        return new StringTokenizer(getAntPattern(), "/").countTokens();
+      }
+
+      /**
+       * Access expression string.
        *
        * @param ensureRolePrefixFunction the ensure role prefix function
-       * @param defaultRoles the default roles
-       * @return the user roles
+       * @return the string
        */
-      public Set<String> userRolesOrDefaults(
-          Function<String, String> ensureRolePrefixFunction,
-          String... defaultRoles) {
-        return rolesOrDefaults(userRoles, ensureRolePrefixFunction, defaultRoles);
+      public String accessExpression(Function<String, String> ensureRolePrefixFunction) {
+        return AccessExpressionUtils.buildAccessExpression(this, ensureRolePrefixFunction);
       }
 
       /**
-       * Admin roles or defaults list.
+       * Roles set.
        *
        * @param ensureRolePrefixFunction the ensure role prefix function
-       * @param defaultRoles the default roles
-       * @return the list
+       * @return the set
        */
-      public Set<String> adminRolesOrDefaults(
-          Function<String, String> ensureRolePrefixFunction,
-          String... defaultRoles) {
-        return rolesOrDefaults(adminRoles, ensureRolePrefixFunction, defaultRoles);
+      public Set<String> roles(Function<String, String> ensureRolePrefixFunction) {
+        return roles.stream()
+            .filter(StringUtils::hasText)
+            .map(role -> ensureRolePrefixFunction != null
+                ? ensureRolePrefixFunction.apply(role)
+                : role)
+            .collect(Collectors.toSet());
       }
 
-      /**
-       * Builds access expression.
-       *
-       * @param roles the roles
-       * @param ipAddresses the ip addresses
-       * @param addDefaultExpressionAlways specifies whether the default expression should be
-       *     added always
-       * @param defaultExpressionConcatenation the concatenation value, default is {@code 'or'}
-       * @return the access expression
-       */
-      public String buildAccessExpression(
-          Collection<String> roles,
-          Collection<String> ipAddresses,
-          boolean addDefaultExpressionAlways,
-          String defaultExpressionConcatenation) {
+      @Override
+      public int compareTo(PathMatcherProperties o) {
 
-        StringBuilder sb = new StringBuilder();
-        sb.append(hasAuthorityOrIpAddressExpr(roles, ipAddresses, null));
-        if (roles == null || roles.isEmpty() || addDefaultExpressionAlways) {
-          if (sb.length() > 0) {
-            String concatenation = StringUtils.hasText(defaultExpressionConcatenation)
-                ? defaultExpressionConcatenation
-                : "or";
-            if (!concatenation.startsWith(" ")) {
-              sb.append(" ");
-            }
-            sb.append(concatenation);
-            if (!concatenation.endsWith(" ")) {
-              sb.append(" ");
-            }
-          }
-          sb.append(defaultAccessExpression);
-        }
-        return sb.toString();
-      }
-
-      @Setter
-      @EqualsAndHashCode
-      @NoArgsConstructor
-      public static class PathMatcherProperties implements Comparable<PathMatcherProperties> {
-
-        private String httpMethod = ALL_HTTP_METHODS;
-
-        private String antPattern = "/**";
-
-        public String getHttpMethod() {
-          if (StringUtils.hasText(httpMethod)
-              && HttpMethod.resolve(httpMethod.toUpperCase()) != null) {
-            return httpMethod.toUpperCase();
-          }
-          return ALL_HTTP_METHODS;
+        // 1.: compare the size of the path segments
+        int c1 = countPathSegments();
+        int c2 = o.countPathSegments();
+        int result = Integer.compare(c2, c1);
+        if (result != 0) {
+          return result;
         }
 
-        public String getAntPattern() {
-          return StringUtils.hasText(antPattern) ? antPattern : "/**";
-        }
-
-        public HttpMethod httpMethod() {
-          return HttpMethod.resolve(getHttpMethod());
-        }
-
-        @Override
-        public int compareTo(PathMatcherProperties o) {
-          String o1 = getHttpMethod();
-          String o2 = o.getHttpMethod();
-          int result = o1.compareTo(o2);
-          if (result == 0) {
-            return getAntPattern().compareToIgnoreCase(o.getAntPattern());
-          }
-          if (o1.equals(ALL_HTTP_METHODS)) {
+        // 2.: compare the ant path
+        result = getAntPattern().compareToIgnoreCase(o.getAntPattern());
+        if (result != 0) {
+          if (ANY_PATH.equals(getAntPattern())) {
             return 1;
           }
-          if (o2.equals(ALL_HTTP_METHODS)) {
+          if (ANY_PATH.equals(o.getAntPattern())) {
             return -1;
           }
           return result;
         }
 
-        @Override
-        public String toString() {
-          if (ALL_HTTP_METHODS.equals(getHttpMethod())) {
-            return getAntPattern();
+        // 3. compare the http method
+        String m1 = getHttpMethod();
+        String m2 = o.getHttpMethod();
+        result = m1.compareTo(m2);
+        if (result != 0) {
+          if (m1.equals(ALL_HTTP_METHODS)) {
+            return 1;
           }
-          return getHttpMethod() + ": " + getAntPattern();
+          if (m2.equals(ALL_HTTP_METHODS)) {
+            return -1;
+          }
         }
+        return result;
+      }
+
+      @Override
+      public String toString() {
+        final String path;
+        if (ALL_HTTP_METHODS.equals(getHttpMethod())) {
+          path = getAntPattern();
+        } else {
+          path = getHttpMethod() + ": " + getAntPattern();
+        }
+        return path + " with access = " + accessExpression(null);
       }
     }
 
@@ -508,16 +430,7 @@ public class SecurityProperties {
        * @return the access expression
        */
       public String buildAccessExpression(Function<String, String> ensureRolePrefixFunction) {
-        if (StringUtils.hasText(role)) {
-          return hasAuthorityOrIpAddressExpr(
-              Collections.singleton(role),
-              ipAddresses,
-              ensureRolePrefixFunction);
-        }
-        String ipsExpr = hasIpAddressExpr(ipAddresses);
-        return StringUtils.hasText(ipsExpr)
-            ? IS_AUTHENTICATED + " or " + ipsExpr
-            : IS_AUTHENTICATED;
+        return AccessExpressionUtils.buildAccessExpression(this, ensureRolePrefixFunction);
       }
 
       /**
@@ -559,7 +472,7 @@ public class SecurityProperties {
     @Setter
     @ToString(exclude = {"clientSecret"})
     @EqualsAndHashCode(exclude = {"clientSecret"})
-    public static class ClientCredentialFlow implements ClientCredentialsFlowPropertiesProvider {
+    public static class ClientCredentialsFlow implements ClientCredentialsFlowPropertiesProvider {
 
       private String tokenEndpoint;
 
@@ -680,7 +593,7 @@ public class SecurityProperties {
   public static class CorsProperties {
 
     @Getter
-    private boolean disabled;
+    private boolean enable = true;
 
     @Getter
     private boolean allowAll = true;
@@ -705,7 +618,7 @@ public class SecurityProperties {
       if (configs == null) {
         configs = new ArrayList<>();
       }
-      if (!disabled && allowAll && configs.isEmpty()) {
+      if (enable && allowAll && configs.isEmpty()) {
         return allowAllConfiguration();
       }
       return configs.stream()

@@ -59,7 +59,16 @@ import org.springframework.test.web.reactive.server.WebTestClient;
         "bremersee.messages.fallback-to-system-locale=false",
         "bremersee.messages.default-locale=en",
         "spring.application.name=common-base-security-test",
-        "bremersee.exception-mapping.api-paths=/api/**"
+        "bremersee.exception-mapping.api-paths=/api/**",
+        "bremersee.security.authentication.resource-server-auto-configuration=true",
+        "bremersee.security.authentication.enable-jwt-support=true",
+        "bremersee.security.authentication.path-matchers[0].ant-pattern=/public/**",
+        "bremersee.security.authentication.path-matchers[0].access-mode=permit_all",
+        "bremersee.security.authentication.basic-auth-users[0].name=actuator",
+        "bremersee.security.authentication.basic-auth-users[0].password=actuator",
+        "bremersee.security.authentication.basic-auth-users[0].authorities[0]=ROLE_ACTUATOR",
+        "spring.security.oauth2.resourceserver.jwt.jwk-set-uri=http://localhost:9876/auth",
+        "management.endpoints.web.exposure.include=*"
     })
 @Slf4j
 public class AutoConfigureTest {
@@ -193,7 +202,7 @@ public class AutoConfigureTest {
     JavaLocale expected = JavaLocale.fromLocale(Locale.CANADA_FRENCH);
     webClient
         .get()
-        .uri("/java-locale/{locale}", expected)
+        .uri("/public/java-locale/{locale}", expected)
         .exchange()
         .expectBody(String.class)
         .value(actual -> assertEquals(expected.toString(), actual));
@@ -207,7 +216,7 @@ public class AutoConfigureTest {
     Locale expected = Locale.CANADA_FRENCH;
     webClient
         .get()
-        .uri("/locale/{locale}", expected)
+        .uri("/public/locale/{locale}", expected)
         .exchange()
         .expectBody(String.class)
         .value(actual -> assertEquals(expected.toString(), actual));
@@ -221,7 +230,7 @@ public class AutoConfigureTest {
     MongoSearchLanguage expected = MongoSearchLanguage.DE;
     webClient
         .get()
-        .uri("/mongo/{value}", expected)
+        .uri("/public/mongo/{value}", expected)
         .exchange()
         .expectBody(String.class)
         .value(actual -> assertEquals(expected.toString(), actual));
@@ -235,7 +244,7 @@ public class AutoConfigureTest {
     ThreeLetterCountryCode expected = ThreeLetterCountryCode.BRA;
     webClient
         .get()
-        .uri("/3country/{value}", expected)
+        .uri("/public/3country/{value}", expected)
         .exchange()
         .expectBody(String.class)
         .value(actual -> assertEquals(expected.toString(), actual));
@@ -249,7 +258,7 @@ public class AutoConfigureTest {
     ThreeLetterLanguageCode expected = ThreeLetterLanguageCode.BEL;
     webClient
         .get()
-        .uri("/3language/{value}", expected)
+        .uri("/public/3language/{value}", expected)
         .exchange()
         .expectBody(String.class)
         .value(actual -> assertEquals(expected.toString(), actual));
@@ -263,7 +272,7 @@ public class AutoConfigureTest {
     TwoLetterCountryCode expected = TwoLetterCountryCode.BR;
     webClient
         .get()
-        .uri("/2country/{value}", expected)
+        .uri("/public/2country/{value}", expected)
         .exchange()
         .expectBody(String.class)
         .value(actual -> assertEquals(expected.toString(), actual));
@@ -277,7 +286,7 @@ public class AutoConfigureTest {
     TwoLetterLanguageCode expected = TwoLetterLanguageCode.BE;
     webClient
         .get()
-        .uri("/2language/{value}", expected)
+        .uri("/public/2language/{value}", expected)
         .exchange()
         .expectBody(String.class)
         .value(actual -> assertEquals(expected.toString(), actual));
@@ -295,7 +304,7 @@ public class AutoConfigureTest {
     String value = URLEncoder.encode(expected.toString(), StandardCharsets.UTF_8.name());
     webClient
         .get()
-        .uri("/timezone/{value}", value)
+        .uri("/public/timezone/{value}", value)
         .exchange()
         .expectBody(String.class)
         .value(actual -> assertEquals(expected.toString(), actual));

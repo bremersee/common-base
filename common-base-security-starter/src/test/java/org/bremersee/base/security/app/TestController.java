@@ -44,7 +44,7 @@ public class TestController {
    * @param javaLocale the java locale
    * @return the response entity
    */
-  @GetMapping(path = "/java-locale/{locale}", produces = MediaType.TEXT_PLAIN_VALUE)
+  @GetMapping(path = "/public/java-locale/{locale}", produces = MediaType.TEXT_PLAIN_VALUE)
   public Mono<String> convertJavaLocale(@PathVariable("locale") JavaLocale javaLocale) {
     return Mono.just(javaLocale.toString());
   }
@@ -55,7 +55,7 @@ public class TestController {
    * @param locale the locale
    * @return the response entity
    */
-  @GetMapping(path = "/locale/{locale}", produces = MediaType.TEXT_PLAIN_VALUE)
+  @GetMapping(path = "/public/locale/{locale}", produces = MediaType.TEXT_PLAIN_VALUE)
   public Mono<String> convertLocale(@PathVariable("locale") Locale locale) {
     return Mono.just(locale.toString());
   }
@@ -66,7 +66,7 @@ public class TestController {
    * @param value the value
    * @return the response entity
    */
-  @GetMapping(path = "/mongo/{value}", produces = MediaType.TEXT_PLAIN_VALUE)
+  @GetMapping(path = "/public/mongo/{value}", produces = MediaType.TEXT_PLAIN_VALUE)
   public Mono<String> convertMongoSearchLanguage(
       @PathVariable("value") MongoSearchLanguage value) {
     return Mono.just(value.toString());
@@ -78,7 +78,7 @@ public class TestController {
    * @param value the value
    * @return the response entity
    */
-  @GetMapping(path = "/3country/{value}", produces = MediaType.TEXT_PLAIN_VALUE)
+  @GetMapping(path = "/public/3country/{value}", produces = MediaType.TEXT_PLAIN_VALUE)
   public Mono<String> convertThreeLetterCountry(
       @PathVariable("value") ThreeLetterCountryCode value) {
     return Mono.just(value.toString());
@@ -90,7 +90,7 @@ public class TestController {
    * @param value the value
    * @return the response entity
    */
-  @GetMapping(path = "/3language/{value}", produces = MediaType.TEXT_PLAIN_VALUE)
+  @GetMapping(path = "/public/3language/{value}", produces = MediaType.TEXT_PLAIN_VALUE)
   public Mono<String> convertThreeLetterLanguage(
       @PathVariable("value") ThreeLetterLanguageCode value) {
     return Mono.just(value.toString());
@@ -102,7 +102,7 @@ public class TestController {
    * @param value the value
    * @return the response entity
    */
-  @GetMapping(path = "/2country/{value}", produces = MediaType.TEXT_PLAIN_VALUE)
+  @GetMapping(path = "/public/2country/{value}", produces = MediaType.TEXT_PLAIN_VALUE)
   public Mono<String> convertTwoLetterCountry(
       @PathVariable("value") TwoLetterCountryCode value) {
     return Mono.just(value.toString());
@@ -114,7 +114,7 @@ public class TestController {
    * @param value the value
    * @return the response entity
    */
-  @GetMapping(path = "/2language/{value}", produces = MediaType.TEXT_PLAIN_VALUE)
+  @GetMapping(path = "/public/2language/{value}", produces = MediaType.TEXT_PLAIN_VALUE)
   public Mono<String> convertTwoLetterLanguage(
       @PathVariable("value") TwoLetterLanguageCode value) {
     return Mono.just(value.toString());
@@ -126,7 +126,7 @@ public class TestController {
    * @param value the value
    * @return the response entity
    */
-  @GetMapping(path = "/timezone/{value}", produces = MediaType.TEXT_PLAIN_VALUE)
+  @GetMapping(path = "/public/timezone/{value}", produces = MediaType.TEXT_PLAIN_VALUE)
   public Mono<String> convertTimeZone(
       @PathVariable("value") TimeZoneId value) {
     return Mono.just(value.toString());

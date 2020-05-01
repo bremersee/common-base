@@ -121,7 +121,7 @@ public class ActuatorSecurityAutoConfiguration extends WebSecurityConfigurerAdap
 
   @Override
   protected void configure(HttpSecurity httpSecurity) throws Exception {
-    log.info("Authorizing requests to /actuator/**");
+    log.info("Securing requests to /actuator/**");
     httpSecurity
         .requestMatcher(EndpointRequest.toAnyEndpoint())
         .authorizeRequests()
@@ -135,7 +135,7 @@ public class ActuatorSecurityAutoConfiguration extends WebSecurityConfigurerAdap
         .and()
         .csrf().disable()
         .cors(customizer -> {
-          if (actuatorSecurityProperties.isCorsDisabled()) {
+          if (!actuatorSecurityProperties.isEnableCors()) {
             customizer.disable();
           }
         })

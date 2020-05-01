@@ -136,7 +136,7 @@ public class ReactiveActuatorSecurityAutoConfiguration {
     ServerHttpSecurity http = httpProvider.getIfAvailable();
     Assert.notNull(http, "Server http security must be present.");
 
-    log.info("Authorizing requests to /actuator/**");
+    log.info("Securing requests to /actuator/**");
     return http
         .securityMatcher(EndpointRequest.toAnyEndpoint())
         .authorizeExchange()
@@ -157,7 +157,7 @@ public class ReactiveActuatorSecurityAutoConfiguration {
         .formLogin().disable()
         .csrf().disable()
         .cors(customizer -> {
-          if (actuatorSecurityProperties.isCorsDisabled()) {
+          if (!actuatorSecurityProperties.isEnableCors()) {
             customizer.disable();
           }
         })
