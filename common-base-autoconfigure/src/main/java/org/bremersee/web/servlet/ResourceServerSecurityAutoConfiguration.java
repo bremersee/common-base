@@ -33,12 +33,11 @@ import org.springframework.context.event.EventListener;
 import org.springframework.core.annotation.Order;
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpMethod;
-import org.springframework.security.authentication.AuthenticationProvider;
-import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.annotation.web.configurers.ExpressionUrlAuthorizationConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.util.matcher.NegatedRequestMatcher;
 import org.springframework.util.Assert;
@@ -147,20 +146,20 @@ public class ResourceServerSecurityAutoConfiguration extends WebSecurityConfigur
     log.info("Configure authentication provider with basic auth and in-memory users.");
     String realm = environment.getProperty("spring.application.name", "Restricted area");
     return http
-        .authenticationProvider(inMemoryAuthenticationProvider())
-        .httpBasic()
-        .realmName(realm)
-        .and()
+        .userDetailsService(userDetailsService())
         .formLogin().disable()
+        .httpBasic().realmName(realm)
+        .and()
         .sessionManagement((sm) -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
   }
 
-  private AuthenticationProvider inMemoryAuthenticationProvider() {
-    DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
-    provider.setPasswordEncoder(securityProperties.getAuthentication().passwordEncoder());
-    provider.setUserDetailsPasswordService(new InMemoryUserDetailsManager(
-        securityProperties.getAuthentication().buildBasicAuthUserDetails()));
-    return provider;
+  @Override
+  protected UserDetailsService userDetailsService() {
+    if (securityProperties.getAuthentication().isEnableJwtSupport()) {
+      return super.userDetailsService();
+    }
+    return new InMemoryUserDetailsManager(
+        securityProperties.getAuthentication().buildBasicAuthUserDetails());
   }
 
 }
