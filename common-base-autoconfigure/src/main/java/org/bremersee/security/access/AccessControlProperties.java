@@ -31,7 +31,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
  *
  * @author Christian Bremer
  */
-@ConfigurationProperties(prefix = "bremersee.security.acl")
+@ConfigurationProperties(prefix = "bremersee.acl")
 @Getter
 @Setter
 @ToString

@@ -16,8 +16,7 @@
 
 package org.bremersee.web.reactive;
 
-import org.bremersee.security.SecurityProperties;
-import org.bremersee.security.SecurityProperties.CorsProperties;
+import org.bremersee.web.CorsProperties;
 import org.junit.jupiter.api.Test;
 import org.springframework.web.reactive.config.CorsRegistry;
 
@@ -35,9 +34,7 @@ class CorsAutoConfigurationTest {
   void addCorsMappings() {
     CorsProperties properties = new CorsProperties();
     properties.setAllowAll(true);
-    SecurityProperties securityProperties = new SecurityProperties();
-    securityProperties.setCors(properties);
-    CorsAutoConfiguration configuration = new CorsAutoConfiguration(securityProperties);
+    CorsAutoConfiguration configuration = new CorsAutoConfiguration(properties);
     configuration.init();
     CorsRegistry corsRegistry = new CorsRegistry();
     configuration.addCorsMappings(corsRegistry);

@@ -46,28 +46,28 @@ public class PasswordFlowAuthenticationManager
   private static final OAuth2Error DEFAULT_INVALID_TOKEN =
       invalidToken("An error occurred while attempting to decode the Jwt: Invalid token");
 
-  private PasswordFlowPropertiesProvider passwordFlowPropertiesProvider;
+  private final ClientCredentialsFlowProperties passwordFlowProperties;
 
-  private AccessTokenRetriever<String> accessTokenRetriever;
+  private final AccessTokenRetriever<String> accessTokenRetriever;
 
-  private JwtDecoder jwtDecoder;
+  private final JwtDecoder jwtDecoder;
 
-  private Converter<Jwt, ? extends AbstractAuthenticationToken> jwtAuthenticationConverter;
+  private final Converter<Jwt, ? extends AbstractAuthenticationToken> jwtAuthenticationConverter;
 
   /**
    * Instantiates a new password flow authentication manager.
    *
-   * @param passwordFlowPropertiesProvider the password flow properties provider
+   * @param passwordFlowProperties the password flow properties
    * @param jwtDecoder the jwt decoder
    * @param jwtAuthenticationConverter the jwt authentication converter
    * @param accessTokenRetriever the access token retriever
    */
   public PasswordFlowAuthenticationManager(
-      PasswordFlowPropertiesProvider passwordFlowPropertiesProvider,
+      ClientCredentialsFlowProperties passwordFlowProperties,
       JwtDecoder jwtDecoder,
       @Nullable Converter<Jwt, ? extends AbstractAuthenticationToken> jwtAuthenticationConverter,
       AccessTokenRetriever<String> accessTokenRetriever) {
-    this.passwordFlowPropertiesProvider = passwordFlowPropertiesProvider;
+    this.passwordFlowProperties = passwordFlowProperties;
     this.jwtDecoder = jwtDecoder;
     this.jwtAuthenticationConverter = Objects.requireNonNullElseGet(
         jwtAuthenticationConverter,
@@ -77,10 +77,12 @@ public class PasswordFlowAuthenticationManager
 
   @Override
   public Authentication authenticate(Authentication authentication) throws AuthenticationException {
-    final String username = authentication.getName();
-    final String password = (String) authentication.getCredentials();
-    final String tokenStr = accessTokenRetriever
-        .retrieveAccessToken(passwordFlowPropertiesProvider.toPasswordFlowProperties(username, password));
+    final PasswordFlowProperties properties = PasswordFlowProperties.builder()
+        .from(passwordFlowProperties)
+        .username(authentication.getName())
+        .password((String) authentication.getCredentials())
+        .build();
+    final String tokenStr = accessTokenRetriever.retrieveAccessToken(properties);
     Jwt jwt;
     try {
       jwt = this.jwtDecoder.decode(tokenStr);

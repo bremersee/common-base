@@ -32,7 +32,7 @@ import org.springframework.http.codec.ServerCodecConfigurer;
 import org.springframework.http.codec.support.DefaultServerCodecConfigurer;
 
 /**
- * The type Api exception handler auto configuration test.
+ * The api exception handler auto configuration test.
  *
  * @author Christian Bremer
  */

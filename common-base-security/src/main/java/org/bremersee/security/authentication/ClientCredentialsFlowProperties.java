@@ -53,7 +53,9 @@ public interface ClientCredentialsFlowProperties extends AccessTokenRetrieverPro
    *
    * @return the additional properties
    */
-  MultiValueMap<String, String> getAdditionalProperties();
+  default MultiValueMap<String, String> getAdditionalProperties() {
+    return new LinkedMultiValueMap<>();
+  }
 
   @Override
   default Optional<BasicAuthProperties> getBasicAuthProperties() {
@@ -95,7 +97,7 @@ public interface ClientCredentialsFlowProperties extends AccessTokenRetrieverPro
 
     private String clientSecret;
 
-    private MultiValueMap<String, String> additionalProperties = new LinkedMultiValueMap<>();
+    private final MultiValueMap<String, String> additionalProperties = new LinkedMultiValueMap<>();
 
     /**
      * Sets token endpoint on builder.
@@ -181,14 +183,13 @@ public interface ClientCredentialsFlowProperties extends AccessTokenRetrieverPro
     @EqualsAndHashCode(exclude = {"clientSecret"})
     private static class Impl implements ClientCredentialsFlowProperties {
 
-      private String tokenEndpoint;
+      private final String tokenEndpoint;
 
-      private String clientId;
+      private final String clientId;
 
-      private String clientSecret;
+      private final String clientSecret;
 
-      private MultiValueMap<String, String> additionalProperties;
-
+      private final MultiValueMap<String, String> additionalProperties;
     }
   }
 

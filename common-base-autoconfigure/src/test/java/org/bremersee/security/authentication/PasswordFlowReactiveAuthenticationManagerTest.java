@@ -28,7 +28,7 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
 import java.util.Map;
-import org.bremersee.security.SecurityProperties.AuthenticationProperties.PasswordFlow;
+import org.bremersee.security.authentication.AuthProperties.PasswordFlow;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
@@ -77,6 +77,38 @@ class PasswordFlowReactiveAuthenticationManagerTest {
   }
 
   /**
+   * Authenticate with jwt converter.
+   */
+  @Test
+  void authenticateWithJwtConverter() {
+    Map<String, Object> headers = new HashMap<>();
+    headers.put("test-key", "test-value");
+    Map<String, Object> claims = new HashMap<>();
+    claims.put("sub", "an_username");
+    Jwt jwt = jwt(headers, claims);
+
+    PasswordFlowReactiveAuthenticationManager manager = workingManager(
+        jwt,
+        new JsonPathJwtConverter());
+
+    Authentication loginAuthentication = mock(Authentication.class);
+    when(loginAuthentication.getName()).thenReturn("an_username");
+    when(loginAuthentication.getCredentials()).thenReturn("a_password");
+
+    StepVerifier.create(manager.authenticate(loginAuthentication))
+        .assertNext(authentication -> {
+          assertTrue(authentication instanceof JwtAuthenticationToken);
+          JwtAuthenticationToken authenticationToken = (JwtAuthenticationToken) authentication;
+          Jwt actualJwt = authenticationToken.getToken();
+          assertNotNull(actualJwt);
+          assertEquals(jwt.getClaims(), actualJwt.getClaims());
+          assertEquals(jwt.getHeaders(), actualJwt.getHeaders());
+        })
+        .expectNextCount(0)
+        .verifyComplete();
+  }
+
+  /**
    * Tests authenticate fails.
    */
   @Test
@@ -90,15 +122,14 @@ class PasswordFlowReactiveAuthenticationManagerTest {
     StepVerifier.create(manager.authenticate(loginAuthentication))
         .expectErrorMatches(throwable -> throwable instanceof OAuth2AuthenticationException)
         .verify();
-
   }
 
   private static PasswordFlow properties() {
     PasswordFlow passwordFlow = new PasswordFlow();
     passwordFlow.setClientId("abc");
     passwordFlow.setClientSecret("xyz");
-    passwordFlow.setSystemPassword("XYZ");
-    passwordFlow.setSystemUsername("ABC");
+    passwordFlow.setPassword("XYZ");
+    passwordFlow.setUsername("ABC");
     passwordFlow.setTokenEndpoint("http://localhost/token");
     return passwordFlow;
   }
@@ -131,6 +162,18 @@ class PasswordFlowReactiveAuthenticationManagerTest {
         workingJwtDecoder(jwt),
         null,
         retriever());
+  }
+
+  private static PasswordFlowReactiveAuthenticationManager workingManager(
+      Jwt jwt,
+      JsonPathJwtConverter jwtConverter) {
+    PasswordFlowReactiveAuthenticationManager manager = new PasswordFlowReactiveAuthenticationManager(
+        properties(),
+        workingJwtDecoder(jwt),
+        null,
+        retriever());
+    manager.setJwtAuthenticationConverter(jwtConverter);
+    return manager;
   }
 
   private static ReactiveJwtDecoder notWorkingJwtDecoder() {

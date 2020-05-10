@@ -1,3 +1,5 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-org.bremersee.actuator.web.servlet.ActuatorSecurityAutoConfiguration,\
-org.bremersee.actuator.web.reactive.ReactiveActuatorSecurityAutoConfiguration
+org.bremersee.actuator.security.authentication.ActuatorSecurityAutoConfiguration,\
+org.bremersee.actuator.security.authentication.ReactiveActuatorSecurityAutoConfiguration,\
+org.bremersee.actuator.security.authentication.ReactiveResourceServerWithActuatorAutoConfiguration,\
+org.bremersee.actuator.security.authentication.ResourceServerWithActuatorAutoConfiguration

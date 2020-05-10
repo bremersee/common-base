@@ -20,7 +20,6 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import org.bremersee.security.SecurityProperties;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.ObjectProvider;
@@ -35,15 +34,15 @@ import org.springframework.web.client.RestTemplate;
  */
 class AuthenticationSupportAutoConfigurationTest {
 
-  private static AuthenticationSupportAutoConfiguration configuration;
+  private static JwtSupportAutoConfiguration configuration;
 
   /**
    * Init.
    */
   @BeforeAll
   static void init() {
-    SecurityProperties properties = new SecurityProperties();
-    configuration = new AuthenticationSupportAutoConfiguration(properties);
+    AuthProperties properties = new AuthProperties();
+    configuration = new JwtSupportAutoConfiguration(properties);
     configuration.init();
   }
 

@@ -30,8 +30,7 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
 import java.util.Map;
-import org.bremersee.security.SecurityProperties;
-import org.bremersee.security.SecurityProperties.AuthenticationProperties.PasswordFlow;
+import org.bremersee.security.authentication.AuthProperties.PasswordFlow;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -52,8 +51,8 @@ class PasswordFlowAuthenticationManagerTest {
     PasswordFlow passwordFlow = new PasswordFlow();
     passwordFlow.setClientId("abc");
     passwordFlow.setClientSecret("xyz");
-    passwordFlow.setSystemPassword("XYZ");
-    passwordFlow.setSystemUsername("ABC");
+    passwordFlow.setPassword("XYZ");
+    passwordFlow.setUsername("ABC");
     passwordFlow.setTokenEndpoint("http://localhost/token");
     return passwordFlow;
   }
@@ -156,6 +155,6 @@ class PasswordFlowAuthenticationManagerTest {
     Jwt jwt = jwt(headers, claims);
     PasswordFlowAuthenticationManager manager = workingManager(jwt);
     assertTrue(manager.supports(UsernamePasswordAuthenticationToken.class));
-    assertFalse(manager.supports(SecurityProperties.class));
+    assertFalse(manager.supports(AuthProperties.class));
   }
 }

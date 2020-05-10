@@ -82,9 +82,9 @@ public interface BasicAuthProperties {
     @EqualsAndHashCode(exclude = {"password"})
     private static class Impl implements BasicAuthProperties {
 
-      private String username;
+      private final String username;
 
-      private String password;
+      private final String password;
 
     }
   }

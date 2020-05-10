@@ -31,6 +31,8 @@ import org.springframework.web.servlet.HandlerExceptionResolver;
 
 /**
  * The api exception resolver auto configuration test.
+ *
+ * @author Christian Bremer
  */
 class ApiExceptionResolverAutoConfigurationTest {
 
