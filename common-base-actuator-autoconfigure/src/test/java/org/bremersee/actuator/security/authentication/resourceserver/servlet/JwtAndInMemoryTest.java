@@ -16,7 +16,9 @@
 
 package org.bremersee.actuator.security.authentication.resourceserver.servlet;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -36,10 +38,13 @@ import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.boot.web.server.LocalServerPort;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.context.WebApplicationContext;
 
@@ -144,6 +149,20 @@ public class JwtAndInMemoryTest {
   }
 
   /**
+   * Rest template rest template.
+   *
+   * @param user the user
+   * @param password the password
+   * @return the rest template
+   */
+  RestTemplate restTemplate(String user, String password) {
+    return restTemplateBuilder
+        .rootUri(baseUrl())
+        .basicAuthentication(user, password)
+        .build();
+  }
+
+  /**
    * Gets public.
    *
    * @throws Exception the exception
@@ -211,14 +230,22 @@ public class JwtAndInMemoryTest {
 
   /**
    * Gets metrics.
-   *
-   * @throws Exception the exception
    */
   @Test
-  @WithMockUser(username = "actuator", password = "actuator", authorities = "ROLE_ACTUATOR")
-  void getMetrics() throws Exception {
-    mvc.perform(get("/actuator/metrics"))
-        .andExpect(status().isOk());
+  void getMetrics() {
+    ResponseEntity<String> response = restTemplate("actuator", "actuator")
+        .getForEntity("/actuator/metrics", String.class);
+    assertNotNull(response);
+    assertEquals(HttpStatus.OK, response.getStatusCode());
+  }
+
+  /**
+   * Gets metrics and expect exception.
+   */
+  @Test
+  void getMetricsAndExpectException() {
+    assertThrows(HttpClientErrorException.class, () -> restTemplate("user", "user")
+        .getForEntity("/actuator/metrics", String.class));
   }
 
   /**

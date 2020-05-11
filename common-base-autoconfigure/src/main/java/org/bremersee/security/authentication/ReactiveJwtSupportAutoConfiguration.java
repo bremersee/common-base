@@ -124,6 +124,13 @@ public class ReactiveJwtSupportAutoConfiguration {
    * @param tokenRetriever the token retriever
    * @return the password flow reactive authentication manager
    */
+  @ConditionalOnProperty(
+      prefix = "bremersee.auth.password-flow",
+      name = {
+          "token-endpoint",
+          "client-id",
+          "client-secret"
+      })
   @ConditionalOnMissingBean
   @Bean
   public PasswordFlowReactiveAuthenticationManager passwordFlowReactiveAuthenticationManager(

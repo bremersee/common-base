@@ -132,6 +132,13 @@ public class JwtSupportAutoConfiguration {
    * @param tokenRetriever the token retriever
    * @return the password flow authentication manager
    */
+  @ConditionalOnProperty(
+      prefix = "bremersee.auth.password-flow",
+      name = {
+          "token-endpoint",
+          "client-id",
+          "client-secret"
+      })
   @ConditionalOnMissingBean
   @Bean
   public PasswordFlowAuthenticationManager passwordFlowAuthenticationManager(
