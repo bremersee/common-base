@@ -124,7 +124,9 @@ public class ReactiveActuatorSecurityAutoConfiguration {
    * Init.
    */
   @EventListener(ApplicationReadyEvent.class)
+  @SuppressWarnings("DuplicatedCode")
   public void init() {
+    final boolean hasJwkUriSet = StringUtils.hasText(actuatorAuthProperties.getJwkUriSet());
     log.info("\n"
             + "*********************************************************************************\n"
             + "* {}\n"
@@ -137,8 +139,16 @@ public class ReactiveActuatorSecurityAutoConfiguration {
         ClassUtils.getUserClass(getClass()).getSimpleName(),
         actuatorAuthProperties.getEnable().name(),
         actuatorAuthProperties.getOrder(),
-        StringUtils.hasText(actuatorAuthProperties.getJwkUriSet()),
+        hasJwkUriSet,
         actuatorAuthProperties.isEnableCors());
+    if (hasJwkUriSet) {
+      Assert.hasText(actuatorAuthProperties.getPasswordFlow().getTokenEndpoint(),
+          "Token endpoint of actuator password flow must be present.");
+      Assert.hasText(actuatorAuthProperties.getPasswordFlow().getClientId(),
+          "Client ID of actuator password flow must be present.");
+      Assert.notNull(actuatorAuthProperties.getPasswordFlow().getClientSecret(),
+          "Client secret of actuator password flow must be present.");
+    }
   }
 
   /**
