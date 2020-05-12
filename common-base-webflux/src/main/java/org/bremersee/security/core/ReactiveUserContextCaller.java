@@ -120,7 +120,9 @@ public class ReactiveUserContextCaller {
     return ReactiveSecurityContextHolder.getContext()
         .map(SecurityContext::getAuthentication)
         .filter(Authentication::isAuthenticated)
-        .zipWhen(groupsFn::apply)
+        .zipWhen(authentication -> groupsFn
+            .apply(authentication)
+            .switchIfEmpty(EMPTY_GROUPS_SUPPLIER.get()))
         .map(tuple -> UserContext.newInstance(
             tuple.getT1().getName(),
             toRoles(tuple.getT1()),
@@ -175,7 +177,9 @@ public class ReactiveUserContextCaller {
     return ReactiveSecurityContextHolder.getContext()
         .map(SecurityContext::getAuthentication)
         .filter(Authentication::isAuthenticated)
-        .zipWhen(groupsFn::apply)
+        .zipWhen(authentication -> groupsFn
+            .apply(authentication)
+            .switchIfEmpty(EMPTY_GROUPS_SUPPLIER.get()))
         .map(tuple -> UserContext.newInstance(
             tuple.getT1().getName(),
             toRoles(tuple.getT1()),
