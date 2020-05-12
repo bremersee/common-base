@@ -22,77 +22,101 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
+import javax.validation.constraints.NotNull;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
+import org.springframework.lang.Nullable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.util.StringUtils;
+import org.springframework.validation.annotation.Validated;
 
 /**
  * The user context.
  *
  * @author Christian Bremer
  */
-@ToString
-@EqualsAndHashCode
-public class UserContext {
-
-  @Getter
-  private final String userId;
-
-  @Getter
-  private final Set<String> roles;
-
-  @Getter
-  private final Set<String> groups;
+@Validated
+public interface UserContext extends Principal {
 
   /**
-   * Instantiates a new user context.
-   */
-  public UserContext() {
-    this(null, null, null);
-  }
-
-  /**
-   * Instantiates a new user context.
+   * Gets user id.
    *
-   * @param authentication the authentication
-   * @param groupsSupplier the groups supplier
+   * @return the user id
    */
-  public UserContext(Authentication authentication, Supplier<Collection<String>> groupsSupplier) {
-    this(authentication, groupsSupplier != null ? groupsSupplier.get() : null);
+  String getUserId();
+
+  @Override
+  default String getName() {
+    return getUserId();
   }
 
   /**
-   * Instantiates a new user context.
+   * Gets roles.
+   *
+   * @return the roles
+   */
+  @NotNull
+  default Set<String> getRoles() {
+    return Collections.emptySet();
+  }
+
+  /**
+   * Gets groups.
+   *
+   * @return the groups
+   */
+  @NotNull
+  default Set<String> getGroups() {
+    return Collections.emptySet();
+  }
+
+  /**
+   * New instance user context.
+   *
+   * @return the user context
+   */
+  static UserContext newInstance() {
+    return new Impl();
+  }
+
+  /**
+   * New instance user context.
    *
    * @param authentication the authentication
    * @param groups the groups
+   * @return the user context
    */
-  public UserContext(Authentication authentication, Collection<String> groups) {
-    this(
-        Optional.ofNullable(authentication).map(Principal::getName).orElse(null),
-        Optional.ofNullable(authentication)
-            .map(auth -> auth.getAuthorities().stream()
-                .map(GrantedAuthority::getAuthority)
-                .collect(Collectors.toSet()))
-            .orElse(null),
-        groups);
+  static UserContext newInstance(
+      @Nullable Authentication authentication,
+      @Nullable Collection<String> groups) {
+    return new Impl(authentication, groups);
   }
 
   /**
-   * Instantiates a new user context.
+   * New instance user context.
    *
    * @param userId the user id
    * @param roles the roles
    * @param groups the groups
+   * @return the user context
    */
-  public UserContext(String userId, Collection<String> roles, Collection<String> groups) {
-    this.userId = userId;
-    this.roles = roles != null ? Set.copyOf(roles) : Collections.emptySet();
-    this.groups = groups != null ? Set.copyOf(groups) : Collections.emptySet();
+  static UserContext newInstance(
+      @Nullable String userId,
+      @Nullable Collection<String> roles,
+      @Nullable Collection<String> groups) {
+    return new Impl(userId, roles, groups);
+  }
+
+  /**
+   * Determines whether the user id is present or not.
+   *
+   * @return the boolean
+   */
+  default boolean isUserIdPresent() {
+    return StringUtils.hasText(getUserId());
   }
 
   /**
@@ -101,8 +125,8 @@ public class UserContext {
    * @param role the role
    * @return the boolean
    */
-  public boolean hasRole(String role) {
-    return role != null && roles.contains(role);
+  default boolean hasRole(@Nullable String role) {
+    return role != null && getRoles().contains(role);
   }
 
   /**
@@ -111,7 +135,7 @@ public class UserContext {
    * @param roles the roles
    * @return the boolean
    */
-  public boolean hasAnyRole(Collection<String> roles) {
+  default boolean hasAnyRole(@Nullable Collection<String> roles) {
     return Optional.ofNullable(roles)
         .map(col -> col.stream().anyMatch(this::hasRole))
         .orElse(false);
@@ -123,7 +147,7 @@ public class UserContext {
    * @param roles the roles
    * @return the boolean
    */
-  public boolean hasAnyRole(String... roles) {
+  default boolean hasAnyRole(@Nullable String... roles) {
     return Optional.ofNullable(roles)
         .map(arr -> hasAnyRole(Arrays.asList(arr)))
         .orElse(false);
@@ -135,8 +159,8 @@ public class UserContext {
    * @param group the group
    * @return the boolean
    */
-  public boolean isInGroup(String group) {
-    return group != null && groups.contains(group);
+  default boolean isInGroup(@Nullable String group) {
+    return group != null && getGroups().contains(group);
   }
 
   /**
@@ -145,7 +169,7 @@ public class UserContext {
    * @param groups the groups
    * @return the boolean
    */
-  public boolean isInAnyGroup(Collection<String> groups) {
+  default boolean isInAnyGroup(@Nullable Collection<String> groups) {
     return Optional.ofNullable(groups)
         .map(col -> col.stream().anyMatch(this::isInGroup))
         .orElse(false);
@@ -157,10 +181,65 @@ public class UserContext {
    * @param groups the groups
    * @return the boolean
    */
-  public boolean isInAnyGroup(String... groups) {
+  default boolean isInAnyGroup(@Nullable String... groups) {
     return Optional.ofNullable(groups)
         .map(arr -> isInAnyGroup(Arrays.asList(arr)))
         .orElse(false);
   }
+
+  /**
+   * The default implementation.
+   */
+  @ToString
+  @EqualsAndHashCode
+  class Impl implements UserContext {
+
+    @Getter
+    private final String userId;
+
+    @Getter
+    private final Set<String> roles;
+
+    @Getter
+    private final Set<String> groups;
+
+    /**
+     * Instantiates a new user context.
+     */
+    public Impl() {
+      this(null, null, null);
+    }
+
+    /**
+     * Instantiates a new user context.
+     *
+     * @param authentication the authentication
+     * @param groups the groups
+     */
+    public Impl(Authentication authentication, Collection<String> groups) {
+      this(
+          Optional.ofNullable(authentication).map(Principal::getName).orElse(null),
+          Optional.ofNullable(authentication)
+              .map(auth -> auth.getAuthorities().stream()
+                  .map(GrantedAuthority::getAuthority)
+                  .collect(Collectors.toSet()))
+              .orElse(null),
+          groups);
+    }
+
+    /**
+     * Instantiates a new user context.
+     *
+     * @param userId the user id
+     * @param roles the roles
+     * @param groups the groups
+     */
+    public Impl(String userId, Collection<String> roles, Collection<String> groups) {
+      this.userId = userId;
+      this.roles = roles != null ? Set.copyOf(roles) : Collections.emptySet();
+      this.groups = groups != null ? Set.copyOf(groups) : Collections.emptySet();
+    }
+  }
+
 
 }

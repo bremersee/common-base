@@ -45,7 +45,7 @@ public class ReactiveUserContext {
    * The constant EMPTY_USER_CONTEXT_SUPPLIER.
    */
   public static final Supplier<Mono<UserContext>> EMPTY_USER_CONTEXT_SUPPLIER = () -> Mono
-      .just(new UserContext());
+      .just(UserContext.newInstance());
 
   /**
    * The constant FORBIDDEN_SUPPLIER.
@@ -114,7 +114,7 @@ public class ReactiveUserContext {
         .map(SecurityContext::getAuthentication)
         .filter(Authentication::isAuthenticated)
         .zipWhen(groupsFn::apply)
-        .map(tuple -> new UserContext(
+        .map(tuple -> UserContext.newInstance(
             tuple.getT1().getName(),
             toRoles(tuple.getT1()),
             tuple.getT2()))
@@ -168,7 +168,7 @@ public class ReactiveUserContext {
         .map(SecurityContext::getAuthentication)
         .filter(Authentication::isAuthenticated)
         .zipWhen(groupsFn::apply)
-        .map(tuple -> new UserContext(
+        .map(tuple -> UserContext.newInstance(
             tuple.getT1().getName(),
             toRoles(tuple.getT1()),
             tuple.getT2()))
