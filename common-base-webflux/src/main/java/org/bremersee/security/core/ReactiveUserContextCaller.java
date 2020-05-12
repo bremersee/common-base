@@ -20,21 +20,25 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
+import javax.validation.constraints.NotNull;
 import org.bremersee.exception.ServiceException;
 import org.reactivestreams.Publisher;
+import org.springframework.lang.Nullable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.ReactiveSecurityContextHolder;
 import org.springframework.security.core.context.SecurityContext;
+import org.springframework.validation.annotation.Validated;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 /**
- * The reactive user context.
+ * The reactive user context caller.
  *
  * @author Christian Bremer
  */
-public class ReactiveUserContext {
+@Validated
+public class ReactiveUserContextCaller {
 
   /**
    * The constant EMPTY_GROUPS_SUPPLIER.
@@ -58,21 +62,21 @@ public class ReactiveUserContext {
   private final Supplier<Mono<UserContext>> unauthenticatedSupplier;
 
   /**
-   * Instantiates a new reactive user context.
+   * Instantiates a new reactive user context caller.
    */
-  public ReactiveUserContext() {
+  public ReactiveUserContextCaller() {
     this(EMPTY_GROUPS_SUPPLIER, null);
   }
 
   /**
-   * Instantiates a new reactive user context.
+   * Instantiates a new reactive user context caller.
    *
    * @param groupsSupplier the groups supplier
    * @param unauthenticatedSupplier the unauthenticated supplier
    */
-  public ReactiveUserContext(
-      Supplier<Mono<Set<String>>> groupsSupplier,
-      Supplier<Mono<UserContext>> unauthenticatedSupplier) {
+  public ReactiveUserContextCaller(
+      @Nullable Supplier<Mono<Set<String>>> groupsSupplier,
+      @Nullable Supplier<Mono<UserContext>> unauthenticatedSupplier) {
     this(
         groupsSupplier != null
             ? authentication -> groupsSupplier.get()
@@ -81,14 +85,14 @@ public class ReactiveUserContext {
   }
 
   /**
-   * Instantiates a new reactive user context.
+   * Instantiates a new reactive user context caller.
    *
    * @param groupsFn the groups fn
    * @param unauthenticatedSupplier the unauthenticated supplier
    */
-  public ReactiveUserContext(
-      Function<Authentication, Mono<Set<String>>> groupsFn,
-      Supplier<Mono<UserContext>> unauthenticatedSupplier) {
+  public ReactiveUserContextCaller(
+      @Nullable Function<Authentication, Mono<Set<String>>> groupsFn,
+      @Nullable Supplier<Mono<UserContext>> unauthenticatedSupplier) {
     this.groupsFn = groupsFn != null ? groupsFn : authentication -> EMPTY_GROUPS_SUPPLIER.get();
     this.unauthenticatedSupplier = unauthenticatedSupplier != null
         ? unauthenticatedSupplier
@@ -109,7 +113,8 @@ public class ReactiveUserContext {
    * @param function the function
    * @return the mono
    */
-  public <R> Mono<R> oneWithUserContext(Function<UserContext, ? extends Mono<R>> function) {
+  public <R> Mono<R> oneWithUserContext(
+      @NotNull Function<UserContext, ? extends Mono<R>> function) {
     return ReactiveSecurityContextHolder.getContext()
         .map(SecurityContext::getAuthentication)
         .filter(Authentication::isAuthenticated)
@@ -132,10 +137,10 @@ public class ReactiveUserContext {
    * @return the mono
    */
   public static <R> Mono<R> oneWithUserContext(
-      Function<UserContext, ? extends Mono<R>> function,
-      Function<Authentication, Mono<Set<String>>> groupsFn,
-      Supplier<Mono<UserContext>> unauthenticatedSupplier) {
-    return new ReactiveUserContext(groupsFn, unauthenticatedSupplier)
+      @NotNull Function<UserContext, ? extends Mono<R>> function,
+      @Nullable Function<Authentication, Mono<Set<String>>> groupsFn,
+      @Nullable Supplier<Mono<UserContext>> unauthenticatedSupplier) {
+    return new ReactiveUserContextCaller(groupsFn, unauthenticatedSupplier)
         .oneWithUserContext(function);
   }
 
@@ -149,10 +154,10 @@ public class ReactiveUserContext {
    * @return the mono
    */
   public static <R> Mono<R> oneWithUserContext(
-      Function<UserContext, ? extends Mono<R>> function,
-      Supplier<Mono<Set<String>>> groupsSupplier,
-      Supplier<Mono<UserContext>> unauthenticatedSupplier) {
-    return new ReactiveUserContext(groupsSupplier, unauthenticatedSupplier)
+      @NotNull Function<UserContext, ? extends Mono<R>> function,
+      @Nullable Supplier<Mono<Set<String>>> groupsSupplier,
+      @Nullable Supplier<Mono<UserContext>> unauthenticatedSupplier) {
+    return new ReactiveUserContextCaller(groupsSupplier, unauthenticatedSupplier)
         .oneWithUserContext(function);
   }
 
@@ -163,7 +168,8 @@ public class ReactiveUserContext {
    * @param function the function
    * @return the flux
    */
-  public <R> Flux<R> manyWithUserContext(Function<UserContext, ? extends Publisher<R>> function) {
+  public <R> Flux<R> manyWithUserContext(
+      @NotNull Function<UserContext, ? extends Publisher<R>> function) {
     return ReactiveSecurityContextHolder.getContext()
         .map(SecurityContext::getAuthentication)
         .filter(Authentication::isAuthenticated)
@@ -186,10 +192,10 @@ public class ReactiveUserContext {
    * @return the flux
    */
   public static <R> Flux<R> manyWithUserContext(
-      Function<UserContext, ? extends Publisher<R>> function,
-      Function<Authentication, Mono<Set<String>>> groupsFn,
-      Supplier<Mono<UserContext>> unauthenticatedSupplier) {
-    return new ReactiveUserContext(groupsFn, unauthenticatedSupplier)
+      @NotNull Function<UserContext, ? extends Publisher<R>> function,
+      @Nullable Function<Authentication, Mono<Set<String>>> groupsFn,
+      @Nullable Supplier<Mono<UserContext>> unauthenticatedSupplier) {
+    return new ReactiveUserContextCaller(groupsFn, unauthenticatedSupplier)
         .manyWithUserContext(function);
   }
 
@@ -203,10 +209,10 @@ public class ReactiveUserContext {
    * @return the flux
    */
   public static <R> Flux<R> manyWithUserContext(
-      Function<UserContext, ? extends Publisher<R>> function,
-      Supplier<Mono<Set<String>>> groupsSupplier,
-      Supplier<Mono<UserContext>> unauthenticatedSupplier) {
-    return new ReactiveUserContext(groupsSupplier, unauthenticatedSupplier)
+      @NotNull Function<UserContext, ? extends Publisher<R>> function,
+      @Nullable Supplier<Mono<Set<String>>> groupsSupplier,
+      @Nullable Supplier<Mono<UserContext>> unauthenticatedSupplier) {
+    return new ReactiveUserContextCaller(groupsSupplier, unauthenticatedSupplier)
         .manyWithUserContext(function);
   }
 

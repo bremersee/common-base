@@ -17,16 +17,18 @@
 package org.bremersee.security.core;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.util.Collection;
 import java.util.Collections;
-import org.bremersee.exception.ServiceException;
+import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.test.context.TestSecurityContextHolder;
 import org.springframework.security.test.context.support.ReactorContextTestExecutionListener;
 import org.springframework.test.context.TestExecutionListener;
@@ -35,13 +37,20 @@ import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
 /**
- * The unauthenticated user context test.
+ * The authenticated reactive user context test.
  *
  * @author Christian Bremer
  */
-class UnauthenticatedUserContextTest {
+class AuthenticatedReactiveUserContextCallerTest {
 
-  private static final UserContext expected = UserContext.newInstance();
+  private static final String userId = UUID.randomUUID().toString();
+
+  private static final String role = UUID.randomUUID().toString();
+
+  private static final String group = UUID.randomUUID().toString();
+
+  private static final UserContext expected = UserContext.newInstance(
+      userId, Collections.singleton(role), Collections.singleton(group));
 
   private final TestExecutionListener reactorContextTestExecutionListener =
       new ReactorContextTestExecutionListener();
@@ -54,71 +63,70 @@ class UnauthenticatedUserContextTest {
   @BeforeEach
   void setUp() throws Exception {
     TestSecurityContextHolder.clearContext();
+    Collection<GrantedAuthority> roles = Collections.singleton(new SimpleGrantedAuthority(role));
     Authentication authentication = mock(Authentication.class);
-    when(authentication.isAuthenticated()).thenReturn(false);
-    when(authentication.getName()).thenReturn("guest");
-    when(authentication.getAuthorities()).then(invocation -> Collections.emptyList());
+    when(authentication.isAuthenticated()).thenReturn(true);
+    when(authentication.getName()).thenReturn(userId);
+    when(authentication.getAuthorities()).then(invocation -> roles);
     TestSecurityContextHolder.setAuthentication(authentication);
     //noinspection ConstantConditions
     reactorContextTestExecutionListener.beforeTestMethod(null);
   }
 
   /**
-   * One with user context.
+   * One with user context and groups supplier.
    */
   @Test
-  void oneWithUserContext() {
+  void oneWithUserContextAndGroupsSupplier() {
     StepVerifier
-        .create(ReactiveUserContext.oneWithUserContext(
+        .create(ReactiveUserContextCaller.oneWithUserContext(
             userContext -> this.serviceMono(userContext, new Object()),
-            ReactiveUserContext.EMPTY_GROUPS_SUPPLIER,
-            ReactiveUserContext.EMPTY_USER_CONTEXT_SUPPLIER))
-        .assertNext(userContext -> {
-          assertFalse(userContext.isUserIdPresent());
-          assertEquals(expected, userContext);
-        })
+            () -> Mono.just(Collections.singleton(group)),
+            ReactiveUserContextCaller.FORBIDDEN_SUPPLIER))
+        .assertNext(userContext -> assertEquals(expected, userContext))
         .verifyComplete();
   }
 
   /**
-   * One with user context and expect forbidden.
+   * One with user context and groups function.
    */
   @Test
-  void oneWithUserContextAndExpectForbidden() {
-    ReactiveUserContext ctx = new ReactiveUserContext();
+  void oneWithUserContextAndGroupsFunction() {
     StepVerifier
-        .create(ctx.oneWithUserContext(userContext -> this.serviceMono(userContext, new Object())))
-        .expectError(ServiceException.class)
-        .verify();
+        .create(ReactiveUserContextCaller.oneWithUserContext(
+            userContext -> this.serviceMono(userContext, new Object()),
+            auth -> Mono.just(Collections.singleton(group)),
+            ReactiveUserContextCaller.FORBIDDEN_SUPPLIER))
+        .assertNext(userContext -> assertEquals(expected, userContext))
+        .verifyComplete();
   }
 
   /**
-   * Many with user context.
+   * Many with user context and groups supplier.
    */
   @Test
-  void manyWithUserContext() {
+  void manyWithUserContextAndGroupsSupplier() {
     StepVerifier
-        .create(ReactiveUserContext.manyWithUserContext(
+        .create(ReactiveUserContextCaller.manyWithUserContext(
             userContext -> this.serviceFlux(userContext, new Object()),
-            ReactiveUserContext.EMPTY_GROUPS_SUPPLIER,
-            ReactiveUserContext.EMPTY_USER_CONTEXT_SUPPLIER))
-        .assertNext(userContext -> {
-          assertFalse(userContext.isUserIdPresent());
-          assertEquals(expected, userContext);
-        })
+            () -> Mono.just(Collections.singleton(group)),
+            ReactiveUserContextCaller.FORBIDDEN_SUPPLIER))
+        .assertNext(userContext -> assertEquals(expected, userContext))
         .verifyComplete();
   }
 
   /**
-   * Many with user context and expect forbidden.
+   * Many with user context and groups function.
    */
   @Test
-  void manyWithUserContextAndExpectForbidden() {
-    ReactiveUserContext ctx = new ReactiveUserContext();
+  void manyWithUserContextAndGroupsFunction() {
     StepVerifier
-        .create(ctx.manyWithUserContext(userContext -> this.serviceFlux(userContext, new Object())))
-        .expectError(ServiceException.class)
-        .verify();
+        .create(ReactiveUserContextCaller.manyWithUserContext(
+            userContext -> this.serviceFlux(userContext, new Object()),
+            auth -> Mono.just(Collections.singleton(group)),
+            ReactiveUserContextCaller.FORBIDDEN_SUPPLIER))
+        .assertNext(userContext -> assertEquals(expected, userContext))
+        .verifyComplete();
   }
 
   private Mono<UserContext> serviceMono(UserContext userContext, Object arg) {
