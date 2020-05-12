@@ -16,6 +16,7 @@
 
 package org.bremersee.security.core;
 
+import java.util.Collections;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -43,7 +44,8 @@ public class ReactiveUserContextCaller {
   /**
    * The constant EMPTY_GROUPS_SUPPLIER.
    */
-  public static final Supplier<Mono<Set<String>>> EMPTY_GROUPS_SUPPLIER = Mono::empty;
+  public static final Supplier<Mono<Set<String>>> EMPTY_GROUPS_SUPPLIER = () -> Mono
+      .just(Collections.emptySet());
 
   /**
    * The constant EMPTY_USER_CONTEXT_SUPPLIER.
