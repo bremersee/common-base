@@ -119,6 +119,7 @@ public class CorsProperties {
       configuration.allowedOrigins = Collections.singletonList("*");
       configuration.allowedMethods = Collections.singletonList("*");
       configuration.allowedHeaders = Collections.singletonList("*");
+      configuration.allowCredentials = true;
       return configuration;
     }
 
