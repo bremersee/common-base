@@ -173,6 +173,9 @@ public class ReactiveActuatorSecurityAutoConfiguration {
           .and()
           .httpBasic().disable();
     } else {
+      if (actuatorAuthProperties.isEnableCors()) {
+        spec = spec.pathMatchers(HttpMethod.OPTIONS, "/**").permitAll();
+      }
       http = spec
           .matchers(unauthenticatedEndpointMatchers()).permitAll()
           .matchers(new AndServerWebExchangeMatcher(

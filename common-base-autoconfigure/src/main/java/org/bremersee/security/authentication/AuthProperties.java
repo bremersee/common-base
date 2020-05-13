@@ -26,8 +26,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.StringTokenizer;
-import java.util.TreeSet;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import javax.validation.constraints.NotEmpty;
@@ -138,28 +136,6 @@ public class AuthProperties {
   private List<SimpleUser> inMemoryUsers = new ArrayList<>();
 
   /**
-   * Path matchers.
-   *
-   * @return the path matchers
-   */
-  @NotNull
-  public Set<PathMatcherProperties> pathMatchers() {
-    boolean containsAny = false;
-    TreeSet<PathMatcherProperties> pathMatcherSet = new TreeSet<>();
-    for (PathMatcherProperties props : pathMatchers) {
-      pathMatcherSet.add(props);
-      containsAny = containsAny || (PathMatcherProperties.ANY_PATH.equals(props.getAntPattern())
-          && PathMatcherProperties.ALL_HTTP_METHODS.equals(props.getHttpMethod()));
-    }
-    if (!containsAny) {
-      PathMatcherProperties any = new PathMatcherProperties();
-      any.setAccessMode(anyAccessMode);
-      pathMatcherSet.add(any);
-    }
-    return pathMatcherSet;
-  }
-
-  /**
    * Build user details from in memory users.
    *
    * @param passwordEncoder the password encoder
@@ -195,10 +171,10 @@ public class AuthProperties {
    * The path matcher properties.
    */
   @Setter
-  @EqualsAndHashCode(exclude = {"accessMode", "roles", "ipAddresses"})
+  @EqualsAndHashCode(of = {"httpMethod", "antPattern"})
   @NoArgsConstructor
   @Validated
-  public static class PathMatcherProperties implements Comparable<PathMatcherProperties> {
+  public static class PathMatcherProperties {
 
     /**
      * The constant ALL_HTTP_METHODS.
@@ -262,10 +238,6 @@ public class AuthProperties {
       return HttpMethod.resolve(getHttpMethod());
     }
 
-    private int countPathSegments() {
-      return new StringTokenizer(getAntPattern(), "/").countTokens();
-    }
-
     /**
      * Access expression string.
      *
@@ -291,44 +263,6 @@ public class AuthProperties {
               ? ensureRolePrefixFunction.apply(role)
               : role)
           .collect(Collectors.toSet());
-    }
-
-    @Override
-    public int compareTo(PathMatcherProperties o) {
-
-      // 1.: compare the size of the path segments
-      int c1 = countPathSegments();
-      int c2 = o.countPathSegments();
-      int result = Integer.compare(c2, c1);
-      if (result != 0) {
-        return result;
-      }
-
-      // 2.: compare the ant path
-      result = o.getAntPattern().compareToIgnoreCase(getAntPattern());
-      if (result != 0) {
-        if (ANY_PATH.equals(getAntPattern())) {
-          return 1;
-        }
-        if (ANY_PATH.equals(o.getAntPattern())) {
-          return -1;
-        }
-        return result;
-      }
-
-      // 3. compare the http method
-      String m1 = getHttpMethod();
-      String m2 = o.getHttpMethod();
-      result = m1.compareTo(m2);
-      if (result != 0) {
-        if (m1.equals(ALL_HTTP_METHODS)) {
-          return 1;
-        }
-        if (m2.equals(ALL_HTTP_METHODS)) {
-          return -1;
-        }
-      }
-      return result;
     }
 
     @Override

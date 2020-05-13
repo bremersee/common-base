@@ -49,10 +49,10 @@ import org.springframework.web.reactive.function.BodyInserters;
         "bremersee.auth.path-matchers[0].ant-pattern=/public/**",
         "bremersee.auth.path-matchers[0].access-mode=permit_all",
         "bremersee.auth.path-matchers[1].ant-pattern=/protected/**",
-        "bremersee.auth.path-matchers[1].roles=ROLE_USER",
+        "bremersee.auth.path-matchers[1].http-method=POST",
+        "bremersee.auth.path-matchers[1].roles=ROLE_ADMIN",
         "bremersee.auth.path-matchers[2].ant-pattern=/protected/**",
-        "bremersee.auth.path-matchers[2].http-method=POST",
-        "bremersee.auth.path-matchers[2].roles=ROLE_ADMIN",
+        "bremersee.auth.path-matchers[2].roles=ROLE_USER",
         "bremersee.exception-mapping.api-paths=/**"
     })
 @TestInstance(Lifecycle.PER_CLASS) // allows us to use @BeforeAll with a non-static method

@@ -22,11 +22,8 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.util.Arrays;
 import java.util.Collections;
-import java.util.List;
 import java.util.Set;
-import java.util.TreeSet;
 import java.util.UUID;
 import org.bremersee.security.authentication.AuthProperties.PathMatcherProperties;
 import org.junit.jupiter.api.Test;
@@ -160,53 +157,6 @@ class PathMatcherPropertiesTest {
     PathMatcherProperties properties = new PathMatcherProperties();
     properties.setAccessMode(AccessMode.AUTHENTICATED);
     assertEquals("isAuthenticated()", properties.accessExpression(null));
-  }
-
-  /**
-   * Compare to.
-   */
-  @Test
-  void compareTo() {
-    PathMatcherProperties p0 = new PathMatcherProperties();
-
-    PathMatcherProperties p1 = new PathMatcherProperties();
-    p1.setAntPattern("/actuator/**");
-
-    PathMatcherProperties p2 = new PathMatcherProperties();
-    p2.setAntPattern("/actuator/**");
-    p2.setHttpMethod("POST");
-
-    PathMatcherProperties p3 = new PathMatcherProperties();
-    p3.setAntPattern("/public/roles/**");
-    p3.setHttpMethod("GET");
-
-    PathMatcherProperties p4 = new PathMatcherProperties();
-    p4.setAntPattern("/public/roles/**");
-    p4.setHttpMethod("GET");
-
-    PathMatcherProperties p5 = new PathMatcherProperties();
-    p5.setHttpMethod("DELETE");
-
-    PathMatcherProperties p6 = new PathMatcherProperties();
-    p6.setAntPattern("/api/**");
-
-    PathMatcherProperties p7 = new PathMatcherProperties();
-    p7.setAntPattern("/api/menu");
-
-    List<PathMatcherProperties> list = Arrays.asList(p0, p1, p2, p3, p4, p5, p6, p7);
-
-    Collections.shuffle(list);
-    Set<PathMatcherProperties> set = new TreeSet<>(list);
-    List<PathMatcherProperties> sortedList = List.copyOf(set);
-
-    assertEquals(7, sortedList.size());
-    assertEquals(p3, sortedList.get(0));
-    assertEquals(p7, sortedList.get(1));
-    assertEquals(p6, sortedList.get(2));
-    assertEquals(p2, sortedList.get(3));
-    assertEquals(p1, sortedList.get(4));
-    assertEquals(p5, sortedList.get(5));
-    assertEquals(p0, sortedList.get(6));
   }
 
 }

@@ -25,7 +25,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.UUID;
 import org.bremersee.security.authentication.AuthProperties.ClientCredentialsFlow;
 import org.bremersee.security.authentication.AuthProperties.EurekaAccessProperties;
@@ -235,13 +234,8 @@ class AuthPropertiesTest {
     AuthProperties properties = new AuthProperties();
     PathMatcherProperties defaults = new PathMatcherProperties();
     defaults.setAccessMode(properties.getAnyAccessMode());
-    Set<PathMatcherProperties> actual = properties.pathMatchers();
-    assertNotNull(actual);
-    assertEquals(1, actual.size());
-    assertTrue(actual.contains(defaults));
-
     properties.setPathMatchers(Collections.singletonList(defaults));
-    actual = properties.pathMatchers();
+    List<PathMatcherProperties> actual = properties.getPathMatchers();
     assertNotNull(actual);
     assertEquals(1, actual.size());
     assertTrue(actual.contains(defaults));
