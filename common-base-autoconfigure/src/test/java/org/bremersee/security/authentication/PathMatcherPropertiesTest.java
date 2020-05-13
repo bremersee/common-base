@@ -187,20 +187,26 @@ class PathMatcherPropertiesTest {
     PathMatcherProperties p5 = new PathMatcherProperties();
     p5.setHttpMethod("DELETE");
 
-    List<PathMatcherProperties> list = Arrays.asList(p0, p1, p2, p3, p4, p5);
-    for (int i = 0; i < 50; i++) {
-      Collections.shuffle(list);
+    PathMatcherProperties p6 = new PathMatcherProperties();
+    p6.setAntPattern("/api/**");
 
-      Set<PathMatcherProperties> set = new TreeSet<>(list);
-      List<PathMatcherProperties> sortedList = List.copyOf(set);
+    PathMatcherProperties p7 = new PathMatcherProperties();
+    p7.setAntPattern("/api/menu");
 
-      assertEquals(5, sortedList.size());
-      assertEquals(p3, sortedList.get(0));
-      assertEquals(p2, sortedList.get(1));
-      assertEquals(p1, sortedList.get(2));
-      assertEquals(p5, sortedList.get(3));
-      assertEquals(p0, sortedList.get(4));
-    }
+    List<PathMatcherProperties> list = Arrays.asList(p0, p1, p2, p3, p4, p5, p6, p7);
+
+    Collections.shuffle(list);
+    Set<PathMatcherProperties> set = new TreeSet<>(list);
+    List<PathMatcherProperties> sortedList = List.copyOf(set);
+
+    assertEquals(7, sortedList.size());
+    assertEquals(p3, sortedList.get(0));
+    assertEquals(p7, sortedList.get(1));
+    assertEquals(p6, sortedList.get(2));
+    assertEquals(p2, sortedList.get(3));
+    assertEquals(p1, sortedList.get(4));
+    assertEquals(p5, sortedList.get(5));
+    assertEquals(p0, sortedList.get(6));
   }
 
 }

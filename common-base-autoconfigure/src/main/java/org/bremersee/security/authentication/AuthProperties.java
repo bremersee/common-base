@@ -305,7 +305,7 @@ public class AuthProperties {
       }
 
       // 2.: compare the ant path
-      result = getAntPattern().compareToIgnoreCase(o.getAntPattern());
+      result = o.getAntPattern().compareToIgnoreCase(getAntPattern());
       if (result != 0) {
         if (ANY_PATH.equals(getAntPattern())) {
           return 1;
