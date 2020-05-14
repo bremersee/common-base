@@ -20,13 +20,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.bremersee.web.CorsProperties;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication.Type;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.event.EventListener;
 import org.springframework.security.authentication.ReactiveAuthenticationManager;
@@ -42,8 +42,7 @@ import org.springframework.security.web.server.SecurityWebFilterChain;
  * @author Christian Bremer
  */
 @ConditionalOnWebApplication(type = Type.REACTIVE)
-@ConditionalOnExpression(
-    "'${bremersee.auth.resource-server:OTHER}' != T(org.bremersee.security.authentication.AutoSecurityMode).OTHER")
+@Conditional({ResourceServerAutoSecurityCondition.class})
 @ConditionalOnClass({
     ServerHttpSecurity.class,
     ReactiveAuthenticationManager.class,

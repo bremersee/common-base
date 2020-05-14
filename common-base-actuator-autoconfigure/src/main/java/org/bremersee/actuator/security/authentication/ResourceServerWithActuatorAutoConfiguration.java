@@ -19,6 +19,7 @@ package org.bremersee.actuator.security.authentication;
 import lombok.extern.slf4j.Slf4j;
 import org.bremersee.security.authentication.AbstractResourceServerAutoConfiguration;
 import org.bremersee.security.authentication.AuthProperties;
+import org.bremersee.security.authentication.ResourceServerAutoSecurityCondition;
 import org.bremersee.security.authentication.InMemoryUserDetailsAutoConfiguration;
 import org.bremersee.security.authentication.JsonPathJwtConverter;
 import org.bremersee.security.authentication.PasswordFlowProperties;
@@ -37,6 +38,7 @@ import org.springframework.boot.autoconfigure.security.SecurityProperties;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.event.EventListener;
 import org.springframework.core.env.Environment;
@@ -52,8 +54,7 @@ import org.springframework.security.web.util.matcher.NegatedRequestMatcher;
  * @author Christian Bremer
  */
 @ConditionalOnWebApplication(type = Type.SERVLET)
-@ConditionalOnExpression(
-    "'${bremersee.auth.resource-server:OTHER}' != T(org.bremersee.security.authentication.AutoSecurityMode).OTHER")
+@Conditional({ResourceServerAutoSecurityCondition.class})
 @ConditionalOnClass({
     HttpSecurity.class,
     PasswordFlowProperties.class,

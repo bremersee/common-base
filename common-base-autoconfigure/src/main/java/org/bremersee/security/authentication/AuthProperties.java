@@ -354,15 +354,21 @@ public class AuthProperties {
     /**
      * Build basic auth user details.
      *
+     * @param passwordEncoder the password encoder
      * @param otherUserDetails the other user details
      * @return the user details
      */
     @NotNull
-    public UserDetails[] buildBasicAuthUserDetails(UserDetails... otherUserDetails) {
+    public UserDetails[] buildBasicAuthUserDetails(
+        @Nullable PasswordEncoder passwordEncoder,
+        UserDetails... otherUserDetails) {
+
       if (!StringUtils.hasText(username)) {
         return Optional.ofNullable(otherUserDetails).orElse(new UserDetails[0]);
       }
-      final PasswordEncoder encoder = PasswordEncoderFactories.createDelegatingPasswordEncoder();
+      final PasswordEncoder encoder = passwordEncoder != null
+          ? passwordEncoder
+          : PasswordEncoderFactories.createDelegatingPasswordEncoder();
       final SimpleUser user = new SimpleUser();
       user.setName(username);
       user.setPassword(StringUtils.hasText(password) ? password : "");

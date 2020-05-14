@@ -36,6 +36,7 @@ import org.springframework.boot.autoconfigure.security.SecurityProperties;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.event.EventListener;
 import org.springframework.core.Ordered;
@@ -63,8 +64,7 @@ import org.springframework.web.client.RestTemplate;
  * @author Christian Bremer
  */
 @ConditionalOnWebApplication(type = Type.SERVLET)
-@ConditionalOnExpression(
-    "'${bremersee.actuator.auth.enable:OTHER}' != T(org.bremersee.security.authentication.AutoSecurityMode).OTHER")
+@Conditional({ActuatorAutoSecurityCondition.class})
 @ConditionalOnClass({
     HttpSecurity.class,
     PasswordFlowProperties.class,

@@ -28,6 +28,7 @@ import org.springframework.boot.autoconfigure.security.SecurityProperties;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.event.EventListener;
 import org.springframework.core.env.Environment;
@@ -42,8 +43,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
  * @author Christian Bremer
  */
 @ConditionalOnWebApplication(type = Type.SERVLET)
-@ConditionalOnExpression(
-    "'${bremersee.auth.resource-server:OTHER}' != T(org.bremersee.security.authentication.AutoSecurityMode).OTHER")
+//@ConditionalOnExpression(
+//    "'${bremersee.auth.resource-server:OTHER}' != T(org.bremersee.security.authentication.AutoSecurityMode).OTHER")
+@Conditional({ResourceServerAutoSecurityCondition.class})
 @ConditionalOnClass({
     HttpSecurity.class,
     PasswordFlowProperties.class

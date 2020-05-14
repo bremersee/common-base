@@ -143,7 +143,7 @@ class EurekaAccessPropertiesTest {
     properties.setUsername(UUID.randomUUID().toString());
     properties.setPassword(UUID.randomUUID().toString());
     properties.setRole("ROLE_QWERTZ");
-    UserDetails[] userDetails = properties.buildBasicAuthUserDetails();
+    UserDetails[] userDetails = properties.buildBasicAuthUserDetails(null);
     assertNotNull(userDetails);
     assertEquals(1, userDetails.length);
     UserDetails user = userDetails[0];
@@ -153,12 +153,12 @@ class EurekaAccessPropertiesTest {
         .map(GrantedAuthority::getAuthority)
         .anyMatch(a -> a.equals(properties.getRole())));
 
-    userDetails = properties.buildBasicAuthUserDetails(user);
+    userDetails = properties.buildBasicAuthUserDetails(null, user);
     assertNotNull(userDetails);
     assertEquals(2, userDetails.length);
 
     properties.setUsername("");
-    userDetails = properties.buildBasicAuthUserDetails(user);
+    userDetails = properties.buildBasicAuthUserDetails(null, user);
     assertNotNull(userDetails);
     assertEquals(1, userDetails.length);
   }
