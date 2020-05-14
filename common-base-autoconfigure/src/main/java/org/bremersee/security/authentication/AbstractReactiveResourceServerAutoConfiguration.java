@@ -16,15 +16,12 @@
 
 package org.bremersee.security.authentication;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.bremersee.core.OrderedProxy;
 import org.bremersee.security.authentication.AuthProperties.PathMatcherProperties;
 import org.bremersee.web.CorsProperties;
 import org.springframework.beans.factory.ObjectProvider;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.ReactiveAuthenticationManager;
 import org.springframework.security.authentication.UserDetailsRepositoryReactiveAuthenticationManager;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
@@ -127,22 +124,9 @@ public abstract class AbstractReactiveResourceServerAutoConfiguration {
         authProperties.getResourceServerOrder());
   }
 
-  @SuppressWarnings("DuplicatedCode")
   private AuthorizeExchangeSpec configurePathMatchers(AuthorizeExchangeSpec spec) {
 
-    List<PathMatcherProperties> pathMatchers = new ArrayList<>(authProperties.getPathMatchers());
-    PathMatcherProperties corsMatcher = new PathMatcherProperties();
-    corsMatcher.setHttpMethod(HttpMethod.OPTIONS.name());
-    corsMatcher.setAccessMode(AccessMode.PERMIT_ALL);
-    if (corsProperties.isEnable() && !pathMatchers.contains(corsMatcher)) {
-      pathMatchers.add(0, corsMatcher);
-    }
-    PathMatcherProperties anyRequestMatcher = new PathMatcherProperties();
-    anyRequestMatcher.setAccessMode(authProperties.getAnyAccessMode());
-    if (!pathMatchers.contains(anyRequestMatcher)) {
-      pathMatchers.add(anyRequestMatcher);
-    }
-    for (PathMatcherProperties props : pathMatchers) {
+    for (PathMatcherProperties props : authProperties.preparePathMatchers(corsProperties)) {
       log.info("Securing requests to {}", props);
       switch (props.getAccessMode()) {
         case DENY_ALL:

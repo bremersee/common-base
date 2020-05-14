@@ -36,6 +36,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import org.bremersee.security.core.AuthorityConstants;
+import org.bremersee.web.CorsProperties;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.http.HttpMethod;
 import org.springframework.lang.Nullable;
@@ -165,6 +166,31 @@ public class AuthProperties {
   public String ensureRolePrefix(@NotEmpty String role) {
     final String prefix = rolePrefix.trim();
     return StringUtils.hasText(prefix) && role.startsWith(prefix) ? role : prefix + role;
+  }
+
+  /**
+   * Prepare path matchers.
+   *
+   * @param corsProperties the cors properties
+   * @return the prepared path matchers
+   */
+  @NotEmpty
+  public List<PathMatcherProperties> preparePathMatchers(
+      @NotNull CorsProperties corsProperties) {
+
+    List<PathMatcherProperties> pathMatchers = new ArrayList<>(getPathMatchers());
+    PathMatcherProperties corsMatcher = new PathMatcherProperties();
+    corsMatcher.setHttpMethod(HttpMethod.OPTIONS.name());
+    corsMatcher.setAccessMode(AccessMode.PERMIT_ALL);
+    if (corsProperties.isEnable() && !pathMatchers.contains(corsMatcher)) {
+      pathMatchers.add(0, corsMatcher);
+    }
+    PathMatcherProperties anyRequestMatcher = new PathMatcherProperties();
+    anyRequestMatcher.setAccessMode(getAnyAccessMode());
+    if (!pathMatchers.contains(anyRequestMatcher)) {
+      pathMatchers.add(anyRequestMatcher);
+    }
+    return pathMatchers;
   }
 
   /**

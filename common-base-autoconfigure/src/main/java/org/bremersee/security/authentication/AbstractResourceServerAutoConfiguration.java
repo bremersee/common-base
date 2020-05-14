@@ -16,8 +16,6 @@
 
 package org.bremersee.security.authentication;
 
-import java.util.ArrayList;
-import java.util.List;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -135,24 +133,11 @@ public abstract class AbstractResourceServerAutoConfiguration extends WebSecurit
     }
   }
 
-  @SuppressWarnings("DuplicatedCode")
   private ExpressionUrlAuthorizationConfigurer<HttpSecurity>.ExpressionInterceptUrlRegistry
   configurePathMatchers(
       ExpressionUrlAuthorizationConfigurer<HttpSecurity>.ExpressionInterceptUrlRegistry reg) {
 
-    List<PathMatcherProperties> pathMatchers = new ArrayList<>(authProperties.getPathMatchers());
-    PathMatcherProperties corsMatcher = new PathMatcherProperties();
-    corsMatcher.setHttpMethod(HttpMethod.OPTIONS.name());
-    corsMatcher.setAccessMode(AccessMode.PERMIT_ALL);
-    if (corsProperties.isEnable() && !pathMatchers.contains(corsMatcher)) {
-      pathMatchers.add(0, corsMatcher);
-    }
-    PathMatcherProperties anyRequestMatcher = new PathMatcherProperties();
-    anyRequestMatcher.setAccessMode(authProperties.getAnyAccessMode());
-    if (!pathMatchers.contains(anyRequestMatcher)) {
-      pathMatchers.add(anyRequestMatcher);
-    }
-    for (PathMatcherProperties props : pathMatchers) {
+    for (PathMatcherProperties props : authProperties.preparePathMatchers(corsProperties)) {
       log.info("Securing requests to {}", props);
       HttpMethod httpMethod = props.httpMethod();
       if (httpMethod == null) {
