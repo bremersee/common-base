@@ -167,13 +167,13 @@ class PasswordFlowReactiveAuthenticationManagerTest {
   private static PasswordFlowReactiveAuthenticationManager workingManager(
       Jwt jwt,
       JsonPathJwtConverter jwtConverter) {
-    PasswordFlowReactiveAuthenticationManager manager = new PasswordFlowReactiveAuthenticationManager(
+    PasswordFlowReactiveAuthenticationManager man = new PasswordFlowReactiveAuthenticationManager(
         properties(),
         workingJwtDecoder(jwt),
         null,
         retriever());
-    manager.setJwtAuthenticationConverter(jwtConverter);
-    return manager;
+    man.setJwtAuthenticationConverter(jwtConverter);
+    return man;
   }
 
   private static ReactiveJwtDecoder notWorkingJwtDecoder() {

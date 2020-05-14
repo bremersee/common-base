@@ -274,7 +274,7 @@ class ConverterIntegrationTest {
   @Test
   void testTimeZone() {
     TimeZoneId expected = TimeZoneId.EUROPE_BERLIN;
-    Assertions.assertEquals(expected, new StringToTimeZoneIdConverter().convert(expected.toString()));
+    assertEquals(expected, new StringToTimeZoneIdConverter().convert(expected.toString()));
     String actual = restTemplate
         .getForEntity("/timezone?value={value}", String.class, expected)
         .getBody();
