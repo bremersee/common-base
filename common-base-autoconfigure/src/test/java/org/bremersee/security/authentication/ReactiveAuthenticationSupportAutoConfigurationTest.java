@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 the original author or authors.
+ * Copyright 2019-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,15 +32,15 @@ import org.springframework.security.oauth2.jwt.ReactiveJwtDecoder;
  */
 class ReactiveAuthenticationSupportAutoConfigurationTest {
 
-  private static ReactiveAuthenticationSupportAutoConfiguration configuration;
+  private static ReactiveJwtSupportAutoConfiguration configuration;
 
   /**
    * Init.
    */
   @BeforeAll
   static void init() {
-    AuthenticationProperties properties = new AuthenticationProperties();
-    configuration = new ReactiveAuthenticationSupportAutoConfiguration(properties);
+    AuthProperties properties = new AuthProperties();
+    configuration = new ReactiveJwtSupportAutoConfiguration(properties);
     configuration.init();
   }
 

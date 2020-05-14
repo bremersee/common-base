@@ -1,0 +1,1 @@
+# Common Base Actuator Autoconfigure

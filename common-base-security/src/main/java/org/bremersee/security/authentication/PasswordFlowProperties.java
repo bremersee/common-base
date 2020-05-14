@@ -17,6 +17,7 @@
 package org.bremersee.security.authentication;
 
 import java.util.Arrays;
+import java.util.Optional;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
@@ -31,21 +32,7 @@ import org.springframework.util.StringUtils;
  *
  * @author Christian Bremer
  */
-public interface PasswordFlowProperties extends AccessTokenRetrieverProperties {
-
-  /**
-   * Gets client id.
-   *
-   * @return the client id
-   */
-  String getClientId();
-
-  /**
-   * Gets client secret.
-   *
-   * @return the client secret
-   */
-  String getClientSecret();
+public interface PasswordFlowProperties extends ClientCredentialsFlowProperties {
 
   /**
    * Gets username.
@@ -61,12 +48,10 @@ public interface PasswordFlowProperties extends AccessTokenRetrieverProperties {
    */
   String getPassword();
 
-  /**
-   * Gets additional properties.
-   *
-   * @return the additional properties
-   */
-  MultiValueMap<String, String> getAdditionalProperties();
+  @Override
+  default Optional<BasicAuthProperties> getBasicAuthProperties() {
+    return Optional.empty();
+  }
 
   @Override
   default MultiValueMap<String, String> createBody() {
@@ -116,7 +101,7 @@ public interface PasswordFlowProperties extends AccessTokenRetrieverProperties {
 
     private String password;
 
-    private MultiValueMap<String, String> additionalProperties = new LinkedMultiValueMap<>();
+    private final MultiValueMap<String, String> additionalProperties = new LinkedMultiValueMap<>();
 
     /**
      * Sets token endpoint on builder.
@@ -188,21 +173,27 @@ public interface PasswordFlowProperties extends AccessTokenRetrieverProperties {
     }
 
     /**
-     * Gets the values from the given password flow properties.
+     * Gets the values from the given properties.
      *
-     * @param passwordFlowProperties the password flow properties
+     * @param properties the properties
      * @return the builder
      */
-    public Builder from(PasswordFlowProperties passwordFlowProperties) {
-      if (passwordFlowProperties != null) {
-        if (passwordFlowProperties.getAdditionalProperties() != null) {
-          this.additionalProperties.addAll(passwordFlowProperties.getAdditionalProperties());
+    public Builder from(ClientCredentialsFlowProperties properties) {
+      if (properties != null) {
+        if (properties.getAdditionalProperties() != null) {
+          this.additionalProperties.addAll(properties.getAdditionalProperties());
         }
-        return tokenEndpoint(passwordFlowProperties.getTokenEndpoint())
-            .clientId(passwordFlowProperties.getClientId())
-            .clientSecret(passwordFlowProperties.getClientSecret())
-            .username(passwordFlowProperties.getUsername())
-            .password(passwordFlowProperties.getPassword());
+        final String username = properties instanceof PasswordFlowProperties
+            ? ((PasswordFlowProperties) properties).getUsername()
+            : null;
+        final String password = properties instanceof PasswordFlowProperties
+            ? ((PasswordFlowProperties) properties).getPassword()
+            : null;
+        return tokenEndpoint(properties.getTokenEndpoint())
+            .clientId(properties.getClientId())
+            .clientSecret(properties.getClientSecret())
+            .username(username)
+            .password(password);
       }
       return this;
     }
@@ -228,18 +219,17 @@ public interface PasswordFlowProperties extends AccessTokenRetrieverProperties {
     @EqualsAndHashCode(exclude = {"clientSecret", "password"})
     private static class Impl implements PasswordFlowProperties {
 
-      private String tokenEndpoint;
+      private final String tokenEndpoint;
 
-      private String clientId;
+      private final String clientId;
 
-      private String clientSecret;
+      private final String clientSecret;
 
-      private String username;
+      private final String username;
 
-      private String password;
+      private final String password;
 
-      private MultiValueMap<String, String> additionalProperties;
-
+      private final MultiValueMap<String, String> additionalProperties;
     }
   }
 

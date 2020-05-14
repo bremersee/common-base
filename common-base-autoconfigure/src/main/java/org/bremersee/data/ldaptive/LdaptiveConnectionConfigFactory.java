@@ -47,7 +47,7 @@ public interface LdaptiveConnectionConfigFactory {
     return createConnectionConfig(
         properties,
         properties.getBindDn(),
-        properties.getBindCredential());
+        properties.getBindCredentials());
   }
 
   /**
@@ -87,7 +87,7 @@ public interface LdaptiveConnectionConfigFactory {
       final String username = bindDn != null ? bindDn : properties.getBindDn();
       final String password = bindCredential != null
           ? bindCredential
-          : properties.getBindCredential();
+          : properties.getBindCredentials();
       final ConnectionConfig cc = new ConnectionConfig();
       cc.setLdapUrl(properties.getLdapUrl());
 

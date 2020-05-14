@@ -198,8 +198,8 @@ class LdaptivePropertiesTest {
   void getBindCredential() {
     String value = UUID.randomUUID().toString();
     LdaptiveProperties expected = new LdaptiveProperties();
-    expected.setBindCredential(value);
-    assertEquals(value, expected.getBindCredential());
+    expected.setBindCredentials(value);
+    assertEquals(value, expected.getBindCredentials());
   }
 
   /**

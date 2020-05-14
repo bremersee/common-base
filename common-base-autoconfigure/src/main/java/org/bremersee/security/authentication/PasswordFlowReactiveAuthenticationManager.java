@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 the original author or authors.
+ * Copyright 2019-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,28 +43,28 @@ import reactor.core.publisher.Mono;
 @Slf4j
 public class PasswordFlowReactiveAuthenticationManager implements ReactiveAuthenticationManager {
 
-  private AuthenticationProperties properties;
+  private final ClientCredentialsFlowProperties passwordFlowProperties;
 
-  private ReactiveJwtDecoder jwtDecoder;
+  private final ReactiveJwtDecoder jwtDecoder;
 
   private Converter<Jwt, ? extends Mono<? extends AbstractAuthenticationToken>> jwtConverter;
 
-  private AccessTokenRetriever<Mono<String>> retriever;
+  private final AccessTokenRetriever<Mono<String>> retriever;
 
   /**
    * Instantiates a new password flow reactive authentication manager.
    *
-   * @param properties the properties
+   * @param passwordFlowProperties the password flow properties
    * @param jwtDecoder the jwt decoder
    * @param jwtConverter the jwt converter
    * @param retriever the retriever
    */
   public PasswordFlowReactiveAuthenticationManager(
-      AuthenticationProperties properties,
+      ClientCredentialsFlowProperties passwordFlowProperties,
       ReactiveJwtDecoder jwtDecoder,
       @Nullable Converter<Jwt, ? extends Mono<? extends AbstractAuthenticationToken>> jwtConverter,
       @Nullable AccessTokenRetriever<Mono<String>> retriever) {
-    this.properties = properties;
+    this.passwordFlowProperties = passwordFlowProperties;
     this.jwtDecoder = jwtDecoder;
     this.jwtConverter = Objects.requireNonNullElseGet(
         jwtConverter,
@@ -79,7 +79,6 @@ public class PasswordFlowReactiveAuthenticationManager implements ReactiveAuthen
    *
    * @param jwtConverter the jwt converter
    */
-  @SuppressWarnings("unused")
   public void setJwtAuthenticationConverter(
       Converter<Jwt, ? extends AbstractAuthenticationToken> jwtConverter) {
     if (jwtConverter != null) {
@@ -92,13 +91,15 @@ public class PasswordFlowReactiveAuthenticationManager implements ReactiveAuthen
   @Override
   public Mono<Authentication> authenticate(final Authentication authentication) {
 
-    final String username = authentication.getName();
-    final String password = (String) authentication.getCredentials();
-    //noinspection NullableInLambdaInTransform
-    return Mono.just(properties.getPasswordFlow().toProperties(username, password))
+    final PasswordFlowProperties properties = PasswordFlowProperties.builder()
+        .from(passwordFlowProperties)
+        .username(authentication.getName())
+        .password((String) authentication.getCredentials())
+        .build();
+    return Mono.just(properties)
         .flatMap(retriever::retrieveAccessToken)
         .flatMap(jwtDecoder::decode)
-        .flatMap(jwtConverter::convert)
+        .flatMap(jwt -> Objects.requireNonNull(jwtConverter.convert(jwt)))
         .cast(Authentication.class)
         .onErrorMap(JwtException.class, this::onError);
   }

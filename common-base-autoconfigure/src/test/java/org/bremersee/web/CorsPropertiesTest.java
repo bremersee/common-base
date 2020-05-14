@@ -88,9 +88,7 @@ class CorsPropertiesTest {
     c1.setPathPattern("/foo/**");
 
     assertTrue(c1.getAllowedHeaders().contains("*"));
-    assertTrue(c1.getAllowedMethods().contains("GET"));
-    assertTrue(c1.getAllowedMethods().contains("POST"));
-    assertTrue(c1.getAllowedMethods().contains("HEAD"));
+    assertTrue(c1.getAllowedMethods().contains("*"));
     assertTrue(c1.getAllowedOrigins().contains("*"));
 
     CorsConfiguration c2 = new CorsConfiguration();

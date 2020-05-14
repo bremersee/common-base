@@ -92,6 +92,9 @@ class ApiExceptionHandlerTest {
     exceptionHandler.setPathMatcher(new AntPathMatcher());
   }
 
+  /**
+   * Test get router function.
+   */
   @Test
   void testGetRouterFunction() {
     assertNotNull(exceptionHandler.getRoutingFunction(mock(ErrorAttributes.class)));

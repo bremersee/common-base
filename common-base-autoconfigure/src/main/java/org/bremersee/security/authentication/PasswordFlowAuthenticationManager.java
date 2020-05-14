@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 the original author or authors.
+ * Copyright 2019-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -46,28 +46,28 @@ public class PasswordFlowAuthenticationManager
   private static final OAuth2Error DEFAULT_INVALID_TOKEN =
       invalidToken("An error occurred while attempting to decode the Jwt: Invalid token");
 
-  private AuthenticationProperties properties;
+  private final ClientCredentialsFlowProperties passwordFlowProperties;
 
-  private AccessTokenRetriever<String> accessTokenRetriever;
+  private final AccessTokenRetriever<String> accessTokenRetriever;
 
-  private JwtDecoder jwtDecoder;
+  private final JwtDecoder jwtDecoder;
 
-  private Converter<Jwt, ? extends AbstractAuthenticationToken> jwtAuthenticationConverter;
+  private final Converter<Jwt, ? extends AbstractAuthenticationToken> jwtAuthenticationConverter;
 
   /**
    * Instantiates a new password flow authentication manager.
    *
-   * @param properties the properties
+   * @param passwordFlowProperties the password flow properties
    * @param jwtDecoder the jwt decoder
    * @param jwtAuthenticationConverter the jwt authentication converter
    * @param accessTokenRetriever the access token retriever
    */
   public PasswordFlowAuthenticationManager(
-      AuthenticationProperties properties,
+      ClientCredentialsFlowProperties passwordFlowProperties,
       JwtDecoder jwtDecoder,
       @Nullable Converter<Jwt, ? extends AbstractAuthenticationToken> jwtAuthenticationConverter,
       AccessTokenRetriever<String> accessTokenRetriever) {
-    this.properties = properties;
+    this.passwordFlowProperties = passwordFlowProperties;
     this.jwtDecoder = jwtDecoder;
     this.jwtAuthenticationConverter = Objects.requireNonNullElseGet(
         jwtAuthenticationConverter,
@@ -77,10 +77,12 @@ public class PasswordFlowAuthenticationManager
 
   @Override
   public Authentication authenticate(Authentication authentication) throws AuthenticationException {
-    final String username = authentication.getName();
-    final String password = (String) authentication.getCredentials();
-    final String tokenStr = accessTokenRetriever
-        .retrieveAccessToken(properties.getPasswordFlow().toProperties(username, password));
+    final PasswordFlowProperties properties = PasswordFlowProperties.builder()
+        .from(passwordFlowProperties)
+        .username(authentication.getName())
+        .password((String) authentication.getCredentials())
+        .build();
+    final String tokenStr = accessTokenRetriever.retrieveAccessToken(properties);
     Jwt jwt;
     try {
       jwt = this.jwtDecoder.decode(tokenStr);

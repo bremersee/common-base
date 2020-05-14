@@ -27,7 +27,7 @@ class LdaptiveConnectionPoolFactoryTest {
     properties.setAuthenticationCertificate("authcert");
     properties.setAuthenticationKey("authkey");
     properties.setBindDn("ou=admin");
-    properties.setBindCredential("changeit");
+    properties.setBindCredentials("changeit");
 
     properties.setPrunePeriod(1L);
     properties.setValidatePeriod(2L);

@@ -16,11 +16,9 @@
 
 package org.bremersee.security.authentication;
 
-import static org.springframework.util.StringUtils.hasText;
-
 import java.util.Collection;
-import java.util.Objects;
 import java.util.Optional;
+import org.springframework.security.authorization.AuthenticatedReactiveAuthorizationManager;
 import org.springframework.security.authorization.AuthorityReactiveAuthorizationManager;
 import org.springframework.security.authorization.AuthorizationDecision;
 import org.springframework.security.authorization.ReactiveAuthorizationManager;
@@ -36,35 +34,33 @@ import reactor.core.publisher.Mono;
 public class RoleBasedAuthorizationManager
     implements ReactiveAuthorizationManager<AuthorizationContext> {
 
-  private static final String DEFAULT_ROLE_PREFIX = "ROLE_";
-
   private final String[] roles;
 
+  private final boolean withAuthenticatedFallback;
+
   /**
-   * Instantiates a new Role or ip based authorization manager.
+   * Instantiates a new role based authorization manager.
    *
    * @param roles the roles
    */
   public RoleBasedAuthorizationManager(Collection<String> roles) {
-    this(roles, DEFAULT_ROLE_PREFIX);
+    this(roles, true);
   }
 
   /**
    * Instantiates a new role based authorization manager.
    *
    * @param roles the roles
-   * @param rolePrefix the role prefix
+   * @param withAuthenticatedFallback the with authenticated fallback flag
    */
   public RoleBasedAuthorizationManager(
       Collection<String> roles,
-      String rolePrefix) {
-    final String prefix = hasText(rolePrefix) ? rolePrefix : "";
+      boolean withAuthenticatedFallback) {
+
     this.roles = Optional.ofNullable(roles)
-        .map(col -> col.stream()
-            .filter(Objects::nonNull)
-            .map(role -> hasText(prefix) && role.startsWith(prefix) ? role : prefix + role)
-            .toArray(String[]::new))
+        .map(col -> col.toArray(new String[0]))
         .orElseGet(() -> new String[0]);
+    this.withAuthenticatedFallback = withAuthenticatedFallback;
   }
 
   @Override
@@ -72,8 +68,15 @@ public class RoleBasedAuthorizationManager
       Mono<Authentication> authentication,
       AuthorizationContext authorizationContext) {
 
-    return AuthorityReactiveAuthorizationManager.hasAnyAuthority(roles)
-        .check(authentication, authorizationContext);
+    if (roles.length == 0 && withAuthenticatedFallback) {
+      return AuthenticatedReactiveAuthorizationManager
+          .authenticated().check(authentication, authorizationContext);
+    } else if (roles.length == 0) {
+      return Mono.just(new AuthorizationDecision(false));
+    } else {
+      return AuthorityReactiveAuthorizationManager.hasAnyAuthority(roles)
+          .check(authentication, authorizationContext);
+    }
   }
 
 }

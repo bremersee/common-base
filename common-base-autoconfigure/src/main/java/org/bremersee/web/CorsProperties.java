@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 the original author or authors.
+ * Copyright 2019-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,28 +20,35 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.http.HttpMethod;
 import org.springframework.util.StringUtils;
+import org.springframework.validation.annotation.Validated;
 
 /**
- * CORS configuration properties.
+ * The cors properties.
  *
  * @author Christian Bremer
  */
-@ConfigurationProperties(prefix = "bremersee.security.cors")
+@ConfigurationProperties(prefix = "bremersee.cors")
 @Setter
 @ToString
 @EqualsAndHashCode
+@Validated
 public class CorsProperties {
 
   @Getter
-  private boolean allowAll;
+  private boolean enable = true;
 
+  @Getter
+  private boolean allowAll = true;
+
+  @NotNull
   private List<CorsConfiguration> configs = new ArrayList<>();
 
   /**
@@ -49,9 +56,10 @@ public class CorsProperties {
    *
    * @return the allow all configuration
    */
-  @SuppressWarnings("WeakerAccess")
+  @NotEmpty
   public static List<CorsConfiguration> allowAllConfiguration() {
-    return Collections.singletonList(CorsConfiguration.allowAllConfiguration());
+    return Collections
+        .singletonList(CorsConfiguration.allowAllConfiguration());
   }
 
   /**
@@ -59,12 +67,13 @@ public class CorsProperties {
    *
    * @return the configs
    */
+  @NotNull
   public List<CorsConfiguration> getConfigs() {
-    if (allowAll) {
-      return allowAllConfiguration();
-    }
     if (configs == null) {
       configs = new ArrayList<>();
+    }
+    if (enable && allowAll && configs.isEmpty()) {
+      return allowAllConfiguration();
     }
     return configs.stream()
         .filter(config -> StringUtils.hasText(config.getPathPattern()))
@@ -77,6 +86,7 @@ public class CorsProperties {
   @Setter
   @ToString
   @EqualsAndHashCode
+  @Validated
   public static class CorsConfiguration {
 
     @Getter
@@ -87,6 +97,10 @@ public class CorsProperties {
     private List<String> allowedMethods = new ArrayList<>();
 
     private List<String> allowedHeaders = new ArrayList<>();
+
+    @Getter
+    @NotNull
+    private List<String> exposedHeaders = new ArrayList<>();
 
     @Getter
     private boolean allowCredentials;
@@ -105,6 +119,7 @@ public class CorsProperties {
       configuration.allowedOrigins = Collections.singletonList("*");
       configuration.allowedMethods = Collections.singletonList("*");
       configuration.allowedHeaders = Collections.singletonList("*");
+      configuration.allowCredentials = true;
       return configuration;
     }
 
@@ -113,6 +128,7 @@ public class CorsProperties {
      *
      * @return the allowed origins
      */
+    @NotEmpty
     public List<String> getAllowedOrigins() {
       if (allowedOrigins == null) {
         allowedOrigins = new ArrayList<>();
@@ -128,14 +144,13 @@ public class CorsProperties {
      *
      * @return the allowed methods
      */
+    @NotEmpty
     public List<String> getAllowedMethods() {
       if (allowedMethods == null) {
         allowedMethods = new ArrayList<>();
       }
       if (allowedMethods.isEmpty()) {
-        allowedMethods.add(HttpMethod.GET.name());
-        allowedMethods.add(HttpMethod.POST.name());
-        allowedMethods.add(HttpMethod.HEAD.name());
+        allowedMethods.add("*");
       }
       return allowedMethods;
     }
@@ -145,6 +160,7 @@ public class CorsProperties {
      *
      * @return the allowed headers
      */
+    @NotEmpty
     public List<String> getAllowedHeaders() {
       if (allowedHeaders == null) {
         allowedHeaders = new ArrayList<>();
@@ -155,5 +171,4 @@ public class CorsProperties {
       return allowedHeaders;
     }
   }
-
 }
