@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ReactiveInMemoryUserDetailsAutoConfiguration.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">common-base-autoconfigure</a> &gt; <a href="index.source.html" class="el_package">org.bremersee.security.authentication</a> &gt; <span class="el_source">ReactiveInMemoryUserDetailsAutoConfiguration.java</span></div><h1>ReactiveInMemoryUserDetailsAutoConfiguration.java</h1><pre class="source lang-java linenums">/*
+ * Copyright 2020 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package org.bremersee.security.authentication;
+
+import java.util.Optional;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.boot.autoconfigure.AutoConfigureAfter;
+import org.springframework.boot.autoconfigure.AutoConfigureBefore;
+import org.springframework.boot.autoconfigure.condition.AnyNestedCondition;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
+import org.springframework.boot.autoconfigure.rsocket.RSocketMessagingAutoConfiguration;
+import org.springframework.boot.autoconfigure.security.SecurityProperties;
+import org.springframework.boot.autoconfigure.security.reactive.ReactiveUserDetailsServiceAutoConfiguration;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Conditional;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.ReactiveAuthenticationManager;
+import org.springframework.security.core.userdetails.MapReactiveUserDetailsService;
+import org.springframework.security.core.userdetails.ReactiveUserDetailsService;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.util.ClassUtils;
+
+/**
+ * The reactive in memory user details auto configuration.
+ *
+ * @author Christian Bremer
+ */
+@Configuration(proxyBeanMethods = false)
+@ConditionalOnClass({ReactiveAuthenticationManager.class})
+@ConditionalOnMissingBean(
+    value = {
+        ReactiveAuthenticationManager.class,
+        ReactiveUserDetailsService.class
+    },
+    type = {
+        &quot;org.springframework.security.oauth2.jwt.ReactiveJwtDecoder&quot;,
+        &quot;org.springframework.security.oauth2.server.resource.introspection.ReactiveOpaqueTokenIntrospector&quot;
+    })
+@Conditional(ReactiveInMemoryUserDetailsAutoConfiguration.ReactiveUserDetailsServiceCondition.class)
+@AutoConfigureAfter(RSocketMessagingAutoConfiguration.class)
+@AutoConfigureBefore(ReactiveUserDetailsServiceAutoConfiguration.class)
+@EnableConfigurationProperties({
+    SecurityProperties.class,
+    AuthProperties.class})
+<span class="fc" id="L64">@Slf4j</span>
+<span class="fc" id="L65">public class ReactiveInMemoryUserDetailsAutoConfiguration {</span>
+
+  /**
+   * Creates a reactive user details service bean.
+   *
+   * @param securityProperties the security properties
+   * @param authProperties the auth properties
+   * @param passwordEncoder the password encoder
+   * @return the map reactive user details service
+   */
+  @Bean
+  public MapReactiveUserDetailsService reactiveUserDetailsService(
+      SecurityProperties securityProperties,
+      AuthProperties authProperties,
+      ObjectProvider&lt;PasswordEncoder&gt; passwordEncoder) {
+
+<span class="fc" id="L81">    log.info(&quot;\n&quot;</span>
+            + &quot;*********************************************************************************\n&quot;
+            + &quot;* {} is creating a {}\n&quot;
+            + &quot;*********************************************************************************&quot;,
+<span class="fc" id="L85">        ClassUtils.getUserClass(getClass()).getSimpleName(),</span>
+<span class="fc" id="L86">        ClassUtils.getUserClass(MapReactiveUserDetailsService.class).getSimpleName());</span>
+
+<span class="fc" id="L88">    return Optional.of(authProperties.buildBasicAuthUserDetails(passwordEncoder.getIfAvailable()))</span>
+<span class="fc bfc" id="L89" title="All 2 branches covered.">        .filter(userDetails -&gt; userDetails.length &gt; 0)</span>
+<span class="fc" id="L90">        .map(MapReactiveUserDetailsService::new)</span>
+<span class="fc" id="L91">        .orElseGet(() -&gt; new ReactiveUserDetailsServiceAutoConfiguration()</span>
+<span class="fc" id="L92">            .reactiveUserDetailsService(securityProperties, passwordEncoder));</span>
+  }
+
+  /**
+   * The reactive user details service condition.
+   */
+  static class ReactiveUserDetailsServiceCondition extends AnyNestedCondition {
+
+    /**
+     * Instantiates a new Reactive user details service condition.
+     */
+    ReactiveUserDetailsServiceCondition() {
+<span class="fc" id="L104">      super(ConfigurationPhase.REGISTER_BEAN);</span>
+<span class="fc" id="L105">    }</span>
+
+    /**
+     * The type R socket security enabled condition.
+     */
+    @ConditionalOnBean(type = {
+        &quot;org.springframework.messaging.rsocket.annotation.support.RSocketMessageHandler&quot;})
+    @SuppressWarnings(&quot;unused&quot;)
+<span class="nc" id="L113">    static class RSocketSecurityEnabledCondition {</span>
+
+    }
+
+    /**
+     * The type Reactive web application condition.
+     */
+    @ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.REACTIVE)
+    @SuppressWarnings(&quot;unused&quot;)
+<span class="nc" id="L122">    static class ReactiveWebApplicationCondition {</span>
+
+    }
+  }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

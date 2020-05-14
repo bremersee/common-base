@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AbstractReactiveResourceServerAutoConfiguration.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">common-base-autoconfigure</a> &gt; <a href="index.source.html" class="el_package">org.bremersee.security.authentication</a> &gt; <span class="el_source">AbstractReactiveResourceServerAutoConfiguration.java</span></div><h1>AbstractReactiveResourceServerAutoConfiguration.java</h1><pre class="source lang-java linenums">/*
+ * Copyright 2020 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package org.bremersee.security.authentication;
+
+import java.util.Optional;
+import lombok.extern.slf4j.Slf4j;
+import org.bremersee.core.OrderedProxy;
+import org.bremersee.security.authentication.AuthProperties.PathMatcherProperties;
+import org.bremersee.web.CorsProperties;
+import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.security.authentication.ReactiveAuthenticationManager;
+import org.springframework.security.authentication.UserDetailsRepositoryReactiveAuthenticationManager;
+import org.springframework.security.config.web.server.ServerHttpSecurity;
+import org.springframework.security.config.web.server.ServerHttpSecurity.AuthorizeExchangeSpec;
+import org.springframework.security.core.userdetails.MapReactiveUserDetailsService;
+import org.springframework.security.core.userdetails.ReactiveUserDetailsService;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.server.SecurityWebFilterChain;
+import org.springframework.security.web.server.util.matcher.ServerWebExchangeMatcher;
+import org.springframework.security.web.server.util.matcher.ServerWebExchangeMatchers;
+import org.springframework.util.Assert;
+import org.springframework.util.ClassUtils;
+
+/**
+ * The abstract reactive resource server security auto configuration.
+ *
+ * @author Christian Bremer
+ */
+<span class="fc" id="L43">@Slf4j</span>
+public abstract class AbstractReactiveResourceServerAutoConfiguration {
+
+  private final CorsProperties corsProperties;
+
+  private final AuthProperties authProperties;
+
+  private final ObjectProvider&lt;JsonPathReactiveJwtConverter&gt; jwtConverterProvider;
+
+  private final ObjectProvider&lt;ReactiveUserDetailsService&gt; userDetailsServiceProvider;
+
+  private final ObjectProvider&lt;PasswordEncoder&gt; passwordEncoderProvider;
+
+  /**
+   * Instantiates a new abstract reactive resource server security auto configuration.
+   *
+   * @param corsProperties the cors properties
+   * @param authProperties the authentication nad authorization properties
+   * @param jwtConverterProvider the jwt converter provider
+   * @param userDetailsServiceProvider the user details service provider
+   * @param passwordEncoderProvider the password encoder provider
+   */
+  protected AbstractReactiveResourceServerAutoConfiguration(
+      CorsProperties corsProperties,
+      AuthProperties authProperties,
+      ObjectProvider&lt;JsonPathReactiveJwtConverter&gt; jwtConverterProvider,
+      ObjectProvider&lt;ReactiveUserDetailsService&gt; userDetailsServiceProvider,
+<span class="fc" id="L70">      ObjectProvider&lt;PasswordEncoder&gt; passwordEncoderProvider) {</span>
+<span class="fc" id="L71">    this.corsProperties = corsProperties;</span>
+<span class="fc" id="L72">    this.authProperties = authProperties;</span>
+<span class="fc" id="L73">    this.jwtConverterProvider = jwtConverterProvider;</span>
+<span class="fc" id="L74">    this.userDetailsServiceProvider = userDetailsServiceProvider;</span>
+<span class="fc" id="L75">    this.passwordEncoderProvider = passwordEncoderProvider;</span>
+<span class="fc" id="L76">  }</span>
+
+  /**
+   * Init.
+   */
+  protected void init() {
+<span class="fc" id="L82">    log.info(&quot;\n&quot;</span>
+            + &quot;*********************************************************************************\n&quot;
+            + &quot;* {}\n&quot;
+            + &quot;*********************************************************************************&quot;,
+<span class="fc" id="L86">        ClassUtils.getUserClass(getClass()).getSimpleName());</span>
+<span class="fc" id="L87">  }</span>
+
+  /**
+   * Init authorize exchange.
+   *
+   * @param http the http
+   * @return the authorize exchange spec
+   */
+  protected abstract AuthorizeExchangeSpec init(ServerHttpSecurity http);
+
+  /**
+   * Resource server filter chain.
+   *
+   * @param serverHttpSecurity the server http security
+   * @return the security web filter chain
+   */
+  protected SecurityWebFilterChain resourceServerFilterChain(
+      ServerHttpSecurity serverHttpSecurity) {
+
+<span class="fc" id="L106">    ServerHttpSecurity http = serverHttpSecurity;</span>
+<span class="fc" id="L107">    Assert.notNull(http, &quot;Server http security must be present.&quot;);</span>
+<span class="fc" id="L108">    AuthorizeExchangeSpec spec = init(http);</span>
+<span class="fc bfc" id="L109" title="All 2 branches covered.">    if (authProperties.getResourceServer() == AutoSecurityMode.NONE) {</span>
+<span class="fc" id="L110">      http = spec</span>
+<span class="fc" id="L111">          .anyExchange().permitAll()</span>
+<span class="fc" id="L112">          .and()</span>
+<span class="fc" id="L113">          .httpBasic().disable();</span>
+    } else {
+<span class="fc" id="L115">      spec = configurePathMatchers(spec);</span>
+<span class="fc" id="L116">      http = configureAuthenticationManager(spec.and());</span>
+    }
+<span class="fc" id="L118">    http = http.csrf().disable();</span>
+<span class="pc bpc" id="L119" title="1 of 2 branches missed.">    if (!corsProperties.isEnable()) {</span>
+<span class="nc" id="L120">      http = http.cors().disable();</span>
+    }
+<span class="fc" id="L122">    return OrderedProxy.create(</span>
+<span class="fc" id="L123">        http.build(),</span>
+<span class="fc" id="L124">        authProperties.getResourceServerOrder());</span>
+  }
+
+  private AuthorizeExchangeSpec configurePathMatchers(AuthorizeExchangeSpec spec) {
+
+<span class="fc bfc" id="L129" title="All 2 branches covered.">    for (PathMatcherProperties props : authProperties.preparePathMatchers(corsProperties)) {</span>
+<span class="fc" id="L130">      log.info(&quot;Securing requests to {}&quot;, props);</span>
+<span class="fc bfc" id="L131" title="All 3 branches covered.">      switch (props.getAccessMode()) {</span>
+        case DENY_ALL:
+<span class="fc" id="L133">          spec = spec.matchers(matcher(props)).denyAll();</span>
+<span class="fc" id="L134">          break;</span>
+        case PERMIT_ALL:
+<span class="fc" id="L136">          spec = spec.matchers(matcher(props)).permitAll();</span>
+<span class="fc" id="L137">          break;</span>
+        default:
+<span class="fc" id="L139">          spec = spec.matchers(matcher(props)).access(new RoleOrIpBasedAuthorizationManager(</span>
+<span class="fc" id="L140">              props.roles(authProperties::ensureRolePrefix),</span>
+<span class="fc" id="L141">              props.getIpAddresses()));</span>
+      }
+<span class="fc" id="L143">    }</span>
+<span class="fc" id="L144">    return spec;</span>
+  }
+
+  private ServerWebExchangeMatcher matcher(PathMatcherProperties props) {
+<span class="fc" id="L148">    return Optional.ofNullable(props.httpMethod())</span>
+<span class="fc" id="L149">        .map(method -&gt; ServerWebExchangeMatchers.pathMatchers(method, props.getAntPattern()))</span>
+<span class="fc" id="L150">        .orElseGet(() -&gt; ServerWebExchangeMatchers.pathMatchers(props.getAntPattern()));</span>
+  }
+
+  private ServerHttpSecurity configureAuthenticationManager(ServerHttpSecurity http) {
+
+<span class="fc" id="L155">    return Optional.ofNullable(jwtConverterProvider.getIfAvailable())</span>
+<span class="fc" id="L156">        .map(jwtConverter -&gt; http</span>
+<span class="fc" id="L157">            .oauth2ResourceServer((rs) -&gt; rs</span>
+<span class="fc" id="L158">                .jwt()</span>
+<span class="fc" id="L159">                .jwtAuthenticationConverter(jwtConverter)</span>
+<span class="fc" id="L160">                .and()))</span>
+<span class="fc" id="L161">        .orElseGet(() -&gt; http</span>
+<span class="fc" id="L162">            .authenticationManager(userDetailsAuthenticationManager())</span>
+<span class="fc" id="L163">            .httpBasic()</span>
+<span class="fc" id="L164">            .and()</span>
+<span class="fc" id="L165">            .formLogin().disable());</span>
+  }
+
+  private ReactiveAuthenticationManager userDetailsAuthenticationManager() {
+
+<span class="fc" id="L170">    return Optional.ofNullable(userDetailsServiceProvider.getIfAvailable())</span>
+<span class="fc" id="L171">        .map(UserDetailsRepositoryReactiveAuthenticationManager::new)</span>
+<span class="pc" id="L172">        .orElseGet(() -&gt; new UserDetailsRepositoryReactiveAuthenticationManager(</span>
+            new MapReactiveUserDetailsService(authProperties
+<span class="nc" id="L174">                .buildBasicAuthUserDetails(passwordEncoderProvider.getIfAvailable()))));</span>
+  }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

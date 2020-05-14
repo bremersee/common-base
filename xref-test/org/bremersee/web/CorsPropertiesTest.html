@@ -96,49 +96,47 @@
 <a class="jxr_linenumber" name="L88" href="#L88">88</a>      c1.setPathPattern(<span class="jxr_string">"/foo/**"</span>);
 <a class="jxr_linenumber" name="L89" href="#L89">89</a>  
 <a class="jxr_linenumber" name="L90" href="#L90">90</a>      assertTrue(c1.getAllowedHeaders().contains(<span class="jxr_string">"*"</span>));
-<a class="jxr_linenumber" name="L91" href="#L91">91</a>      assertTrue(c1.getAllowedMethods().contains(<span class="jxr_string">"GET"</span>));
-<a class="jxr_linenumber" name="L92" href="#L92">92</a>      assertTrue(c1.getAllowedMethods().contains(<span class="jxr_string">"POST"</span>));
-<a class="jxr_linenumber" name="L93" href="#L93">93</a>      assertTrue(c1.getAllowedMethods().contains(<span class="jxr_string">"HEAD"</span>));
-<a class="jxr_linenumber" name="L94" href="#L94">94</a>      assertTrue(c1.getAllowedOrigins().contains(<span class="jxr_string">"*"</span>));
-<a class="jxr_linenumber" name="L95" href="#L95">95</a>  
-<a class="jxr_linenumber" name="L96" href="#L96">96</a>      CorsConfiguration c2 = <strong class="jxr_keyword">new</strong> CorsConfiguration();
-<a class="jxr_linenumber" name="L97" href="#L97">97</a>      properties.setConfigs(Arrays.asList(c0, c1, c2));
-<a class="jxr_linenumber" name="L98" href="#L98">98</a>  
-<a class="jxr_linenumber" name="L99" href="#L99">99</a>      configurations = properties.getConfigs();
-<a class="jxr_linenumber" name="L100" href="#L100">100</a>     assertNotNull(configurations);
-<a class="jxr_linenumber" name="L101" href="#L101">101</a>     assertEquals(2, configurations.size());
-<a class="jxr_linenumber" name="L102" href="#L102">102</a>     assertTrue(configurations.contains(c0));
-<a class="jxr_linenumber" name="L103" href="#L103">103</a>     assertTrue(configurations.contains(c1));
-<a class="jxr_linenumber" name="L104" href="#L104">104</a>     assertFalse(configurations.contains(c2));
-<a class="jxr_linenumber" name="L105" href="#L105">105</a>   }
-<a class="jxr_linenumber" name="L106" href="#L106">106</a> 
-<a class="jxr_linenumber" name="L107" href="#L107">107</a>   <em class="jxr_javadoccomment">/**</em>
-<a class="jxr_linenumber" name="L108" href="#L108">108</a> <em class="jxr_javadoccomment">   * Tests allow all.</em>
-<a class="jxr_linenumber" name="L109" href="#L109">109</a> <em class="jxr_javadoccomment">   */</em>
-<a class="jxr_linenumber" name="L110" href="#L110">110</a>   @Test
-<a class="jxr_linenumber" name="L111" href="#L111">111</a>   <strong class="jxr_keyword">void</strong> allowAll() {
-<a class="jxr_linenumber" name="L112" href="#L112">112</a>     CorsProperties properties = <strong class="jxr_keyword">new</strong> CorsProperties();
-<a class="jxr_linenumber" name="L113" href="#L113">113</a>     properties.setAllowAll(<strong class="jxr_keyword">true</strong>);
-<a class="jxr_linenumber" name="L114" href="#L114">114</a>     assertTrue(properties.isAllowAll());
-<a class="jxr_linenumber" name="L115" href="#L115">115</a>     properties.setAllowAll(false);
-<a class="jxr_linenumber" name="L116" href="#L116">116</a>     assertFalse(properties.isAllowAll());
-<a class="jxr_linenumber" name="L117" href="#L117">117</a>   }
-<a class="jxr_linenumber" name="L118" href="#L118">118</a> 
-<a class="jxr_linenumber" name="L119" href="#L119">119</a>   <em class="jxr_javadoccomment">/**</em>
-<a class="jxr_linenumber" name="L120" href="#L120">120</a> <em class="jxr_javadoccomment">   * Tests to string and equals.</em>
-<a class="jxr_linenumber" name="L121" href="#L121">121</a> <em class="jxr_javadoccomment">   */</em>
-<a class="jxr_linenumber" name="L122" href="#L122">122</a>   @Test
-<a class="jxr_linenumber" name="L123" href="#L123">123</a>   <strong class="jxr_keyword">void</strong> toStringAndEquals() {
-<a class="jxr_linenumber" name="L124" href="#L124">124</a>     CorsProperties cp0 = <strong class="jxr_keyword">new</strong> CorsProperties();
-<a class="jxr_linenumber" name="L125" href="#L125">125</a>     cp0.setConfigs(CorsProperties.allowAllConfiguration());
-<a class="jxr_linenumber" name="L126" href="#L126">126</a>     assertEquals(cp0, cp0);
-<a class="jxr_linenumber" name="L127" href="#L127">127</a>     CorsProperties cp1 = <strong class="jxr_keyword">new</strong> CorsProperties();
-<a class="jxr_linenumber" name="L128" href="#L128">128</a>     cp1.setConfigs(CorsProperties.allowAllConfiguration());
-<a class="jxr_linenumber" name="L129" href="#L129">129</a>     assertEquals(cp0, cp1);
-<a class="jxr_linenumber" name="L130" href="#L130">130</a>     assertNotNull(cp0.toString());
-<a class="jxr_linenumber" name="L131" href="#L131">131</a>   }
-<a class="jxr_linenumber" name="L132" href="#L132">132</a> 
-<a class="jxr_linenumber" name="L133" href="#L133">133</a> }
+<a class="jxr_linenumber" name="L91" href="#L91">91</a>      assertTrue(c1.getAllowedMethods().contains(<span class="jxr_string">"*"</span>));
+<a class="jxr_linenumber" name="L92" href="#L92">92</a>      assertTrue(c1.getAllowedOrigins().contains(<span class="jxr_string">"*"</span>));
+<a class="jxr_linenumber" name="L93" href="#L93">93</a>  
+<a class="jxr_linenumber" name="L94" href="#L94">94</a>      CorsConfiguration c2 = <strong class="jxr_keyword">new</strong> CorsConfiguration();
+<a class="jxr_linenumber" name="L95" href="#L95">95</a>      properties.setConfigs(Arrays.asList(c0, c1, c2));
+<a class="jxr_linenumber" name="L96" href="#L96">96</a>  
+<a class="jxr_linenumber" name="L97" href="#L97">97</a>      configurations = properties.getConfigs();
+<a class="jxr_linenumber" name="L98" href="#L98">98</a>      assertNotNull(configurations);
+<a class="jxr_linenumber" name="L99" href="#L99">99</a>      assertEquals(2, configurations.size());
+<a class="jxr_linenumber" name="L100" href="#L100">100</a>     assertTrue(configurations.contains(c0));
+<a class="jxr_linenumber" name="L101" href="#L101">101</a>     assertTrue(configurations.contains(c1));
+<a class="jxr_linenumber" name="L102" href="#L102">102</a>     assertFalse(configurations.contains(c2));
+<a class="jxr_linenumber" name="L103" href="#L103">103</a>   }
+<a class="jxr_linenumber" name="L104" href="#L104">104</a> 
+<a class="jxr_linenumber" name="L105" href="#L105">105</a>   <em class="jxr_javadoccomment">/**</em>
+<a class="jxr_linenumber" name="L106" href="#L106">106</a> <em class="jxr_javadoccomment">   * Tests allow all.</em>
+<a class="jxr_linenumber" name="L107" href="#L107">107</a> <em class="jxr_javadoccomment">   */</em>
+<a class="jxr_linenumber" name="L108" href="#L108">108</a>   @Test
+<a class="jxr_linenumber" name="L109" href="#L109">109</a>   <strong class="jxr_keyword">void</strong> allowAll() {
+<a class="jxr_linenumber" name="L110" href="#L110">110</a>     CorsProperties properties = <strong class="jxr_keyword">new</strong> CorsProperties();
+<a class="jxr_linenumber" name="L111" href="#L111">111</a>     properties.setAllowAll(<strong class="jxr_keyword">true</strong>);
+<a class="jxr_linenumber" name="L112" href="#L112">112</a>     assertTrue(properties.isAllowAll());
+<a class="jxr_linenumber" name="L113" href="#L113">113</a>     properties.setAllowAll(false);
+<a class="jxr_linenumber" name="L114" href="#L114">114</a>     assertFalse(properties.isAllowAll());
+<a class="jxr_linenumber" name="L115" href="#L115">115</a>   }
+<a class="jxr_linenumber" name="L116" href="#L116">116</a> 
+<a class="jxr_linenumber" name="L117" href="#L117">117</a>   <em class="jxr_javadoccomment">/**</em>
+<a class="jxr_linenumber" name="L118" href="#L118">118</a> <em class="jxr_javadoccomment">   * Tests to string and equals.</em>
+<a class="jxr_linenumber" name="L119" href="#L119">119</a> <em class="jxr_javadoccomment">   */</em>
+<a class="jxr_linenumber" name="L120" href="#L120">120</a>   @Test
+<a class="jxr_linenumber" name="L121" href="#L121">121</a>   <strong class="jxr_keyword">void</strong> toStringAndEquals() {
+<a class="jxr_linenumber" name="L122" href="#L122">122</a>     CorsProperties cp0 = <strong class="jxr_keyword">new</strong> CorsProperties();
+<a class="jxr_linenumber" name="L123" href="#L123">123</a>     cp0.setConfigs(CorsProperties.allowAllConfiguration());
+<a class="jxr_linenumber" name="L124" href="#L124">124</a>     assertEquals(cp0, cp0);
+<a class="jxr_linenumber" name="L125" href="#L125">125</a>     CorsProperties cp1 = <strong class="jxr_keyword">new</strong> CorsProperties();
+<a class="jxr_linenumber" name="L126" href="#L126">126</a>     cp1.setConfigs(CorsProperties.allowAllConfiguration());
+<a class="jxr_linenumber" name="L127" href="#L127">127</a>     assertEquals(cp0, cp1);
+<a class="jxr_linenumber" name="L128" href="#L128">128</a>     assertNotNull(cp0.toString());
+<a class="jxr_linenumber" name="L129" href="#L129">129</a>   }
+<a class="jxr_linenumber" name="L130" href="#L130">130</a> 
+<a class="jxr_linenumber" name="L131" href="#L131">131</a> }
 </pre>
 <hr/>
 <div id="footer">Copyright &#169; 2020 <a href="http://bremersee.org">bremersee.org</a>. All rights reserved.</div>

@@ -1,0 +1,246 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>UserContext.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">common-base-security</a> &gt; <a href="index.source.html" class="el_package">org.bremersee.security.core</a> &gt; <span class="el_source">UserContext.java</span></div><h1>UserContext.java</h1><pre class="source lang-java linenums">/*
+ * Copyright 2020 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package org.bremersee.security.core;
+
+import java.security.Principal;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
+import javax.validation.constraints.NotNull;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.ToString;
+import org.springframework.lang.Nullable;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.util.StringUtils;
+import org.springframework.validation.annotation.Validated;
+
+/**
+ * The user context.
+ *
+ * @author Christian Bremer
+ */
+@Validated
+public interface UserContext extends Principal {
+
+  /**
+   * Gets user id.
+   *
+   * @return the user id
+   */
+  String getUserId();
+
+  @Override
+  default String getName() {
+<span class="fc" id="L53">    return getUserId();</span>
+  }
+
+  /**
+   * Gets roles.
+   *
+   * @return the roles
+   */
+  @NotNull
+  default Set&lt;String&gt; getRoles() {
+<span class="fc" id="L63">    return Collections.emptySet();</span>
+  }
+
+  /**
+   * Gets groups.
+   *
+   * @return the groups
+   */
+  @NotNull
+  default Set&lt;String&gt; getGroups() {
+<span class="fc" id="L73">    return Collections.emptySet();</span>
+  }
+
+  /**
+   * New instance user context.
+   *
+   * @return the user context
+   */
+  static UserContext newInstance() {
+<span class="fc" id="L82">    return new Impl();</span>
+  }
+
+  /**
+   * New instance user context.
+   *
+   * @param authentication the authentication
+   * @param groups the groups
+   * @return the user context
+   */
+  static UserContext newInstance(
+      @Nullable Authentication authentication,
+      @Nullable Collection&lt;String&gt; groups) {
+<span class="fc" id="L95">    return new Impl(authentication, groups);</span>
+  }
+
+  /**
+   * New instance user context.
+   *
+   * @param userId the user id
+   * @param roles the roles
+   * @param groups the groups
+   * @return the user context
+   */
+  static UserContext newInstance(
+      @Nullable String userId,
+      @Nullable Collection&lt;String&gt; roles,
+      @Nullable Collection&lt;String&gt; groups) {
+<span class="fc" id="L110">    return new Impl(userId, roles, groups);</span>
+  }
+
+  /**
+   * Determines whether the user id is present or not.
+   *
+   * @return the boolean
+   */
+  default boolean isUserIdPresent() {
+<span class="fc" id="L119">    return StringUtils.hasText(getUserId());</span>
+  }
+
+  /**
+   * Has role boolean.
+   *
+   * @param role the role
+   * @return the boolean
+   */
+  default boolean hasRole(@Nullable String role) {
+<span class="pc bpc" id="L129" title="1 of 4 branches missed.">    return role != null &amp;&amp; getRoles().contains(role);</span>
+  }
+
+  /**
+   * Has any role boolean.
+   *
+   * @param roles the roles
+   * @return the boolean
+   */
+  default boolean hasAnyRole(@Nullable Collection&lt;String&gt; roles) {
+<span class="fc" id="L139">    return Optional.ofNullable(roles)</span>
+<span class="fc" id="L140">        .map(col -&gt; col.stream().anyMatch(this::hasRole))</span>
+<span class="fc" id="L141">        .orElse(false);</span>
+  }
+
+  /**
+   * Has any role boolean.
+   *
+   * @param roles the roles
+   * @return the boolean
+   */
+  default boolean hasAnyRole(@Nullable String... roles) {
+<span class="fc" id="L151">    return Optional.ofNullable(roles)</span>
+<span class="fc" id="L152">        .map(arr -&gt; hasAnyRole(Arrays.asList(arr)))</span>
+<span class="fc" id="L153">        .orElse(false);</span>
+  }
+
+  /**
+   * Is in group boolean.
+   *
+   * @param group the group
+   * @return the boolean
+   */
+  default boolean isInGroup(@Nullable String group) {
+<span class="pc bpc" id="L163" title="1 of 4 branches missed.">    return group != null &amp;&amp; getGroups().contains(group);</span>
+  }
+
+  /**
+   * Is in any group boolean.
+   *
+   * @param groups the groups
+   * @return the boolean
+   */
+  default boolean isInAnyGroup(@Nullable Collection&lt;String&gt; groups) {
+<span class="fc" id="L173">    return Optional.ofNullable(groups)</span>
+<span class="fc" id="L174">        .map(col -&gt; col.stream().anyMatch(this::isInGroup))</span>
+<span class="fc" id="L175">        .orElse(false);</span>
+  }
+
+  /**
+   * Is in any group boolean.
+   *
+   * @param groups the groups
+   * @return the boolean
+   */
+  default boolean isInAnyGroup(@Nullable String... groups) {
+<span class="fc" id="L185">    return Optional.ofNullable(groups)</span>
+<span class="fc" id="L186">        .map(arr -&gt; isInAnyGroup(Arrays.asList(arr)))</span>
+<span class="fc" id="L187">        .orElse(false);</span>
+  }
+
+  /**
+   * The default implementation.
+   */
+<span class="fc" id="L193">  @ToString</span>
+<span class="pc bpc" id="L194" title="14 of 30 branches missed.">  @EqualsAndHashCode</span>
+  class Impl implements UserContext {
+
+<span class="fc" id="L197">    @Getter</span>
+    private final String userId;
+
+<span class="fc" id="L200">    @Getter</span>
+    private final Set&lt;String&gt; roles;
+
+<span class="fc" id="L203">    @Getter</span>
+    private final Set&lt;String&gt; groups;
+
+    /**
+     * Instantiates a new user context.
+     */
+    public Impl() {
+<span class="fc" id="L210">      this(null, null, null);</span>
+<span class="fc" id="L211">    }</span>
+
+    /**
+     * Instantiates a new user context.
+     *
+     * @param authentication the authentication
+     * @param groups the groups
+     */
+    public Impl(Authentication authentication, Collection&lt;String&gt; groups) {
+<span class="fc" id="L220">      this(</span>
+<span class="fc" id="L221">          Optional.ofNullable(authentication).map(Principal::getName).orElse(null),</span>
+<span class="fc" id="L222">          Optional.ofNullable(authentication)</span>
+<span class="fc" id="L223">              .map(auth -&gt; auth.getAuthorities().stream()</span>
+<span class="fc" id="L224">                  .map(GrantedAuthority::getAuthority)</span>
+<span class="fc" id="L225">                  .collect(Collectors.toSet()))</span>
+<span class="fc" id="L226">              .orElse(null),</span>
+          groups);
+<span class="fc" id="L228">    }</span>
+
+    /**
+     * Instantiates a new user context.
+     *
+     * @param userId the user id
+     * @param roles the roles
+     * @param groups the groups
+     */
+<span class="fc" id="L237">    public Impl(String userId, Collection&lt;String&gt; roles, Collection&lt;String&gt; groups) {</span>
+<span class="fc" id="L238">      this.userId = userId;</span>
+<span class="fc bfc" id="L239" title="All 2 branches covered.">      this.roles = roles != null ? Set.copyOf(roles) : Collections.emptySet();</span>
+<span class="fc bfc" id="L240" title="All 2 branches covered.">      this.groups = groups != null ? Set.copyOf(groups) : Collections.emptySet();</span>
+<span class="fc" id="L241">    }</span>
+  }
+
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

@@ -1,1 +1,0 @@
-packageSearchIndex = [{"l":"All Packages","url":"allpackages-index.html"},{"l":"org.bremersee.base.security"},{"l":"org.bremersee.base.security.app"}]

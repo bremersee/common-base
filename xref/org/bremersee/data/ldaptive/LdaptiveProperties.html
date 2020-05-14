@@ -42,8 +42,8 @@
 <a class="jxr_linenumber" name="L34" href="#L34">34</a>  @ConfigurationProperties(prefix = <span class="jxr_string">"bremersee.ldaptive"</span>)
 <a class="jxr_linenumber" name="L35" href="#L35">35</a>  @Getter
 <a class="jxr_linenumber" name="L36" href="#L36">36</a>  @Setter
-<a class="jxr_linenumber" name="L37" href="#L37">37</a>  @ToString(exclude = {<span class="jxr_string">"bindCredential"</span>})
-<a class="jxr_linenumber" name="L38" href="#L38">38</a>  @EqualsAndHashCode(exclude = {<span class="jxr_string">"bindCredential"</span>, <span class="jxr_string">"searchValidator"</span>})
+<a class="jxr_linenumber" name="L37" href="#L37">37</a>  @ToString(exclude = {<span class="jxr_string">"bindCredentials"</span>})
+<a class="jxr_linenumber" name="L38" href="#L38">38</a>  @EqualsAndHashCode(exclude = {<span class="jxr_string">"bindCredentials"</span>, <span class="jxr_string">"searchValidator"</span>})
 <a class="jxr_linenumber" name="L39" href="#L39">39</a>  @NoArgsConstructor
 <a class="jxr_linenumber" name="L40" href="#L40">40</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">class</strong> LdaptiveProperties {
 <a class="jxr_linenumber" name="L41" href="#L41">41</a>  
@@ -105,7 +105,7 @@
 <a class="jxr_linenumber" name="L97" href="#L97">97</a>    <em class="jxr_javadoccomment">/**</em>
 <a class="jxr_linenumber" name="L98" href="#L98">98</a>  <em class="jxr_javadoccomment">   * Credential for the bind DN.</em>
 <a class="jxr_linenumber" name="L99" href="#L99">99</a>  <em class="jxr_javadoccomment">   */</em>
-<a class="jxr_linenumber" name="L100" href="#L100">100</a>   <strong class="jxr_keyword">private</strong> String bindCredential;
+<a class="jxr_linenumber" name="L100" href="#L100">100</a>   <strong class="jxr_keyword">private</strong> String bindCredentials;
 <a class="jxr_linenumber" name="L101" href="#L101">101</a> 
 <a class="jxr_linenumber" name="L102" href="#L102">102</a>   <em class="jxr_javadoccomment">/**</em>
 <a class="jxr_linenumber" name="L103" href="#L103">103</a> <em class="jxr_javadoccomment">   * Specifies whether the connection should be pooled or not. Default is {@code false}.</em>

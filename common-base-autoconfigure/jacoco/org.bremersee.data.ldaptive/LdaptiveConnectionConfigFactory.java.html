@@ -47,7 +47,7 @@ public interface LdaptiveConnectionConfigFactory {
 <span class="fc" id="L47">    return createConnectionConfig(</span>
         properties,
 <span class="fc" id="L49">        properties.getBindDn(),</span>
-<span class="fc" id="L50">        properties.getBindCredential());</span>
+<span class="fc" id="L50">        properties.getBindCredentials());</span>
   }
 
   /**
@@ -87,7 +87,7 @@ public interface LdaptiveConnectionConfigFactory {
 <span class="fc bfc" id="L87" title="All 2 branches covered.">      final String username = bindDn != null ? bindDn : properties.getBindDn();</span>
 <span class="fc bfc" id="L88" title="All 2 branches covered.">      final String password = bindCredential != null</span>
 <span class="fc" id="L89">          ? bindCredential</span>
-<span class="fc" id="L90">          : properties.getBindCredential();</span>
+<span class="fc" id="L90">          : properties.getBindCredentials();</span>
 <span class="fc" id="L91">      final ConnectionConfig cc = new ConnectionConfig();</span>
 <span class="fc" id="L92">      cc.setLdapUrl(properties.getLdapUrl());</span>
 

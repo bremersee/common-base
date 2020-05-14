@@ -31,11 +31,11 @@ import static org.bremersee.test.web.RestApiTesterPath.PathType.CLASS;
 import static org.bremersee.test.web.RestApiTesterPath.PathType.METHOD;
 import static org.bremersee.test.web.RestApiTesterPath.PathType.METHOD_PARAMETER;
 import static org.bremersee.test.web.RestApiTesterPath.pathBuilder;
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedElement;
@@ -76,8 +76,8 @@ public class RestApiTester {
 
 <span class="fc" id="L77">    log.info(&quot;Assert same api: expected = {}, actual = {}&quot;, name(expected),</span>
 <span class="fc" id="L78">        name(actual));</span>
-<span class="fc" id="L79">    assertNotNull(&quot;Expected api class must not be null.&quot;, expected);</span>
-<span class="fc" id="L80">    assertNotNull(&quot;Actual api class must not be null.&quot;, actual);</span>
+<span class="fc" id="L79">    assertNotNull(expected, &quot;Expected api class must not be null.&quot;);</span>
+<span class="fc" id="L80">    assertNotNull(actual, &quot;Actual api class must not be null.&quot;);</span>
 
 <span class="fc" id="L82">    RestApiTesterPath path = pathBuilder().add(CLASS, expected.getSimpleName()).build();</span>
 <span class="pc bpc" id="L83" title="1 of 2 branches missed.">    if (!isExcluded(path, CLASS_MUST_BE_INTERFACE, exclusions)) {</span>
@@ -85,7 +85,7 @@ public class RestApiTester {
               + &quot;\n  - path = {}&quot;
               + &quot;\n  - type = {}&quot;,
           path, CLASS_MUST_BE_INTERFACE);
-<span class="fc" id="L88">      assertTrue(&quot;Expected api class must be an interface.&quot;, expected.isInterface());</span>
+<span class="fc" id="L88">      assertTrue(expected.isInterface(), &quot;Expected api class must be an interface.&quot;);</span>
     }
 
 <span class="fc" id="L91">    path = pathBuilder().add(CLASS, actual.getSimpleName()).build();</span>
@@ -94,7 +94,7 @@ public class RestApiTester {
               + &quot;\n  - path = {}&quot;
               + &quot;\n  - type = {}&quot;,
           path, CLASS_MUST_BE_INTERFACE);
-<span class="fc" id="L97">      assertTrue(&quot;Actual api class must be an interface.&quot;, actual.isInterface());</span>
+<span class="fc" id="L97">      assertTrue(actual.isInterface(), &quot;Actual api class must be an interface.&quot;);</span>
     }
 
 <span class="fc" id="L100">    assertSameClassAnnotations(expected, actual, exclusions);</span>
@@ -130,58 +130,60 @@ public class RestApiTester {
               + &quot;\n  - path = {}&quot;
               + &quot;\n  - type = {}&quot;,
           classPath, SAME_METHOD_SIZE);
-<span class="fc" id="L133">      assertEquals(format(&quot;Methods must have the same size on %s and %s.&quot;,</span>
-<span class="fc" id="L134">          expected.getSimpleName(), actual.getSimpleName()),</span>
-          expectedMethods.length, actualMethods.length);
+<span class="fc" id="L133">      assertEquals(</span>
+          expectedMethods.length,
+          actualMethods.length,
+<span class="fc" id="L136">          format(&quot;Methods must have the same size on %s and %s.&quot;,</span>
+<span class="fc" id="L137">              expected.getSimpleName(), actual.getSimpleName()));</span>
     }
 
-<span class="fc bfc" id="L138" title="All 2 branches covered.">    for (final Method expectedMethod : expectedMethods) {</span>
-<span class="fc" id="L139">      final RestApiTesterPath methodPath = classPath.toPathBuilder()</span>
-<span class="fc" id="L140">          .add(METHOD, expectedMethod.getName())</span>
-<span class="fc" id="L141">          .build();</span>
-<span class="fc" id="L142">      final Method actualMethod = ReflectionUtils.findMethod(</span>
-<span class="fc" id="L143">          actual, expectedMethod.getName(), expectedMethod.getParameterTypes());</span>
-<span class="fc bfc" id="L144" title="All 2 branches covered.">      if (!isExcluded(methodPath, METHOD_MUST_NOT_BE_NULL, exclusions)) {</span>
-<span class="fc" id="L145">        log.info(&quot;Assert method exists:&quot;</span>
+<span class="fc bfc" id="L140" title="All 2 branches covered.">    for (final Method expectedMethod : expectedMethods) {</span>
+<span class="fc" id="L141">      final RestApiTesterPath methodPath = classPath.toPathBuilder()</span>
+<span class="fc" id="L142">          .add(METHOD, expectedMethod.getName())</span>
+<span class="fc" id="L143">          .build();</span>
+<span class="fc" id="L144">      final Method actualMethod = ReflectionUtils.findMethod(</span>
+<span class="fc" id="L145">          actual, expectedMethod.getName(), expectedMethod.getParameterTypes());</span>
+<span class="fc bfc" id="L146" title="All 2 branches covered.">      if (!isExcluded(methodPath, METHOD_MUST_NOT_BE_NULL, exclusions)) {</span>
+<span class="fc" id="L147">        log.info(&quot;Assert method exists:&quot;</span>
                 + &quot;\n  - path = {}&quot;
                 + &quot;\n  - type = {}&quot;,
             methodPath, METHOD_MUST_NOT_BE_NULL);
-<span class="fc" id="L149">        assertNotNull(</span>
-<span class="fc" id="L150">            format(&quot;Method %s (%s) is missing on %s&quot;, expectedMethod.getName(),</span>
-<span class="fc" id="L151">                parameters(expectedMethod.getParameterTypes()), name(actual)),</span>
-            actualMethod);
-<span class="pc bpc" id="L153" title="1 of 2 branches missed.">      } else if (actualMethod == null) {</span>
-<span class="fc" id="L154">        continue;</span>
+<span class="fc" id="L151">        assertNotNull(</span>
+            actualMethod,
+<span class="fc" id="L153">            format(&quot;Method %s (%s) is missing on %s&quot;, expectedMethod.getName(),</span>
+<span class="fc" id="L154">                parameters(expectedMethod.getParameterTypes()), name(actual)));</span>
+<span class="pc bpc" id="L155" title="1 of 2 branches missed.">      } else if (actualMethod == null) {</span>
+<span class="fc" id="L156">        continue;</span>
       }
 
-<span class="fc" id="L157">      final Annotation[] expectedAnnotations = expectedMethod.getAnnotations();</span>
-<span class="fc" id="L158">      final Annotation[] actualAnnotations = actualMethod.getAnnotations();</span>
-<span class="fc" id="L159">      assertSameAnnotations(</span>
+<span class="fc" id="L159">      final Annotation[] expectedAnnotations = expectedMethod.getAnnotations();</span>
+<span class="fc" id="L160">      final Annotation[] actualAnnotations = actualMethod.getAnnotations();</span>
+<span class="fc" id="L161">      assertSameAnnotations(</span>
           methodPath,
           expectedAnnotations,
           actualAnnotations,
           actualMethod,
           exclusions);
 
-<span class="pc bpc" id="L166" title="1 of 2 branches missed.">      if (expectedMethod.getParameterCount() &gt; 0) {</span>
-<span class="fc" id="L167">        final Parameter[] expectedParameters = expectedMethod.getParameters();</span>
-<span class="fc" id="L168">        final Parameter[] actualParameters = actualMethod.getParameters();</span>
-<span class="fc bfc" id="L169" title="All 2 branches covered.">        for (int i = 0; i &lt; expectedParameters.length; i++) {</span>
-<span class="fc" id="L170">          final Parameter expectedParameter = expectedParameters[i];</span>
-<span class="fc" id="L171">          final Parameter actualParameter = actualParameters[i];</span>
-<span class="fc" id="L172">          final RestApiTesterPath methodParameterPath = methodPath.toPathBuilder()</span>
-<span class="fc" id="L173">              .add(METHOD_PARAMETER, String.valueOf(i))</span>
-<span class="fc" id="L174">              .build();</span>
-<span class="fc" id="L175">          assertSameAnnotations(</span>
+<span class="pc bpc" id="L168" title="1 of 2 branches missed.">      if (expectedMethod.getParameterCount() &gt; 0) {</span>
+<span class="fc" id="L169">        final Parameter[] expectedParameters = expectedMethod.getParameters();</span>
+<span class="fc" id="L170">        final Parameter[] actualParameters = actualMethod.getParameters();</span>
+<span class="fc bfc" id="L171" title="All 2 branches covered.">        for (int i = 0; i &lt; expectedParameters.length; i++) {</span>
+<span class="fc" id="L172">          final Parameter expectedParameter = expectedParameters[i];</span>
+<span class="fc" id="L173">          final Parameter actualParameter = actualParameters[i];</span>
+<span class="fc" id="L174">          final RestApiTesterPath methodParameterPath = methodPath.toPathBuilder()</span>
+<span class="fc" id="L175">              .add(METHOD_PARAMETER, String.valueOf(i))</span>
+<span class="fc" id="L176">              .build();</span>
+<span class="fc" id="L177">          assertSameAnnotations(</span>
               methodParameterPath,
-<span class="fc" id="L177">              expectedParameter.getAnnotations(),</span>
-<span class="fc" id="L178">              actualParameter.getAnnotations(),</span>
+<span class="fc" id="L179">              expectedParameter.getAnnotations(),</span>
+<span class="fc" id="L180">              actualParameter.getAnnotations(),</span>
               actualParameter,
               exclusions);
         }
       }
     }
-<span class="fc" id="L184">  }</span>
+<span class="fc" id="L186">  }</span>
 
   private static void assertSameAnnotations(
       final RestApiTesterPath path,
@@ -190,25 +192,26 @@ public class RestApiTester {
       final AnnotatedElement actualAnnotatedElement,
       final RestApiTesterExclusion... exclusions) {
 
-<span class="fc bfc" id="L193" title="All 2 branches covered.">    if (!isExcluded(path, SAME_ANNOTATION_SIZE, exclusions)) {</span>
-<span class="fc" id="L194">      log.info(&quot;Assert same annotation size:&quot;</span>
+<span class="fc bfc" id="L195" title="All 2 branches covered.">    if (!isExcluded(path, SAME_ANNOTATION_SIZE, exclusions)) {</span>
+<span class="fc" id="L196">      log.info(&quot;Assert same annotation size:&quot;</span>
               + &quot;\n  - path = {}&quot;
               + &quot;\n  - type = {}&quot;,
           path, SAME_ANNOTATION_SIZE);
-<span class="fc" id="L198">      assertEquals(</span>
-<span class="fc" id="L199">          format(&quot;Annotations must have the same size on %s.&quot;, path),</span>
-          expectedAnnotations.length, actualAnnotations.length);
+<span class="fc" id="L200">      assertEquals(</span>
+          expectedAnnotations.length,
+          actualAnnotations.length,
+<span class="fc" id="L203">          format(&quot;Annotations must have the same size on %s.&quot;, path));</span>
     }
-<span class="fc bfc" id="L202" title="All 2 branches covered.">    for (final Annotation expectedAnnotation : expectedAnnotations) {</span>
-<span class="fc" id="L203">      final Annotation actualAnnotation = AnnotationUtils.getAnnotation(</span>
-<span class="fc" id="L204">          actualAnnotatedElement, expectedAnnotation.annotationType());</span>
-<span class="fc" id="L205">      assertSameAnnotation(</span>
+<span class="fc bfc" id="L205" title="All 2 branches covered.">    for (final Annotation expectedAnnotation : expectedAnnotations) {</span>
+<span class="fc" id="L206">      final Annotation actualAnnotation = AnnotationUtils.getAnnotation(</span>
+<span class="fc" id="L207">          actualAnnotatedElement, expectedAnnotation.annotationType());</span>
+<span class="fc" id="L208">      assertSameAnnotation(</span>
           path,
           expectedAnnotation,
           actualAnnotation,
           exclusions);
     }
-<span class="fc" id="L211">  }</span>
+<span class="fc" id="L214">  }</span>
 
   private static void assertSameAnnotation(
       final RestApiTesterPath path,
@@ -216,31 +219,31 @@ public class RestApiTester {
       final Annotation actual,
       final RestApiTesterExclusion... exclusions) {
 
-<span class="fc" id="L219">    final RestApiTesterPath annotationPath = path.toPathBuilder()</span>
-<span class="fc" id="L220">        .add(ANNOTATION, expected.annotationType().getSimpleName())</span>
-<span class="fc" id="L221">        .build();</span>
-<span class="fc bfc" id="L222" title="All 2 branches covered.">    if (!isExcluded(annotationPath, ANNOTATION_MUST_NOT_BE_NULL, exclusions)) {</span>
-<span class="fc" id="L223">      log.info(&quot;Assert annotation is not null:&quot;</span>
+<span class="fc" id="L222">    final RestApiTesterPath annotationPath = path.toPathBuilder()</span>
+<span class="fc" id="L223">        .add(ANNOTATION, expected.annotationType().getSimpleName())</span>
+<span class="fc" id="L224">        .build();</span>
+<span class="fc bfc" id="L225" title="All 2 branches covered.">    if (!isExcluded(annotationPath, ANNOTATION_MUST_NOT_BE_NULL, exclusions)) {</span>
+<span class="fc" id="L226">      log.info(&quot;Assert annotation is not null:&quot;</span>
               + &quot;\n  - path = {}&quot;
               + &quot;\n  - type = {}&quot;,
           annotationPath, ANNOTATION_MUST_NOT_BE_NULL);
-<span class="fc" id="L227">      assertNotNull(</span>
-<span class="fc" id="L228">          format(&quot;Annotation %s is missing on %s.&quot;, name(expected), path),</span>
-          actual);
+<span class="fc" id="L230">      assertNotNull(</span>
+          actual,
+<span class="fc" id="L232">          format(&quot;Annotation %s is missing on %s.&quot;, name(expected), path));</span>
     }
-<span class="fc bfc" id="L231" title="All 2 branches covered.">    if (actual == null) {</span>
-<span class="fc" id="L232">      return;</span>
+<span class="fc bfc" id="L234" title="All 2 branches covered.">    if (actual == null) {</span>
+<span class="fc" id="L235">      return;</span>
     }
-<span class="fc" id="L234">    final Map&lt;String, Object&gt; expectedAttributes = AnnotationUtils.getAnnotationAttributes(</span>
+<span class="fc" id="L237">    final Map&lt;String, Object&gt; expectedAttributes = AnnotationUtils.getAnnotationAttributes(</span>
         expected, true, false);
-<span class="fc" id="L236">    final Map&lt;String, Object&gt; actualAttributes = AnnotationUtils.getAnnotationAttributes(</span>
+<span class="fc" id="L239">    final Map&lt;String, Object&gt; actualAttributes = AnnotationUtils.getAnnotationAttributes(</span>
         actual, true, false);
-<span class="fc" id="L238">    assertSameAttributes(</span>
+<span class="fc" id="L241">    assertSameAttributes(</span>
         annotationPath,
         expectedAttributes,
         actualAttributes,
         exclusions);
-<span class="fc" id="L243">  }</span>
+<span class="fc" id="L246">  }</span>
 
   private static void assertSameAttributes(
       final RestApiTesterPath annotationPath,
@@ -248,25 +251,26 @@ public class RestApiTester {
       final Map&lt;String, Object&gt; actual,
       final RestApiTesterExclusion... exclusions) {
 
-<span class="pc bpc" id="L251" title="1 of 2 branches missed.">    if (!isExcluded(annotationPath, SAME_ANNOTATION_ATTRIBUTES_SIZE, exclusions)) {</span>
-<span class="fc" id="L252">      log.info(&quot;Assert same annotation attributes size:&quot;</span>
+<span class="pc bpc" id="L254" title="1 of 2 branches missed.">    if (!isExcluded(annotationPath, SAME_ANNOTATION_ATTRIBUTES_SIZE, exclusions)) {</span>
+<span class="fc" id="L255">      log.info(&quot;Assert same annotation attributes size:&quot;</span>
               + &quot;\n  - path = {}&quot;
               + &quot;\n  - type = {}&quot;,
           annotationPath, SAME_ANNOTATION_ATTRIBUTES_SIZE);
-<span class="fc" id="L256">      assertEquals(</span>
-<span class="fc" id="L257">          format(&quot;Attributes of annotation (%s) must have the same size.&quot;, annotationPath),</span>
-<span class="fc" id="L258">          expected.size(), actual.size());</span>
+<span class="fc" id="L259">      assertEquals(</span>
+<span class="fc" id="L260">          expected.size(),</span>
+<span class="fc" id="L261">          actual.size(),</span>
+<span class="fc" id="L262">          format(&quot;Attributes of annotation (%s) must have the same size.&quot;, annotationPath));</span>
     }
-<span class="fc bfc" id="L260" title="All 2 branches covered.">    for (final Map.Entry&lt;String, Object&gt; expectedAttribute : expected.entrySet()) {</span>
-<span class="fc" id="L261">      final Object expectedAttributeValue = expectedAttribute.getValue();</span>
-<span class="fc" id="L262">      final Object actualAttributeValue = actual.get(expectedAttribute.getKey());</span>
-<span class="fc" id="L263">      assertSameAttributeValues(</span>
-<span class="fc" id="L264">          annotationPath.toPathBuilder().add(ATTRIBUTE, expectedAttribute.getKey()).build(),</span>
+<span class="fc bfc" id="L264" title="All 2 branches covered.">    for (final Map.Entry&lt;String, Object&gt; expectedAttribute : expected.entrySet()) {</span>
+<span class="fc" id="L265">      final Object expectedAttributeValue = expectedAttribute.getValue();</span>
+<span class="fc" id="L266">      final Object actualAttributeValue = actual.get(expectedAttribute.getKey());</span>
+<span class="fc" id="L267">      assertSameAttributeValues(</span>
+<span class="fc" id="L268">          annotationPath.toPathBuilder().add(ATTRIBUTE, expectedAttribute.getKey()).build(),</span>
           expectedAttributeValue,
           actualAttributeValue,
           exclusions);
-<span class="fc" id="L268">    }</span>
-<span class="fc" id="L269">  }</span>
+<span class="fc" id="L272">    }</span>
+<span class="fc" id="L273">  }</span>
 
   private static void assertSameAttributeValues(
       final RestApiTesterPath attributePath,
@@ -274,67 +278,67 @@ public class RestApiTester {
       final Object actual,
       final RestApiTesterExclusion... exclusions) {
 
-<span class="fc bfc" id="L277" title="All 2 branches covered.">    if (!isExcluded(attributePath, SAME_ANNOTATION_ATTRIBUTE_VALUE, exclusions)) {</span>
-<span class="fc" id="L278">      log.info(&quot;Assert same attribute values:&quot;</span>
+<span class="fc bfc" id="L281" title="All 2 branches covered.">    if (!isExcluded(attributePath, SAME_ANNOTATION_ATTRIBUTE_VALUE, exclusions)) {</span>
+<span class="fc" id="L282">      log.info(&quot;Assert same attribute values:&quot;</span>
               + &quot;\n  - path     = {}&quot;
               + &quot;\n  - expected = {}&quot;
               + &quot;\n  - actual   = {}&quot;
               + &quot;\n  - type     = {}&quot;,
           attributePath, expected, actual, SAME_ANNOTATION_ATTRIBUTE_VALUE);
 
-<span class="pc bpc" id="L285" title="1 of 2 branches missed.">      if (expected == null) {</span>
-<span class="nc" id="L286">        assertNull(</span>
-<span class="nc" id="L287">            format(&quot;Attribute (%s) must be null.&quot;, attributePath),</span>
-            actual);
-<span class="fc bfc" id="L289" title="All 2 branches covered.">      } else if (expected instanceof Annotation[]) {</span>
-<span class="fc" id="L290">        assertTrue(actual instanceof Annotation[]);</span>
-<span class="fc" id="L291">        final Annotation[] expectedAnnotations = (Annotation[]) expected;</span>
-<span class="fc" id="L292">        final Annotation[] actualAnnotations = (Annotation[]) actual;</span>
-<span class="fc" id="L293">        assertEquals(expectedAnnotations.length, actualAnnotations.length);</span>
-<span class="fc bfc" id="L294" title="All 2 branches covered.">        for (int i = 0; i &lt; actualAnnotations.length; i++) {</span>
-<span class="fc" id="L295">          final Annotation expectedAnnotation = expectedAnnotations[i];</span>
-<span class="fc" id="L296">          final Annotation actualAnnotation = actualAnnotations[i];</span>
-<span class="fc" id="L297">          assertSameAnnotation(</span>
+<span class="pc bpc" id="L289" title="1 of 2 branches missed.">      if (expected == null) {</span>
+<span class="nc" id="L290">        assertNull(</span>
+            actual,
+<span class="nc" id="L292">            format(&quot;Attribute (%s) must be null.&quot;, attributePath));</span>
+<span class="fc bfc" id="L293" title="All 2 branches covered.">      } else if (expected instanceof Annotation[]) {</span>
+<span class="fc" id="L294">        assertTrue(actual instanceof Annotation[]);</span>
+<span class="fc" id="L295">        final Annotation[] expectedAnnotations = (Annotation[]) expected;</span>
+<span class="fc" id="L296">        final Annotation[] actualAnnotations = (Annotation[]) actual;</span>
+<span class="fc" id="L297">        assertEquals(expectedAnnotations.length, actualAnnotations.length);</span>
+<span class="fc bfc" id="L298" title="All 2 branches covered.">        for (int i = 0; i &lt; actualAnnotations.length; i++) {</span>
+<span class="fc" id="L299">          final Annotation expectedAnnotation = expectedAnnotations[i];</span>
+<span class="fc" id="L300">          final Annotation actualAnnotation = actualAnnotations[i];</span>
+<span class="fc" id="L301">          assertSameAnnotation(</span>
               attributePath,
               expectedAnnotation,
               actualAnnotation,
               exclusions);
         }
-<span class="fc bfc" id="L303" title="All 2 branches covered.">      } else if (expected instanceof Annotation) {</span>
-<span class="fc" id="L304">        final Annotation expectedAnnotation = (Annotation) expected;</span>
-<span class="fc" id="L305">        final Annotation actualAnnotation = (Annotation) actual;</span>
-<span class="fc" id="L306">        assertSameAnnotation(</span>
+<span class="fc bfc" id="L307" title="All 2 branches covered.">      } else if (expected instanceof Annotation) {</span>
+<span class="fc" id="L308">        final Annotation expectedAnnotation = (Annotation) expected;</span>
+<span class="fc" id="L309">        final Annotation actualAnnotation = (Annotation) actual;</span>
+<span class="fc" id="L310">        assertSameAnnotation(</span>
             attributePath,
             expectedAnnotation,
             actualAnnotation,
             exclusions);
-<span class="fc" id="L311">      } else {</span>
-<span class="fc bfc" id="L312" title="All 2 branches covered.">        if (expected.getClass().isArray()) {</span>
-<span class="fc" id="L313">          final Object[] expectedArray = (Object[]) expected;</span>
-<span class="fc" id="L314">          final Object[] actualArray = (Object[]) actual;</span>
-<span class="fc" id="L315">          assertArrayEquals(expectedArray, actualArray);</span>
-<span class="fc" id="L316">        } else {</span>
-<span class="fc" id="L317">          assertEquals(</span>
+<span class="fc" id="L315">      } else {</span>
+<span class="fc bfc" id="L316" title="All 2 branches covered.">        if (expected.getClass().isArray()) {</span>
+<span class="fc" id="L317">          final Object[] expectedArray = (Object[]) expected;</span>
+<span class="fc" id="L318">          final Object[] actualArray = (Object[]) actual;</span>
+<span class="fc" id="L319">          assertArrayEquals(expectedArray, actualArray);</span>
+<span class="fc" id="L320">        } else {</span>
+<span class="fc" id="L321">          assertEquals(</span>
               expected, actual);
         }
       }
     }
-<span class="fc" id="L322">  }</span>
+<span class="fc" id="L326">  }</span>
 
   private static String name(final Annotation annotation) {
-<span class="pc bpc" id="L325" title="1 of 2 branches missed.">    return annotation != null ? name(annotation.annotationType()) : &quot;null&quot;;</span>
+<span class="pc bpc" id="L329" title="1 of 2 branches missed.">    return annotation != null ? name(annotation.annotationType()) : &quot;null&quot;;</span>
   }
 
   private static String name(final Class&lt;?&gt; clazz) {
-<span class="pc bpc" id="L329" title="1 of 2 branches missed.">    return clazz != null ? clazz.getName() : &quot;null&quot;;</span>
+<span class="pc bpc" id="L333" title="1 of 2 branches missed.">    return clazz != null ? clazz.getName() : &quot;null&quot;;</span>
   }
 
   private static String parameters(final Class&lt;?&gt;[] parameters) {
-<span class="pc bpc" id="L333" title="2 of 4 branches missed.">    if (parameters == null || parameters.length == 0) {</span>
-<span class="nc" id="L334">      return &quot;&quot;;</span>
+<span class="pc bpc" id="L337" title="2 of 4 branches missed.">    if (parameters == null || parameters.length == 0) {</span>
+<span class="nc" id="L338">      return &quot;&quot;;</span>
     }
-<span class="fc" id="L336">    return StringUtils.collectionToCommaDelimitedString(Arrays.stream(parameters)</span>
-<span class="fc" id="L337">        .map(RestApiTester::name).collect(Collectors.toList()));</span>
+<span class="fc" id="L340">    return StringUtils.collectionToCommaDelimitedString(Arrays.stream(parameters)</span>
+<span class="fc" id="L341">        .map(RestApiTester::name).collect(Collectors.toList()));</span>
   }
 
 }

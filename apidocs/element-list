@@ -1,5 +1,7 @@
+org.bremersee.actuator.security.authentication
 org.bremersee.context
 org.bremersee.converter
+org.bremersee.core
 org.bremersee.data.convert
 org.bremersee.data.ldaptive
 org.bremersee.exception

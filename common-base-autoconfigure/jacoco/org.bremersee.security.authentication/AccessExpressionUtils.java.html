@@ -1,0 +1,230 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AccessExpressionUtils.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">common-base-autoconfigure</a> &gt; <a href="index.source.html" class="el_package">org.bremersee.security.authentication</a> &gt; <span class="el_source">AccessExpressionUtils.java</span></div><h1>AccessExpressionUtils.java</h1><pre class="source lang-java linenums">/*
+ * Copyright 2020 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package org.bremersee.security.authentication;
+
+import java.util.Collection;
+import java.util.Collections;
+import java.util.LinkedHashSet;
+import java.util.Optional;
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import org.bremersee.security.authentication.AuthProperties.EurekaAccessProperties;
+import org.bremersee.security.authentication.AuthProperties.PathMatcherProperties;
+import org.springframework.util.StringUtils;
+
+/**
+ * The access expression utilities.
+ *
+ * @author Christian Bremer
+ */
+public abstract class AccessExpressionUtils {
+
+  /**
+   * The deny all spring expression.
+   */
+  static final String DENY_ALL = &quot;denyAll&quot;;
+
+  /**
+   * The permit all spring expression.
+   */
+  static final String PERMIT_ALL = &quot;permitAll&quot;;
+
+  /**
+   * The is authenticated spring expression.
+   */
+  static final String IS_AUTHENTICATED = &quot;isAuthenticated()&quot;;
+
+  private static final String HAS_AUTHORITY_TEMPLATE = &quot;hasAuthority('%s')&quot;;
+
+  private static final String HAS_ANY_AUTHORITY_TEMPLATE = &quot;hasAnyAuthority(%s)&quot;;
+
+  private static final String HAS_IP_ADDRESS_TEMPLATE = &quot;hasIpAddress('%s')&quot;;
+
+  private AccessExpressionUtils() {
+  }
+
+  /**
+   * Builds the {@code hasAuthority} expression.
+   *
+   * @param role the role
+   * @param ensurePrefixFunction the ensure prefix function
+   * @return the {@code hasAuthority} expression
+   */
+  public static String hasAuthorityExpr(
+      String role,
+      Function&lt;String, String&gt; ensurePrefixFunction) {
+
+<span class="fc" id="L73">    return String.format(</span>
+        HAS_AUTHORITY_TEMPLATE,
+<span class="fc" id="L75">        Optional.ofNullable(ensurePrefixFunction)</span>
+<span class="fc" id="L76">            .map(f -&gt; f.apply(role))</span>
+<span class="fc" id="L77">            .orElse(role));</span>
+  }
+
+  /**
+   * Builds the {@code hasAnyAuthority} expression.
+   *
+   * @param roles the roles
+   * @param ensurePrefixFunction the ensure prefix function
+   * @return the {@code hasAnyAuthority} expression
+   */
+  public static String hasAnyAuthorityExpr(
+      Collection&lt;String&gt; roles,
+      Function&lt;String, String&gt; ensurePrefixFunction) {
+
+<span class="fc" id="L91">    return Optional.ofNullable(roles)</span>
+<span class="fc" id="L92">        .map(list -&gt; hasAnyAuthorityExprNullSave(</span>
+<span class="fc" id="L93">            list.stream().filter(StringUtils::hasText).collect(Collectors.toList()),</span>
+            ensurePrefixFunction))
+<span class="fc" id="L95">        .orElse(&quot;&quot;);</span>
+  }
+
+  private static String hasAnyAuthorityExprNullSave(
+      Collection&lt;String&gt; roles,
+      Function&lt;String, String&gt; ensurePrefixFunction) {
+
+<span class="fc" id="L102">    return Optional.of(roles.size())</span>
+<span class="fc bfc" id="L103" title="All 2 branches covered.">        .filter(size -&gt; size &gt; 1)</span>
+<span class="fc" id="L104">        .map(size -&gt; roles.stream()</span>
+<span class="fc" id="L105">            .filter(StringUtils::hasText)</span>
+<span class="fc" id="L106">            .map(role -&gt; Optional.ofNullable(ensurePrefixFunction)</span>
+<span class="fc" id="L107">                .map(f -&gt; f.apply(role))</span>
+<span class="fc" id="L108">                .orElse(role))</span>
+<span class="fc" id="L109">            .map(role -&gt; &quot;'&quot; + role + &quot;'&quot;)</span>
+<span class="fc" id="L110">            .collect(Collectors.joining(&quot;,&quot;)))</span>
+<span class="fc" id="L111">        .map(value -&gt; String.format(HAS_ANY_AUTHORITY_TEMPLATE, value))</span>
+<span class="fc" id="L112">        .orElseGet(() -&gt; hasAuthorityExpr(roles.stream()</span>
+<span class="fc" id="L113">            .findFirst().orElse(&quot;&quot;), ensurePrefixFunction));</span>
+  }
+
+  /**
+   * Builds the {@code hasIpAddress} expression.
+   *
+   * @param ip the ip
+   * @return the {@code hasIpAddress} expression
+   */
+  public static String hasIpAddressExpr(String ip) {
+<span class="fc bfc" id="L123" title="All 2 branches covered.">    if (StringUtils.hasText(ip)) {</span>
+<span class="fc" id="L124">      return String.format(HAS_IP_ADDRESS_TEMPLATE, ip);</span>
+    }
+<span class="fc" id="L126">    return &quot;&quot;;</span>
+  }
+
+  /**
+   * Builds the {@code hasIpAddress} expression.
+   *
+   * @param ips the ips
+   * @return the {@code hasIpAddress} expression
+   */
+  public static String hasIpAddressExpr(Collection&lt;String&gt; ips) {
+<span class="fc" id="L136">    return Optional.ofNullable(ips)</span>
+<span class="fc" id="L137">        .map(list -&gt; list.stream()</span>
+<span class="fc" id="L138">            .filter(StringUtils::hasText)</span>
+<span class="fc" id="L139">            .map(AccessExpressionUtils::hasIpAddressExpr)</span>
+<span class="fc" id="L140">            .collect(Collectors.joining(&quot; or &quot;)))</span>
+<span class="fc" id="L141">        .orElse(&quot;&quot;);</span>
+  }
+
+  /**
+   * Builds an access expression from the given roles and ip addresses.
+   *
+   * @param roles the roles
+   * @param ensurePrefixFunction the ensure prefix function
+   * @param ips the ips
+   * @return the access expression
+   */
+  public static String hasAuthorityOrIpAddressExpr(
+      Collection&lt;String&gt; roles,
+      Function&lt;String, String&gt; ensurePrefixFunction,
+      Collection&lt;String&gt; ips) {
+
+<span class="fc bfc" id="L157" title="All 2 branches covered.">    TreeSet&lt;String&gt; roleSet = roles instanceof TreeSet</span>
+<span class="fc" id="L158">        ? (TreeSet&lt;String&gt;) roles</span>
+<span class="fc bfc" id="L159" title="All 2 branches covered.">        : roles == null ? new TreeSet&lt;&gt;() : new TreeSet&lt;&gt;(roles);</span>
+<span class="fc" id="L160">    StringBuilder sb = new StringBuilder();</span>
+<span class="fc bfc" id="L161" title="All 2 branches covered.">    if (roleSet.size() &gt; 1) {</span>
+<span class="fc" id="L162">      sb.append(hasAnyAuthorityExpr(roleSet, ensurePrefixFunction));</span>
+<span class="fc bfc" id="L163" title="All 2 branches covered.">    } else if (roleSet.size() == 1) {</span>
+<span class="fc" id="L164">      sb.append(hasAuthorityExpr(roleSet.first(), ensurePrefixFunction));</span>
+    }
+<span class="fc bfc" id="L166" title="All 2 branches covered.">    Set&lt;String&gt; ipSet = ips instanceof Set</span>
+<span class="fc" id="L167">        ? (Set&lt;String&gt;) ips</span>
+<span class="fc bfc" id="L168" title="All 2 branches covered.">        : ips == null ? Collections.emptySet() : new LinkedHashSet&lt;&gt;(ips);</span>
+<span class="fc bfc" id="L169" title="All 2 branches covered.">    if (!ipSet.isEmpty()) {</span>
+<span class="fc bfc" id="L170" title="All 2 branches covered.">      if (sb.length() &gt; 0) {</span>
+<span class="fc" id="L171">        sb.append(&quot; or &quot;);</span>
+      }
+<span class="fc" id="L173">      sb.append(hasIpAddressExpr(ipSet));</span>
+    }
+<span class="fc" id="L175">    return sb.toString();</span>
+  }
+
+  /**
+   * Build access expression of the given path matcher properties.
+   *
+   * @param properties the properties
+   * @param ensureRolePrefixFunction the ensure role prefix function
+   * @return the access expression
+   */
+  static String buildAccessExpression(
+      PathMatcherProperties properties,
+      Function&lt;String, String&gt; ensureRolePrefixFunction) {
+
+<span class="fc bfc" id="L189" title="All 2 branches covered.">    if (AccessMode.AUTHENTICATED == properties.getAccessMode()) {</span>
+<span class="fc" id="L190">      StringBuilder sb = new StringBuilder();</span>
+<span class="fc" id="L191">      sb.append(hasAuthorityOrIpAddressExpr(</span>
+<span class="fc" id="L192">          properties.getRoles(),</span>
+          ensureRolePrefixFunction,
+<span class="fc" id="L194">          properties.getIpAddresses()));</span>
+<span class="pc bpc" id="L195" title="1 of 4 branches missed.">      if (properties.getRoles() == null || properties.getRoles().isEmpty()) {</span>
+<span class="fc bfc" id="L196" title="All 2 branches covered.">        if (sb.length() &gt; 0) {</span>
+<span class="fc" id="L197">          sb.append(&quot; or &quot;);</span>
+        }
+<span class="fc" id="L199">        sb.append(IS_AUTHENTICATED);</span>
+      }
+<span class="fc" id="L201">      return sb.toString();</span>
+    }
+<span class="fc" id="L203">    return properties.getAccessMode().getExpressionValue();</span>
+  }
+
+  /**
+   * Build access expression of the given eureka access properties.
+   *
+   * @param properties the properties
+   * @param ensureRolePrefixFunction the ensure role prefix function
+   * @return the access expression
+   */
+  static String buildAccessExpression(
+      EurekaAccessProperties properties,
+      Function&lt;String, String&gt; ensureRolePrefixFunction) {
+
+<span class="fc bfc" id="L217" title="All 2 branches covered.">    if (StringUtils.hasText(properties.getRole())) {</span>
+<span class="fc" id="L218">      return hasAuthorityOrIpAddressExpr(</span>
+<span class="fc" id="L219">          Collections.singleton(properties.getRole()),</span>
+          ensureRolePrefixFunction,
+<span class="fc" id="L221">          properties.getIpAddresses());</span>
+    }
+<span class="fc" id="L223">    String ipsExpr = hasIpAddressExpr(properties.getIpAddresses());</span>
+<span class="fc bfc" id="L224" title="All 2 branches covered.">    return StringUtils.hasText(ipsExpr)</span>
+<span class="fc" id="L225">        ? IS_AUTHENTICATED + &quot; or &quot; + ipsExpr</span>
+<span class="fc" id="L226">        : IS_AUTHENTICATED;</span>
+  }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

@@ -16,11 +16,9 @@
 
 package org.bremersee.security.authentication;
 
-import static org.springframework.util.StringUtils.hasText;
-
 import java.util.Collection;
-import java.util.Objects;
 import java.util.Optional;
+import org.springframework.security.authorization.AuthenticatedReactiveAuthorizationManager;
 import org.springframework.security.authorization.AuthorityReactiveAuthorizationManager;
 import org.springframework.security.authorization.AuthorizationDecision;
 import org.springframework.security.authorization.ReactiveAuthorizationManager;
@@ -36,44 +34,49 @@ import reactor.core.publisher.Mono;
 public class RoleBasedAuthorizationManager
     implements ReactiveAuthorizationManager&lt;AuthorizationContext&gt; {
 
-  private static final String DEFAULT_ROLE_PREFIX = &quot;ROLE_&quot;;
-
   private final String[] roles;
 
-  /**
-   * Instantiates a new Role or ip based authorization manager.
-   *
-   * @param roles the roles
-   */
-  public RoleBasedAuthorizationManager(Collection&lt;String&gt; roles) {
-<span class="fc" id="L49">    this(roles, DEFAULT_ROLE_PREFIX);</span>
-<span class="fc" id="L50">  }</span>
+  private final boolean withAuthenticatedFallback;
 
   /**
    * Instantiates a new role based authorization manager.
    *
    * @param roles the roles
-   * @param rolePrefix the role prefix
+   */
+  public RoleBasedAuthorizationManager(Collection&lt;String&gt; roles) {
+<span class="fc" id="L47">    this(roles, true);</span>
+<span class="fc" id="L48">  }</span>
+
+  /**
+   * Instantiates a new role based authorization manager.
+   *
+   * @param roles the roles
+   * @param withAuthenticatedFallback the with authenticated fallback flag
    */
   public RoleBasedAuthorizationManager(
       Collection&lt;String&gt; roles,
-<span class="fc" id="L60">      String rolePrefix) {</span>
-<span class="fc bfc" id="L61" title="All 2 branches covered.">    final String prefix = hasText(rolePrefix) ? rolePrefix : &quot;&quot;;</span>
-<span class="fc" id="L62">    this.roles = Optional.ofNullable(roles)</span>
-<span class="fc" id="L63">        .map(col -&gt; col.stream()</span>
-<span class="fc" id="L64">            .filter(Objects::nonNull)</span>
-<span class="fc bfc" id="L65" title="All 4 branches covered.">            .map(role -&gt; hasText(prefix) &amp;&amp; role.startsWith(prefix) ? role : prefix + role)</span>
-<span class="fc" id="L66">            .toArray(String[]::new))</span>
-<span class="pc" id="L67">        .orElseGet(() -&gt; new String[0]);</span>
-<span class="fc" id="L68">  }</span>
+<span class="fc" id="L58">      boolean withAuthenticatedFallback) {</span>
+
+<span class="fc" id="L60">    this.roles = Optional.ofNullable(roles)</span>
+<span class="fc" id="L61">        .map(col -&gt; col.toArray(new String[0]))</span>
+<span class="pc" id="L62">        .orElseGet(() -&gt; new String[0]);</span>
+<span class="fc" id="L63">    this.withAuthenticatedFallback = withAuthenticatedFallback;</span>
+<span class="fc" id="L64">  }</span>
 
   @Override
   public Mono&lt;AuthorizationDecision&gt; check(
       Mono&lt;Authentication&gt; authentication,
       AuthorizationContext authorizationContext) {
 
-<span class="fc" id="L75">    return AuthorityReactiveAuthorizationManager.hasAnyAuthority(roles)</span>
-<span class="fc" id="L76">        .check(authentication, authorizationContext);</span>
+<span class="fc bfc" id="L71" title="All 4 branches covered.">    if (roles.length == 0 &amp;&amp; withAuthenticatedFallback) {</span>
+<span class="fc" id="L72">      return AuthenticatedReactiveAuthorizationManager</span>
+<span class="fc" id="L73">          .authenticated().check(authentication, authorizationContext);</span>
+<span class="fc bfc" id="L74" title="All 2 branches covered.">    } else if (roles.length == 0) {</span>
+<span class="fc" id="L75">      return Mono.just(new AuthorizationDecision(false));</span>
+    } else {
+<span class="fc" id="L77">      return AuthorityReactiveAuthorizationManager.hasAnyAuthority(roles)</span>
+<span class="fc" id="L78">          .check(authentication, authorizationContext);</span>
+    }
   }
 
 }

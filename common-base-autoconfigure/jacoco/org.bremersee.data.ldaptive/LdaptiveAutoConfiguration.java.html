@@ -94,8 +94,8 @@ public class LdaptiveAutoConfiguration {
 <span class="fc" id="L94">        ClassUtils.getUserClass(getClass()).getSimpleName(),</span>
 <span class="fc" id="L95">        ClassUtils.getUserClass(connectionConfigFactory).getSimpleName(),</span>
 <span class="fc" id="L96">        ClassUtils.getUserClass(connectionConfigFactory).getSimpleName(),</span>
-<span class="pc bpc" id="L97" title="1 of 2 branches missed.">        ldaptiveProvider != null</span>
-<span class="nc" id="L98">            ? ClassUtils.getUserClass(ldaptiveProvider).getSimpleName()</span>
+<span class="fc bfc" id="L97" title="All 2 branches covered.">        ldaptiveProvider != null</span>
+<span class="fc" id="L98">            ? ClassUtils.getUserClass(ldaptiveProvider).getSimpleName()</span>
 <span class="fc" id="L99">            : &quot;null&quot;);</span>
 
 <span class="pc bpc" id="L101" title="1 of 2 branches missed.">    if (properties.isPooled()) {</span>
@@ -138,8 +138,8 @@ public class LdaptiveAutoConfiguration {
   private DefaultConnectionFactory defaultConnectionFactory() {
 <span class="fc" id="L139">    DefaultConnectionFactory factory = new DefaultConnectionFactory();</span>
 <span class="fc" id="L140">    factory.setConnectionConfig(connectionConfig());</span>
-<span class="pc bpc" id="L141" title="1 of 2 branches missed.">    if (ldaptiveProvider != null) {</span>
-<span class="nc" id="L142">      factory.setProvider(ldaptiveProvider);</span>
+<span class="fc bfc" id="L141" title="All 2 branches covered.">    if (ldaptiveProvider != null) {</span>
+<span class="fc" id="L142">      factory.setProvider(ldaptiveProvider);</span>
     }
 <span class="fc" id="L144">    return factory;</span>
   }

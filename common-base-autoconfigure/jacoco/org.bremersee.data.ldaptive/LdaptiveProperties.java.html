@@ -34,8 +34,8 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @ConfigurationProperties(prefix = &quot;bremersee.ldaptive&quot;)
 @Getter
 <span class="fc" id="L36">@Setter</span>
-<span class="fc" id="L37">@ToString(exclude = {&quot;bindCredential&quot;})</span>
-<span class="pc bpc" id="L38" title="56 of 94 branches missed.">@EqualsAndHashCode(exclude = {&quot;bindCredential&quot;, &quot;searchValidator&quot;})</span>
+<span class="fc" id="L37">@ToString(exclude = {&quot;bindCredentials&quot;})</span>
+<span class="pc bpc" id="L38" title="56 of 94 branches missed.">@EqualsAndHashCode(exclude = {&quot;bindCredentials&quot;, &quot;searchValidator&quot;})</span>
 <span class="fc" id="L39">@NoArgsConstructor</span>
 public class LdaptiveProperties {
 
@@ -97,7 +97,7 @@ public class LdaptiveProperties {
   /**
    * Credential for the bind DN.
    */
-<span class="fc" id="L100">  private String bindCredential;</span>
+<span class="fc" id="L100">  private String bindCredentials;</span>
 
   /**
    * Specifies whether the connection should be pooled or not. Default is {@code false}.

@@ -1,0 +1,226 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ReactiveUserContextCaller.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">common-base-webflux</a> &gt; <a href="index.source.html" class="el_package">org.bremersee.security.core</a> &gt; <span class="el_source">ReactiveUserContextCaller.java</span></div><h1>ReactiveUserContextCaller.java</h1><pre class="source lang-java linenums">/*
+ * Copyright 2020 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package org.bremersee.security.core;
+
+import java.util.Collections;
+import java.util.Set;
+import java.util.function.Function;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
+import javax.validation.constraints.NotNull;
+import org.bremersee.exception.ServiceException;
+import org.reactivestreams.Publisher;
+import org.springframework.lang.Nullable;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.ReactiveSecurityContextHolder;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.validation.annotation.Validated;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+
+/**
+ * The reactive user context caller.
+ *
+ * @author Christian Bremer
+ */
+@Validated
+public class ReactiveUserContextCaller {
+
+  /**
+   * The constant EMPTY_GROUPS_SUPPLIER.
+   */
+<span class="fc" id="L47">  public static final Supplier&lt;Mono&lt;Set&lt;String&gt;&gt;&gt; EMPTY_GROUPS_SUPPLIER = () -&gt; Mono</span>
+<span class="fc" id="L48">      .just(Collections.emptySet());</span>
+
+  /**
+   * The constant EMPTY_USER_CONTEXT_SUPPLIER.
+   */
+<span class="fc" id="L53">  public static final Supplier&lt;Mono&lt;UserContext&gt;&gt; EMPTY_USER_CONTEXT_SUPPLIER = () -&gt; Mono</span>
+<span class="fc" id="L54">      .just(UserContext.newInstance());</span>
+
+  /**
+   * The constant FORBIDDEN_SUPPLIER.
+   */
+<span class="fc" id="L59">  public static final Supplier&lt;Mono&lt;UserContext&gt;&gt; FORBIDDEN_SUPPLIER = () -&gt; Mono</span>
+<span class="fc" id="L60">      .error(ServiceException::forbidden);</span>
+
+  private final Function&lt;Authentication, Mono&lt;Set&lt;String&gt;&gt;&gt; groupsFn;
+
+  private final Supplier&lt;Mono&lt;UserContext&gt;&gt; unauthenticatedSupplier;
+
+  /**
+   * Instantiates a new reactive user context caller.
+   */
+  public ReactiveUserContextCaller() {
+<span class="fc" id="L70">    this(EMPTY_GROUPS_SUPPLIER, null);</span>
+<span class="fc" id="L71">  }</span>
+
+  /**
+   * Instantiates a new reactive user context caller.
+   *
+   * @param groupsSupplier the groups supplier
+   * @param unauthenticatedSupplier the unauthenticated supplier
+   */
+  public ReactiveUserContextCaller(
+      @Nullable Supplier&lt;Mono&lt;Set&lt;String&gt;&gt;&gt; groupsSupplier,
+      @Nullable Supplier&lt;Mono&lt;UserContext&gt;&gt; unauthenticatedSupplier) {
+<span class="fc" id="L82">    this(</span>
+<span class="pc bpc" id="L83" title="1 of 2 branches missed.">        groupsSupplier != null</span>
+<span class="fc" id="L84">            ? authentication -&gt; groupsSupplier.get()</span>
+<span class="pc" id="L85">            : authentication -&gt; EMPTY_GROUPS_SUPPLIER.get(),</span>
+        unauthenticatedSupplier);
+<span class="fc" id="L87">  }</span>
+
+  /**
+   * Instantiates a new reactive user context caller.
+   *
+   * @param groupsFn the groups fn
+   * @param unauthenticatedSupplier the unauthenticated supplier
+   */
+  public ReactiveUserContextCaller(
+      @Nullable Function&lt;Authentication, Mono&lt;Set&lt;String&gt;&gt;&gt; groupsFn,
+<span class="fc" id="L97">      @Nullable Supplier&lt;Mono&lt;UserContext&gt;&gt; unauthenticatedSupplier) {</span>
+<span class="pc bpc" id="L98" title="1 of 2 branches missed.">    this.groupsFn = groupsFn != null ? groupsFn : authentication -&gt; EMPTY_GROUPS_SUPPLIER.get();</span>
+<span class="fc bfc" id="L99" title="All 2 branches covered.">    this.unauthenticatedSupplier = unauthenticatedSupplier != null</span>
+<span class="fc" id="L100">        ? unauthenticatedSupplier</span>
+<span class="fc" id="L101">        : FORBIDDEN_SUPPLIER;</span>
+<span class="fc" id="L102">  }</span>
+
+  private Set&lt;String&gt; toRoles(Authentication authentication) {
+<span class="fc" id="L105">    return authentication.getAuthorities()</span>
+<span class="fc" id="L106">        .stream()</span>
+<span class="fc" id="L107">        .map(GrantedAuthority::getAuthority)</span>
+<span class="fc" id="L108">        .collect(Collectors.toSet());</span>
+  }
+
+  /**
+   * One with user context mono.
+   *
+   * @param &lt;R&gt; the type parameter
+   * @param function the function
+   * @return the mono
+   */
+  public &lt;R&gt; Mono&lt;R&gt; oneWithUserContext(
+      @NotNull Function&lt;UserContext, ? extends Mono&lt;R&gt;&gt; function) {
+<span class="fc" id="L120">    return ReactiveSecurityContextHolder.getContext()</span>
+<span class="fc" id="L121">        .map(SecurityContext::getAuthentication)</span>
+<span class="fc" id="L122">        .filter(Authentication::isAuthenticated)</span>
+<span class="fc" id="L123">        .zipWhen(authentication -&gt; groupsFn</span>
+<span class="fc" id="L124">            .apply(authentication)</span>
+<span class="fc" id="L125">            .switchIfEmpty(EMPTY_GROUPS_SUPPLIER.get()))</span>
+<span class="fc" id="L126">        .map(tuple -&gt; UserContext.newInstance(</span>
+<span class="fc" id="L127">            tuple.getT1().getName(),</span>
+<span class="fc" id="L128">            toRoles(tuple.getT1()),</span>
+<span class="fc" id="L129">            tuple.getT2()))</span>
+<span class="fc" id="L130">        .switchIfEmpty(unauthenticatedSupplier.get())</span>
+<span class="fc" id="L131">        .flatMap(function);</span>
+  }
+
+  /**
+   * One with user context mono.
+   *
+   * @param &lt;R&gt; the type parameter
+   * @param function the function
+   * @param groupsFn the groups fn
+   * @param unauthenticatedSupplier the unauthenticated supplier
+   * @return the mono
+   */
+  public static &lt;R&gt; Mono&lt;R&gt; oneWithUserContext(
+      @NotNull Function&lt;UserContext, ? extends Mono&lt;R&gt;&gt; function,
+      @Nullable Function&lt;Authentication, Mono&lt;Set&lt;String&gt;&gt;&gt; groupsFn,
+      @Nullable Supplier&lt;Mono&lt;UserContext&gt;&gt; unauthenticatedSupplier) {
+<span class="fc" id="L147">    return new ReactiveUserContextCaller(groupsFn, unauthenticatedSupplier)</span>
+<span class="fc" id="L148">        .oneWithUserContext(function);</span>
+  }
+
+  /**
+   * One with user context mono.
+   *
+   * @param &lt;R&gt; the type parameter
+   * @param function the function
+   * @param groupsSupplier the groups supplier
+   * @param unauthenticatedSupplier the unauthenticated supplier
+   * @return the mono
+   */
+  public static &lt;R&gt; Mono&lt;R&gt; oneWithUserContext(
+      @NotNull Function&lt;UserContext, ? extends Mono&lt;R&gt;&gt; function,
+      @Nullable Supplier&lt;Mono&lt;Set&lt;String&gt;&gt;&gt; groupsSupplier,
+      @Nullable Supplier&lt;Mono&lt;UserContext&gt;&gt; unauthenticatedSupplier) {
+<span class="fc" id="L164">    return new ReactiveUserContextCaller(groupsSupplier, unauthenticatedSupplier)</span>
+<span class="fc" id="L165">        .oneWithUserContext(function);</span>
+  }
+
+  /**
+   * Many with user context flux.
+   *
+   * @param &lt;R&gt; the type parameter
+   * @param function the function
+   * @return the flux
+   */
+  public &lt;R&gt; Flux&lt;R&gt; manyWithUserContext(
+      @NotNull Function&lt;UserContext, ? extends Publisher&lt;R&gt;&gt; function) {
+<span class="fc" id="L177">    return ReactiveSecurityContextHolder.getContext()</span>
+<span class="fc" id="L178">        .map(SecurityContext::getAuthentication)</span>
+<span class="fc" id="L179">        .filter(Authentication::isAuthenticated)</span>
+<span class="fc" id="L180">        .zipWhen(authentication -&gt; groupsFn</span>
+<span class="fc" id="L181">            .apply(authentication)</span>
+<span class="fc" id="L182">            .switchIfEmpty(EMPTY_GROUPS_SUPPLIER.get()))</span>
+<span class="fc" id="L183">        .map(tuple -&gt; UserContext.newInstance(</span>
+<span class="fc" id="L184">            tuple.getT1().getName(),</span>
+<span class="fc" id="L185">            toRoles(tuple.getT1()),</span>
+<span class="fc" id="L186">            tuple.getT2()))</span>
+<span class="fc" id="L187">        .switchIfEmpty(unauthenticatedSupplier.get())</span>
+<span class="fc" id="L188">        .flatMapMany(function);</span>
+  }
+
+  /**
+   * Many with user context flux.
+   *
+   * @param &lt;R&gt; the type parameter
+   * @param function the function
+   * @param groupsFn the groups fn
+   * @param unauthenticatedSupplier the unauthenticated supplier
+   * @return the flux
+   */
+  public static &lt;R&gt; Flux&lt;R&gt; manyWithUserContext(
+      @NotNull Function&lt;UserContext, ? extends Publisher&lt;R&gt;&gt; function,
+      @Nullable Function&lt;Authentication, Mono&lt;Set&lt;String&gt;&gt;&gt; groupsFn,
+      @Nullable Supplier&lt;Mono&lt;UserContext&gt;&gt; unauthenticatedSupplier) {
+<span class="fc" id="L204">    return new ReactiveUserContextCaller(groupsFn, unauthenticatedSupplier)</span>
+<span class="fc" id="L205">        .manyWithUserContext(function);</span>
+  }
+
+  /**
+   * Many with user context flux.
+   *
+   * @param &lt;R&gt; the type parameter
+   * @param function the function
+   * @param groupsSupplier the groups supplier
+   * @param unauthenticatedSupplier the unauthenticated supplier
+   * @return the flux
+   */
+  public static &lt;R&gt; Flux&lt;R&gt; manyWithUserContext(
+      @NotNull Function&lt;UserContext, ? extends Publisher&lt;R&gt;&gt; function,
+      @Nullable Supplier&lt;Mono&lt;Set&lt;String&gt;&gt;&gt; groupsSupplier,
+      @Nullable Supplier&lt;Mono&lt;UserContext&gt;&gt; unauthenticatedSupplier) {
+<span class="fc" id="L221">    return new ReactiveUserContextCaller(groupsSupplier, unauthenticatedSupplier)</span>
+<span class="fc" id="L222">        .manyWithUserContext(function);</span>
+  }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

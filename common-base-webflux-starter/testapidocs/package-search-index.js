@@ -1,1 +1,0 @@
-packageSearchIndex = [{"l":"All Packages","url":"allpackages-index.html"},{"l":"org.bremersee.base.webflux"},{"l":"org.bremersee.base.webflux.app"}]

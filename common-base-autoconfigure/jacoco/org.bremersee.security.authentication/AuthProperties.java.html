@@ -1,0 +1,474 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AuthProperties.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">common-base-autoconfigure</a> &gt; <a href="index.source.html" class="el_package">org.bremersee.security.authentication</a> &gt; <span class="el_source">AuthProperties.java</span></div><h1>AuthProperties.java</h1><pre class="source lang-java linenums">/*
+ * Copyright 2020 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package org.bremersee.security.authentication;
+
+import java.io.Serializable;
+import java.security.Principal;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
+import org.bremersee.security.core.AuthorityConstants;
+import org.bremersee.web.CorsProperties;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.http.HttpMethod;
+import org.springframework.lang.Nullable;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.factory.PasswordEncoderFactories;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.util.StringUtils;
+import org.springframework.validation.annotation.Validated;
+
+/**
+ * Authentication and authorization properties.
+ *
+ * @author Christian Bremer
+ */
+@ConfigurationProperties(prefix = &quot;bremersee.auth&quot;)
+@Getter
+<span class="fc" id="L57">@Setter</span>
+<span class="fc" id="L58">@ToString(exclude = {&quot;roleDefinitions&quot;, &quot;ipDefinitions&quot;})</span>
+<span class="pc bpc" id="L59" title="70 of 116 branches missed.">@EqualsAndHashCode</span>
+@Validated
+<span class="fc" id="L61">public class AuthProperties {</span>
+
+  /**
+   * Specifies the behaviour of the resource server security auto configuration.
+   */
+<span class="fc" id="L66">  @NotNull</span>
+<span class="fc" id="L67">  private AutoSecurityMode resourceServer = AutoSecurityMode.OTHER;</span>
+
+  /**
+   * The order of the resource server security auto configuration.
+   */
+<span class="fc" id="L72">  private int resourceServerOrder = 51;</span>
+
+  /**
+   * The role prefix to add.
+   */
+<span class="fc" id="L77">  @NotNull</span>
+<span class="fc" id="L78">  private String rolePrefix = &quot;ROLE_&quot;;</span>
+
+  /**
+   * The json path in the JWT to the roles.
+   */
+<span class="fc" id="L83">  @NotEmpty</span>
+<span class="fc" id="L84">  private String rolesJsonPath = &quot;$.realm_access.roles&quot;;</span>
+
+  /**
+   * Specifies whether the roles value is a list (json array) or a simple string.
+   */
+<span class="fc" id="L89">  private boolean rolesValueList = true;</span>
+
+  /**
+   * The role value separator to use if the role value is a simple string.
+   */
+<span class="fc" id="L94">  @NotNull</span>
+<span class="fc" id="L95">  private String rolesValueSeparator = &quot; &quot;;</span>
+
+  /**
+   * The json path in the JWT to the user name.
+   */
+<span class="fc" id="L100">  @NotEmpty</span>
+<span class="fc" id="L101">  private String nameJsonPath = &quot;$.preferred_username&quot;;</span>
+
+<span class="fc" id="L103">  @NotNull</span>
+<span class="fc" id="L104">  private Map&lt;String, List&lt;String&gt;&gt; roleDefinitions = new LinkedHashMap&lt;&gt;();</span>
+
+<span class="fc" id="L106">  @NotNull</span>
+<span class="fc" id="L107">  private Map&lt;String, List&lt;String&gt;&gt; ipDefinitions = new LinkedHashMap&lt;&gt;();</span>
+
+<span class="fc" id="L109">  @NotNull</span>
+<span class="fc" id="L110">  private List&lt;PathMatcherProperties&gt; pathMatchers = new ArrayList&lt;&gt;();</span>
+
+<span class="fc" id="L112">  @NotNull</span>
+<span class="fc" id="L113">  private AccessMode anyAccessMode = AccessMode.AUTHENTICATED;</span>
+
+  /**
+   * Properties for eureka endpoints.
+   */
+<span class="fc" id="L118">  @NotNull</span>
+<span class="fc" id="L119">  private EurekaAccessProperties eureka = new EurekaAccessProperties();</span>
+
+  /**
+   * The properties for the oauth2 password flow.
+   */
+<span class="fc" id="L124">  @NotNull</span>
+<span class="fc" id="L125">  private PasswordFlow passwordFlow = new PasswordFlow();</span>
+
+  /**
+   * The properties for the client credentials flow.
+   */
+<span class="fc" id="L130">  @NotNull</span>
+<span class="fc" id="L131">  private ClientCredentialsFlow clientCredentialsFlow = new ClientCredentialsFlow();</span>
+
+  /**
+   * A list of in-memory users, that can login with basic authentication for testing purposes.
+   */
+<span class="fc" id="L136">  @NotNull</span>
+<span class="fc" id="L137">  private List&lt;SimpleUser&gt; inMemoryUsers = new ArrayList&lt;&gt;();</span>
+
+  /**
+   * Build user details from in memory users.
+   *
+   * @param passwordEncoder the password encoder
+   * @return the user details
+   */
+  @NotNull
+  public UserDetails[] buildBasicAuthUserDetails(@Nullable PasswordEncoder passwordEncoder) {
+<span class="fc" id="L147">    final PasswordEncoder encoder = Optional.ofNullable(passwordEncoder)</span>
+<span class="fc" id="L148">        .orElseGet(PasswordEncoderFactories::createDelegatingPasswordEncoder);</span>
+<span class="fc" id="L149">    return getInMemoryUsers().stream().map(</span>
+<span class="fc" id="L150">        simpleUser -&gt; User.builder()</span>
+<span class="fc" id="L151">            .username(simpleUser.getName())</span>
+<span class="fc" id="L152">            .password(simpleUser.getPassword())</span>
+<span class="fc" id="L153">            .authorities(simpleUser.buildAuthorities())</span>
+<span class="fc" id="L154">            .passwordEncoder(encoder::encode)</span>
+<span class="fc" id="L155">            .build())</span>
+<span class="fc" id="L156">        .toArray(UserDetails[]::new);</span>
+  }
+
+  /**
+   * Ensure role prefix.
+   *
+   * @param role the role
+   * @return the role with prefix
+   */
+  @NotEmpty
+  public String ensureRolePrefix(@NotEmpty String role) {
+<span class="fc" id="L167">    final String prefix = rolePrefix.trim();</span>
+<span class="fc bfc" id="L168" title="All 4 branches covered.">    return StringUtils.hasText(prefix) &amp;&amp; role.startsWith(prefix) ? role : prefix + role;</span>
+  }
+
+  /**
+   * Prepare path matchers.
+   *
+   * @param corsProperties the cors properties
+   * @return the prepared path matchers
+   */
+  @NotEmpty
+  public List&lt;PathMatcherProperties&gt; preparePathMatchers(
+      @NotNull CorsProperties corsProperties) {
+
+<span class="fc" id="L181">    List&lt;PathMatcherProperties&gt; pathMatchers = new ArrayList&lt;&gt;(getPathMatchers());</span>
+<span class="fc" id="L182">    PathMatcherProperties corsMatcher = new PathMatcherProperties();</span>
+<span class="fc" id="L183">    corsMatcher.setHttpMethod(HttpMethod.OPTIONS.name());</span>
+<span class="fc" id="L184">    corsMatcher.setAccessMode(AccessMode.PERMIT_ALL);</span>
+<span class="pc bpc" id="L185" title="2 of 4 branches missed.">    if (corsProperties.isEnable() &amp;&amp; !pathMatchers.contains(corsMatcher)) {</span>
+<span class="fc" id="L186">      pathMatchers.add(0, corsMatcher);</span>
+    }
+<span class="fc" id="L188">    PathMatcherProperties anyRequestMatcher = new PathMatcherProperties();</span>
+<span class="fc" id="L189">    anyRequestMatcher.setAccessMode(getAnyAccessMode());</span>
+<span class="pc bpc" id="L190" title="1 of 2 branches missed.">    if (!pathMatchers.contains(anyRequestMatcher)) {</span>
+<span class="fc" id="L191">      pathMatchers.add(anyRequestMatcher);</span>
+    }
+<span class="fc" id="L193">    return pathMatchers;</span>
+  }
+
+  /**
+   * The path matcher properties.
+   */
+<span class="fc" id="L199">  @Setter</span>
+<span class="pc bpc" id="L200" title="11 of 22 branches missed.">  @EqualsAndHashCode(of = {&quot;httpMethod&quot;, &quot;antPattern&quot;})</span>
+<span class="fc" id="L201">  @NoArgsConstructor</span>
+  @Validated
+  public static class PathMatcherProperties {
+
+    /**
+     * The constant ALL_HTTP_METHODS.
+     */
+    public static final String ALL_HTTP_METHODS = &quot;*&quot;;
+
+    /**
+     * The constant ANY_PATH.
+     */
+    public static final String ANY_PATH = &quot;/**&quot;;
+
+<span class="fc" id="L215">    @NotNull</span>
+    private String httpMethod = ALL_HTTP_METHODS;
+
+<span class="fc" id="L218">    @NotNull</span>
+    private String antPattern = ANY_PATH;
+
+<span class="fc" id="L221">    @Getter</span>
+    @NotNull
+    private AccessMode accessMode = AccessMode.AUTHENTICATED;
+
+<span class="fc" id="L225">    @Getter</span>
+    @NotNull
+    private List&lt;String&gt; roles = new ArrayList&lt;&gt;();
+
+<span class="fc" id="L229">    @Getter</span>
+    @NotNull
+    private List&lt;String&gt; ipAddresses = new ArrayList&lt;&gt;();
+
+    /**
+     * Gets http method.
+     *
+     * @return the http method
+     */
+    @NotEmpty
+    public String getHttpMethod() {
+<span class="pc bpc" id="L240" title="1 of 2 branches missed.">      if (StringUtils.hasText(httpMethod)</span>
+<span class="fc bfc" id="L241" title="All 2 branches covered.">          &amp;&amp; HttpMethod.resolve(httpMethod.toUpperCase()) != null) {</span>
+<span class="fc" id="L242">        return httpMethod.toUpperCase();</span>
+      }
+<span class="fc" id="L244">      return ALL_HTTP_METHODS;</span>
+    }
+
+    /**
+     * Gets ant pattern.
+     *
+     * @return the ant pattern
+     */
+    @NotEmpty
+    public String getAntPattern() {
+<span class="pc bpc" id="L254" title="1 of 2 branches missed.">      return StringUtils.hasText(antPattern) ? antPattern : ANY_PATH;</span>
+    }
+
+    /**
+     * Http method http method.
+     *
+     * @return the http method
+     */
+    @Nullable
+    public HttpMethod httpMethod() {
+<span class="fc" id="L264">      return HttpMethod.resolve(getHttpMethod());</span>
+    }
+
+    /**
+     * Access expression string.
+     *
+     * @param ensureRolePrefixFunction the ensure role prefix function
+     * @return the string
+     */
+    @NotEmpty
+    public String accessExpression(
+        @Nullable Function&lt;String, String&gt; ensureRolePrefixFunction) {
+<span class="fc" id="L276">      return AccessExpressionUtils.buildAccessExpression(this, ensureRolePrefixFunction);</span>
+    }
+
+    /**
+     * Returns valid roles.
+     *
+     * @param ensureRolePrefixFunction the ensure role prefix function
+     * @return the valid roles
+     */
+    public Set&lt;String&gt; roles(@Nullable Function&lt;String, String&gt; ensureRolePrefixFunction) {
+<span class="fc" id="L286">      return roles.stream()</span>
+<span class="fc" id="L287">          .filter(StringUtils::hasText)</span>
+<span class="fc bfc" id="L288" title="All 2 branches covered.">          .map(role -&gt; ensureRolePrefixFunction != null</span>
+<span class="fc" id="L289">              ? ensureRolePrefixFunction.apply(role)</span>
+<span class="fc" id="L290">              : role)</span>
+<span class="fc" id="L291">          .collect(Collectors.toSet());</span>
+    }
+
+    @Override
+    public String toString() {
+      final String path;
+<span class="fc bfc" id="L297" title="All 2 branches covered.">      if (ALL_HTTP_METHODS.equals(getHttpMethod())) {</span>
+<span class="fc" id="L298">        path = getAntPattern();</span>
+      } else {
+<span class="fc" id="L300">        path = getHttpMethod() + &quot;: &quot; + getAntPattern();</span>
+      }
+<span class="fc" id="L302">      return path + &quot; with access = &quot; + accessExpression(null);</span>
+    }
+  }
+
+  /**
+   * The eureka access properties.
+   */
+  @Getter
+<span class="fc" id="L310">  @Setter</span>
+<span class="fc" id="L311">  @ToString(exclude = {&quot;password&quot;})</span>
+<span class="pc bpc" id="L312" title="17 of 38 branches missed.">  @EqualsAndHashCode</span>
+<span class="fc" id="L313">  @NoArgsConstructor</span>
+  @Validated
+  public static class EurekaAccessProperties {
+
+<span class="fc" id="L317">    private String username;</span>
+
+<span class="fc" id="L319">    private String password;</span>
+
+<span class="fc" id="L321">    private String role = AuthorityConstants.EUREKA_ROLE_NAME;</span>
+
+    /**
+     * The IP addresses which can access protected eureka endpoints without authentication.
+     */
+<span class="fc" id="L326">    @NotNull</span>
+<span class="fc" id="L327">    private List&lt;String&gt; ipAddresses = new ArrayList&lt;&gt;();</span>
+
+    /**
+     * Returns the role.
+     *
+     * @param ensureRolePrefixFunction function to ensure role prefix
+     * @return the role
+     */
+    @Nullable
+    public String role(@Nullable Function&lt;String, String&gt; ensureRolePrefixFunction) {
+<span class="fc" id="L337">      return Optional.ofNullable(ensureRolePrefixFunction)</span>
+<span class="pc bpc" id="L338" title="1 of 2 branches missed.">          .map(func -&gt; StringUtils.hasText(role) ? func.apply(role) : role)</span>
+<span class="fc" id="L339">          .orElse(role);</span>
+    }
+
+    /**
+     * Build access expression.
+     *
+     * @param ensureRolePrefixFunction function to ensure role prefix
+     * @return the access expression
+     */
+    @NotEmpty
+    public String buildAccessExpression(
+        @Nullable Function&lt;String, String&gt; ensureRolePrefixFunction) {
+<span class="fc" id="L351">      return AccessExpressionUtils.buildAccessExpression(this, ensureRolePrefixFunction);</span>
+    }
+
+    /**
+     * Build basic auth user details.
+     *
+     * @param passwordEncoder the password encoder
+     * @param otherUserDetails the other user details
+     * @return the user details
+     */
+    @NotNull
+    public UserDetails[] buildBasicAuthUserDetails(
+        @Nullable PasswordEncoder passwordEncoder,
+        UserDetails... otherUserDetails) {
+
+<span class="fc bfc" id="L366" title="All 2 branches covered.">      if (!StringUtils.hasText(username)) {</span>
+<span class="fc" id="L367">        return Optional.ofNullable(otherUserDetails).orElse(new UserDetails[0]);</span>
+      }
+<span class="pc bpc" id="L369" title="1 of 2 branches missed.">      final PasswordEncoder encoder = passwordEncoder != null</span>
+<span class="nc" id="L370">          ? passwordEncoder</span>
+<span class="fc" id="L371">          : PasswordEncoderFactories.createDelegatingPasswordEncoder();</span>
+<span class="fc" id="L372">      final SimpleUser user = new SimpleUser();</span>
+<span class="fc" id="L373">      user.setName(username);</span>
+<span class="pc bpc" id="L374" title="1 of 2 branches missed.">      user.setPassword(StringUtils.hasText(password) ? password : &quot;&quot;);</span>
+<span class="pc bpc" id="L375" title="1 of 2 branches missed.">      if (StringUtils.hasText(role)) {</span>
+<span class="fc" id="L376">        user.setAuthorities(Collections.singletonList(role));</span>
+      }
+<span class="fc" id="L378">      final UserDetails userDetails = User.builder()</span>
+<span class="fc" id="L379">          .username(user.getName())</span>
+<span class="fc" id="L380">          .password(user.getPassword())</span>
+<span class="fc" id="L381">          .authorities(user.buildAuthorities())</span>
+<span class="fc" id="L382">          .passwordEncoder(encoder::encode)</span>
+<span class="fc" id="L383">          .build();</span>
+<span class="fc" id="L384">      List&lt;UserDetails&gt; users = new ArrayList&lt;&gt;();</span>
+<span class="pc bpc" id="L385" title="1 of 2 branches missed.">      if (otherUserDetails != null) {</span>
+<span class="fc" id="L386">        users.addAll(Arrays.asList(otherUserDetails));</span>
+      }
+<span class="fc" id="L388">      users.add(userDetails);</span>
+<span class="fc" id="L389">      return users.toArray(new UserDetails[0]);</span>
+    }
+  }
+
+  /**
+   * The client credentials flow.
+   */
+  @Getter
+<span class="fc" id="L397">  @Setter</span>
+<span class="fc" id="L398">  @ToString(exclude = {&quot;clientSecret&quot;})</span>
+<span class="pc bpc" id="L399" title="7 of 22 branches missed.">  @EqualsAndHashCode(exclude = {&quot;clientSecret&quot;})</span>
+<span class="fc" id="L400">  public static class ClientCredentialsFlow implements ClientCredentialsFlowProperties {</span>
+
+<span class="fc" id="L402">    private String tokenEndpoint;</span>
+
+<span class="fc" id="L404">    private String clientId;</span>
+
+<span class="fc" id="L406">    private String clientSecret;</span>
+  }
+
+  /**
+   * OAuth2 password flow configuration properties.
+   */
+  @Getter
+<span class="fc" id="L413">  @Setter</span>
+<span class="fc" id="L414">  @ToString(exclude = {&quot;clientSecret&quot;, &quot;password&quot;})</span>
+<span class="pc bpc" id="L415" title="10 of 30 branches missed.">  @EqualsAndHashCode(exclude = {&quot;clientSecret&quot;, &quot;password&quot;})</span>
+<span class="fc" id="L416">  public static class PasswordFlow implements PasswordFlowProperties {</span>
+
+<span class="fc" id="L418">    private String tokenEndpoint;</span>
+
+<span class="fc" id="L420">    private String clientId;</span>
+
+<span class="fc" id="L422">    private String clientSecret;</span>
+
+<span class="fc" id="L424">    private String username;</span>
+
+<span class="fc" id="L426">    private String password;</span>
+  }
+
+  /**
+   * A simple user.
+   */
+  @Getter
+<span class="fc" id="L433">  @Setter</span>
+<span class="fc" id="L434">  @ToString(exclude = &quot;password&quot;)</span>
+<span class="pc bpc" id="L435" title="11 of 22 branches missed.">  @EqualsAndHashCode(exclude = &quot;password&quot;)</span>
+<span class="fc" id="L436">  @NoArgsConstructor</span>
+  @Validated
+  public static class SimpleUser implements Serializable, Principal {
+
+    private static final long serialVersionUID = 1L;
+
+    /**
+     * The user name of the user.
+     */
+<span class="fc" id="L445">    private String name;</span>
+
+    /**
+     * The password of the user.
+     */
+<span class="fc" id="L450">    private String password;</span>
+
+    /**
+     * The granted authorities of the user. The names of the authorities starts with {@code ROLE_}.
+     */
+<span class="fc" id="L455">    @NotNull</span>
+<span class="fc" id="L456">    private List&lt;String&gt; authorities = new ArrayList&lt;&gt;();</span>
+
+    /**
+     * Build authorities.
+     *
+     * @return the authorities
+     */
+    String[] buildAuthorities() {
+<span class="fc bfc" id="L464" title="All 2 branches covered.">      if (authorities.isEmpty()) {</span>
+<span class="fc" id="L465">        return new String[]{</span>
+            AuthorityConstants.USER_ROLE_NAME
+        };
+      }
+<span class="fc" id="L469">      return authorities.toArray(new String[0]);</span>
+    }
+  }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

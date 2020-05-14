@@ -375,27 +375,27 @@ public class RestApiExceptionMapperImpl implements RestApiExceptionMapper {
       final @Nullable Throwable cause,
       final @NotNull ExceptionMappingConfig config) {
 
-<span class="pc bpc" id="L378" title="1 of 2 branches missed.">    if (cause == null) {</span>
+<span class="fc bfc" id="L378" title="All 2 branches covered.">    if (cause == null) {</span>
 <span class="fc" id="L379">      return null;</span>
     }
 
-<span class="nc bnc" id="L382" title="All 2 branches missed.">    if (cause instanceof RestApiExceptionAware</span>
+<span class="pc bpc" id="L382" title="1 of 2 branches missed.">    if (cause instanceof RestApiExceptionAware</span>
 <span class="nc bnc" id="L383" title="All 2 branches missed.">        &amp;&amp; ((RestApiExceptionAware) config).getRestApiException() != null) {</span>
 <span class="nc" id="L384">      final RestApiException source = ((RestApiExceptionAware) cause).getRestApiException();</span>
 <span class="nc" id="L385">      return cloneRestApiException(source, config);</span>
     }
 
-<span class="nc" id="L388">    final RestApiException restApiException = new RestApiException();</span>
-<span class="nc" id="L389">    restApiException.setMessage(detectMessage(cause, null, config));</span>
-<span class="nc" id="L390">    restApiException.setErrorCode(detectErrorCode(cause, null, config));</span>
-<span class="nc bnc" id="L391" title="All 2 branches missed.">    if (config.isIncludeExceptionClassName()) {</span>
-<span class="nc" id="L392">      restApiException.setClassName(cause.getClass().getName());</span>
+<span class="fc" id="L388">    final RestApiException restApiException = new RestApiException();</span>
+<span class="fc" id="L389">    restApiException.setMessage(detectMessage(cause, null, config));</span>
+<span class="fc" id="L390">    restApiException.setErrorCode(detectErrorCode(cause, null, config));</span>
+<span class="pc bpc" id="L391" title="1 of 2 branches missed.">    if (config.isIncludeExceptionClassName()) {</span>
+<span class="fc" id="L392">      restApiException.setClassName(cause.getClass().getName());</span>
     }
-<span class="nc bnc" id="L394" title="All 2 branches missed.">    if (config.isIncludeStackTrace()) {</span>
+<span class="pc bpc" id="L394" title="1 of 2 branches missed.">    if (config.isIncludeStackTrace()) {</span>
 <span class="nc" id="L395">      addStackTraceItems(restApiException, cause.getStackTrace());</span>
     }
-<span class="nc" id="L397">    restApiException.setCause(buildRestApiExceptionCause(cause.getCause(), config));</span>
-<span class="nc" id="L398">    return restApiException;</span>
+<span class="fc" id="L397">    restApiException.setCause(buildRestApiExceptionCause(cause.getCause(), config));</span>
+<span class="fc" id="L398">    return restApiException;</span>
   }
 
   @Nullable

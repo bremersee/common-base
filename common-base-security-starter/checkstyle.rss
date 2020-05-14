@@ -25,7 +25,7 @@ under the License.
     <language>en-us</language>
     <copyright>&#169;2020 bremersee.org</copyright>
     <item>
-      <title>File: 3,
+      <title>File: 0,
              Errors: 0,
              Warnings: 0,
              Infos: 0
@@ -44,48 +44,6 @@ under the License.
             </tr>
           </thead>
           <tbody>
-                          <tr>
-                <td>
-                  <a href="https://github.com/bremersee/common-base/common-base-security-starter/checkstyle.html#org.bremersee.base.security.AutoConfigureTest.java">org/bremersee/base/security/AutoConfigureTest.java</a>
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-              </tr>
-                          <tr>
-                <td>
-                  <a href="https://github.com/bremersee/common-base/common-base-security-starter/checkstyle.html#org.bremersee.base.security.app.TestController.java">org/bremersee/base/security/app/TestController.java</a>
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-              </tr>
-                          <tr>
-                <td>
-                  <a href="https://github.com/bremersee/common-base/common-base-security-starter/checkstyle.html#org.bremersee.base.security.app.TestConfiguration.java">org/bremersee/base/security/app/TestConfiguration.java</a>
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-              </tr>
                       </tbody>
         </table>
         

@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AbstractResourceServerAutoConfiguration.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">common-base-autoconfigure</a> &gt; <a href="index.source.html" class="el_package">org.bremersee.security.authentication</a> &gt; <span class="el_source">AbstractResourceServerAutoConfiguration.java</span></div><h1>AbstractResourceServerAutoConfiguration.java</h1><pre class="source lang-java linenums">/*
+ * Copyright 2020 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package org.bremersee.security.authentication;
+
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
+import org.bremersee.security.authentication.AuthProperties.PathMatcherProperties;
+import org.bremersee.web.CorsProperties;
+import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.boot.autoconfigure.security.SecurityProperties;
+import org.springframework.core.Ordered;
+import org.springframework.core.env.Environment;
+import org.springframework.http.HttpMethod;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.annotation.web.configurers.ExpressionUrlAuthorizationConfigurer;
+import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.util.ClassUtils;
+
+/**
+ * The abstract resource server security auto configuration.
+ *
+ * @author Christian Bremer
+ */
+<span class="fc" id="L41">@Slf4j</span>
+public abstract class AbstractResourceServerAutoConfiguration extends WebSecurityConfigurerAdapter
+    implements Ordered {
+
+<span class="nc" id="L45">  @Getter(AccessLevel.PROTECTED)</span>
+  private final Environment environment;
+
+<span class="fc" id="L48">  @Getter(AccessLevel.PROTECTED)</span>
+  private final SecurityProperties securityProperties;
+
+<span class="fc" id="L51">  @Getter(AccessLevel.PROTECTED)</span>
+  private final AuthProperties authProperties;
+
+<span class="nc" id="L54">  @Getter(AccessLevel.PROTECTED)</span>
+  private final CorsProperties corsProperties;
+
+<span class="nc" id="L57">  @Getter(AccessLevel.PROTECTED)</span>
+  private final ObjectProvider&lt;JsonPathJwtConverter&gt; jwtConverterProvider;
+
+<span class="fc" id="L60">  @Getter(AccessLevel.PROTECTED)</span>
+  private final ObjectProvider&lt;PasswordEncoder&gt; passwordEncoderProvider;
+
+  /**
+   * Instantiates a new abstract resource server security auto configuration.
+   *
+   * @param environment the environment
+   * @param securityProperties the spring properties
+   * @param authProperties the authentication and authorization properties
+   * @param corsProperties the cors properties
+   * @param jwtConverterProvider the jwt converter provider
+   * @param passwordEncoderProvider the password encoder provider
+   */
+  protected AbstractResourceServerAutoConfiguration(
+      Environment environment,
+      SecurityProperties securityProperties,
+      AuthProperties authProperties,
+      CorsProperties corsProperties,
+      ObjectProvider&lt;JsonPathJwtConverter&gt; jwtConverterProvider,
+<span class="fc" id="L79">      ObjectProvider&lt;PasswordEncoder&gt; passwordEncoderProvider) {</span>
+
+<span class="fc" id="L81">    this.environment = environment;</span>
+<span class="fc" id="L82">    this.securityProperties = securityProperties;</span>
+<span class="fc" id="L83">    this.authProperties = authProperties;</span>
+<span class="fc" id="L84">    this.corsProperties = corsProperties;</span>
+<span class="fc" id="L85">    this.jwtConverterProvider = jwtConverterProvider;</span>
+<span class="fc" id="L86">    this.passwordEncoderProvider = passwordEncoderProvider;</span>
+<span class="fc" id="L87">  }</span>
+
+  @Override
+  public int getOrder() {
+<span class="fc" id="L91">    return authProperties.getResourceServerOrder();</span>
+  }
+
+  /**
+   * Init.
+   */
+  protected void init() {
+<span class="fc" id="L98">    log.info(&quot;\n&quot;</span>
+            + &quot;*********************************************************************************\n&quot;
+            + &quot;* {}\n&quot;
+            + &quot;*********************************************************************************&quot;,
+<span class="fc" id="L102">        ClassUtils.getUserClass(getClass()).getSimpleName());</span>
+<span class="fc" id="L103">  }</span>
+
+  /**
+   * Init expression url authorization configurer . expression intercept url registry.
+   *
+   * @param httpSecurity the http security
+   * @return the expression url authorization configurer . expression intercept url registry
+   * @throws Exception the exception
+   */
+  protected abstract ExpressionUrlAuthorizationConfigurer&lt;HttpSecurity&gt;.ExpressionInterceptUrlRegistry
+  init(HttpSecurity httpSecurity) throws Exception;
+
+  @Override
+  protected void configure(HttpSecurity httpSecurity) throws Exception {
+
+<span class="fc" id="L118">    HttpSecurity http = httpSecurity;</span>
+<span class="fc" id="L119">    ExpressionUrlAuthorizationConfigurer&lt;HttpSecurity&gt;.ExpressionInterceptUrlRegistry reg = init(</span>
+        http);
+<span class="fc bfc" id="L121" title="All 2 branches covered.">    if (authProperties.getResourceServer() == AutoSecurityMode.NONE) {</span>
+<span class="fc" id="L122">      http = reg</span>
+<span class="fc" id="L123">          .anyRequest().permitAll()</span>
+<span class="fc" id="L124">          .and()</span>
+<span class="fc" id="L125">          .httpBasic().disable();</span>
+    } else {
+<span class="fc" id="L127">      reg = configurePathMatchers(reg);</span>
+<span class="fc" id="L128">      http = configureAuthenticationProvider(reg.and());</span>
+    }
+<span class="fc" id="L130">    http = http.csrf().disable();</span>
+<span class="pc bpc" id="L131" title="1 of 2 branches missed.">    if (!corsProperties.isEnable()) {</span>
+<span class="nc" id="L132">      http.cors().disable();</span>
+    }
+<span class="fc" id="L134">  }</span>
+
+  private ExpressionUrlAuthorizationConfigurer&lt;HttpSecurity&gt;.ExpressionInterceptUrlRegistry
+  configurePathMatchers(
+      ExpressionUrlAuthorizationConfigurer&lt;HttpSecurity&gt;.ExpressionInterceptUrlRegistry reg) {
+
+<span class="fc bfc" id="L140" title="All 2 branches covered.">    for (PathMatcherProperties props : authProperties.preparePathMatchers(corsProperties)) {</span>
+<span class="fc" id="L141">      log.info(&quot;Securing requests to {}&quot;, props);</span>
+<span class="fc" id="L142">      HttpMethod httpMethod = props.httpMethod();</span>
+<span class="fc bfc" id="L143" title="All 2 branches covered.">      if (httpMethod == null) {</span>
+<span class="fc" id="L144">        reg = reg.antMatchers(props.getAntPattern())</span>
+<span class="fc" id="L145">            .access(props.accessExpression(</span>
+<span class="fc" id="L146">                authProperties::ensureRolePrefix));</span>
+      } else {
+<span class="fc" id="L148">        reg = reg.antMatchers(httpMethod, props.getAntPattern())</span>
+<span class="fc" id="L149">            .access(props.accessExpression(</span>
+<span class="fc" id="L150">                authProperties::ensureRolePrefix));</span>
+      }
+<span class="fc" id="L152">    }</span>
+<span class="fc" id="L153">    return reg;</span>
+  }
+
+  private HttpSecurity configureAuthenticationProvider(HttpSecurity http) throws Exception {
+
+<span class="fc bfc" id="L158" title="All 2 branches covered.">    if (jwtConverterProvider.getIfAvailable() != null) {</span>
+<span class="fc" id="L159">      log.info(&quot;Configure authentication provider with JWT.&quot;);</span>
+<span class="fc" id="L160">      return http</span>
+<span class="fc" id="L161">          .oauth2ResourceServer((rs) -&gt; rs</span>
+<span class="fc" id="L162">              .jwt()</span>
+<span class="fc" id="L163">              .jwtAuthenticationConverter(jwtConverterProvider.getIfAvailable())</span>
+<span class="fc" id="L164">              .and());</span>
+    }
+<span class="fc" id="L166">    log.info(&quot;Configure authentication provider with basic auth and in-memory users.&quot;);</span>
+<span class="fc" id="L167">    String realm = environment.getProperty(&quot;spring.application.name&quot;, &quot;Restricted area&quot;);</span>
+<span class="fc" id="L168">    return http</span>
+        // .userDetailsService(userDetailsService())
+<span class="fc" id="L170">        .formLogin().disable()</span>
+<span class="fc" id="L171">        .httpBasic().realmName(realm)</span>
+<span class="fc" id="L172">        .and()</span>
+<span class="fc" id="L173">        .sessionManagement((sm) -&gt; sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS));</span>
+  }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

@@ -24,67 +24,70 @@
 <a class="jxr_linenumber" name="L16" href="#L16">16</a>  
 <a class="jxr_linenumber" name="L17" href="#L17">17</a>  <strong class="jxr_keyword">package</strong> org.bremersee.security.authentication;
 <a class="jxr_linenumber" name="L18" href="#L18">18</a>  
-<a class="jxr_linenumber" name="L19" href="#L19">19</a>  <strong class="jxr_keyword">import</strong> <strong class="jxr_keyword">static</strong> org.springframework.util.StringUtils.hasText;
-<a class="jxr_linenumber" name="L20" href="#L20">20</a>  
-<a class="jxr_linenumber" name="L21" href="#L21">21</a>  <strong class="jxr_keyword">import</strong> java.util.Collection;
-<a class="jxr_linenumber" name="L22" href="#L22">22</a>  <strong class="jxr_keyword">import</strong> java.util.Objects;
-<a class="jxr_linenumber" name="L23" href="#L23">23</a>  <strong class="jxr_keyword">import</strong> java.util.Optional;
-<a class="jxr_linenumber" name="L24" href="#L24">24</a>  <strong class="jxr_keyword">import</strong> org.springframework.security.authorization.AuthorityReactiveAuthorizationManager;
-<a class="jxr_linenumber" name="L25" href="#L25">25</a>  <strong class="jxr_keyword">import</strong> org.springframework.security.authorization.AuthorizationDecision;
-<a class="jxr_linenumber" name="L26" href="#L26">26</a>  <strong class="jxr_keyword">import</strong> org.springframework.security.authorization.ReactiveAuthorizationManager;
-<a class="jxr_linenumber" name="L27" href="#L27">27</a>  <strong class="jxr_keyword">import</strong> org.springframework.security.core.Authentication;
-<a class="jxr_linenumber" name="L28" href="#L28">28</a>  <strong class="jxr_keyword">import</strong> org.springframework.security.web.server.authorization.AuthorizationContext;
-<a class="jxr_linenumber" name="L29" href="#L29">29</a>  <strong class="jxr_keyword">import</strong> reactor.core.publisher.Mono;
-<a class="jxr_linenumber" name="L30" href="#L30">30</a>  
-<a class="jxr_linenumber" name="L31" href="#L31">31</a>  <em class="jxr_javadoccomment">/**</em>
-<a class="jxr_linenumber" name="L32" href="#L32">32</a>  <em class="jxr_javadoccomment"> * The role based authorization manager.</em>
-<a class="jxr_linenumber" name="L33" href="#L33">33</a>  <em class="jxr_javadoccomment"> *</em>
-<a class="jxr_linenumber" name="L34" href="#L34">34</a>  <em class="jxr_javadoccomment"> * @author Christian Bremer</em>
-<a class="jxr_linenumber" name="L35" href="#L35">35</a>  <em class="jxr_javadoccomment"> */</em>
-<a class="jxr_linenumber" name="L36" href="#L36">36</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">class</strong> <a name="RoleBasedAuthorizationManager" href="../../../../org/bremersee/security/authentication/RoleBasedAuthorizationManager.html#RoleBasedAuthorizationManager">RoleBasedAuthorizationManager</a>
-<a class="jxr_linenumber" name="L37" href="#L37">37</a>      <strong class="jxr_keyword">implements</strong> ReactiveAuthorizationManager&lt;AuthorizationContext&gt; {
+<a class="jxr_linenumber" name="L19" href="#L19">19</a>  <strong class="jxr_keyword">import</strong> java.util.Collection;
+<a class="jxr_linenumber" name="L20" href="#L20">20</a>  <strong class="jxr_keyword">import</strong> java.util.Optional;
+<a class="jxr_linenumber" name="L21" href="#L21">21</a>  <strong class="jxr_keyword">import</strong> org.springframework.security.authorization.AuthenticatedReactiveAuthorizationManager;
+<a class="jxr_linenumber" name="L22" href="#L22">22</a>  <strong class="jxr_keyword">import</strong> org.springframework.security.authorization.AuthorityReactiveAuthorizationManager;
+<a class="jxr_linenumber" name="L23" href="#L23">23</a>  <strong class="jxr_keyword">import</strong> org.springframework.security.authorization.AuthorizationDecision;
+<a class="jxr_linenumber" name="L24" href="#L24">24</a>  <strong class="jxr_keyword">import</strong> org.springframework.security.authorization.ReactiveAuthorizationManager;
+<a class="jxr_linenumber" name="L25" href="#L25">25</a>  <strong class="jxr_keyword">import</strong> org.springframework.security.core.Authentication;
+<a class="jxr_linenumber" name="L26" href="#L26">26</a>  <strong class="jxr_keyword">import</strong> org.springframework.security.web.server.authorization.AuthorizationContext;
+<a class="jxr_linenumber" name="L27" href="#L27">27</a>  <strong class="jxr_keyword">import</strong> reactor.core.publisher.Mono;
+<a class="jxr_linenumber" name="L28" href="#L28">28</a>  
+<a class="jxr_linenumber" name="L29" href="#L29">29</a>  <em class="jxr_javadoccomment">/**</em>
+<a class="jxr_linenumber" name="L30" href="#L30">30</a>  <em class="jxr_javadoccomment"> * The role based authorization manager.</em>
+<a class="jxr_linenumber" name="L31" href="#L31">31</a>  <em class="jxr_javadoccomment"> *</em>
+<a class="jxr_linenumber" name="L32" href="#L32">32</a>  <em class="jxr_javadoccomment"> * @author Christian Bremer</em>
+<a class="jxr_linenumber" name="L33" href="#L33">33</a>  <em class="jxr_javadoccomment"> */</em>
+<a class="jxr_linenumber" name="L34" href="#L34">34</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">class</strong> <a name="RoleBasedAuthorizationManager" href="../../../../org/bremersee/security/authentication/RoleBasedAuthorizationManager.html#RoleBasedAuthorizationManager">RoleBasedAuthorizationManager</a>
+<a class="jxr_linenumber" name="L35" href="#L35">35</a>      <strong class="jxr_keyword">implements</strong> ReactiveAuthorizationManager&lt;AuthorizationContext&gt; {
+<a class="jxr_linenumber" name="L36" href="#L36">36</a>  
+<a class="jxr_linenumber" name="L37" href="#L37">37</a>    <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">final</strong> String[] roles;
 <a class="jxr_linenumber" name="L38" href="#L38">38</a>  
-<a class="jxr_linenumber" name="L39" href="#L39">39</a>    <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">static</strong> <strong class="jxr_keyword">final</strong> String DEFAULT_ROLE_PREFIX = <span class="jxr_string">"ROLE_"</span>;
+<a class="jxr_linenumber" name="L39" href="#L39">39</a>    <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">final</strong> <strong class="jxr_keyword">boolean</strong> withAuthenticatedFallback;
 <a class="jxr_linenumber" name="L40" href="#L40">40</a>  
-<a class="jxr_linenumber" name="L41" href="#L41">41</a>    <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">final</strong> String[] roles;
-<a class="jxr_linenumber" name="L42" href="#L42">42</a>  
-<a class="jxr_linenumber" name="L43" href="#L43">43</a>    <em class="jxr_javadoccomment">/**</em>
-<a class="jxr_linenumber" name="L44" href="#L44">44</a>  <em class="jxr_javadoccomment">   * Instantiates a new Role or ip based authorization manager.</em>
-<a class="jxr_linenumber" name="L45" href="#L45">45</a>  <em class="jxr_javadoccomment">   *</em>
-<a class="jxr_linenumber" name="L46" href="#L46">46</a>  <em class="jxr_javadoccomment">   * @param roles the roles</em>
-<a class="jxr_linenumber" name="L47" href="#L47">47</a>  <em class="jxr_javadoccomment">   */</em>
-<a class="jxr_linenumber" name="L48" href="#L48">48</a>    <strong class="jxr_keyword">public</strong> <a name="RoleBasedAuthorizationManager" href="../../../../org/bremersee/security/authentication/RoleBasedAuthorizationManager.html#RoleBasedAuthorizationManager">RoleBasedAuthorizationManager</a>(Collection&lt;String&gt; roles) {
-<a class="jxr_linenumber" name="L49" href="#L49">49</a>      <strong class="jxr_keyword">this</strong>(roles, DEFAULT_ROLE_PREFIX);
-<a class="jxr_linenumber" name="L50" href="#L50">50</a>    }
-<a class="jxr_linenumber" name="L51" href="#L51">51</a>  
-<a class="jxr_linenumber" name="L52" href="#L52">52</a>    <em class="jxr_javadoccomment">/**</em>
-<a class="jxr_linenumber" name="L53" href="#L53">53</a>  <em class="jxr_javadoccomment">   * Instantiates a new role based authorization manager.</em>
-<a class="jxr_linenumber" name="L54" href="#L54">54</a>  <em class="jxr_javadoccomment">   *</em>
-<a class="jxr_linenumber" name="L55" href="#L55">55</a>  <em class="jxr_javadoccomment">   * @param roles the roles</em>
-<a class="jxr_linenumber" name="L56" href="#L56">56</a>  <em class="jxr_javadoccomment">   * @param rolePrefix the role prefix</em>
-<a class="jxr_linenumber" name="L57" href="#L57">57</a>  <em class="jxr_javadoccomment">   */</em>
-<a class="jxr_linenumber" name="L58" href="#L58">58</a>    <strong class="jxr_keyword">public</strong> <a name="RoleBasedAuthorizationManager" href="../../../../org/bremersee/security/authentication/RoleBasedAuthorizationManager.html#RoleBasedAuthorizationManager">RoleBasedAuthorizationManager</a>(
-<a class="jxr_linenumber" name="L59" href="#L59">59</a>        Collection&lt;String&gt; roles,
-<a class="jxr_linenumber" name="L60" href="#L60">60</a>        String rolePrefix) {
-<a class="jxr_linenumber" name="L61" href="#L61">61</a>      <strong class="jxr_keyword">final</strong> String prefix = hasText(rolePrefix) ? rolePrefix : <span class="jxr_string">""</span>;
-<a class="jxr_linenumber" name="L62" href="#L62">62</a>      <strong class="jxr_keyword">this</strong>.roles = Optional.ofNullable(roles)
-<a class="jxr_linenumber" name="L63" href="#L63">63</a>          .map(col -&gt; col.stream()
-<a class="jxr_linenumber" name="L64" href="#L64">64</a>              .filter(Objects::nonNull)
-<a class="jxr_linenumber" name="L65" href="#L65">65</a>              .map(role -&gt; hasText(prefix) &amp;&amp; role.startsWith(prefix) ? role : prefix + role)
-<a class="jxr_linenumber" name="L66" href="#L66">66</a>              .toArray(String[]::<strong class="jxr_keyword">new</strong>))
-<a class="jxr_linenumber" name="L67" href="#L67">67</a>          .orElseGet(() -&gt; <strong class="jxr_keyword">new</strong> String[0]);
-<a class="jxr_linenumber" name="L68" href="#L68">68</a>    }
-<a class="jxr_linenumber" name="L69" href="#L69">69</a>  
-<a class="jxr_linenumber" name="L70" href="#L70">70</a>    @Override
-<a class="jxr_linenumber" name="L71" href="#L71">71</a>    <strong class="jxr_keyword">public</strong> Mono&lt;AuthorizationDecision&gt; check(
-<a class="jxr_linenumber" name="L72" href="#L72">72</a>        Mono&lt;Authentication&gt; authentication,
-<a class="jxr_linenumber" name="L73" href="#L73">73</a>        AuthorizationContext authorizationContext) {
-<a class="jxr_linenumber" name="L74" href="#L74">74</a>  
-<a class="jxr_linenumber" name="L75" href="#L75">75</a>      <strong class="jxr_keyword">return</strong> AuthorityReactiveAuthorizationManager.hasAnyAuthority(roles)
-<a class="jxr_linenumber" name="L76" href="#L76">76</a>          .check(authentication, authorizationContext);
-<a class="jxr_linenumber" name="L77" href="#L77">77</a>    }
-<a class="jxr_linenumber" name="L78" href="#L78">78</a>  
-<a class="jxr_linenumber" name="L79" href="#L79">79</a>  }
+<a class="jxr_linenumber" name="L41" href="#L41">41</a>    <em class="jxr_javadoccomment">/**</em>
+<a class="jxr_linenumber" name="L42" href="#L42">42</a>  <em class="jxr_javadoccomment">   * Instantiates a new role based authorization manager.</em>
+<a class="jxr_linenumber" name="L43" href="#L43">43</a>  <em class="jxr_javadoccomment">   *</em>
+<a class="jxr_linenumber" name="L44" href="#L44">44</a>  <em class="jxr_javadoccomment">   * @param roles the roles</em>
+<a class="jxr_linenumber" name="L45" href="#L45">45</a>  <em class="jxr_javadoccomment">   */</em>
+<a class="jxr_linenumber" name="L46" href="#L46">46</a>    <strong class="jxr_keyword">public</strong> <a name="RoleBasedAuthorizationManager" href="../../../../org/bremersee/security/authentication/RoleBasedAuthorizationManager.html#RoleBasedAuthorizationManager">RoleBasedAuthorizationManager</a>(Collection&lt;String&gt; roles) {
+<a class="jxr_linenumber" name="L47" href="#L47">47</a>      <strong class="jxr_keyword">this</strong>(roles, <strong class="jxr_keyword">true</strong>);
+<a class="jxr_linenumber" name="L48" href="#L48">48</a>    }
+<a class="jxr_linenumber" name="L49" href="#L49">49</a>  
+<a class="jxr_linenumber" name="L50" href="#L50">50</a>    <em class="jxr_javadoccomment">/**</em>
+<a class="jxr_linenumber" name="L51" href="#L51">51</a>  <em class="jxr_javadoccomment">   * Instantiates a new role based authorization manager.</em>
+<a class="jxr_linenumber" name="L52" href="#L52">52</a>  <em class="jxr_javadoccomment">   *</em>
+<a class="jxr_linenumber" name="L53" href="#L53">53</a>  <em class="jxr_javadoccomment">   * @param roles the roles</em>
+<a class="jxr_linenumber" name="L54" href="#L54">54</a>  <em class="jxr_javadoccomment">   * @param withAuthenticatedFallback the with authenticated fallback flag</em>
+<a class="jxr_linenumber" name="L55" href="#L55">55</a>  <em class="jxr_javadoccomment">   */</em>
+<a class="jxr_linenumber" name="L56" href="#L56">56</a>    <strong class="jxr_keyword">public</strong> <a name="RoleBasedAuthorizationManager" href="../../../../org/bremersee/security/authentication/RoleBasedAuthorizationManager.html#RoleBasedAuthorizationManager">RoleBasedAuthorizationManager</a>(
+<a class="jxr_linenumber" name="L57" href="#L57">57</a>        Collection&lt;String&gt; roles,
+<a class="jxr_linenumber" name="L58" href="#L58">58</a>        <strong class="jxr_keyword">boolean</strong> withAuthenticatedFallback) {
+<a class="jxr_linenumber" name="L59" href="#L59">59</a>  
+<a class="jxr_linenumber" name="L60" href="#L60">60</a>      <strong class="jxr_keyword">this</strong>.roles = Optional.ofNullable(roles)
+<a class="jxr_linenumber" name="L61" href="#L61">61</a>          .map(col -&gt; col.toArray(<strong class="jxr_keyword">new</strong> String[0]))
+<a class="jxr_linenumber" name="L62" href="#L62">62</a>          .orElseGet(() -&gt; <strong class="jxr_keyword">new</strong> String[0]);
+<a class="jxr_linenumber" name="L63" href="#L63">63</a>      <strong class="jxr_keyword">this</strong>.withAuthenticatedFallback = withAuthenticatedFallback;
+<a class="jxr_linenumber" name="L64" href="#L64">64</a>    }
+<a class="jxr_linenumber" name="L65" href="#L65">65</a>  
+<a class="jxr_linenumber" name="L66" href="#L66">66</a>    @Override
+<a class="jxr_linenumber" name="L67" href="#L67">67</a>    <strong class="jxr_keyword">public</strong> Mono&lt;AuthorizationDecision&gt; check(
+<a class="jxr_linenumber" name="L68" href="#L68">68</a>        Mono&lt;Authentication&gt; authentication,
+<a class="jxr_linenumber" name="L69" href="#L69">69</a>        AuthorizationContext authorizationContext) {
+<a class="jxr_linenumber" name="L70" href="#L70">70</a>  
+<a class="jxr_linenumber" name="L71" href="#L71">71</a>      <strong class="jxr_keyword">if</strong> (roles.length == 0 &amp;&amp; withAuthenticatedFallback) {
+<a class="jxr_linenumber" name="L72" href="#L72">72</a>        <strong class="jxr_keyword">return</strong> AuthenticatedReactiveAuthorizationManager
+<a class="jxr_linenumber" name="L73" href="#L73">73</a>            .authenticated().check(authentication, authorizationContext);
+<a class="jxr_linenumber" name="L74" href="#L74">74</a>      } <strong class="jxr_keyword">else</strong> <strong class="jxr_keyword">if</strong> (roles.length == 0) {
+<a class="jxr_linenumber" name="L75" href="#L75">75</a>        <strong class="jxr_keyword">return</strong> Mono.just(<strong class="jxr_keyword">new</strong> AuthorizationDecision(false));
+<a class="jxr_linenumber" name="L76" href="#L76">76</a>      } <strong class="jxr_keyword">else</strong> {
+<a class="jxr_linenumber" name="L77" href="#L77">77</a>        <strong class="jxr_keyword">return</strong> AuthorityReactiveAuthorizationManager.hasAnyAuthority(roles)
+<a class="jxr_linenumber" name="L78" href="#L78">78</a>            .check(authentication, authorizationContext);
+<a class="jxr_linenumber" name="L79" href="#L79">79</a>      }
+<a class="jxr_linenumber" name="L80" href="#L80">80</a>    }
+<a class="jxr_linenumber" name="L81" href="#L81">81</a>  
+<a class="jxr_linenumber" name="L82" href="#L82">82</a>  }
 </pre>
 <hr/>
 <div id="footer">Copyright &#169; 2020 <a href="http://bremersee.org">bremersee.org</a>. All rights reserved.</div>

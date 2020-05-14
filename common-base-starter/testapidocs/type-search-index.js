@@ -1,1 +1,0 @@
-typeSearchIndex = [{"p":"org.bremersee.base.app","l":"AceEntity"},{"p":"org.bremersee.base.app","l":"AclEntity"},{"l":"All Classes","url":"allclasses-index.html"},{"p":"org.bremersee.base","l":"AutoConfigureTest"},{"p":"org.bremersee.base.app","l":"TestConfiguration"}]

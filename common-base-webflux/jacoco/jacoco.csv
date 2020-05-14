@@ -27,9 +27,11 @@ common-base-webflux,org.bremersee.web.reactive.function.client,DefaultWebClientE
 common-base-webflux,org.bremersee.web.reactive.function.client,MessageAwareWebClientErrorDecoder,0,75,1,3,0,20,1,9,0,8
 common-base-webflux,org.bremersee.web.reactive.function.client,WebClientException,2,31,2,2,0,8,2,5,0,5
 common-base-webflux,org.bremersee.web.reactive.function.client,AbstractWebClientErrorDecoder,0,19,0,0,0,5,0,3,0,3
-common-base-webflux,org.bremersee.security.authentication,RoleOrIpBasedAuthorizationManager,0,57,0,0,0,15,0,6,0,6
+common-base-webflux,org.bremersee.security.core,ReactiveUserContextCaller,10,177,2,4,0,55,4,20,2,19
+common-base-webflux,org.bremersee.security.authentication,RoleOrIpBasedAuthorizationManager,0,31,0,0,0,8,0,3,0,3
 common-base-webflux,org.bremersee.security.authentication,WebClientAccessTokenRetriever,17,68,1,1,4,22,3,6,2,6
-common-base-webflux,org.bremersee.security.authentication,RoleBasedAuthorizationManager,3,59,0,6,0,13,1,9,1,6
+common-base-webflux,org.bremersee.security.authentication,IpBasedAuthorizationManager,0,76,0,4,0,21,0,9,0,7
+common-base-webflux,org.bremersee.security.authentication,RoleBasedAuthorizationManager,3,55,0,6,0,15,1,7,1,4
 common-base-webflux,org.bremersee.security.authentication,ReactiveAccessTokenProviders,6,26,0,0,1,7,1,5,1,5
-common-base-webflux,org.bremersee.security.authentication,JsonPathReactiveJwtConverter,0,26,0,2,0,6,0,4,0,3
+common-base-webflux,org.bremersee.security.authentication,JsonPathReactiveJwtConverter,65,26,14,2,2,6,11,4,4,3
 common-base-webflux,org.bremersee.security,ReactiveIpAddressMatcher,1,30,1,1,0,10,1,3,0,3

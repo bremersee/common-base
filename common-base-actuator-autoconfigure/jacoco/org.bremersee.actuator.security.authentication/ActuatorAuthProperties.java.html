@@ -1,0 +1,244 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ActuatorAuthProperties.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">common-base-actuator-autoconfigure</a> &gt; <a href="index.source.html" class="el_package">org.bremersee.actuator.security.authentication</a> &gt; <span class="el_source">ActuatorAuthProperties.java</span></div><h1>ActuatorAuthProperties.java</h1><pre class="source lang-java linenums">/*
+ * Copyright 2020 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package org.bremersee.actuator.security.authentication;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.stream.Collectors;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
+import org.bremersee.security.authentication.AccessExpressionUtils;
+import org.bremersee.security.authentication.AutoSecurityMode;
+import org.bremersee.security.authentication.ClientCredentialsFlowProperties;
+import org.bremersee.security.core.AuthorityConstants;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.util.StringUtils;
+import org.springframework.validation.annotation.Validated;
+
+/**
+ * Actuator authentication and authorization properties.
+ *
+ * @author Christian Bremer
+ */
+@ConfigurationProperties(prefix = &quot;bremersee.actuator.auth&quot;)
+@Getter
+<span class="fc" id="L45">@Setter</span>
+<span class="fc" id="L46">@ToString</span>
+<span class="pc bpc" id="L47" title="68 of 120 branches missed.">@EqualsAndHashCode</span>
+@Validated
+<span class="fc" id="L49">public class ActuatorAuthProperties {</span>
+
+  /**
+   * Specifies the behaviour of the actuator security auto configuration.
+   */
+<span class="fc" id="L54">  @NotNull</span>
+<span class="fc" id="L55">  private AutoSecurityMode enable = AutoSecurityMode.OTHER;</span>
+
+  /**
+   * The order of the actuator security auto configuration.
+   */
+<span class="fc" id="L60">  private int order = 61;</span>
+
+  /**
+   * Specifies whether cors should be enabled for the actuator endpoints or not.
+   */
+<span class="fc" id="L65">  private boolean enableCors = true;</span>
+
+  /**
+   * A list with unauthenticated actuator endpoints.
+   */
+<span class="fc" id="L70">  @NotNull</span>
+<span class="fc" id="L71">  private List&lt;Class&lt;?&gt;&gt; unauthenticatedEndpoints = new ArrayList&lt;&gt;();</span>
+
+  /**
+   * The roles which can write to protected actuator endpoints. The role names normally start with
+   * {@code ROLE_}.
+   */
+<span class="fc" id="L77">  @NotNull</span>
+<span class="fc" id="L78">  private List&lt;String&gt; adminRoles = new ArrayList&lt;&gt;();</span>
+
+  /**
+   * The roles which can read protected actuator endpoints. The role names normally start with
+   * {@code ROLE_}.
+   */
+<span class="fc" id="L84">  @NotNull</span>
+<span class="fc" id="L85">  private List&lt;String&gt; roles = new ArrayList&lt;&gt;();</span>
+
+  /**
+   * The IP addresses which can access protected actuator endpoints without authentication.
+   */
+<span class="fc" id="L90">  @NotNull</span>
+<span class="fc" id="L91">  private List&lt;String&gt; ipAddresses = new ArrayList&lt;&gt;();</span>
+
+  /**
+   * The JWK uri.
+   */
+<span class="fc" id="L96">  private String jwkUriSet;</span>
+
+  /**
+   * The JWS algorithm
+   */
+<span class="fc" id="L101">  @NotEmpty</span>
+<span class="fc" id="L102">  private String jwsAlgorithm = &quot;RS256&quot;;</span>
+
+  /**
+   * The issuer uri.
+   */
+<span class="fc" id="L107">  private String issuerUri;</span>
+
+  /**
+   * The json path in the JWT to the roles.
+   */
+<span class="fc" id="L112">  @NotEmpty</span>
+<span class="fc" id="L113">  private String rolesJsonPath = &quot;$.realm_access.roles&quot;;</span>
+
+  /**
+   * Specifies whether the roles value is a list (json array) or a simple string.
+   */
+<span class="fc" id="L118">  private boolean rolesValueList = true;</span>
+
+  /**
+   * The role value separator to use if the role value is a simple string.
+   */
+<span class="fc" id="L123">  @NotNull</span>
+<span class="fc" id="L124">  private String rolesValueSeparator = &quot; &quot;;</span>
+
+  /**
+   * The role prefix to add.
+   */
+<span class="fc" id="L129">  @NotNull</span>
+<span class="fc" id="L130">  private String rolePrefix = &quot;ROLE_&quot;;</span>
+
+  /**
+   * The json path in the JWT to the user name.
+   */
+<span class="fc" id="L135">  @NotEmpty</span>
+<span class="fc" id="L136">  private String nameJsonPath = &quot;$.preferred_username&quot;;</span>
+
+  /**
+   * The password flow properties for the actuator endpoints.
+   */
+<span class="fc" id="L141">  @NotNull</span>
+<span class="fc" id="L142">  private ActuatorPasswordFlow passwordFlow = new ActuatorPasswordFlow();</span>
+
+  /**
+   * Gets unauthenticated endpoints or defaults (these are the health and info endpoints).
+   *
+   * @return the unauthenticated endpoints
+   */
+  @NotNull
+  public List&lt;Class&lt;?&gt;&gt; unauthenticatedEndpointsOrDefaults() {
+<span class="fc bfc" id="L151" title="All 2 branches covered.">    if (unauthenticatedEndpoints.isEmpty()) {</span>
+<span class="fc" id="L152">      unauthenticatedEndpoints.add(</span>
+          org.springframework.boot.actuate.health.HealthEndpoint.class);
+<span class="fc" id="L154">      unauthenticatedEndpoints.add(</span>
+          org.springframework.boot.actuate.info.InfoEndpoint.class);
+    }
+<span class="fc" id="L157">    return unauthenticatedEndpoints;</span>
+  }
+
+  /**
+   * Roles or defaults.
+   *
+   * @return the roles
+   */
+  @NotNull
+  public Set&lt;String&gt; rolesOrDefaults() {
+<span class="fc" id="L167">    final TreeSet&lt;String&gt; roleSet = new TreeSet&lt;&gt;(roles);</span>
+<span class="fc bfc" id="L168" title="All 2 branches covered.">    if (roleSet.isEmpty()) {</span>
+<span class="fc" id="L169">      roleSet.add(AuthorityConstants.ACTUATOR_ROLE_NAME);</span>
+<span class="fc" id="L170">      roleSet.add(AuthorityConstants.ACTUATOR_ADMIN_ROLE_NAME);</span>
+<span class="fc" id="L171">      roleSet.add(AuthorityConstants.ADMIN_ROLE_NAME);</span>
+    }
+<span class="fc" id="L173">    return roleSet.stream()</span>
+<span class="fc" id="L174">        .map(this::ensureRolePrefix)</span>
+<span class="fc" id="L175">        .collect(Collectors.toSet());</span>
+  }
+
+  /**
+   * Admin roles or defaults.
+   *
+   * @return the admin roles
+   */
+  @NotNull
+  public Set&lt;String&gt; adminRolesOrDefaults() {
+<span class="fc" id="L185">    final TreeSet&lt;String&gt; roleSet = new TreeSet&lt;&gt;(adminRoles);</span>
+<span class="fc bfc" id="L186" title="All 2 branches covered.">    if (roleSet.isEmpty()) {</span>
+<span class="fc" id="L187">      roleSet.add(AuthorityConstants.ACTUATOR_ADMIN_ROLE_NAME);</span>
+<span class="fc" id="L188">      roleSet.add(AuthorityConstants.ADMIN_ROLE_NAME);</span>
+    }
+<span class="fc" id="L190">    return roleSet.stream()</span>
+<span class="fc" id="L191">        .map(this::ensureRolePrefix)</span>
+<span class="fc" id="L192">        .collect(Collectors.toSet());</span>
+  }
+
+  /**
+   * Build access expression (SpEL) for actuator endpoints.
+   *
+   * @return the access expression (SpEL) for actuator endpoints
+   */
+  @NotNull
+  public String buildAccessExpression() {
+<span class="fc" id="L202">    return AccessExpressionUtils.hasAuthorityOrIpAddressExpr(</span>
+<span class="fc" id="L203">        rolesOrDefaults(), null, ipAddresses);</span>
+  }
+
+  /**
+   * Build access expression (SpEL) for admin actuator endpoints.
+   *
+   * @return the access expression (SpEL) for admin actuator endpoints
+   */
+  @NotNull
+  public String buildAdminAccessExpression() {
+<span class="fc" id="L213">    return AccessExpressionUtils.hasAuthorityOrIpAddressExpr(adminRolesOrDefaults(), null, null);</span>
+  }
+
+  /**
+   * Ensure role prefix.
+   *
+   * @param role the role
+   * @return the role with prefix
+   */
+  @NotNull
+  public String ensureRolePrefix(@NotNull String role) {
+<span class="fc" id="L224">    final String prefix = rolePrefix.trim();</span>
+<span class="fc bfc" id="L225" title="All 4 branches covered.">    return StringUtils.hasText(prefix) &amp;&amp; role.startsWith(prefix) ? role : prefix + role;</span>
+  }
+
+  /**
+   * OAuth2 password flow configuration properties.
+   */
+  @Getter
+<span class="fc" id="L232">  @Setter</span>
+<span class="fc" id="L233">  @ToString(exclude = {&quot;clientSecret&quot;})</span>
+<span class="pc bpc" id="L234" title="8 of 22 branches missed.">  @EqualsAndHashCode(exclude = {&quot;clientSecret&quot;})</span>
+<span class="fc" id="L235">  public static class ActuatorPasswordFlow implements ClientCredentialsFlowProperties {</span>
+
+<span class="fc" id="L237">    private String tokenEndpoint;</span>
+
+<span class="fc" id="L239">    private String clientId;</span>
+
+<span class="nc" id="L241">    private String clientSecret;</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

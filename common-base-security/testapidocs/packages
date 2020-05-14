@@ -1,4 +1,7 @@
 org.bremersee.security
+org.bremersee.security.core
+org.bremersee.security.core
+org.bremersee.security.core
 org.bremersee.security.authentication
 org.bremersee.security.authentication
 org.bremersee.security.authentication

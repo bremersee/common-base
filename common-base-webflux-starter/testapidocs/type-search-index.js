@@ -1,1 +1,0 @@
-typeSearchIndex = [{"l":"All Classes","url":"allclasses-index.html"},{"p":"org.bremersee.base.webflux","l":"AutoConfigureTest"},{"p":"org.bremersee.base.webflux.app","l":"TestConfiguration"},{"p":"org.bremersee.base.webflux.app","l":"TestController"}]

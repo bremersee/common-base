@@ -17,12 +17,6 @@
 package org.bremersee.security.authentication;
 
 import java.util.Collection;
-import java.util.Collections;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
-import org.bremersee.security.ReactiveIpAddressMatcher;
 import org.springframework.security.authorization.AuthorizationDecision;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.server.authorization.AuthorizationContext;
@@ -35,10 +29,10 @@ import reactor.core.publisher.Mono;
  */
 public class RoleOrIpBasedAuthorizationManager extends RoleBasedAuthorizationManager {
 
-  private final Set&lt;String&gt; ipAddresses;
+  private IpBasedAuthorizationManager ipBasedAuthorizationManager;
 
   /**
-   * Instantiates a new Role or ip based authorization manager.
+   * Instantiates a new role or ip based authorization manager.
    *
    * @param roles the roles
    * @param ipAddresses the ip addresses
@@ -46,42 +40,32 @@ public class RoleOrIpBasedAuthorizationManager extends RoleBasedAuthorizationMan
   public RoleOrIpBasedAuthorizationManager(
       Collection&lt;String&gt; roles,
       Collection&lt;String&gt; ipAddresses) {
-<span class="fc" id="L49">    this(roles, null, ipAddresses);</span>
-<span class="fc" id="L50">  }</span>
+<span class="fc" id="L43">    this(roles, ipAddresses, true);</span>
+<span class="fc" id="L44">  }</span>
 
   /**
-   * Instantiates a new Role or ip based authorization manager.
+   * Instantiates a new role or ip based authorization manager.
    *
    * @param roles the roles
-   * @param rolePrefix the role prefix
    * @param ipAddresses the ip addresses
+   * @param withAuthenticatedFallback the with authenticated fallback flag
    */
   public RoleOrIpBasedAuthorizationManager(
       Collection&lt;String&gt; roles,
-      String rolePrefix,
-      Collection&lt;String&gt; ipAddresses) {
-<span class="fc" id="L63">    super(roles, rolePrefix);</span>
-<span class="fc" id="L64">    this.ipAddresses = Optional.ofNullable(ipAddresses)</span>
-<span class="fc" id="L65">        .map(col -&gt; col.stream()</span>
-<span class="fc" id="L66">            .filter(Objects::nonNull)</span>
-<span class="fc" id="L67">            .collect(Collectors.toSet()))</span>
-<span class="fc" id="L68">        .orElseGet(Collections::emptySet);</span>
-<span class="fc" id="L69">  }</span>
+      Collection&lt;String&gt; ipAddresses,
+      boolean withAuthenticatedFallback) {
+<span class="fc" id="L57">    super(roles, withAuthenticatedFallback);</span>
+<span class="fc" id="L58">    this.ipBasedAuthorizationManager = new IpBasedAuthorizationManager(ipAddresses, false);</span>
+<span class="fc" id="L59">  }</span>
 
   @Override
   public Mono&lt;AuthorizationDecision&gt; check(
       Mono&lt;Authentication&gt; authentication,
       AuthorizationContext authorizationContext) {
 
-<span class="fc" id="L76">    return super.check(authentication, authorizationContext)</span>
-<span class="fc" id="L77">        .filter(AuthorizationDecision::isGranted)</span>
-<span class="fc" id="L78">        .defaultIfEmpty(new AuthorizationDecision(isWhiteListedIp(authorizationContext)));</span>
-  }
-
-  private boolean isWhiteListedIp(AuthorizationContext context) {
-<span class="fc" id="L82">    return ipAddresses.stream()</span>
-<span class="fc" id="L83">        .anyMatch(ip -&gt; new ReactiveIpAddressMatcher(ip)</span>
-<span class="fc" id="L84">            .matchesRemoteAddress(context.getExchange()));</span>
+<span class="fc" id="L66">    return ipBasedAuthorizationManager.check(authentication, authorizationContext)</span>
+<span class="fc" id="L67">        .filter(AuthorizationDecision::isGranted)</span>
+<span class="fc" id="L68">        .switchIfEmpty(super.check(authentication, authorizationContext));</span>
   }
 
 }

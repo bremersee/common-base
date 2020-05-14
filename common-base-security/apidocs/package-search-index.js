@@ -1,1 +1,1 @@
-packageSearchIndex = [{"l":"All Packages","url":"allpackages-index.html"},{"l":"org.bremersee.exception"},{"l":"org.bremersee.security"},{"l":"org.bremersee.security.authentication"}]
+packageSearchIndex = [{"l":"All Packages","url":"allpackages-index.html"},{"l":"org.bremersee.exception"},{"l":"org.bremersee.security"},{"l":"org.bremersee.security.authentication"},{"l":"org.bremersee.security.core"}]

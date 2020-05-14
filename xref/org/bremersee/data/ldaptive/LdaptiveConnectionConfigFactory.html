@@ -55,7 +55,7 @@
 <a class="jxr_linenumber" name="L47" href="#L47">47</a>      <strong class="jxr_keyword">return</strong> createConnectionConfig(
 <a class="jxr_linenumber" name="L48" href="#L48">48</a>          properties,
 <a class="jxr_linenumber" name="L49" href="#L49">49</a>          properties.getBindDn(),
-<a class="jxr_linenumber" name="L50" href="#L50">50</a>          properties.getBindCredential());
+<a class="jxr_linenumber" name="L50" href="#L50">50</a>          properties.getBindCredentials());
 <a class="jxr_linenumber" name="L51" href="#L51">51</a>    }
 <a class="jxr_linenumber" name="L52" href="#L52">52</a>  
 <a class="jxr_linenumber" name="L53" href="#L53">53</a>    <em class="jxr_javadoccomment">/**</em>
@@ -95,7 +95,7 @@
 <a class="jxr_linenumber" name="L87" href="#L87">87</a>        <strong class="jxr_keyword">final</strong> String username = bindDn != <strong class="jxr_keyword">null</strong> ? bindDn : properties.getBindDn();
 <a class="jxr_linenumber" name="L88" href="#L88">88</a>        <strong class="jxr_keyword">final</strong> String password = bindCredential != <strong class="jxr_keyword">null</strong>
 <a class="jxr_linenumber" name="L89" href="#L89">89</a>            ? bindCredential
-<a class="jxr_linenumber" name="L90" href="#L90">90</a>            : properties.getBindCredential();
+<a class="jxr_linenumber" name="L90" href="#L90">90</a>            : properties.getBindCredentials();
 <a class="jxr_linenumber" name="L91" href="#L91">91</a>        <strong class="jxr_keyword">final</strong> ConnectionConfig cc = <strong class="jxr_keyword">new</strong> ConnectionConfig();
 <a class="jxr_linenumber" name="L92" href="#L92">92</a>        cc.setLdapUrl(properties.getLdapUrl());
 <a class="jxr_linenumber" name="L93" href="#L93">93</a>  

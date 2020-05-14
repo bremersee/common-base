@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>UserContextCaller.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">common-base-security</a> &gt; <a href="index.source.html" class="el_package">org.bremersee.security.core</a> &gt; <span class="el_source">UserContextCaller.java</span></div><h1>UserContextCaller.java</h1><pre class="source lang-java linenums">/*
+ * Copyright 2020 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package org.bremersee.security.core;
+
+import java.util.Collections;
+import java.util.Optional;
+import java.util.Set;
+import java.util.function.Function;
+import java.util.function.Supplier;
+import javax.validation.constraints.NotNull;
+import org.bremersee.exception.ServiceException;
+import org.springframework.http.ResponseEntity;
+import org.springframework.lang.Nullable;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.validation.annotation.Validated;
+
+/**
+ * The user context caller.
+ *
+ * @author Christian Bremer
+ */
+@Validated
+public class UserContextCaller {
+
+  /**
+   * The constant EMPTY_GROUPS_SUPPLIER.
+   */
+<span class="fc" id="L43">  public static final Supplier&lt;Set&lt;String&gt;&gt; EMPTY_GROUPS_SUPPLIER = Collections::emptySet;</span>
+
+  /**
+   * The constant FORBIDDEN_SUPPLIER.
+   */
+<span class="fc" id="L48">  public static final Supplier&lt;ServiceException&gt; FORBIDDEN_SUPPLIER = ServiceException::forbidden;</span>
+
+  private final Function&lt;Authentication, Set&lt;String&gt;&gt; groupsFn;
+
+  private final Supplier&lt;ServiceException&gt; unauthenticatedExceptionSupplier;
+
+  /**
+   * Instantiates a new user context caller.
+   */
+<span class="fc" id="L57">  public UserContextCaller() {</span>
+<span class="pc" id="L58">    this.groupsFn = authentication -&gt; Collections.emptySet();</span>
+<span class="fc" id="L59">    this.unauthenticatedExceptionSupplier = FORBIDDEN_SUPPLIER;</span>
+<span class="fc" id="L60">  }</span>
+
+  /**
+   * Instantiates a new user context caller.
+   *
+   * @param groupsSupplier the groups supplier
+   */
+  public UserContextCaller(@Nullable Supplier&lt;Set&lt;String&gt;&gt; groupsSupplier) {
+<span class="fc" id="L68">    this(groupsSupplier, FORBIDDEN_SUPPLIER);</span>
+<span class="fc" id="L69">  }</span>
+
+  /**
+   * Instantiates a new user context caller.
+   *
+   * @param groupsFn the groups fn
+   */
+  public UserContextCaller(@Nullable Function&lt;Authentication, Set&lt;String&gt;&gt; groupsFn) {
+<span class="fc" id="L77">    this(groupsFn, FORBIDDEN_SUPPLIER);</span>
+<span class="fc" id="L78">  }</span>
+
+  /**
+   * Instantiates a new user context caller.
+   *
+   * @param groupsSupplier the groups supplier
+   * @param unauthenticatedExceptionSupplier the unauthenticated exception supplier
+   */
+  public UserContextCaller(
+      @Nullable Supplier&lt;Set&lt;String&gt;&gt; groupsSupplier,
+<span class="fc" id="L88">      @Nullable Supplier&lt;ServiceException&gt; unauthenticatedExceptionSupplier) {</span>
+<span class="pc bpc" id="L89" title="1 of 2 branches missed.">    this.groupsFn = groupsSupplier != null</span>
+<span class="fc" id="L90">        ? authentication -&gt; groupsSupplier.get()</span>
+<span class="pc" id="L91">        : authentication -&gt; Collections.emptySet();</span>
+<span class="fc bfc" id="L92" title="All 2 branches covered.">    this.unauthenticatedExceptionSupplier = unauthenticatedExceptionSupplier != null</span>
+<span class="fc" id="L93">        ? unauthenticatedExceptionSupplier</span>
+<span class="fc" id="L94">        : FORBIDDEN_SUPPLIER;</span>
+<span class="fc" id="L95">  }</span>
+
+  /**
+   * Instantiates a new user context caller.
+   *
+   * @param groupsFn the groups fn
+   * @param unauthenticatedExceptionSupplier the unauthenticated exception supplier
+   */
+  public UserContextCaller(
+      @Nullable Function&lt;Authentication, Set&lt;String&gt;&gt; groupsFn,
+<span class="fc" id="L105">      @Nullable Supplier&lt;ServiceException&gt; unauthenticatedExceptionSupplier) {</span>
+<span class="pc bpc" id="L106" title="1 of 2 branches missed.">    this.groupsFn = groupsFn != null ? groupsFn : authentication -&gt; Collections.emptySet();</span>
+<span class="fc bfc" id="L107" title="All 2 branches covered.">    this.unauthenticatedExceptionSupplier = unauthenticatedExceptionSupplier != null</span>
+<span class="fc" id="L108">        ? unauthenticatedExceptionSupplier</span>
+<span class="fc" id="L109">        : FORBIDDEN_SUPPLIER;</span>
+<span class="fc" id="L110">  }</span>
+
+  /**
+   * Call with required user context.
+   *
+   * @param &lt;R&gt; the type parameter
+   * @param function the function
+   * @return the response
+   */
+  public &lt;R&gt; R callWithRequiredUserContext(@NotNull Function&lt;UserContext, R&gt; function) {
+<span class="fc" id="L120">    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();</span>
+<span class="pc bpc" id="L121" title="1 of 4 branches missed.">    if (authentication == null || !authentication.isAuthenticated()) {</span>
+<span class="fc" id="L122">      throw unauthenticatedExceptionSupplier.get();</span>
+    }
+<span class="fc" id="L124">    return function.apply(UserContext.newInstance(authentication, groupsFn.apply(authentication)));</span>
+  }
+
+  /**
+   * Call with optional user context.
+   *
+   * @param &lt;R&gt; the type parameter
+   * @param function the function
+   * @return the response
+   */
+  public &lt;R&gt; R callWithOptionalUserContext(@NotNull Function&lt;UserContext, R&gt; function) {
+<span class="fc" id="L135">    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();</span>
+<span class="pc bpc" id="L136" title="1 of 4 branches missed.">    if (authentication == null || !authentication.isAuthenticated()) {</span>
+<span class="fc" id="L137">      return function.apply(UserContext.newInstance());</span>
+    }
+<span class="fc" id="L139">    return function.apply(UserContext.newInstance(authentication, groupsFn.apply(authentication)));</span>
+  }
+
+  /**
+   * Response with required user context response entity.
+   *
+   * @param &lt;R&gt; the type parameter
+   * @param &lt;E&gt; the type parameter
+   * @param function the function
+   * @return the response entity
+   */
+  public &lt;R, E&gt; ResponseEntity&lt;E&gt; responseWithRequiredUserContext(
+      @NotNull Function&lt;UserContext, R&gt; function) {
+<span class="fc" id="L152">    return toResponseEntity(callWithRequiredUserContext(function));</span>
+  }
+
+  /**
+   * Response with optional user context response entity.
+   *
+   * @param &lt;R&gt; the type parameter
+   * @param &lt;E&gt; the type parameter
+   * @param function the function
+   * @return the response entity
+   */
+  public &lt;R, E&gt; ResponseEntity&lt;E&gt; responseWithOptionalUserContext(
+      @NotNull Function&lt;UserContext, R&gt; function) {
+<span class="fc" id="L165">    return toResponseEntity(callWithOptionalUserContext(function));</span>
+  }
+
+  /**
+   * To response entity response entity.
+   *
+   * @param &lt;R&gt; the type parameter
+   * @param &lt;E&gt; the type parameter
+   * @param result the result
+   * @return the response entity
+   */
+  @SuppressWarnings(&quot;unchecked&quot;)
+  protected &lt;R, E&gt; ResponseEntity&lt;E&gt; toResponseEntity(R result) {
+<span class="fc bfc" id="L178" title="All 2 branches covered.">    if (result == null) {</span>
+<span class="fc" id="L179">      return ResponseEntity.notFound().build();</span>
+<span class="fc bfc" id="L180" title="All 2 branches covered.">    } else if (result instanceof Optional) {</span>
+<span class="fc" id="L181">      return ResponseEntity.of((Optional&lt;E&gt;) result);</span>
+    } else {
+<span class="fc" id="L183">      return (ResponseEntity&lt;E&gt;) ResponseEntity.ok(result);</span>
+    }
+  }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

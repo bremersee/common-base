@@ -16,6 +16,8 @@
 
 package org.bremersee.security.authentication;
 
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
@@ -26,6 +28,8 @@ import reactor.core.publisher.Mono;
  *
  * @author Christian Bremer
  */
+<span class="nc" id="L31">@ToString(doNotUseGetters = true)</span>
+<span class="nc bnc" id="L32" title="All 14 branches missed.">@EqualsAndHashCode(doNotUseGetters = true)</span>
 public class JsonPathReactiveJwtConverter implements Converter&lt;Jwt, Mono&lt;JwtAuthenticationToken&gt;&gt; {
 
   private final JsonPathJwtConverter converter;
@@ -35,22 +39,22 @@ public class JsonPathReactiveJwtConverter implements Converter&lt;Jwt, Mono&lt;J
    */
   @SuppressWarnings(&quot;unused&quot;)
   public JsonPathReactiveJwtConverter() {
-<span class="fc" id="L38">    this(null);</span>
-<span class="fc" id="L39">  }</span>
+<span class="fc" id="L42">    this(null);</span>
+<span class="fc" id="L43">  }</span>
 
   /**
    * Instantiates a new json path reactive jwt converter.
    *
    * @param converter the converter
    */
-<span class="fc" id="L46">  public JsonPathReactiveJwtConverter(JsonPathJwtConverter converter) {</span>
-<span class="fc bfc" id="L47" title="All 2 branches covered.">    this.converter = converter != null ? converter : new JsonPathJwtConverter();</span>
-<span class="fc" id="L48">  }</span>
+<span class="fc" id="L50">  public JsonPathReactiveJwtConverter(JsonPathJwtConverter converter) {</span>
+<span class="fc bfc" id="L51" title="All 2 branches covered.">    this.converter = converter != null ? converter : new JsonPathJwtConverter();</span>
+<span class="fc" id="L52">  }</span>
 
   @Override
   public Mono&lt;JwtAuthenticationToken&gt; convert(final Jwt jwt) {
     //noinspection NullableInLambdaInTransform
-<span class="fc" id="L53">    return Mono.just(jwt).map(this.converter::convert);</span>
+<span class="fc" id="L57">    return Mono.just(jwt).map(this.converter::convert);</span>
   }
 
 }

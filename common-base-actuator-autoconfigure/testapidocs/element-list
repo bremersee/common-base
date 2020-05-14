@@ -1,0 +1,5 @@
+org.bremersee.actuator.security.authentication
+org.bremersee.actuator.security.authentication.resourceserver.reactive
+org.bremersee.actuator.security.authentication.resourceserver.reactive.app
+org.bremersee.actuator.security.authentication.resourceserver.servlet
+org.bremersee.actuator.security.authentication.resourceserver.servlet.app
