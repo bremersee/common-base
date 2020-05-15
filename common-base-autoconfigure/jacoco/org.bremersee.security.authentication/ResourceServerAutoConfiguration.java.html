@@ -43,8 +43,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
  * @author Christian Bremer
  */
 @ConditionalOnWebApplication(type = Type.SERVLET)
-//@ConditionalOnExpression(
-//    &quot;'${bremersee.auth.resource-server:OTHER}' != T(org.bremersee.security.authentication.AutoSecurityMode).OTHER&quot;)
 @Conditional({ResourceServerAutoSecurityCondition.class})
 @ConditionalOnClass({
     HttpSecurity.class,
@@ -58,7 +56,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
     SecurityProperties.class,
     AuthProperties.class})
 @Configuration
-<span class="fc" id="L61">@Slf4j</span>
+<span class="fc" id="L59">@Slf4j</span>
 public class ResourceServerAutoConfiguration extends AbstractResourceServerAutoConfiguration {
 
   /**
@@ -78,20 +76,20 @@ public class ResourceServerAutoConfiguration extends AbstractResourceServerAutoC
       CorsProperties corsProperties,
       ObjectProvider&lt;JsonPathJwtConverter&gt; jwtConverterProvider,
       ObjectProvider&lt;PasswordEncoder&gt; passwordEncoderProvider) {
-<span class="fc" id="L81">    super(environment, securityProperties, authProperties, corsProperties, jwtConverterProvider,</span>
+<span class="fc" id="L79">    super(environment, securityProperties, authProperties, corsProperties, jwtConverterProvider,</span>
         passwordEncoderProvider);
-<span class="fc" id="L83">  }</span>
+<span class="fc" id="L81">  }</span>
 
   @EventListener(ApplicationReadyEvent.class)
   @Override
   public void init() {
-<span class="fc" id="L88">    super.init();</span>
-<span class="fc" id="L89">  }</span>
+<span class="fc" id="L86">    super.init();</span>
+<span class="fc" id="L87">  }</span>
 
   @Override
   protected ExpressionUrlAuthorizationConfigurer&lt;HttpSecurity&gt;.ExpressionInterceptUrlRegistry init(
       HttpSecurity httpSecurity) throws Exception {
-<span class="fc" id="L94">    return httpSecurity.authorizeRequests();</span>
+<span class="fc" id="L92">    return httpSecurity.authorizeRequests();</span>
   }
 
   @ConditionalOnExpression(&quot;'${spring.security.oauth2.resourceserver.jwt.jwk-set-uri:}'.empty&quot;)
@@ -99,10 +97,10 @@ public class ResourceServerAutoConfiguration extends AbstractResourceServerAutoC
   @Bean
   @Override
   public UserDetailsService userDetailsServiceBean() {
-<span class="fc" id="L102">    return new InMemoryUserDetailsAutoConfiguration().inMemoryUserDetailsManager(</span>
-<span class="fc" id="L103">        getSecurityProperties(),</span>
-<span class="fc" id="L104">        getAuthProperties(),</span>
-<span class="fc" id="L105">        getPasswordEncoderProvider());</span>
+<span class="fc" id="L100">    return new InMemoryUserDetailsAutoConfiguration().inMemoryUserDetailsManager(</span>
+<span class="fc" id="L101">        getSecurityProperties(),</span>
+<span class="fc" id="L102">        getAuthProperties(),</span>
+<span class="fc" id="L103">        getPasswordEncoderProvider());</span>
   }
 
 }

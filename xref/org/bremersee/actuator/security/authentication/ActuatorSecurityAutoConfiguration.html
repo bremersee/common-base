@@ -181,7 +181,7 @@
 <a class="jxr_linenumber" name="L173" href="#L173">173</a>           .httpBasic().disable();
 <a class="jxr_linenumber" name="L174" href="#L174">174</a>     } <strong class="jxr_keyword">else</strong> {
 <a class="jxr_linenumber" name="L175" href="#L175">175</a>       <strong class="jxr_keyword">if</strong> (actuatorAuthProperties.isEnableCors()) {
-<a class="jxr_linenumber" name="L176" href="#L176">176</a>         reg = reg.regexMatchers(HttpMethod.OPTIONS, <span class="jxr_string">"/**"</span>).permitAll();
+<a class="jxr_linenumber" name="L176" href="#L176">176</a>         reg = reg.antMatchers(HttpMethod.OPTIONS, <span class="jxr_string">"/**"</span>).permitAll();
 <a class="jxr_linenumber" name="L177" href="#L177">177</a>       }
 <a class="jxr_linenumber" name="L178" href="#L178">178</a>       http = reg
 <a class="jxr_linenumber" name="L179" href="#L179">179</a>           .requestMatchers(unauthenticatedEndpointMatchers()).permitAll()

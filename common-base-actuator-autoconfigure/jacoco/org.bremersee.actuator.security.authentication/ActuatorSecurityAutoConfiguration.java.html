@@ -154,9 +154,9 @@ public class ActuatorSecurityAutoConfiguration extends WebSecurityConfigurerAdap
   }
 
   private EndpointRequest.EndpointRequestMatcher[] unauthenticatedEndpointMatchers() {
-<span class="nc" id="L157">    return actuatorAuthProperties.unauthenticatedEndpointsOrDefaults().stream()</span>
-<span class="nc" id="L158">        .map(EndpointRequest::to)</span>
-<span class="nc" id="L159">        .toArray(EndpointRequest.EndpointRequestMatcher[]::new);</span>
+<span class="fc" id="L157">    return actuatorAuthProperties.unauthenticatedEndpointsOrDefaults().stream()</span>
+<span class="fc" id="L158">        .map(EndpointRequest::to)</span>
+<span class="fc" id="L159">        .toArray(EndpointRequest.EndpointRequestMatcher[]::new);</span>
   }
 
   @Override
@@ -173,24 +173,24 @@ public class ActuatorSecurityAutoConfiguration extends WebSecurityConfigurerAdap
 <span class="fc" id="L173">          .httpBasic().disable();</span>
     } else {
 <span class="pc bpc" id="L175" title="1 of 2 branches missed.">      if (actuatorAuthProperties.isEnableCors()) {</span>
-<span class="nc" id="L176">        reg = reg.regexMatchers(HttpMethod.OPTIONS, &quot;/**&quot;).permitAll();</span>
+<span class="fc" id="L176">        reg = reg.antMatchers(HttpMethod.OPTIONS, &quot;/**&quot;).permitAll();</span>
       }
-<span class="nc" id="L178">      http = reg</span>
-<span class="nc" id="L179">          .requestMatchers(unauthenticatedEndpointMatchers()).permitAll()</span>
-<span class="nc" id="L180">          .requestMatchers(new AndRequestMatcher(</span>
-<span class="nc" id="L181">              EndpointRequest.toAnyEndpoint(),</span>
+<span class="fc" id="L178">      http = reg</span>
+<span class="fc" id="L179">          .requestMatchers(unauthenticatedEndpointMatchers()).permitAll()</span>
+<span class="fc" id="L180">          .requestMatchers(new AndRequestMatcher(</span>
+<span class="fc" id="L181">              EndpointRequest.toAnyEndpoint(),</span>
               new AntPathRequestMatcher(&quot;/**&quot;, &quot;GET&quot;)))
-<span class="nc" id="L183">          .access(actuatorAuthProperties.buildAccessExpression())</span>
-<span class="nc" id="L184">          .anyRequest()</span>
-<span class="nc" id="L185">          .access(actuatorAuthProperties.buildAdminAccessExpression())</span>
-<span class="nc" id="L186">          .and();</span>
-<span class="nc bnc" id="L187" title="All 2 branches missed.">      if (StringUtils.hasText(actuatorAuthProperties.getJwkUriSet())) {</span>
+<span class="fc" id="L183">          .access(actuatorAuthProperties.buildAccessExpression())</span>
+<span class="fc" id="L184">          .anyRequest()</span>
+<span class="fc" id="L185">          .access(actuatorAuthProperties.buildAdminAccessExpression())</span>
+<span class="fc" id="L186">          .and();</span>
+<span class="pc bpc" id="L187" title="1 of 2 branches missed.">      if (StringUtils.hasText(actuatorAuthProperties.getJwkUriSet())) {</span>
 <span class="nc" id="L188">        http.authenticationProvider(passwordFlowAuthenticationManager());</span>
       }
-<span class="nc" id="L190">      http = http</span>
-<span class="nc" id="L191">          .formLogin().disable()</span>
-<span class="nc" id="L192">          .httpBasic().realmName(&quot;actuator&quot;)</span>
-<span class="nc" id="L193">          .and();</span>
+<span class="fc" id="L190">      http = http</span>
+<span class="fc" id="L191">          .formLogin().disable()</span>
+<span class="fc" id="L192">          .httpBasic().realmName(&quot;actuator&quot;)</span>
+<span class="fc" id="L193">          .and();</span>
     }
 <span class="fc" id="L195">    http</span>
 <span class="fc" id="L196">        .csrf().disable()</span>
