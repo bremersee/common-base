@@ -123,7 +123,7 @@ public class ActuatorSecurityAutoConfiguration extends WebSecurityConfigurerAdap
   @EventListener(ApplicationReadyEvent.class)
   @SuppressWarnings(&quot;DuplicatedCode&quot;)
   public void init() {
-<span class="fc" id="L126">    final boolean hasJwkUriSet = StringUtils.hasText(actuatorAuthProperties.getJwkUriSet());</span>
+<span class="fc" id="L126">    final boolean hasJwkUriSet = StringUtils.hasText(actuatorAuthProperties.getJwkSetUri());</span>
 <span class="fc" id="L127">    log.info(&quot;\n&quot;</span>
             + &quot;*********************************************************************************\n&quot;
             + &quot;* {}\n&quot;
@@ -138,12 +138,12 @@ public class ActuatorSecurityAutoConfiguration extends WebSecurityConfigurerAdap
 <span class="fc" id="L138">        actuatorAuthProperties.getOrder(),</span>
 <span class="fc" id="L139">        hasJwkUriSet,</span>
 <span class="fc" id="L140">        actuatorAuthProperties.isEnableCors());</span>
-<span class="pc bpc" id="L141" title="1 of 2 branches missed.">    if (hasJwkUriSet) {</span>
-<span class="nc" id="L142">      Assert.hasText(actuatorAuthProperties.getPasswordFlow().getTokenEndpoint(),</span>
+<span class="fc bfc" id="L141" title="All 2 branches covered.">    if (hasJwkUriSet) {</span>
+<span class="fc" id="L142">      Assert.hasText(actuatorAuthProperties.getPasswordFlow().getTokenEndpoint(),</span>
           &quot;Token endpoint of actuator password flow must be present.&quot;);
-<span class="nc" id="L144">      Assert.hasText(actuatorAuthProperties.getPasswordFlow().getClientId(),</span>
+<span class="fc" id="L144">      Assert.hasText(actuatorAuthProperties.getPasswordFlow().getClientId(),</span>
           &quot;Client ID of actuator password flow must be present.&quot;);
-<span class="nc" id="L146">      Assert.notNull(actuatorAuthProperties.getPasswordFlow().getClientSecret(),</span>
+<span class="fc" id="L146">      Assert.notNull(actuatorAuthProperties.getPasswordFlow().getClientSecret(),</span>
           &quot;Client secret of actuator password flow must be present.&quot;);
     }
 <span class="fc" id="L149">  }</span>
@@ -184,8 +184,8 @@ public class ActuatorSecurityAutoConfiguration extends WebSecurityConfigurerAdap
 <span class="fc" id="L184">          .anyRequest()</span>
 <span class="fc" id="L185">          .access(actuatorAuthProperties.buildAdminAccessExpression())</span>
 <span class="fc" id="L186">          .and();</span>
-<span class="pc bpc" id="L187" title="1 of 2 branches missed.">      if (StringUtils.hasText(actuatorAuthProperties.getJwkUriSet())) {</span>
-<span class="nc" id="L188">        http.authenticationProvider(passwordFlowAuthenticationManager());</span>
+<span class="fc bfc" id="L187" title="All 2 branches covered.">      if (StringUtils.hasText(actuatorAuthProperties.getJwkSetUri())) {</span>
+<span class="fc" id="L188">        http.authenticationProvider(passwordFlowAuthenticationManager());</span>
       }
 <span class="fc" id="L190">      http = http</span>
 <span class="fc" id="L191">          .formLogin().disable()</span>
@@ -215,42 +215,42 @@ public class ActuatorSecurityAutoConfiguration extends WebSecurityConfigurerAdap
   }
 
   private PasswordFlowAuthenticationManager passwordFlowAuthenticationManager() {
-<span class="nc" id="L218">    return new PasswordFlowAuthenticationManager(</span>
-<span class="nc" id="L219">        actuatorAuthProperties.getPasswordFlow(),</span>
-<span class="nc" id="L220">        jwtDecoder(),</span>
-<span class="nc" id="L221">        jwtConverter(),</span>
+<span class="fc" id="L218">    return new PasswordFlowAuthenticationManager(</span>
+<span class="fc" id="L219">        actuatorAuthProperties.getPasswordFlow(),</span>
+<span class="fc" id="L220">        jwtDecoder(),</span>
+<span class="fc" id="L221">        jwtConverter(),</span>
         tokenRetrieverProvider
-<span class="nc" id="L223">            .getIfAvailable(() -&gt; new RestTemplateAccessTokenRetriever(new RestTemplate())));</span>
+<span class="pc" id="L223">            .getIfAvailable(() -&gt; new RestTemplateAccessTokenRetriever(new RestTemplate())));</span>
   }
 
   private JwtDecoder jwtDecoder() {
-<span class="nc" id="L227">    NimbusJwtDecoder nimbusJwtDecoder = NimbusJwtDecoder</span>
-<span class="nc" id="L228">        .withJwkSetUri(actuatorAuthProperties.getJwkUriSet())</span>
-<span class="nc" id="L229">        .jwsAlgorithm(SignatureAlgorithm.from(actuatorAuthProperties.getJwsAlgorithm()))</span>
-<span class="nc" id="L230">        .build();</span>
-<span class="nc bnc" id="L231" title="All 2 branches missed.">    if (StringUtils.hasText(actuatorAuthProperties.getIssuerUri())) {</span>
+<span class="fc" id="L227">    NimbusJwtDecoder nimbusJwtDecoder = NimbusJwtDecoder</span>
+<span class="fc" id="L228">        .withJwkSetUri(actuatorAuthProperties.getJwkSetUri())</span>
+<span class="fc" id="L229">        .jwsAlgorithm(SignatureAlgorithm.from(actuatorAuthProperties.getJwsAlgorithm()))</span>
+<span class="fc" id="L230">        .build();</span>
+<span class="pc bpc" id="L231" title="1 of 2 branches missed.">    if (StringUtils.hasText(actuatorAuthProperties.getIssuerUri())) {</span>
 <span class="nc" id="L232">      nimbusJwtDecoder.setJwtValidator(</span>
 <span class="nc" id="L233">          JwtValidators.createDefaultWithIssuer(actuatorAuthProperties.getIssuerUri()));</span>
     }
-<span class="nc" id="L235">    return nimbusJwtDecoder;</span>
+<span class="fc" id="L235">    return nimbusJwtDecoder;</span>
   }
 
   private JsonPathJwtConverter jwtConverter() {
-<span class="nc" id="L239">    JsonPathJwtConverter internalJwtConverter = new JsonPathJwtConverter();</span>
-<span class="nc" id="L240">    internalJwtConverter.setNameJsonPath(actuatorAuthProperties.getNameJsonPath());</span>
-<span class="nc" id="L241">    internalJwtConverter.setRolePrefix(actuatorAuthProperties.getRolePrefix());</span>
-<span class="nc" id="L242">    internalJwtConverter.setRolesJsonPath(actuatorAuthProperties.getRolesJsonPath());</span>
-<span class="nc" id="L243">    internalJwtConverter.setRolesValueList(actuatorAuthProperties.isRolesValueList());</span>
-<span class="nc" id="L244">    internalJwtConverter.setRolesValueSeparator(</span>
-<span class="nc" id="L245">        actuatorAuthProperties.getRolesValueSeparator());</span>
-<span class="nc" id="L246">    JsonPathJwtConverter externalJwtConverter = jsonPathJwtConverterProvider.getIfAvailable();</span>
+<span class="fc" id="L239">    JsonPathJwtConverter internalJwtConverter = new JsonPathJwtConverter();</span>
+<span class="fc" id="L240">    internalJwtConverter.setNameJsonPath(actuatorAuthProperties.getNameJsonPath());</span>
+<span class="fc" id="L241">    internalJwtConverter.setRolePrefix(actuatorAuthProperties.getRolePrefix());</span>
+<span class="fc" id="L242">    internalJwtConverter.setRolesJsonPath(actuatorAuthProperties.getRolesJsonPath());</span>
+<span class="fc" id="L243">    internalJwtConverter.setRolesValueList(actuatorAuthProperties.isRolesValueList());</span>
+<span class="fc" id="L244">    internalJwtConverter.setRolesValueSeparator(</span>
+<span class="fc" id="L245">        actuatorAuthProperties.getRolesValueSeparator());</span>
+<span class="fc" id="L246">    JsonPathJwtConverter externalJwtConverter = jsonPathJwtConverterProvider.getIfAvailable();</span>
     JsonPathJwtConverter jwtConverter;
-<span class="nc bnc" id="L248" title="All 2 branches missed.">    if (internalJwtConverter.equals(externalJwtConverter)) {</span>
-<span class="nc" id="L249">      jwtConverter = externalJwtConverter;</span>
+<span class="pc bpc" id="L248" title="1 of 2 branches missed.">    if (internalJwtConverter.equals(externalJwtConverter)) {</span>
+<span class="fc" id="L249">      jwtConverter = externalJwtConverter;</span>
     } else {
 <span class="nc" id="L251">      jwtConverter = internalJwtConverter;</span>
     }
-<span class="nc" id="L253">    return jwtConverter;</span>
+<span class="fc" id="L253">    return jwtConverter;</span>
   }
 
 }

@@ -16,7 +16,7 @@
 -docencoding
 'UTF-8'
 -doctitle
-'common-base 2.1.1 Test API'
+'common-base 2.1.2 Test API'
 -link
 '../apidocs'
 -linkoffline
@@ -24,4 +24,4 @@
 -use
 -version
 -windowtitle
-'common-base 2.1.1 Test API'
+'common-base 2.1.2 Test API'
