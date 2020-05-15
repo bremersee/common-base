@@ -123,7 +123,7 @@ public class ActuatorSecurityAutoConfiguration extends WebSecurityConfigurerAdap
   @EventListener(ApplicationReadyEvent.class)
   @SuppressWarnings("DuplicatedCode")
   public void init() {
-    final boolean hasJwkUriSet = StringUtils.hasText(actuatorAuthProperties.getJwkUriSet());
+    final boolean hasJwkUriSet = StringUtils.hasText(actuatorAuthProperties.getJwkSetUri());
     log.info("\n"
             + "*********************************************************************************\n"
             + "* {}\n"
@@ -184,7 +184,7 @@ public class ActuatorSecurityAutoConfiguration extends WebSecurityConfigurerAdap
           .anyRequest()
           .access(actuatorAuthProperties.buildAdminAccessExpression())
           .and();
-      if (StringUtils.hasText(actuatorAuthProperties.getJwkUriSet())) {
+      if (StringUtils.hasText(actuatorAuthProperties.getJwkSetUri())) {
         http.authenticationProvider(passwordFlowAuthenticationManager());
       }
       http = http
@@ -225,7 +225,7 @@ public class ActuatorSecurityAutoConfiguration extends WebSecurityConfigurerAdap
 
   private JwtDecoder jwtDecoder() {
     NimbusJwtDecoder nimbusJwtDecoder = NimbusJwtDecoder
-        .withJwkSetUri(actuatorAuthProperties.getJwkUriSet())
+        .withJwkSetUri(actuatorAuthProperties.getJwkSetUri())
         .jwsAlgorithm(SignatureAlgorithm.from(actuatorAuthProperties.getJwsAlgorithm()))
         .build();
     if (StringUtils.hasText(actuatorAuthProperties.getIssuerUri())) {

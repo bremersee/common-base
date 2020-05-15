@@ -253,15 +253,15 @@ class ActuatorAuthPropertiesTest {
    * Gets jwk uri set.
    */
   @Test
-  void getJwkUriSet() {
+  void getJwkSetUri() {
     String value = UUID.randomUUID().toString();
     ActuatorAuthProperties expected = new ActuatorAuthProperties();
-    expected.setJwkUriSet(value);
+    expected.setJwkSetUri(value);
 
     ActuatorAuthProperties actual = new ActuatorAuthProperties();
-    actual.setJwkUriSet(value);
+    actual.setJwkSetUri(value);
 
-    assertEquals(value, actual.getJwkUriSet());
+    assertEquals(value, actual.getJwkSetUri());
     assertEquals(expected, actual);
     assertTrue(expected.toString().contains(value));
   }

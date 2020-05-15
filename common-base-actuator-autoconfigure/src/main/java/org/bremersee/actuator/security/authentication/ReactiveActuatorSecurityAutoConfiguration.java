@@ -125,7 +125,7 @@ public class ReactiveActuatorSecurityAutoConfiguration {
   @EventListener(ApplicationReadyEvent.class)
   @SuppressWarnings("DuplicatedCode")
   public void init() {
-    final boolean hasJwkUriSet = StringUtils.hasText(actuatorAuthProperties.getJwkUriSet());
+    final boolean hasJwkUriSet = StringUtils.hasText(actuatorAuthProperties.getJwkSetUri());
     log.info("\n"
             + "*********************************************************************************\n"
             + "* {}\n"
@@ -209,7 +209,7 @@ public class ReactiveActuatorSecurityAutoConfiguration {
   }
 
   private ReactiveAuthenticationManager authenticationManager() {
-    return StringUtils.hasText(actuatorAuthProperties.getJwkUriSet())
+    return StringUtils.hasText(actuatorAuthProperties.getJwkSetUri())
         ? passwordFlowReactiveAuthenticationManager()
         : userDetailsAuthenticationManager();
   }
@@ -232,7 +232,7 @@ public class ReactiveActuatorSecurityAutoConfiguration {
 
   private ReactiveJwtDecoder jwtDecoder() {
     NimbusReactiveJwtDecoder nimbusJwtDecoder = NimbusReactiveJwtDecoder
-        .withJwkSetUri(actuatorAuthProperties.getJwkUriSet())
+        .withJwkSetUri(actuatorAuthProperties.getJwkSetUri())
         .jwsAlgorithm(SignatureAlgorithm.from(actuatorAuthProperties.getJwsAlgorithm()))
         .build();
     if (StringUtils.hasText(actuatorAuthProperties.getIssuerUri())) {
