@@ -43,8 +43,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
  * @author Christian Bremer
  */
 @ConditionalOnWebApplication(type = Type.SERVLET)
-//@ConditionalOnExpression(
-//    "'${bremersee.auth.resource-server:OTHER}' != T(org.bremersee.security.authentication.AutoSecurityMode).OTHER")
 @Conditional({ResourceServerAutoSecurityCondition.class})
 @ConditionalOnClass({
     HttpSecurity.class,

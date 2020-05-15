@@ -173,7 +173,7 @@ public class ActuatorSecurityAutoConfiguration extends WebSecurityConfigurerAdap
           .httpBasic().disable();
     } else {
       if (actuatorAuthProperties.isEnableCors()) {
-        reg = reg.regexMatchers(HttpMethod.OPTIONS, "/**").permitAll();
+        reg = reg.antMatchers(HttpMethod.OPTIONS, "/**").permitAll();
       }
       http = reg
           .requestMatchers(unauthenticatedEndpointMatchers()).permitAll()
