@@ -93,7 +93,7 @@ public class ActuatorAuthProperties {
   /**
    * The JWK uri.
    */
-  private String jwkUriSet;
+  private String jwkSetUri;
 
   /**
    * The JWS algorithm
