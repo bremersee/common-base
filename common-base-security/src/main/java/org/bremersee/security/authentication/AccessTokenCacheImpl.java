@@ -114,7 +114,7 @@ public class AccessTokenCacheImpl implements AccessTokenCache, DisposableBean {
   @Override
   public void destroy() {
     synchronized (CACHE_NAME) {
-      if (!internalCacheTimerCanceled) {
+      if (!internalCacheTimerCanceled && internalCacheTimer != null) {
         internalCacheTimerCanceled = true;
         internalCacheTimer.cancel();
       }
