@@ -1,5 +1,6 @@
 package org.bremersee.security.authentication;
 
+import java.util.List;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.ObjectProvider;
@@ -38,25 +39,21 @@ public class AccessTokenCacheAutoConfiguration {
   /**
    * Creates access token cache.
    *
-   * @param cacheManagerProvider the cache manager provider
+   * @param cacheManagers the cache managers
    * @return the access token cache
    */
   @ConditionalOnMissingBean
   @Bean
-  public AccessTokenCache accessTokenCache(ObjectProvider<CacheManager> cacheManagerProvider) {
-    return Optional.ofNullable(cacheManagerProvider.getIfAvailable())
+  public AccessTokenCache accessTokenCache(ObjectProvider<List<CacheManager>> cacheManagers) {
+    return Optional.ofNullable(cacheManagers.getIfAvailable())
+        .flatMap(managers -> managers.stream()
+            .filter(manager -> manager.getCacheNames().contains(AccessTokenCache.CACHE_NAME))
+            .findFirst())
         .map(cacheManager -> {
-          if (cacheManager.getCacheNames().contains(AccessTokenCache.CACHE_NAME)) {
-            Cache cache = cacheManager.getCache(AccessTokenCache.CACHE_NAME);
-            log.info("Creating access token cache with external cache {} from cache manager {}",
-                cache, cacheManager);
-            return cache;
-          } else {
-            log.info("Creating access token cache: a cache manager was found ({}), but it doesn't "
-                    + "contain a cache with name {}. Using internal cache.",
-                cacheManager, AccessTokenCache.CACHE_NAME);
-            return null;
-          }
+          Cache cache = cacheManager.getCache(AccessTokenCache.CACHE_NAME);
+          log.info("Creating access token cache with external cache {} from cache manager {}",
+              cache, cacheManager);
+          return cache;
         })
         .map(AccessTokenCacheImpl::new)
         .orElseGet(AccessTokenCacheImpl::new);
