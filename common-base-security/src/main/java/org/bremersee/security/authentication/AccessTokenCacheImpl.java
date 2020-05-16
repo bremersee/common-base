@@ -23,15 +23,11 @@ import org.springframework.util.Assert;
 @Slf4j
 public class AccessTokenCacheImpl implements AccessTokenCache, DisposableBean {
 
-  private ConcurrentMapCache internalCache;
-
-  private Timer internalCacheTimer;
-
-  private boolean internalCacheTimerCanceled = false;
-
   private final JwtDecoder jwtDecoder;
 
   private final Cache cache;
+
+  private Timer internalCacheTimer;
 
   @Setter
   @Positive
@@ -57,39 +53,35 @@ public class AccessTokenCacheImpl implements AccessTokenCache, DisposableBean {
    * @param cache the external cache
    */
   public AccessTokenCacheImpl(JwtDecoder jwtDecoder, Cache cache) {
-    Assert.notNull(jwtDecoder, "Jwt decoder must not be present.");
+    Assert.notNull(jwtDecoder, "Jwt decoder must be present.");
     this.jwtDecoder = jwtDecoder;
     if (cache != null) {
       log.info("Creating a jwt cache with given cache.");
       this.cache = cache;
     } else {
       log.info("Creating a jwt cache with internal in memory cache.");
-      this.cache = getInternalCache();
+      this.cache = createInternalCache();
     }
   }
 
-  private ConcurrentMapCache getInternalCache() {
-    synchronized (CACHE_NAME) {
-      if (internalCache == null) {
-        final long period = 1000L * 60L * 30L;
-        internalCache = new ConcurrentMapCache(CACHE_NAME);
-        internalCacheTimer = new Timer();
-        internalCacheTimer.schedule(new TimerTask() {
-          @Override
-          public void run() {
-            Set<Object> keys = internalCache.getNativeCache().keySet();
-            log.trace("Removing obsolete jwt entries from internal cache (sze = {}).", keys.size());
-            keys.forEach(key -> findJwt(String.valueOf(key))
-                .ifPresent(jwt -> {
-                  if (jwt.getExpiresAt() == null || jwt.getExpiresAt().isBefore(Instant.now())) {
-                    internalCache.evict(key);
-                  }
-                }));
-          }
-        }, period, period);
+  private ConcurrentMapCache createInternalCache() {
+    final long period = 1000L * 60L * 30L;
+    ConcurrentMapCache internalCache = new ConcurrentMapCache(CACHE_NAME);
+    internalCacheTimer = new Timer();
+    internalCacheTimer.schedule(new TimerTask() {
+      @Override
+      public void run() {
+        Set<Object> keys = internalCache.getNativeCache().keySet();
+        log.trace("Removing obsolete jwt entries from internal cache (sze = {}).", keys.size());
+        keys.forEach(key -> findJwt(String.valueOf(key))
+            .ifPresent(jwt -> {
+              if (jwt.getExpiresAt() == null || jwt.getExpiresAt().isBefore(Instant.now())) {
+                internalCache.evict(key);
+              }
+            }));
       }
-      return internalCache;
-    }
+    }, period, period);
+    return internalCache;
   }
 
   @Override
@@ -119,11 +111,8 @@ public class AccessTokenCacheImpl implements AccessTokenCache, DisposableBean {
 
   @Override
   public void destroy() {
-    synchronized (CACHE_NAME) {
-      if (!internalCacheTimerCanceled && internalCacheTimer != null) {
-        internalCacheTimerCanceled = true;
-        internalCacheTimer.cancel();
-      }
+    if (internalCacheTimer != null) {
+      internalCacheTimer.cancel();
     }
   }
 
