@@ -107,25 +107,41 @@ public class JwtSupportAutoConfiguration {
   }
 
   /**
-   * Creates a rest template access token retriever bean.
+   * Creates access token cache.
+   *
+   * @return the access token cache
+   */
+  @ConditionalOnMissingBean
+  @Bean
+  public AccessTokenCache accessTokenCache() {
+    return new AccessTokenCacheImpl();
+  }
+
+  /**
+   * Creates access token retriever.
    *
    * @param restTemplateBuilder the rest template builder
+   * @param accessTokenCache the access token cache
    * @return the rest template access token retriever
    */
   @ConditionalOnMissingBean
   @Bean
   public RestTemplateAccessTokenRetriever restTemplateAccessTokenRetriever(
-      ObjectProvider<RestTemplateBuilder> restTemplateBuilder) {
+      ObjectProvider<RestTemplateBuilder> restTemplateBuilder,
+      AccessTokenCache accessTokenCache) {
 
     Assert.notNull(
         restTemplateBuilder.getIfAvailable(),
         "Rest template builder must be present.");
-    log.info("Creating {} ...", RestTemplateAccessTokenRetriever.class.getSimpleName());
-    return new RestTemplateAccessTokenRetriever(restTemplateBuilder.getIfAvailable().build());
+    log.info("Creating {} (using access token cache? {}).",
+        RestTemplateAccessTokenRetriever.class.getSimpleName(), accessTokenCache != null);
+    return new RestTemplateAccessTokenRetriever(
+        restTemplateBuilder.getIfAvailable().build(),
+        accessTokenCache);
   }
 
   /**
-   * Creates a password flow authentication manager bean.
+   * Creates a password flow authentication manager.
    *
    * @param jwtDecoder the jwt decoder
    * @param jwtConverter the jwt converter

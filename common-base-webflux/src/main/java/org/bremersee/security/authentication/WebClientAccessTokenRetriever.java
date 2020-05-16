@@ -42,11 +42,24 @@ public class WebClientAccessTokenRetriever
 
   private final WebClient webClient;
 
+  private final AccessTokenCache accessTokenCache;
+
   /**
    * Instantiates a new access token retriever that uses spring's web client.
    */
   public WebClientAccessTokenRetriever() {
     this.webClient = WebClient.builder().build();
+    this.accessTokenCache = null;
+  }
+
+  /**
+   * Instantiates a new access token retriever that uses spring's web client.
+   *
+   * @param accessTokenCache the access token cache
+   */
+  public WebClientAccessTokenRetriever(AccessTokenCache accessTokenCache) {
+    this.webClient = WebClient.builder().build();
+    this.accessTokenCache = accessTokenCache;
   }
 
   /**
@@ -54,10 +67,23 @@ public class WebClientAccessTokenRetriever
    *
    * @param webClient the web client
    */
-  @SuppressWarnings("unused")
   public WebClientAccessTokenRetriever(
-      final WebClient webClient) {
+      WebClient webClient) {
     this.webClient = webClient;
+    this.accessTokenCache = null;
+  }
+
+  /**
+   * Instantiates a new access token retriever that uses spring's web client.
+   *
+   * @param webClient the web client
+   * @param accessTokenCache the access token cache
+   */
+  public WebClientAccessTokenRetriever(
+      WebClient webClient,
+      AccessTokenCache accessTokenCache) {
+    this.webClient = webClient;
+    this.accessTokenCache = accessTokenCache;
   }
 
   @Override
@@ -65,19 +91,28 @@ public class WebClientAccessTokenRetriever
     if (log.isDebugEnabled()) {
       log.debug("Retrieving access token with password flow, properties = {}", properties);
     }
-    return webClient
-        .method(HttpMethod.POST)
-        .uri(properties.getTokenEndpoint())
-        .contentType(MediaType.APPLICATION_FORM_URLENCODED)
-        .headers(headers -> properties.getBasicAuthProperties()
-            .ifPresent(basicAuthProperties -> headers.setBasicAuth(
-                basicAuthProperties.getUsername(),
-                basicAuthProperties.getPassword())))
-        .body(BodyInserters.fromFormData(properties.createBody()))
-        .retrieve()
-        .onStatus(ErrorDetectors.DEFAULT, this)
-        .bodyToMono(String.class)
-        .map(response -> ((JSONObject) JSONValue.parse(response)).getAsString("access_token"));
+    final String cacheKey = properties.createCacheKeyHashed();
+    return Mono.justOrEmpty(accessTokenCache)
+        .flatMap(cache -> cache.findAccessToken(cacheKey).map(Mono::just).orElse(Mono.empty()))
+        .switchIfEmpty(webClient
+            .method(HttpMethod.POST)
+            .uri(properties.getTokenEndpoint())
+            .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+            .headers(headers -> properties.getBasicAuthProperties()
+                .ifPresent(basicAuthProperties -> headers.setBasicAuth(
+                    basicAuthProperties.getUsername(),
+                    basicAuthProperties.getPassword())))
+            .body(BodyInserters.fromFormData(properties.createBody()))
+            .retrieve()
+            .onStatus(ErrorDetectors.DEFAULT, this)
+            .bodyToMono(String.class)
+            .map(response -> ((JSONObject) JSONValue.parse(response)).getAsString("access_token"))
+            .map(accessToken -> {
+              if (accessTokenCache != null) {
+                accessTokenCache.put(cacheKey, accessToken);
+              }
+              return accessToken;
+            }));
   }
 
   @Override

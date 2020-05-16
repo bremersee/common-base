@@ -105,19 +105,33 @@ public class ReactiveJwtSupportAutoConfiguration {
   }
 
   /**
-   * Web client access token retriever web client access token retriever.
+   * Creates access token cache.
    *
+   * @return the access token cache
+   */
+  @ConditionalOnMissingBean
+  @Bean
+  public AccessTokenCache accessTokenCache() {
+    return new AccessTokenCacheImpl();
+  }
+
+  /**
+   * Creates access token retriever.
+   *
+   * @param accessTokenCache the access token cache
    * @return the web client access token retriever
    */
   @ConditionalOnMissingBean
   @Bean
-  public WebClientAccessTokenRetriever webClientAccessTokenRetriever() {
-    log.info("Creating {} ...", WebClientAccessTokenRetriever.class.getSimpleName());
-    return new WebClientAccessTokenRetriever();
+  public WebClientAccessTokenRetriever webClientAccessTokenRetriever(
+      AccessTokenCache accessTokenCache) {
+    log.info("Creating {} (using access token cache? {}).",
+        WebClientAccessTokenRetriever.class.getSimpleName(), accessTokenCache != null);
+    return new WebClientAccessTokenRetriever(accessTokenCache);
   }
 
   /**
-   * Password flow reactive authentication manager password flow reactive authentication manager.
+   * Creates password flow reactive authentication manager.
    *
    * @param jwtDecoder the jwt decoder
    * @param jwtConverter the jwt converter

@@ -28,11 +28,11 @@ import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.web.client.RestTemplate;
 
 /**
- * The authentication support auto configuration test.
+ * The jwt support auto configuration test.
  *
  * @author Christian Bremer
  */
-class AuthenticationSupportAutoConfigurationTest {
+class JwtSupportAutoConfigurationTest {
 
   private static JwtSupportAutoConfiguration configuration;
 
@@ -59,7 +59,8 @@ class AuthenticationSupportAutoConfigurationTest {
    */
   @Test
   void restTemplateAccessTokenRetriever() {
-    assertNotNull(configuration.restTemplateAccessTokenRetriever(restTemplateBuilder()));
+    assertNotNull(configuration.restTemplateAccessTokenRetriever(
+        restTemplateBuilder(), null));
   }
 
   /**

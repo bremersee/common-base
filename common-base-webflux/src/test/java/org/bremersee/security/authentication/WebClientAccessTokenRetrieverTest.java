@@ -83,7 +83,7 @@ class WebClientAccessTokenRetrieverTest {
       }
 
       @Override
-      public Object createCacheKey() {
+      public String createCacheKey() {
         return getTokenEndpoint();
       }
 

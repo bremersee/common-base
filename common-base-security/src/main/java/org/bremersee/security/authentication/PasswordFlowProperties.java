@@ -54,7 +54,7 @@ public interface PasswordFlowProperties extends ClientCredentialsFlowProperties 
   }
 
   @Override
-  default Object createCacheKey() {
+  default String createCacheKey() {
     return getTokenEndpoint()
         + ":" + getClientId()
         + ":" + getClientSecret()

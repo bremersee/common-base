@@ -24,7 +24,6 @@ import org.bremersee.security.authentication.JsonPathJwtConverter;
 import org.bremersee.security.authentication.PasswordFlowAuthenticationManager;
 import org.bremersee.security.authentication.PasswordFlowProperties;
 import org.bremersee.security.authentication.RestTemplateAccessTokenRetriever;
-import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.actuate.autoconfigure.security.servlet.EndpointRequest;
 import org.springframework.boot.actuate.info.Info;
@@ -78,7 +77,7 @@ import org.springframework.web.client.RestTemplate;
 @Configuration
 @Slf4j
 public class ActuatorSecurityAutoConfiguration extends WebSecurityConfigurerAdapter
-    implements Ordered, DisposableBean {
+    implements Ordered {
 
   private final SecurityProperties securityProperties;
 
@@ -91,8 +90,6 @@ public class ActuatorSecurityAutoConfiguration extends WebSecurityConfigurerAdap
   private final ObjectProvider<RestTemplateAccessTokenRetriever> tokenRetrieverProvider;
 
   private final ObjectProvider<PasswordEncoder> passwordEncoderProvider;
-
-  private PasswordFlowAuthenticationManager passwordFlowAuthenticationManager;
 
   /**
    * Instantiates a new actuator security auto configuration.
@@ -148,13 +145,6 @@ public class ActuatorSecurityAutoConfiguration extends WebSecurityConfigurerAdap
           "Client ID of actuator password flow must be present.");
       Assert.notNull(actuatorAuthProperties.getPasswordFlow().getClientSecret(),
           "Client secret of actuator password flow must be present.");
-    }
-  }
-
-  @Override
-  public void destroy() {
-    if (passwordFlowAuthenticationManager != null) {
-      passwordFlowAuthenticationManager.destroy();
     }
   }
 
@@ -225,13 +215,12 @@ public class ActuatorSecurityAutoConfiguration extends WebSecurityConfigurerAdap
   }
 
   private PasswordFlowAuthenticationManager passwordFlowAuthenticationManager() {
-    passwordFlowAuthenticationManager = new PasswordFlowAuthenticationManager(
+    return new PasswordFlowAuthenticationManager(
         actuatorAuthProperties.getPasswordFlow(),
         jwtDecoder(),
         jwtConverter(),
         tokenRetrieverProvider
             .getIfAvailable(() -> new RestTemplateAccessTokenRetriever(new RestTemplate())));
-    return passwordFlowAuthenticationManager;
   }
 
   private JwtDecoder jwtDecoder() {

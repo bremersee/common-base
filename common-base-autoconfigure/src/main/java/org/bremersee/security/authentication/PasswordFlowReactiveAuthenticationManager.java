@@ -18,7 +18,6 @@ package org.bremersee.security.authentication;
 
 import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.DisposableBean;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.http.HttpStatus;
 import org.springframework.lang.Nullable;
@@ -42,8 +41,7 @@ import reactor.core.publisher.Mono;
  * @author Christian Bremer
  */
 @Slf4j
-public class PasswordFlowReactiveAuthenticationManager
-    implements ReactiveAuthenticationManager, DisposableBean {
+public class PasswordFlowReactiveAuthenticationManager implements ReactiveAuthenticationManager {
 
   private final ClientCredentialsFlowProperties passwordFlowProperties;
 
@@ -52,8 +50,6 @@ public class PasswordFlowReactiveAuthenticationManager
   private Converter<Jwt, ? extends Mono<? extends AbstractAuthenticationToken>> jwtConverter;
 
   private final AccessTokenRetriever<Mono<String>> retriever;
-
-  private final JwtCache jwtCache;
 
   /**
    * Instantiates a new password flow reactive authentication manager.
@@ -76,8 +72,6 @@ public class PasswordFlowReactiveAuthenticationManager
     this.retriever = Objects.requireNonNullElseGet(
         retriever,
         WebClientAccessTokenRetriever::new);
-    // TODO customize
-    this.jwtCache = new JwtCache();
   }
 
   /**
@@ -102,16 +96,8 @@ public class PasswordFlowReactiveAuthenticationManager
         .username(authentication.getName())
         .password((String) authentication.getCredentials())
         .build();
-    final Object cacheKey = properties.createCacheKeyHashed();
-    return Mono.just(properties)
-        .flatMap(props -> jwtCache.findJwt(cacheKey)
-            .map(Mono::just)
-            .orElseGet(() -> retriever.retrieveAccessToken(properties)
-                .flatMap(token -> jwtDecoder.decode(token)
-                    .map(newJwt -> {
-                      jwtCache.put(cacheKey, newJwt);
-                      return newJwt;
-                    }))))
+    return retriever.retrieveAccessToken(properties)
+        .flatMap(jwtDecoder::decode)
         .flatMap(jwt -> Objects.requireNonNull(jwtConverter.convert(jwt)))
         .cast(Authentication.class)
         .onErrorMap(JwtException.class, this::onError);
@@ -131,8 +117,4 @@ public class PasswordFlowReactiveAuthenticationManager
         "https://tools.ietf.org/html/rfc6750#section-3.1");
   }
 
-  @Override
-  public void destroy() {
-    jwtCache.destroy();
-  }
 }

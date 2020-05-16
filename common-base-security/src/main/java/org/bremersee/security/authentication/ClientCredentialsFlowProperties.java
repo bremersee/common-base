@@ -66,7 +66,7 @@ public interface ClientCredentialsFlowProperties extends AccessTokenRetrieverPro
   }
 
   @Override
-  default Object createCacheKey() {
+  default String createCacheKey() {
     return getTokenEndpoint() + ":" + getClientId() + ":" + getClientSecret();
   }
 
