@@ -48,8 +48,7 @@ public class WebClientAccessTokenRetriever
    * Instantiates a new access token retriever that uses spring's web client.
    */
   public WebClientAccessTokenRetriever() {
-    this.webClient = WebClient.builder().build();
-    this.accessTokenCache = null;
+    this(null, null);
   }
 
   /**
@@ -57,9 +56,9 @@ public class WebClientAccessTokenRetriever
    *
    * @param accessTokenCache the access token cache
    */
+  @SuppressWarnings("unused")
   public WebClientAccessTokenRetriever(AccessTokenCache accessTokenCache) {
-    this.webClient = WebClient.builder().build();
-    this.accessTokenCache = accessTokenCache;
+    this(null, accessTokenCache);
   }
 
   /**
@@ -69,8 +68,7 @@ public class WebClientAccessTokenRetriever
    */
   public WebClientAccessTokenRetriever(
       WebClient webClient) {
-    this.webClient = webClient;
-    this.accessTokenCache = null;
+    this(webClient, null);
   }
 
   /**
@@ -82,7 +80,7 @@ public class WebClientAccessTokenRetriever
   public WebClientAccessTokenRetriever(
       WebClient webClient,
       AccessTokenCache accessTokenCache) {
-    this.webClient = webClient;
+    this.webClient = webClient != null ? webClient : WebClient.builder().build();
     this.accessTokenCache = accessTokenCache;
   }
 
@@ -109,7 +107,7 @@ public class WebClientAccessTokenRetriever
             .map(response -> ((JSONObject) JSONValue.parse(response)).getAsString("access_token"))
             .map(accessToken -> {
               if (accessTokenCache != null) {
-                accessTokenCache.put(cacheKey, accessToken);
+                accessTokenCache.putAccessToken(cacheKey, accessToken);
               }
               return accessToken;
             }));

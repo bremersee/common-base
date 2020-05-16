@@ -18,6 +18,7 @@ package org.bremersee.security.authentication;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -31,6 +32,7 @@ import org.springframework.context.event.EventListener;
 import org.springframework.security.oauth2.jwt.ReactiveJwtDecoder;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
+import org.springframework.web.reactive.function.client.WebClient;
 
 /**
  * The reactive authentication support auto configuration.
@@ -116,6 +118,7 @@ public class ReactiveJwtSupportAutoConfiguration {
       ObjectProvider<AccessTokenCache> accessTokenCache) {
 
     return new WebClientAccessTokenRetriever(
+        WebClient.builder().build(),
         accessTokenCache.getIfAvailable());
   }
 
@@ -135,6 +138,7 @@ public class ReactiveJwtSupportAutoConfiguration {
           "client-secret"
       })
   @ConditionalOnMissingBean
+  @ConditionalOnBean(ReactiveJwtDecoder.class)
   @Bean
   public PasswordFlowReactiveAuthenticationManager passwordFlowReactiveAuthenticationManager(
       ObjectProvider<ReactiveJwtDecoder> jwtDecoder,

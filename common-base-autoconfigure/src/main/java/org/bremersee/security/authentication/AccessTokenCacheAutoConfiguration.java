@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
@@ -14,10 +15,15 @@ import org.springframework.cache.CacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.event.EventListener;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.util.ClassUtils;
 
+/**
+ * The type Access token cache auto configuration.
+ */
 @ConditionalOnWebApplication(type = Type.ANY)
 @Configuration
+@ConditionalOnBean(JwtDecoder.class)
 @ConditionalOnClass({
     CacheManager.class
 })
@@ -39,12 +45,16 @@ public class AccessTokenCacheAutoConfiguration {
   /**
    * Creates access token cache.
    *
+   * @param jwtDecoder the jwt decoder
    * @param cacheManagers the cache managers
    * @return the access token cache
    */
   @ConditionalOnMissingBean
   @Bean
-  public AccessTokenCache accessTokenCache(ObjectProvider<List<CacheManager>> cacheManagers) {
+  public AccessTokenCache accessTokenCache(
+      ObjectProvider<JwtDecoder> jwtDecoder,
+      ObjectProvider<List<CacheManager>> cacheManagers) {
+
     return Optional.ofNullable(cacheManagers.getIfAvailable())
         .flatMap(managers -> managers.stream()
             .filter(manager -> manager.getCacheNames().contains(AccessTokenCache.CACHE_NAME))
@@ -55,8 +65,8 @@ public class AccessTokenCacheAutoConfiguration {
               cache, cacheManager);
           return cache;
         })
-        .map(AccessTokenCacheImpl::new)
-        .orElseGet(AccessTokenCacheImpl::new);
+        .map(cache -> new AccessTokenCacheImpl(jwtDecoder.getIfAvailable(), cache))
+        .orElseGet(() -> new AccessTokenCacheImpl(jwtDecoder.getIfAvailable()));
   }
 
 }

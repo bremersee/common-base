@@ -25,12 +25,20 @@ public interface AccessTokenCache {
   Optional<String> findAccessToken(@NotNull String key);
 
   /**
+   * Find not expired jwt from cache.
+   *
+   * @param key the key
+   * @return the optional
+   */
+  Optional<Jwt> findJwt(String key);
+
+  /**
    * Put new access token into the cache.
    *
    * @param key the key
    * @param accessToken the access token
    */
-  void put(@NotNull String key, @NotNull String accessToken);
+  void putAccessToken(@NotNull String key, @NotNull String accessToken);
 
   /**
    * Put new jwt into the cache.
@@ -38,6 +46,6 @@ public interface AccessTokenCache {
    * @param key the key
    * @param jwt the jwt
    */
-  void put(@NotNull String key, @NotNull Jwt jwt);
+  void putJwt(@NotNull String key, @NotNull Jwt jwt);
 
 }

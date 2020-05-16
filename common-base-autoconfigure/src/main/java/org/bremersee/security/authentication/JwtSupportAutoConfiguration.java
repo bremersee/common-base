@@ -18,6 +18,7 @@ package org.bremersee.security.authentication;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -143,6 +144,7 @@ public class JwtSupportAutoConfiguration {
           "client-secret"
       })
   @ConditionalOnMissingBean
+  @ConditionalOnBean(JwtDecoder.class)
   @Bean
   public PasswordFlowAuthenticationManager passwordFlowAuthenticationManager(
       ObjectProvider<JwtDecoder> jwtDecoder,

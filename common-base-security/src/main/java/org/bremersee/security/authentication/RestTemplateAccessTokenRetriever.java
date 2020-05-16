@@ -89,7 +89,7 @@ public class RestTemplateAccessTokenRetriever implements AccessTokenRetriever<St
           final String accessToken = json.getAsString("access_token");
           if (StringUtils.hasText(accessToken)) {
             if (accessTokenCache != null) {
-              accessTokenCache.put(cacheKey, accessToken);
+              accessTokenCache.putAccessToken(cacheKey, accessToken);
             }
             return accessToken;
           }
