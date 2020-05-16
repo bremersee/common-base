@@ -54,6 +54,15 @@ public interface PasswordFlowProperties extends ClientCredentialsFlowProperties 
   }
 
   @Override
+  default Object createCacheKey() {
+    return getTokenEndpoint()
+        + ":" + getClientId()
+        + ":" + getClientSecret()
+        + ":" + getUsername()
+        + ":" + getPassword();
+  }
+
+  @Override
   default MultiValueMap<String, String> createBody() {
     MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
     if (getAdditionalProperties() != null) {
@@ -216,7 +225,7 @@ public interface PasswordFlowProperties extends ClientCredentialsFlowProperties 
     @Getter
     @AllArgsConstructor(access = AccessLevel.PRIVATE)
     @ToString(exclude = {"clientSecret", "password"})
-    @EqualsAndHashCode(exclude = {"clientSecret", "password"})
+    @EqualsAndHashCode
     private static class Impl implements PasswordFlowProperties {
 
       private final String tokenEndpoint;

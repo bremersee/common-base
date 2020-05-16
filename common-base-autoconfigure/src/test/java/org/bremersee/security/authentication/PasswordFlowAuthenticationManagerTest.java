@@ -30,6 +30,7 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 import org.bremersee.security.authentication.AuthProperties.PasswordFlow;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -114,7 +115,7 @@ class PasswordFlowAuthenticationManagerTest {
     PasswordFlowAuthenticationManager manager = workingManager(jwt);
 
     Authentication loginAuthentication = mock(Authentication.class);
-    when(loginAuthentication.getName()).thenReturn("an_username");
+    when(loginAuthentication.getName()).thenReturn(UUID.randomUUID().toString());
     when(loginAuthentication.getCredentials()).thenReturn("a_password");
 
     Authentication authentication = manager.authenticate(loginAuthentication);
@@ -135,7 +136,7 @@ class PasswordFlowAuthenticationManagerTest {
     PasswordFlowAuthenticationManager manager = notWorkingManager();
 
     Authentication loginAuthentication = mock(Authentication.class);
-    when(loginAuthentication.getName()).thenReturn("an_username");
+    when(loginAuthentication.getName()).thenReturn(UUID.randomUUID().toString());
     when(loginAuthentication.getCredentials()).thenReturn("a_password");
 
     assertThrows(

@@ -17,6 +17,7 @@
 package org.bremersee.security.authentication;
 
 import java.util.Objects;
+import org.springframework.beans.factory.DisposableBean;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.http.HttpStatus;
 import org.springframework.lang.Nullable;
@@ -41,7 +42,7 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtAut
  * @author Christian Bremer
  */
 public class PasswordFlowAuthenticationManager
-    implements AuthenticationManager, AuthenticationProvider {
+    implements AuthenticationManager, AuthenticationProvider, DisposableBean {
 
   private static final OAuth2Error DEFAULT_INVALID_TOKEN =
       invalidToken("An error occurred while attempting to decode the Jwt: Invalid token");
@@ -53,6 +54,8 @@ public class PasswordFlowAuthenticationManager
   private final JwtDecoder jwtDecoder;
 
   private final Converter<Jwt, ? extends AbstractAuthenticationToken> jwtAuthenticationConverter;
+
+  private final JwtCache jwtCache;
 
   /**
    * Instantiates a new password flow authentication manager.
@@ -67,12 +70,15 @@ public class PasswordFlowAuthenticationManager
       JwtDecoder jwtDecoder,
       @Nullable Converter<Jwt, ? extends AbstractAuthenticationToken> jwtAuthenticationConverter,
       AccessTokenRetriever<String> accessTokenRetriever) {
+
     this.passwordFlowProperties = passwordFlowProperties;
     this.jwtDecoder = jwtDecoder;
     this.jwtAuthenticationConverter = Objects.requireNonNullElseGet(
         jwtAuthenticationConverter,
         JwtAuthenticationConverter::new);
     this.accessTokenRetriever = accessTokenRetriever;
+    // TODO customize
+    this.jwtCache = new JwtCache();
   }
 
   @Override
@@ -82,16 +88,21 @@ public class PasswordFlowAuthenticationManager
         .username(authentication.getName())
         .password((String) authentication.getCredentials())
         .build();
-    final String tokenStr = accessTokenRetriever.retrieveAccessToken(properties);
-    Jwt jwt;
     try {
-      jwt = this.jwtDecoder.decode(tokenStr);
+      final Object cacheKey = properties.createCacheKeyHashed();
+      final Jwt jwt = jwtCache.findJwt(cacheKey)
+          .orElseGet(() -> {
+            String tokenStr = accessTokenRetriever.retrieveAccessToken(properties);
+            final Jwt newJwt = this.jwtDecoder.decode(tokenStr);
+            jwtCache.put(cacheKey, newJwt);
+            return newJwt;
+          });
+      return this.jwtAuthenticationConverter.convert(jwt);
+
     } catch (JwtException failed) {
       final OAuth2Error invalidToken = invalidToken(failed.getMessage());
       throw new OAuth2AuthenticationException(invalidToken, invalidToken.getDescription(), failed);
     }
-
-    return this.jwtAuthenticationConverter.convert(jwt);
   }
 
   @Override
@@ -114,4 +125,8 @@ public class PasswordFlowAuthenticationManager
     }
   }
 
+  @Override
+  public void destroy() {
+    jwtCache.destroy();
+  }
 }

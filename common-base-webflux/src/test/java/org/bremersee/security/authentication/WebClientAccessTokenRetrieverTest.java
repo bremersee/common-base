@@ -83,6 +83,11 @@ class WebClientAccessTokenRetrieverTest {
       }
 
       @Override
+      public Object createCacheKey() {
+        return getTokenEndpoint();
+      }
+
+      @Override
       public MultiValueMap<String, String> createBody() {
         return new LinkedMultiValueMap<>();
       }

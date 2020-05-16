@@ -38,7 +38,7 @@ import org.springframework.web.client.RestTemplate;
 public class RestTemplateAccessTokenRetriever implements
     AccessTokenRetriever<String> {
 
-  private RestTemplate restTemplate;
+  private final RestTemplate restTemplate;
 
   /**
    * Instantiates a new rest template access token retriever.

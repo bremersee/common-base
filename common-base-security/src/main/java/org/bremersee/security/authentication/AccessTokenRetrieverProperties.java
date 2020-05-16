@@ -16,7 +16,12 @@
 
 package org.bremersee.security.authentication;
 
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.Base64;
 import java.util.Optional;
+import org.bremersee.exception.ServiceException;
 import org.springframework.util.MultiValueMap;
 
 /**
@@ -40,6 +45,34 @@ public interface AccessTokenRetrieverProperties {
    */
   default Optional<BasicAuthProperties> getBasicAuthProperties() {
     return Optional.empty();
+  }
+
+  /**
+   * Create cache key.
+   *
+   * @return the cache key
+   */
+  Object createCacheKey();
+
+  /**
+   * Create an hashed cache key.
+   *
+   * @return the hashed cache key
+   */
+  default Object createCacheKeyHashed() {
+    final Object cacheKey = createCacheKey();
+    return Optional.ofNullable(cacheKey)
+        .filter(key -> key instanceof CharSequence)
+        .map(key -> {
+          try {
+            MessageDigest md = MessageDigest.getInstance("SHA-256");
+            byte[] hashBytes = md.digest(String.valueOf(key).getBytes(StandardCharsets.UTF_8));
+            return (Object) Base64.getEncoder().encodeToString(hashBytes);
+          } catch (NoSuchAlgorithmException e) {
+            throw ServiceException.internalServerError("Creating hash failed.", e);
+          }
+        })
+        .orElse(cacheKey);
   }
 
   /**

@@ -28,6 +28,7 @@ import org.bremersee.security.authentication.PasswordFlowReactiveAuthenticationM
 import org.bremersee.security.authentication.RoleBasedAuthorizationManager;
 import org.bremersee.security.authentication.RoleOrIpBasedAuthorizationManager;
 import org.bremersee.security.authentication.WebClientAccessTokenRetriever;
+import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.actuate.autoconfigure.security.reactive.EndpointRequest;
 import org.springframework.boot.actuate.autoconfigure.security.reactive.EndpointRequest.EndpointServerWebExchangeMatcher;
@@ -80,7 +81,7 @@ import org.springframework.util.StringUtils;
     ActuatorAuthProperties.class})
 @Configuration
 @Slf4j
-public class ReactiveActuatorSecurityAutoConfiguration {
+public class ReactiveActuatorSecurityAutoConfiguration implements DisposableBean {
 
   private final AuthProperties authProperties;
 
@@ -93,6 +94,8 @@ public class ReactiveActuatorSecurityAutoConfiguration {
   private final ObjectProvider<ReactiveUserDetailsService> userDetailsServiceProvider;
 
   private final ObjectProvider<PasswordEncoder> passwordEncoderProvider;
+
+  private PasswordFlowReactiveAuthenticationManager passwordFlowAuthenticationManager;
 
   /**
    * Instantiates a new reactive actuator security auto configuration.
@@ -147,6 +150,13 @@ public class ReactiveActuatorSecurityAutoConfiguration {
           "Client ID of actuator password flow must be present.");
       Assert.notNull(actuatorAuthProperties.getPasswordFlow().getClientSecret(),
           "Client secret of actuator password flow must be present.");
+    }
+  }
+
+  @Override
+  public void destroy() {
+    if (passwordFlowAuthenticationManager != null) {
+      passwordFlowAuthenticationManager.destroy();
     }
   }
 
@@ -223,11 +233,12 @@ public class ReactiveActuatorSecurityAutoConfiguration {
   }
 
   private PasswordFlowReactiveAuthenticationManager passwordFlowReactiveAuthenticationManager() {
-    return new PasswordFlowReactiveAuthenticationManager(
+    passwordFlowAuthenticationManager = new PasswordFlowReactiveAuthenticationManager(
         actuatorAuthProperties.getPasswordFlow(),
         jwtDecoder(),
         jwtConverter(),
         tokenRetrieverProvider.getIfAvailable(WebClientAccessTokenRetriever::new));
+    return passwordFlowAuthenticationManager;
   }
 
   private ReactiveJwtDecoder jwtDecoder() {
