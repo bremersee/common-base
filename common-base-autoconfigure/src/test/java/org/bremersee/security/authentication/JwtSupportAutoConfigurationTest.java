@@ -59,8 +59,12 @@ class JwtSupportAutoConfigurationTest {
    */
   @Test
   void restTemplateAccessTokenRetriever() {
+    @SuppressWarnings("unchecked")
+    ObjectProvider<AccessTokenCache> provider = mock(ObjectProvider.class);
+    when(provider.getIfAvailable()).thenReturn(null);
     assertNotNull(configuration.restTemplateAccessTokenRetriever(
-        restTemplateBuilder(), null));
+        restTemplateBuilder(),
+        provider));
   }
 
   /**

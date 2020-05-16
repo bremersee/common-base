@@ -105,17 +105,6 @@ public class ReactiveJwtSupportAutoConfiguration {
   }
 
   /**
-   * Creates access token cache.
-   *
-   * @return the access token cache
-   */
-  @ConditionalOnMissingBean
-  @Bean
-  public AccessTokenCache accessTokenCache() {
-    return new AccessTokenCacheImpl();
-  }
-
-  /**
    * Creates access token retriever.
    *
    * @param accessTokenCache the access token cache
@@ -124,10 +113,10 @@ public class ReactiveJwtSupportAutoConfiguration {
   @ConditionalOnMissingBean
   @Bean
   public WebClientAccessTokenRetriever webClientAccessTokenRetriever(
-      AccessTokenCache accessTokenCache) {
-    log.info("Creating {} (using access token cache? {}).",
-        WebClientAccessTokenRetriever.class.getSimpleName(), accessTokenCache != null);
-    return new WebClientAccessTokenRetriever(accessTokenCache);
+      ObjectProvider<AccessTokenCache> accessTokenCache) {
+
+    return new WebClientAccessTokenRetriever(
+        accessTokenCache.getIfAvailable());
   }
 
   /**

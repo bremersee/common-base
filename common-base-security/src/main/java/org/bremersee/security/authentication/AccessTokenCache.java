@@ -12,6 +12,11 @@ import org.springframework.validation.annotation.Validated;
 public interface AccessTokenCache {
 
   /**
+   * The constant CACHE_NAME.
+   */
+  String CACHE_NAME = "jwt";
+
+  /**
    * Find not expired access token from cache.
    *
    * @param key the key

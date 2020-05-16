@@ -29,11 +29,6 @@ import org.springframework.security.oauth2.jwt.Jwt;
 @Slf4j
 public class AccessTokenCacheImpl implements AccessTokenCache, DisposableBean {
 
-  /**
-   * The constant CACHE_NAME.
-   */
-  public static final String CACHE_NAME = "jwt";
-
   private static ConcurrentMapCache internalCache;
 
   private static Timer internalCacheTimer;
@@ -164,20 +159,19 @@ public class AccessTokenCacheImpl implements AccessTokenCache, DisposableBean {
   }
 
   private static JWT parse(@NotNull String tokenValue) {
-    Exception exception = null;
     try {
       return SignedJWT.parse(tokenValue);
     } catch (Exception e0) {
       try {
-        exception = ServiceException.internalServerError("Parsing signed jwt failed.", e0);
+        log.warn("Parsing signed jwt failed. Trying to parse encrypted jwt ...", e0);
         return EncryptedJWT.parse(tokenValue);
       } catch (Exception e1) {
         try {
-          exception = ServiceException.internalServerError("Parsing encrypted jwt failed",
-              exception);
+          log.warn("Parsing encrypted jwt failed. Trying to parse plain jwt ...", e1);
           return PlainJWT.parse(tokenValue);
         } catch (Exception e2) {
-          throw ServiceException.internalServerError("Parsing plain jwt failed.", exception);
+          log.error("Parsing plan jwt failed. Throwing internal server error.", e2);
+          throw ServiceException.internalServerError("Parsing jwt failed.");
         }
       }
     }
