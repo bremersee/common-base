@@ -26,6 +26,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplicat
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.event.EventListener;
 import org.springframework.security.oauth2.jwt.ReactiveJwtDecoder;
@@ -39,9 +40,6 @@ import org.springframework.web.reactive.function.client.WebClient;
  * @author Christian Bremer
  */
 @ConditionalOnWebApplication(type = Type.REACTIVE)
-@ConditionalOnProperty(
-    prefix = "spring.security.oauth2.resourceserver.jwt",
-    name = "jwk-set-uri")
 @ConditionalOnClass({
     JsonPathReactiveJwtConverter.class,
     WebClientAccessTokenRetriever.class
@@ -91,11 +89,15 @@ public class ReactiveJwtSupportAutoConfiguration {
    *
    * @return the json path reactive jwt converter
    */
+  @ConditionalOnProperty(
+      prefix = "spring.security.oauth2.resourceserver.jwt",
+      name = "jwk-set-uri")
   @ConditionalOnMissingBean
   @Bean
   @SuppressWarnings("DuplicatedCode")
   public JsonPathReactiveJwtConverter jsonPathReactiveJwtConverter() {
-    log.info("Creating {} ...", JsonPathReactiveJwtConverter.class.getSimpleName());
+
+    log.info("Creating application {} ...", JsonPathReactiveJwtConverter.class.getSimpleName());
     JsonPathJwtConverter converter = new JsonPathJwtConverter();
     converter.setNameJsonPath(properties.getNameJsonPath());
     converter.setRolePrefix(properties.getRolePrefix());
@@ -111,14 +113,18 @@ public class ReactiveJwtSupportAutoConfiguration {
    * @param accessTokenCache the access token cache
    * @return the web client access token retriever
    */
+  @Conditional(JwtSupportCondition.class)
   @ConditionalOnMissingBean
   @Bean
   public WebClientAccessTokenRetriever webClientAccessTokenRetriever(
       ObjectProvider<AccessTokenCache> accessTokenCache) {
 
+    AccessTokenCache cache = accessTokenCache.getIfAvailable();
+    log.info("Creating common {} with cache {} ...",
+        WebClientAccessTokenRetriever.class.getSimpleName(), cache);
     return new WebClientAccessTokenRetriever(
         WebClient.builder().build(),
-        accessTokenCache.getIfAvailable());
+        cache);
   }
 
   /**

@@ -16,6 +16,7 @@
 
 package org.bremersee.actuator.security.authentication;
 
+import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
 import org.bremersee.security.authentication.AuthProperties;
 import org.bremersee.security.authentication.AutoSecurityMode;
@@ -215,12 +216,16 @@ public class ActuatorSecurityAutoConfiguration extends WebSecurityConfigurerAdap
   }
 
   private PasswordFlowAuthenticationManager passwordFlowAuthenticationManager() {
+    RestTemplateAccessTokenRetriever tokenRetriever = tokenRetrieverProvider.getIfAvailable();
+    log.info("Creating actuator {} with token retriever {} ...",
+        PasswordFlowAuthenticationManager.class.getSimpleName(), tokenRetriever);
     return new PasswordFlowAuthenticationManager(
         actuatorAuthProperties.getPasswordFlow(),
         jwtDecoder(),
         jwtConverter(),
-        tokenRetrieverProvider
-            .getIfAvailable(() -> new RestTemplateAccessTokenRetriever(new RestTemplate())));
+        Objects.requireNonNullElseGet(
+            tokenRetriever,
+            () -> new RestTemplateAccessTokenRetriever(new RestTemplate())));
   }
 
   private JwtDecoder jwtDecoder() {

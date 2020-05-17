@@ -1,3 +1,19 @@
+/*
+ * Copyright 2020 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.bremersee.security.authentication;
 
 import java.util.List;
@@ -12,19 +28,22 @@ import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.event.EventListener;
-import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.util.ClassUtils;
 
 /**
- * The type Access token cache auto configuration.
+ * The access token cache auto configuration.
+ *
+ * @author Christian Bremer
  */
 @ConditionalOnWebApplication(type = Type.ANY)
 @Configuration
 @ConditionalOnClass({
     CacheManager.class
 })
+@Conditional(JwtSupportCondition.class)
 @Slf4j
 public class AccessTokenCacheAutoConfiguration {
 
@@ -43,14 +62,12 @@ public class AccessTokenCacheAutoConfiguration {
   /**
    * Creates access token cache.
    *
-   * @param jwtDecoder the jwt decoder
    * @param cacheManagers the cache managers
    * @return the access token cache
    */
-  @ConditionalOnMissingBean
+  @ConditionalOnMissingBean(AccessTokenCache.class)
   @Bean
   public AccessTokenCache accessTokenCache(
-      ObjectProvider<JwtDecoder> jwtDecoder,
       ObjectProvider<List<CacheManager>> cacheManagers) {
 
     return Optional.ofNullable(cacheManagers.getIfAvailable())
@@ -63,8 +80,8 @@ public class AccessTokenCacheAutoConfiguration {
               cache, cacheManager);
           return cache;
         })
-        .map(cache -> new AccessTokenCacheImpl(jwtDecoder.getIfAvailable(), cache))
-        .orElseGet(() -> new AccessTokenCacheImpl(jwtDecoder.getIfAvailable()));
+        .map(AccessTokenCacheImpl::new)
+        .orElseGet(AccessTokenCacheImpl::new);
   }
 
 }
