@@ -42,7 +42,7 @@ public class WebClientAccessTokenRetriever
 
   private final WebClient webClient;
 
-  private final AccessTokenCache accessTokenCache;
+  private final ReactiveAccessTokenCache accessTokenCache;
 
   /**
    * Instantiates a new access token retriever that uses spring's web client.
@@ -57,7 +57,7 @@ public class WebClientAccessTokenRetriever
    * @param accessTokenCache the access token cache
    */
   @SuppressWarnings("unused")
-  public WebClientAccessTokenRetriever(AccessTokenCache accessTokenCache) {
+  public WebClientAccessTokenRetriever(ReactiveAccessTokenCache accessTokenCache) {
     this(null, accessTokenCache);
   }
 
@@ -79,7 +79,7 @@ public class WebClientAccessTokenRetriever
    */
   public WebClientAccessTokenRetriever(
       WebClient webClient,
-      AccessTokenCache accessTokenCache) {
+      ReactiveAccessTokenCache accessTokenCache) {
     this.webClient = webClient != null ? webClient : WebClient.builder().build();
     this.accessTokenCache = accessTokenCache;
   }
@@ -91,7 +91,7 @@ public class WebClientAccessTokenRetriever
     }
     final String cacheKey = properties.createCacheKeyHashed();
     return Mono.justOrEmpty(accessTokenCache)
-        .flatMap(cache -> cache.findAccessToken(cacheKey).map(Mono::just).orElse(Mono.empty()))
+        .flatMap(cache -> cache.findAccessToken(cacheKey))
         .switchIfEmpty(webClient
             .method(HttpMethod.POST)
             .uri(properties.getTokenEndpoint())
@@ -105,12 +105,9 @@ public class WebClientAccessTokenRetriever
             .onStatus(ErrorDetectors.DEFAULT, this)
             .bodyToMono(String.class)
             .map(response -> ((JSONObject) JSONValue.parse(response)).getAsString("access_token"))
-            .map(accessToken -> {
-              if (accessTokenCache != null) {
-                accessTokenCache.putAccessToken(cacheKey, accessToken);
-              }
-              return accessToken;
-            }));
+            .flatMap(accessToken -> accessTokenCache != null
+                ? accessTokenCache.putAccessToken(cacheKey, accessToken)
+                : Mono.just(accessToken)));
   }
 
   @Override

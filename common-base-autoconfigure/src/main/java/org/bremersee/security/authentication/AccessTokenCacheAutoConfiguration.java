@@ -38,7 +38,7 @@ import org.springframework.util.ClassUtils;
  *
  * @author Christian Bremer
  */
-@ConditionalOnWebApplication(type = Type.ANY)
+@ConditionalOnWebApplication(type = Type.SERVLET)
 @Configuration
 @ConditionalOnClass({
     CacheManager.class

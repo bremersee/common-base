@@ -117,9 +117,9 @@ public class ReactiveJwtSupportAutoConfiguration {
   @ConditionalOnMissingBean
   @Bean
   public WebClientAccessTokenRetriever webClientAccessTokenRetriever(
-      ObjectProvider<AccessTokenCache> accessTokenCache) {
+      ObjectProvider<ReactiveAccessTokenCache> accessTokenCache) {
 
-    AccessTokenCache cache = accessTokenCache.getIfAvailable();
+    ReactiveAccessTokenCache cache = accessTokenCache.getIfAvailable();
     log.info("Creating common {} with cache {} ...",
         WebClientAccessTokenRetriever.class.getSimpleName(), cache);
     return new WebClientAccessTokenRetriever(

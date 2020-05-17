@@ -58,7 +58,7 @@ class ReactiveJwtSupportAutoConfigurationTest {
   @Test
   void webClientAccessTokenRetriever() {
     @SuppressWarnings("unchecked")
-    ObjectProvider<AccessTokenCache> provider = mock(ObjectProvider.class);
+    ObjectProvider<ReactiveAccessTokenCache> provider = mock(ObjectProvider.class);
     when(provider.getIfAvailable()).thenReturn(null);
     assertNotNull(configuration.webClientAccessTokenRetriever(provider));
   }
