@@ -58,19 +58,29 @@ public interface AccessTokenCache {
    */
   void putAccessToken(@NotNull String key, @NotNull String accessToken);
 
+  /**
+   * Checks whether the access token is expired. If no expiration claim is present, the result will
+   * always be {@code true}.
+   *
+   * @param tokenValue the token value
+   * @param accessTokenThreshold the access token threshold
+   * @return the boolean
+   */
   static boolean isExpired(@NotNull String tokenValue, Duration accessTokenThreshold) {
     Duration duration = Objects
         .requireNonNullElseGet(accessTokenThreshold, () -> Duration.ofSeconds(20L));
     long millis = System.currentTimeMillis() + duration.toMillis();
     return Optional.ofNullable(getExpirationTime(tokenValue))
         .map(date -> date.getTime() < millis)
-        .orElse(false);
+        .orElse(true);
   }
 
-  static boolean isNotExpired(@NotNull String tokenValue, Duration accessTokenThreshold) {
-    return !isExpired(tokenValue, accessTokenThreshold);
-  }
-
+  /**
+   * Gets expiration time.
+   *
+   * @param tokenValue the token value
+   * @return the expiration time or {@code null} if there is no expiration claim
+   */
   static Date getExpirationTime(@NotNull String tokenValue) {
     JWT jwt = parse(tokenValue);
     try {
@@ -85,6 +95,12 @@ public interface AccessTokenCache {
     return null;
   }
 
+  /**
+   * Parse jwt.
+   *
+   * @param tokenValue the token value
+   * @return the jwt
+   */
   static JWT parse(@NotNull String tokenValue) {
     try {
       return SignedJWT.parse(tokenValue);

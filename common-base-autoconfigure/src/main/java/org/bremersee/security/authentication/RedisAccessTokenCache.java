@@ -17,9 +17,13 @@
 package org.bremersee.security.authentication;
 
 import java.time.Duration;
+import java.util.Date;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.function.Function;
+import javax.validation.constraints.NotNull;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.util.Assert;
@@ -29,12 +33,17 @@ import org.springframework.util.Assert;
  *
  * @author Christian Bremer
  */
+@Slf4j
 public class RedisAccessTokenCache implements AccessTokenCache {
 
   private final StringRedisTemplate redis;
 
   @Setter
   private Duration accessTokenThreshold = Duration.ofSeconds(20L);
+
+  @Setter
+  @NotNull
+  private Function<String, Date> findExpirationTimeFn = AccessTokenCache::getExpirationTime;
 
   /**
    * Instantiates a new redis access token cache.
@@ -51,20 +60,31 @@ public class RedisAccessTokenCache implements AccessTokenCache {
 
   @Override
   public Optional<String> findAccessToken(String key) {
-    return Optional.ofNullable(redis.opsForValue().get(key));
+    try {
+      return Optional.ofNullable(redis.opsForValue().get(key));
+
+    } catch (RuntimeException e) {
+      log.error("Getting access token from redis cache failed.", e);
+      return Optional.empty();
+    }
   }
 
   @Override
   public void putAccessToken(String key, String accessToken) {
-    Duration duration = Objects
-        .requireNonNullElseGet(accessTokenThreshold, () -> Duration.ofSeconds(20L));
-    long millis = System.currentTimeMillis() + duration.toMillis();
-    Optional.ofNullable(AccessTokenCache.getExpirationTime(accessToken))
-        .filter(expirationTime -> expirationTime.getTime() > millis)
-        .ifPresent(expirationTime -> {
-          redis.opsForValue().set(key, accessToken);
-          redis.expireAt(key, expirationTime);
-        });
+    try {
+      Duration duration = Objects
+          .requireNonNullElseGet(accessTokenThreshold, () -> Duration.ofSeconds(20L));
+      long millis = System.currentTimeMillis() + duration.toMillis();
+      Optional.ofNullable(findExpirationTimeFn.apply(accessToken))
+          .filter(expirationTime -> expirationTime.getTime() > millis)
+          .ifPresent(expirationTime -> {
+            redis.opsForValue().set(key, accessToken);
+            redis.expireAt(key, expirationTime);
+          });
+
+    } catch (RuntimeException e) {
+      log.error("Putting access token into the redis cache failed.", e);
+    }
   }
 
 }

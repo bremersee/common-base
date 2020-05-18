@@ -17,8 +17,12 @@
 package org.bremersee.security.authentication;
 
 import java.time.Duration;
+import java.util.Date;
 import java.util.Objects;
+import java.util.function.Function;
+import javax.validation.constraints.NotNull;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.connection.ReactiveRedisConnectionFactory;
 import org.springframework.data.redis.core.ReactiveRedisTemplate;
 import org.springframework.data.redis.serializer.RedisSerializationContext;
@@ -30,12 +34,17 @@ import reactor.core.publisher.Mono;
  *
  * @author Christian Bremer
  */
+@Slf4j
 public class ReactiveRedisAccessTokenCache implements ReactiveAccessTokenCache {
 
   private final ReactiveRedisTemplate<String, String> redis;
 
   @Setter
   private Duration accessTokenThreshold = Duration.ofSeconds(20L);
+
+  @Setter
+  @NotNull
+  private Function<String, Date> findExpirationTimeFn = AccessTokenCache::getExpirationTime;
 
   /**
    * Instantiates a new reactive redis access token cache.
@@ -52,7 +61,13 @@ public class ReactiveRedisAccessTokenCache implements ReactiveAccessTokenCache {
 
   @Override
   public Mono<String> findAccessToken(String key) {
-    return redis.opsForValue().get(key);
+    return redis.opsForValue().get(key)
+        .onErrorResume(
+            throwable -> throwable instanceof RuntimeException,
+            throwable -> {
+              log.error("Getting access token from redis cache failed.", throwable);
+              return Mono.empty();
+            });
   }
 
   @Override
@@ -60,13 +75,19 @@ public class ReactiveRedisAccessTokenCache implements ReactiveAccessTokenCache {
     Duration duration = Objects
         .requireNonNullElseGet(accessTokenThreshold, () -> Duration.ofSeconds(20L));
     long millis = System.currentTimeMillis() + duration.toMillis();
-    return Mono.justOrEmpty(AccessTokenCache.getExpirationTime(accessToken))
+    return Mono.justOrEmpty(findExpirationTimeFn.apply(accessToken))
         .filter(expirationTime -> expirationTime.getTime() > millis)
         .flatMap(expirationTime -> redis.opsForValue().set(key, accessToken)
             .flatMap(success -> success
                 ? redis.expireAt(key, expirationTime.toInstant().minus(accessTokenThreshold))
                 : Mono.just(false)))
         .map(result -> accessToken)
+        .onErrorResume(
+            throwable -> throwable instanceof RuntimeException,
+            throwable -> {
+              log.error("Putting access token into redis cache failed.", throwable);
+              return Mono.just(accessToken);
+            })
         .defaultIfEmpty(accessToken);
   }
 

@@ -21,6 +21,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.function.BiFunction;
+import javax.validation.constraints.NotNull;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.DisposableBean;
@@ -41,6 +43,10 @@ public class AccessTokenCacheImpl implements AccessTokenCache, DisposableBean {
 
   @Setter
   private Duration accessTokenThreshold = Duration.ofSeconds(20L);
+
+  @Setter
+  @NotNull
+  private BiFunction<String, Duration, Boolean> expiredBiFn = AccessTokenCache::isExpired;
 
   /**
    * Instantiates a new access token cache.
@@ -74,7 +80,7 @@ public class AccessTokenCacheImpl implements AccessTokenCache, DisposableBean {
         Set<Object> keys = internalCache.getNativeCache().keySet();
         log.trace("Removing obsolete jwt entries from internal cache (sze = {}).", keys.size());
         keys.forEach(key -> findAccessToken(String.valueOf(key))
-            .filter(token -> AccessTokenCache.isExpired(token, accessTokenThreshold))
+            .filter(token -> expiredBiFn.apply(token, accessTokenThreshold))
             .ifPresent(token -> internalCache.evict(key)));
       }
     }, period, period);
@@ -83,13 +89,24 @@ public class AccessTokenCacheImpl implements AccessTokenCache, DisposableBean {
 
   @Override
   public Optional<String> findAccessToken(String key) {
-    return Optional.ofNullable(cache.get(key, String.class))
-        .filter(token -> AccessTokenCache.isNotExpired(token, accessTokenThreshold));
+    try {
+      return Optional.ofNullable(cache.get(key, String.class))
+          .filter(token -> !expiredBiFn.apply(token, accessTokenThreshold));
+
+    } catch (RuntimeException e) {
+      log.error("Getting access token from cache failed.", e);
+      return Optional.empty();
+    }
   }
 
   @Override
   public void putAccessToken(String key, String accessToken) {
-    cache.put(key, accessToken);
+    try {
+      cache.put(key, accessToken);
+
+    } catch (RuntimeException e) {
+      log.error("Putting access token into the cache failed.", e);
+    }
   }
 
   @Override
