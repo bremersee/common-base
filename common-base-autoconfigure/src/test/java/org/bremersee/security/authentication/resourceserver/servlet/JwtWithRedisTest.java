@@ -16,13 +16,15 @@
 
 package org.bremersee.security.authentication.resourceserver.servlet;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import org.bremersee.security.authentication.resourceserver.servlet.withoutredis.TestConfiguration;
+import java.util.UUID;
+import org.bremersee.security.authentication.resourceserver.servlet.withredis.WithRedisTestConfiguration;
 import org.bremersee.test.security.authentication.WithJwtAuthenticationToken;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -31,6 +33,7 @@ import org.junit.jupiter.api.TestInstance.Lifecycle;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -42,12 +45,13 @@ import org.springframework.web.context.WebApplicationContext;
  * @author Christian Bremer
  */
 @SpringBootTest(
-    classes = TestConfiguration.class,
+    classes = WithRedisTestConfiguration.class,
     webEnvironment = WebEnvironment.RANDOM_PORT,
     properties = {
         "spring.main.web-application-type=servlet",
         "spring.application.name=resourceserver-jwt",
         "spring.security.oauth2.resourceserver.jwt.jwk-set-uri=http://localhost/jwk",
+        "bremersee.redis.embedded=true",
         "bremersee.auth.resource-server=auto",
         "bremersee.auth.any-access-mode=deny_all",
         "bremersee.auth.path-matchers[0].ant-pattern=/public/**",
@@ -60,7 +64,7 @@ import org.springframework.web.context.WebApplicationContext;
         "bremersee.exception-mapping.api-paths=/**"
     })
 @TestInstance(Lifecycle.PER_CLASS) // allows us to use @BeforeAll with a non-static method
-public class JwtTest {
+public class JwtWithRedisTest {
 
   /**
    * The context.
@@ -73,6 +77,9 @@ public class JwtTest {
    */
   MockMvc mvc;
 
+  @Autowired
+  StringRedisTemplate redisTemplate;
+
   /**
    * Setup mock mvc.
    */
@@ -82,6 +89,14 @@ public class JwtTest {
         .webAppContextSetup(context)
         .apply(springSecurity())
         .build();
+  }
+
+  @Test
+  void writeAndReadRedisValue() {
+    String key = UUID.randomUUID().toString();
+    String value = UUID.randomUUID().toString();
+    redisTemplate.opsForValue().set(key, value);
+    assertEquals(value, redisTemplate.opsForValue().get(key));
   }
 
   /**

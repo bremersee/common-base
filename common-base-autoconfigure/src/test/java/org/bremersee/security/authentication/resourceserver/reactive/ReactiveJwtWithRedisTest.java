@@ -18,32 +18,37 @@ package org.bremersee.security.authentication.resourceserver.reactive;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import java.nio.charset.StandardCharsets;
-import org.bremersee.security.authentication.resourceserver.reactive.withoutredis.TestConfiguration;
+import java.util.UUID;
+import org.bremersee.security.authentication.resourceserver.reactive.withredis.WithRedisTestConfiguration;
+import org.bremersee.test.security.authentication.WithJwtAuthenticationToken;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.TestInstance.Lifecycle;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
-import org.springframework.boot.web.server.LocalServerPort;
-import org.springframework.http.HttpStatus;
+import org.springframework.context.ApplicationContext;
+import org.springframework.data.redis.core.ReactiveRedisTemplate;
 import org.springframework.http.MediaType;
+import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.web.reactive.function.BodyInserters;
-import org.springframework.web.reactive.function.client.WebClient;
 import reactor.test.StepVerifier;
 
 /**
- * The reactive in memory test.
+ * The reactive jwt test.
  *
  * @author Christian Bremer
  */
 @SpringBootTest(
-    classes = TestConfiguration.class,
+    classes = WithRedisTestConfiguration.class,
     webEnvironment = WebEnvironment.RANDOM_PORT,
     properties = {
         "spring.main.web-application-type=reactive",
-        "spring.application.name=resourceserver-in-memory",
-        "bremersee.cors.enable=true",
+        "spring.application.name=resourceserver-jwt",
+        "spring.security.oauth2.resourceserver.jwt.jwk-set-uri=http://localhost/jwk",
+        "bremersee.redis.embedded=true",
         "bremersee.auth.resource-server=auto",
         "bremersee.auth.any-access-mode=deny_all",
         "bremersee.auth.path-matchers[0].ant-pattern=/public/**",
@@ -53,44 +58,51 @@ import reactor.test.StepVerifier;
         "bremersee.auth.path-matchers[1].roles=ROLE_ADMIN",
         "bremersee.auth.path-matchers[2].ant-pattern=/protected/**",
         "bremersee.auth.path-matchers[2].roles=ROLE_USER",
-        "bremersee.auth.in-memory-users[0].name=user",
-        "bremersee.auth.in-memory-users[0].password=user",
-        "bremersee.auth.in-memory-users[0].authorities=ROLE_USER",
-        "bremersee.auth.in-memory-users[1].name=admin",
-        "bremersee.auth.in-memory-users[1].password=admin",
-        "bremersee.auth.in-memory-users[1].authorities=ROLE_ADMIN",
-        "bremersee.auth.in-memory-users[2].name=someone",
-        "bremersee.auth.in-memory-users[2].password=someone",
-        "bremersee.auth.in-memory-users[2].authorities=ROLE_SOMETHING",
         "bremersee.exception-mapping.api-paths=/**"
     })
 @TestInstance(Lifecycle.PER_CLASS) // allows us to use @BeforeAll with a non-static method
-public class ReactiveInMemoryTest {
+public class ReactiveJwtWithRedisTest {
 
   /**
-   * The local server port.
+   * The application context.
    */
-  @LocalServerPort
-  int port;
+  @Autowired
+  ApplicationContext context;
 
   /**
-   * Base url of the local server.
-   *
-   * @return the base url of the local server
+   * The test web client (security configuration is by-passed).
    */
-  String baseUrl() {
-    return "http://localhost:" + port;
+  @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
+  @Autowired
+  WebTestClient webClient;
+
+  @Autowired
+  ReactiveRedisTemplate<String, String> redisTemplate;
+
+  /**
+   * Setup tests.
+   */
+  @BeforeAll
+  void setUp() {
+    // https://docs.spring.io/spring-security/site/docs/current/reference/html/test-webflux.html
+    WebTestClient
+        .bindToApplicationContext(this.context)
+        .configureClient()
+        .build();
   }
 
-  /**
-   * Creates a new web client, that uses the real security configuration.
-   *
-   * @return the web client
-   */
-  WebClient newWebClient() {
-    return WebClient.builder()
-        .baseUrl(baseUrl())
-        .build();
+  @Test
+  void writeAndReadRedisValue() {
+    String key = UUID.randomUUID().toString();
+    String value = UUID.randomUUID().toString();
+    StepVerifier
+        .create(redisTemplate.opsForValue().set(key, value))
+        .assertNext(Assertions::assertTrue)
+        .verifyComplete();
+    StepVerifier
+        .create(redisTemplate.opsForValue().get(key))
+        .assertNext(readValue -> assertEquals(value, readValue))
+        .verifyComplete();
   }
 
   /**
@@ -98,65 +110,63 @@ public class ReactiveInMemoryTest {
    */
   @Test
   void getPublic() {
-    StepVerifier.create(newWebClient()
+    webClient
         .get()
         .uri("/public")
-        .retrieve()
-        .bodyToMono(String.class))
-        .assertNext(body -> assertEquals("public", body))
-        .verifyComplete();
+        .exchange()
+        .expectStatus()
+        .isOk()
+        .expectBody(String.class)
+        .value(response -> assertEquals("public", response));
   }
 
   /**
    * Gets protected.
    */
   @Test
+  @WithJwtAuthenticationToken(roles = "ROLE_USER")
   void getProtected() {
-    StepVerifier.create(newWebClient()
+    webClient
         .get()
         .uri("/protected")
-        .headers(httpHeaders -> httpHeaders
-            .setBasicAuth("user", "user", StandardCharsets.UTF_8))
-        .retrieve()
-        .bodyToMono(String.class))
-        .assertNext(body -> assertEquals("protected", body))
-        .verifyComplete();
+        .exchange()
+        .expectStatus()
+        .isOk()
+        .expectBody(String.class)
+        .value(response -> assertEquals("protected", response));
   }
 
   /**
    * Gets protected and expect forbidden.
    */
   @Test
+  @WithJwtAuthenticationToken(roles = "ROLE_SOMETHING")
   void getProtectedAndExpectForbidden() {
-    StepVerifier.create(newWebClient()
+    webClient
         .get()
         .uri("/protected")
-        .headers(httpHeaders -> httpHeaders
-            .setBasicAuth("someone", "someone", StandardCharsets.UTF_8))
-        .exchange())
-        .assertNext(clientResponse -> assertEquals(
-            HttpStatus.FORBIDDEN,
-            clientResponse.statusCode()))
-        .verifyComplete();
+        .exchange()
+        .expectStatus()
+        .isForbidden();
   }
 
   /**
    * Post protected.
    */
   @Test
+  @WithJwtAuthenticationToken(roles = "ROLE_ADMIN")
   void postProtected() {
-    StepVerifier.create(newWebClient()
+    webClient
         .post()
         .uri("/protected")
         .contentType(MediaType.TEXT_PLAIN)
         .accept(MediaType.TEXT_PLAIN)
-        .headers(httpHeaders -> httpHeaders
-            .setBasicAuth("admin", "admin", StandardCharsets.UTF_8))
         .body(BodyInserters.fromValue("hello"))
-        .retrieve()
-        .bodyToMono(String.class))
-        .assertNext(body -> assertEquals("hello", body))
-        .verifyComplete();
+        .exchange()
+        .expectStatus()
+        .isOk()
+        .expectBody(String.class)
+        .value(response -> assertEquals("hello", response));
   }
 
 }

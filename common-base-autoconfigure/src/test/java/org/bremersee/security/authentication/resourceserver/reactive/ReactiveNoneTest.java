@@ -18,7 +18,7 @@ package org.bremersee.security.authentication.resourceserver.reactive;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import org.bremersee.security.authentication.resourceserver.reactive.app.TestConfiguration;
+import org.bremersee.security.authentication.resourceserver.reactive.withoutredis.TestConfiguration;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.TestInstance.Lifecycle;

@@ -14,17 +14,14 @@
  * limitations under the License.
  */
 
-package org.bremersee.exception.integration.reactive.app;
+package org.bremersee.security.authentication.resourceserver.reactive.withoutredis;
 
-import org.bremersee.exception.ServiceException;
+import org.bremersee.security.authentication.resourceserver.reactive.components.TestController;
 import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration;
 import org.springframework.boot.autoconfigure.data.redis.RedisReactiveAutoConfiguration;
 import org.springframework.context.annotation.ComponentScan;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RestController;
-import reactor.core.publisher.Mono;
 
 /**
  * The test configuration.
@@ -33,28 +30,10 @@ import reactor.core.publisher.Mono;
  */
 @SpringBootConfiguration
 @EnableAutoConfiguration(exclude = {
-    RedisAutoConfiguration.class,
-    RedisReactiveAutoConfiguration.class
+    RedisReactiveAutoConfiguration.class,
+    RedisAutoConfiguration.class
 })
-@ComponentScan(basePackageClasses = {TestConfiguration.class})
+@ComponentScan(basePackageClasses = {TestController.class})
 public class TestConfiguration {
-
-  /**
-   * The test controller.
-   */
-  @RestController
-  static class TestController {
-
-    /**
-     * Throws an exception.
-     *
-     * @return the mono
-     */
-    @GetMapping(path = "/test/exception")
-    public Mono<String> exception() {
-      throw ServiceException.badRequest("Second",
-          ServiceException.badRequest("First", "TEST:4711"));
-    }
-  }
 
 }

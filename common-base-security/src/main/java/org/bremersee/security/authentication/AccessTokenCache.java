@@ -16,8 +16,17 @@
 
 package org.bremersee.security.authentication;
 
+import com.nimbusds.jwt.EncryptedJWT;
+import com.nimbusds.jwt.JWT;
+import com.nimbusds.jwt.PlainJWT;
+import com.nimbusds.jwt.SignedJWT;
+import java.text.ParseException;
+import java.time.Duration;
+import java.util.Date;
+import java.util.Objects;
 import java.util.Optional;
 import javax.validation.constraints.NotNull;
+import org.bremersee.exception.ServiceException;
 import org.springframework.validation.annotation.Validated;
 
 /**
@@ -49,4 +58,46 @@ public interface AccessTokenCache {
    */
   void putAccessToken(@NotNull String key, @NotNull String accessToken);
 
+  static boolean isExpired(@NotNull String tokenValue, Duration accessTokenThreshold) {
+    Duration duration = Objects
+        .requireNonNullElseGet(accessTokenThreshold, () -> Duration.ofSeconds(20L));
+    long millis = System.currentTimeMillis() + duration.toMillis();
+    return Optional.ofNullable(getExpirationTime(tokenValue))
+        .map(date -> date.getTime() < millis)
+        .orElse(false);
+  }
+
+  static boolean isNotExpired(@NotNull String tokenValue, Duration accessTokenThreshold) {
+    return !isExpired(tokenValue, accessTokenThreshold);
+  }
+
+  static Date getExpirationTime(@NotNull String tokenValue) {
+    JWT jwt = parse(tokenValue);
+    try {
+      if (jwt.getJWTClaimsSet() != null
+          && jwt.getJWTClaimsSet().getExpirationTime() != null) {
+        return jwt.getJWTClaimsSet().getExpirationTime();
+      }
+
+    } catch (ParseException e) {
+      // ignored
+    }
+    return null;
+  }
+
+  static JWT parse(@NotNull String tokenValue) {
+    try {
+      return SignedJWT.parse(tokenValue);
+    } catch (Exception e0) {
+      try {
+        return EncryptedJWT.parse(tokenValue);
+      } catch (Exception e1) {
+        try {
+          return PlainJWT.parse(tokenValue);
+        } catch (Exception e2) {
+          throw ServiceException.internalServerError("Parsing jwt failed.");
+        }
+      }
+    }
+  }
 }

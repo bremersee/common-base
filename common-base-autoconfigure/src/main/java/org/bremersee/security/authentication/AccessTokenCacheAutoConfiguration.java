@@ -20,17 +20,21 @@ import java.util.List;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication.Type;
+import org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.event.EventListener;
+import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.util.ClassUtils;
 
 /**
@@ -38,50 +42,131 @@ import org.springframework.util.ClassUtils;
  *
  * @author Christian Bremer
  */
-@ConditionalOnWebApplication(type = Type.SERVLET)
-@Configuration
-@ConditionalOnClass({
-    CacheManager.class
+@ConditionalOnClass(name = {
+    "org.bremersee.security.authentication.AccessTokenCache",
 })
+@ConditionalOnWebApplication(type = Type.SERVLET)
 @Conditional(JwtSupportCondition.class)
+@Configuration
+@AutoConfigureAfter(RedisAutoConfiguration.class)
 @Slf4j
 public class AccessTokenCacheAutoConfiguration {
 
   /**
-   * Init.
+   * The default configuration.
    */
-  @EventListener(ApplicationReadyEvent.class)
-  public void init() {
-    log.info("\n"
-            + "*********************************************************************************\n"
-            + "* {}\n"
-            + "*********************************************************************************",
-        ClassUtils.getUserClass(getClass()).getSimpleName());
+  @ConditionalOnClass(name = "org.springframework.cache.CacheManager")
+  @ConditionalOnMissingBean(value = {
+      AccessTokenCache.class
+  }, type = {
+      "org.springframework.data.redis.connection.jedis.JedisConnectionFactory",
+      "org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory"
+  })
+  @Configuration
+  @EnableConfigurationProperties(AuthProperties.class)
+  static class Default {
+
+    private final AuthProperties authProperties;
+
+    /**
+     * Instantiates a new default configuration.
+     *
+     * @param authProperties the auth properties
+     */
+    public Default(AuthProperties authProperties) {
+      this.authProperties = authProperties;
+    }
+
+    /**
+     * Init.
+     */
+    @EventListener(ApplicationReadyEvent.class)
+    public void init() {
+      log.info("\n"
+              + "*******************************************************************************\n"
+              + "* {}.{}\n"
+              + "*******************************************************************************",
+          ClassUtils.getUserClass(AccessTokenCacheAutoConfiguration.class).getSimpleName(),
+          ClassUtils.getUserClass(getClass()).getSimpleName());
+    }
+
+    /**
+     * Creates an access token cache.
+     *
+     * @param cacheManagers the cache managers
+     * @return the access token cache
+     */
+    @Bean
+    public AccessTokenCache accessTokenCache(
+        ObjectProvider<List<CacheManager>> cacheManagers) {
+
+      AccessTokenCacheImpl cache = Optional.ofNullable(cacheManagers.getIfAvailable())
+          .flatMap(managers -> managers.stream()
+              .filter(manager -> manager.getCacheNames().contains(AccessTokenCache.CACHE_NAME))
+              .findFirst())
+          .map(cacheManager -> {
+            Cache externalCache = cacheManager.getCache(AccessTokenCache.CACHE_NAME);
+            log.info("Creating access token cache with external cache {} from cache manager {}",
+                externalCache, cacheManager);
+            return externalCache;
+          })
+          .map(AccessTokenCacheImpl::new)
+          .orElseGet(AccessTokenCacheImpl::new);
+      cache.setAccessTokenThreshold(authProperties.getAccessTokenThreshold());
+      return cache;
+    }
   }
 
   /**
-   * Creates access token cache.
-   *
-   * @param cacheManagers the cache managers
-   * @return the access token cache
+   * The configuration with redis.
    */
+  @ConditionalOnClass(
+      name = "org.springframework.data.redis.connection.RedisConnectionFactory")
+  @Conditional(RedisCondition.class)
   @ConditionalOnMissingBean(AccessTokenCache.class)
-  @Bean
-  public AccessTokenCache accessTokenCache(
-      ObjectProvider<List<CacheManager>> cacheManagers) {
+  @Configuration
+  @EnableConfigurationProperties(AuthProperties.class)
+  static class WithRedis {
 
-    return Optional.ofNullable(cacheManagers.getIfAvailable())
-        .flatMap(managers -> managers.stream()
-            .filter(manager -> manager.getCacheNames().contains(AccessTokenCache.CACHE_NAME))
-            .findFirst())
-        .map(cacheManager -> {
-          Cache cache = cacheManager.getCache(AccessTokenCache.CACHE_NAME);
-          log.info("Creating access token cache with external cache {} from cache manager {}",
-              cache, cacheManager);
-          return cache;
-        })
-        .map(AccessTokenCacheImpl::new)
-        .orElseGet(AccessTokenCacheImpl::new);
+    private final AuthProperties authProperties;
+
+    /**
+     * Instantiates a new configuration with redis.
+     *
+     * @param authProperties the auth properties
+     */
+    public WithRedis(AuthProperties authProperties) {
+      this.authProperties = authProperties;
+    }
+
+    /**
+     * Init.
+     */
+    @EventListener(ApplicationReadyEvent.class)
+    public void init() {
+      log.info("\n"
+              + "*******************************************************************************\n"
+              + "* {}.{}\n"
+              + "*******************************************************************************",
+          ClassUtils.getUserClass(AccessTokenCacheAutoConfiguration.class).getSimpleName(),
+          ClassUtils.getUserClass(getClass()).getSimpleName());
+    }
+
+    /**
+     * Creates an access token cache that uses Redis.
+     *
+     * @param connectionFactory the connection factory
+     * @return the access token cache
+     */
+    @Bean
+    public AccessTokenCache redisAccessTokenCache(
+        ObjectProvider<RedisConnectionFactory> connectionFactory) {
+
+      log.info("Creating {} ...", RedisAccessTokenCache.class.getName());
+      RedisAccessTokenCache cache = new RedisAccessTokenCache(connectionFactory.getIfAvailable());
+      cache.setAccessTokenThreshold(authProperties.getAccessTokenThreshold());
+      return cache;
+    }
   }
 
 }

@@ -16,23 +16,13 @@
 
 package org.bremersee.security.authentication;
 
-import com.nimbusds.jwt.EncryptedJWT;
-import com.nimbusds.jwt.JWT;
-import com.nimbusds.jwt.PlainJWT;
-import com.nimbusds.jwt.SignedJWT;
-import java.text.ParseException;
 import java.time.Duration;
-import java.time.temporal.ChronoUnit;
-import java.util.Date;
 import java.util.Optional;
 import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Positive;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-import org.bremersee.exception.ServiceException;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.cache.Cache;
 import org.springframework.cache.concurrent.ConcurrentMapCache;
@@ -50,12 +40,7 @@ public class AccessTokenCacheImpl implements AccessTokenCache, DisposableBean {
   private Timer internalCacheTimer;
 
   @Setter
-  @Positive
-  private long expirationToleranceAmount = 30L;
-
-  @Setter
-  @NotNull
-  private ChronoUnit expirationToleranceUnit = ChronoUnit.SECONDS;
+  private Duration accessTokenThreshold = Duration.ofSeconds(20L);
 
   /**
    * Instantiates a new access token cache.
@@ -89,7 +74,7 @@ public class AccessTokenCacheImpl implements AccessTokenCache, DisposableBean {
         Set<Object> keys = internalCache.getNativeCache().keySet();
         log.trace("Removing obsolete jwt entries from internal cache (sze = {}).", keys.size());
         keys.forEach(key -> findAccessToken(String.valueOf(key))
-            .filter(token -> isExpired(token))
+            .filter(token -> AccessTokenCache.isExpired(token, accessTokenThreshold))
             .ifPresent(token -> internalCache.evict(key)));
       }
     }, period, period);
@@ -99,7 +84,7 @@ public class AccessTokenCacheImpl implements AccessTokenCache, DisposableBean {
   @Override
   public Optional<String> findAccessToken(String key) {
     return Optional.ofNullable(cache.get(key, String.class))
-        .filter(this::isNotExpired);
+        .filter(token -> AccessTokenCache.isNotExpired(token, accessTokenThreshold));
   }
 
   @Override
@@ -114,41 +99,10 @@ public class AccessTokenCacheImpl implements AccessTokenCache, DisposableBean {
     }
   }
 
-  private boolean isExpired(@NotNull String tokenValue) {
-    return !isNotExpired(tokenValue);
-  }
-
-  private boolean isNotExpired(@NotNull String tokenValue) {
-    JWT jwt = parse(tokenValue);
-    try {
-      long millis = System.currentTimeMillis() + Duration
-          .of(expirationToleranceAmount, expirationToleranceUnit).toMillis();
-      return jwt.getJWTClaimsSet() != null
-          && jwt.getJWTClaimsSet().getExpirationTime() != null
-          && jwt.getJWTClaimsSet().getExpirationTime().after(new Date(millis));
-
-    } catch (ParseException e) {
-      log.warn("Parsing claim set failed. Returning false.");
-      return false;
-    }
-  }
-
-  private JWT parse(@NotNull String tokenValue) {
-    try {
-      return SignedJWT.parse(tokenValue);
-    } catch (Exception e0) {
-      try {
-        log.warn("Parsing signed jwt failed. Trying to parse encrypted jwt ...", e0);
-        return EncryptedJWT.parse(tokenValue);
-      } catch (Exception e1) {
-        try {
-          log.warn("Parsing encrypted jwt failed. Trying to parse plain jwt ...", e1);
-          return PlainJWT.parse(tokenValue);
-        } catch (Exception e2) {
-          log.error("Parsing plan jwt failed. Throwing internal server error.", e2);
-          throw ServiceException.internalServerError("Parsing jwt failed.");
-        }
-      }
-    }
+  @Override
+  public String toString() {
+    return "AccessTokenCacheImpl {cache = "
+        + (internalCacheTimer != null ? "INTERNAL" : "EXTERNAL")
+        + '}';
   }
 }

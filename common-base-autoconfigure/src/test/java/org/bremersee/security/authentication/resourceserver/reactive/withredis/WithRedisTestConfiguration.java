@@ -14,25 +14,21 @@
  * limitations under the License.
  */
 
-package org.bremersee.data.ldaptive.app;
+package org.bremersee.security.authentication.resourceserver.reactive.withredis;
 
+import org.bremersee.security.authentication.resourceserver.reactive.components.TestController;
 import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration;
-import org.springframework.boot.autoconfigure.data.redis.RedisReactiveAutoConfiguration;
 import org.springframework.context.annotation.ComponentScan;
 
 /**
- * The test configuration.
+ * The test configuration with redis.
  *
  * @author Christian Bremer
  */
 @SpringBootConfiguration
-@EnableAutoConfiguration(exclude = {
-    RedisAutoConfiguration.class,
-    RedisReactiveAutoConfiguration.class
-})
-@ComponentScan(basePackageClasses = {TestConfiguration.class})
-public class TestConfiguration {
+@EnableAutoConfiguration
+@ComponentScan(basePackageClasses = {TestController.class})
+public class WithRedisTestConfiguration {
 
 }

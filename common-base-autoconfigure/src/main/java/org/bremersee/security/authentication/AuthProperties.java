@@ -18,6 +18,7 @@ package org.bremersee.security.authentication;
 
 import java.io.Serializable;
 import java.security.Principal;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -99,6 +100,9 @@ public class AuthProperties {
    */
   @NotEmpty
   private String nameJsonPath = "$.preferred_username";
+
+  @NotNull
+  private Duration accessTokenThreshold = Duration.ofSeconds(20L);
 
   @NotNull
   private Map<String, List<String>> roleDefinitions = new LinkedHashMap<>();

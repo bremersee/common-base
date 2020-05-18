@@ -27,4 +27,5 @@ org.bremersee.web.reactive.CorsAutoConfiguration,\
 org.bremersee.thymeleaf.AdditionalThymeleafAutoConfiguration,\
 \
 org.bremersee.data.ldaptive.UnboundIdProviderAutoConfiguration,\
-org.bremersee.data.ldaptive.LdaptiveAutoConfiguration
+org.bremersee.data.ldaptive.LdaptiveAutoConfiguration,\
+org.bremersee.data.redis.EmbeddedRedisAutoConfiguration
