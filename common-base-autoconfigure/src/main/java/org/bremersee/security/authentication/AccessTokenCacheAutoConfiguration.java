@@ -100,7 +100,7 @@ public class AccessTokenCacheAutoConfiguration {
     public AccessTokenCache accessTokenCache(
         ObjectProvider<List<CacheManager>> cacheManagers) {
 
-      AccessTokenCacheImpl cache = Optional.ofNullable(cacheManagers.getIfAvailable())
+      return Optional.ofNullable(cacheManagers.getIfAvailable())
           .flatMap(managers -> managers.stream()
               .filter(manager -> manager.getCacheNames().contains(AccessTokenCache.CACHE_NAME))
               .findFirst())
@@ -110,10 +110,19 @@ public class AccessTokenCacheAutoConfiguration {
                 externalCache, cacheManager);
             return externalCache;
           })
-          .map(AccessTokenCacheImpl::new)
-          .orElseGet(AccessTokenCacheImpl::new);
-      cache.setAccessTokenThreshold(authProperties.getAccessTokenThreshold());
-      return cache;
+          .map(externalCache -> {
+            if (externalCache instanceof AccessTokenCache) {
+              return (AccessTokenCache) externalCache;
+            }
+            AccessTokenCacheImpl impl = new AccessTokenCacheImpl(externalCache);
+            impl.setAccessTokenThreshold(authProperties.getAccessTokenThreshold());
+            return impl;
+          })
+          .orElseGet(() -> {
+            AccessTokenCacheImpl impl = new AccessTokenCacheImpl();
+            impl.setAccessTokenThreshold(authProperties.getAccessTokenThreshold());
+            return impl;
+          });
     }
   }
 
