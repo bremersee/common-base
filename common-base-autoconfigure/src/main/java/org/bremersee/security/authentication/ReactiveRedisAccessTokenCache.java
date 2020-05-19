@@ -18,11 +18,11 @@ package org.bremersee.security.authentication;
 
 import java.time.Duration;
 import java.util.Date;
-import java.util.Objects;
 import java.util.function.Function;
 import javax.validation.constraints.NotNull;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.bremersee.security.authentication.AuthProperties.JwtCache;
 import org.springframework.data.redis.connection.ReactiveRedisConnectionFactory;
 import org.springframework.data.redis.core.ReactiveRedisTemplate;
 import org.springframework.data.redis.serializer.RedisSerializationContext;
@@ -37,10 +37,9 @@ import reactor.core.publisher.Mono;
 @Slf4j
 public class ReactiveRedisAccessTokenCache implements ReactiveAccessTokenCache {
 
-  private final ReactiveRedisTemplate<String, String> redis;
+  private final JwtCache jwtCacheProperties;
 
-  @Setter
-  private Duration accessTokenThreshold = Duration.ofSeconds(20L);
+  private final ReactiveRedisTemplate<String, String> redis;
 
   @Setter
   @NotNull
@@ -49,11 +48,16 @@ public class ReactiveRedisAccessTokenCache implements ReactiveAccessTokenCache {
   /**
    * Instantiates a new reactive redis access token cache.
    *
+   * @param jwtCacheProperties the jwt cache properties
    * @param connectionFactory the connection factory
    */
   public ReactiveRedisAccessTokenCache(
+      JwtCache jwtCacheProperties,
       ReactiveRedisConnectionFactory connectionFactory) {
+
+    Assert.notNull(jwtCacheProperties, "Jwt cache properties must be present.");
     Assert.notNull(connectionFactory, "Redis connection factory must be present.");
+    this.jwtCacheProperties = jwtCacheProperties;
     this.redis = new ReactiveRedisTemplate<>(
         connectionFactory,
         RedisSerializationContext.string());
@@ -72,14 +76,14 @@ public class ReactiveRedisAccessTokenCache implements ReactiveAccessTokenCache {
 
   @Override
   public Mono<String> putAccessToken(String key, String accessToken) {
-    Duration duration = Objects
-        .requireNonNullElseGet(accessTokenThreshold, () -> Duration.ofSeconds(20L));
+    Duration duration = jwtCacheProperties.getExpirationTimeThreshold();
     long millis = System.currentTimeMillis() + duration.toMillis();
+    String dbKey = jwtCacheProperties.addKeyPrefix(key);
     return Mono.justOrEmpty(findExpirationTimeFn.apply(accessToken))
         .filter(expirationTime -> expirationTime.getTime() > millis)
-        .flatMap(expirationTime -> redis.opsForValue().set(key, accessToken)
+        .flatMap(expirationTime -> redis.opsForValue().set(dbKey, accessToken)
             .flatMap(success -> success
-                ? redis.expireAt(key, expirationTime.toInstant().minus(accessTokenThreshold))
+                ? redis.expireAt(dbKey, expirationTime.toInstant().minus(duration))
                 : Mono.just(false)))
         .map(result -> accessToken)
         .onErrorResume(

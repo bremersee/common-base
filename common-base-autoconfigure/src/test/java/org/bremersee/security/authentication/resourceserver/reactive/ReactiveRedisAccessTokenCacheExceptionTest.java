@@ -47,6 +47,8 @@ import reactor.test.StepVerifier;
         "spring.main.web-application-type=reactive",
         "spring.application.name=resourceserver-jwt",
         "spring.security.oauth2.resourceserver.jwt.jwk-set-uri=http://localhost/jwk",
+        "spring.redis.host=unknown",
+        "spring.redis.port=11999",
         "bremersee.redis.embedded=false",
         "bremersee.auth.resource-server=auto",
         "bremersee.auth.any-access-mode=deny_all",

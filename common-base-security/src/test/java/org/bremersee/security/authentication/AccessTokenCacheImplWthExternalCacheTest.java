@@ -49,8 +49,7 @@ class AccessTokenCacheImplWthExternalCacheTest {
     Cache external = mock(Cache.class);
     //noinspection unchecked
     when(external.get(any(), any(Class.class))).thenReturn(value);
-    cache = new AccessTokenCacheImpl(external);
-    cache.setAccessTokenThreshold(Duration.ofSeconds(10L));
+    cache = new AccessTokenCacheImpl(external, Duration.ofSeconds(10L), "jwt_");
     cache.setExpiredBiFn((token, duration) -> false);
   }
 

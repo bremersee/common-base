@@ -168,9 +168,7 @@ public class ReactiveAccessTokenCacheAutoConfiguration {
 
       ReactiveRedisConnectionFactory connectionFactory = connectionFactoryProvider.getIfAvailable();
       log.info("Creating {} ...", ReactiveRedisAccessTokenCache.class.getName());
-      ReactiveRedisAccessTokenCache cache = new ReactiveRedisAccessTokenCache(connectionFactory);
-      cache.setAccessTokenThreshold(authProperties.getAccessTokenThreshold());
-      return cache;
+      return new ReactiveRedisAccessTokenCache(authProperties.getJwtCache(), connectionFactory);
     }
 
   }

@@ -51,8 +51,7 @@ class AccessTokenCacheImplWthExternalExceptionCacheTest {
     doThrow(ServiceException.badRequest()).when(external).put(any(), any());
     //noinspection unchecked
     when(external.get(any(), any(Class.class))).thenThrow(ServiceException.internalServerError());
-    cache = new AccessTokenCacheImpl(external);
-    cache.setAccessTokenThreshold(Duration.ofSeconds(10L));
+    cache = new AccessTokenCacheImpl(external, Duration.ofSeconds(10L), null);
     cache.setExpiredBiFn((token, duration) -> false);
   }
 

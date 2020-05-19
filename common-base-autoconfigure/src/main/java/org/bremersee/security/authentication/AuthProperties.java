@@ -102,9 +102,6 @@ public class AuthProperties {
   private String nameJsonPath = "$.preferred_username";
 
   @NotNull
-  private Duration accessTokenThreshold = Duration.ofSeconds(20L);
-
-  @NotNull
   private Map<String, List<String>> roleDefinitions = new LinkedHashMap<>();
 
   @NotNull
@@ -121,6 +118,12 @@ public class AuthProperties {
    */
   @NotNull
   private EurekaAccessProperties eureka = new EurekaAccessProperties();
+
+  /**
+   * Properties of the jwt cache.
+   */
+  @NotNull
+  private JwtCache jwtCache = new JwtCache();
 
   /**
    * The properties for the oauth2 password flow.
@@ -472,6 +475,47 @@ public class AuthProperties {
       }
       return authorities.toArray(new String[0]);
     }
+  }
+
+  /**
+   * The jwt cache properties.
+   */
+  @Getter
+  @Setter
+  @ToString
+  @EqualsAndHashCode
+  @NoArgsConstructor
+  @Validated
+  public static class JwtCache {
+
+    @NotEmpty
+    private String externalCacheName = AccessTokenCache.CACHE_NAME;
+
+    /**
+     * The expiration time threshold.
+     */
+    @NotNull
+    private Duration expirationTimeThreshold = Duration.ofSeconds(20L);
+
+    /**
+     * The database or cache key prefix.
+     */
+    private String keyPrefix = "jwt:";
+
+    /**
+     * Add key prefix to the given key.
+     *
+     * @param givenKey the given key
+     * @return the string
+     */
+    public String addKeyPrefix(String givenKey) {
+      if (StringUtils.hasText(getKeyPrefix())
+          && !givenKey.startsWith(getKeyPrefix())) {
+        return getKeyPrefix() + givenKey;
+      }
+      return givenKey;
+    }
+
   }
 
 }

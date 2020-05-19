@@ -100,28 +100,25 @@ public class AccessTokenCacheAutoConfiguration {
     public AccessTokenCache accessTokenCache(
         ObjectProvider<List<CacheManager>> cacheManagers) {
 
-      return Optional.ofNullable(cacheManagers.getIfAvailable())
+      return findJwtCache(cacheManagers.getIfAvailable())
+          .map(externalCache -> AccessTokenCache.builder().withExternalCache(externalCache))
+          .orElseGet(AccessTokenCache::builder)
+          .withExpirationTimeThreshold(authProperties.getJwtCache().getExpirationTimeThreshold())
+          .withKeyPrefix(authProperties.getJwtCache().getKeyPrefix())
+          .build();
+    }
+
+    private Optional<Cache> findJwtCache(List<CacheManager> cacheManagers) {
+      final String cacheName = authProperties.getJwtCache().getExternalCacheName();
+      return Optional.ofNullable(cacheManagers)
           .flatMap(managers -> managers.stream()
-              .filter(manager -> manager.getCacheNames().contains(AccessTokenCache.CACHE_NAME))
+              .filter(manager -> manager.getCacheNames().contains(cacheName))
               .findFirst())
           .map(cacheManager -> {
-            Cache externalCache = cacheManager.getCache(AccessTokenCache.CACHE_NAME);
+            Cache externalCache = cacheManager.getCache(cacheName);
             log.info("Creating access token cache with external cache {} from cache manager {}",
                 externalCache, cacheManager);
             return externalCache;
-          })
-          .map(externalCache -> {
-            if (externalCache instanceof AccessTokenCache) {
-              return (AccessTokenCache) externalCache;
-            }
-            AccessTokenCacheImpl impl = new AccessTokenCacheImpl(externalCache);
-            impl.setAccessTokenThreshold(authProperties.getAccessTokenThreshold());
-            return impl;
-          })
-          .orElseGet(() -> {
-            AccessTokenCacheImpl impl = new AccessTokenCacheImpl();
-            impl.setAccessTokenThreshold(authProperties.getAccessTokenThreshold());
-            return impl;
           });
     }
   }
@@ -172,9 +169,9 @@ public class AccessTokenCacheAutoConfiguration {
         ObjectProvider<RedisConnectionFactory> connectionFactory) {
 
       log.info("Creating {} ...", RedisAccessTokenCache.class.getName());
-      RedisAccessTokenCache cache = new RedisAccessTokenCache(connectionFactory.getIfAvailable());
-      cache.setAccessTokenThreshold(authProperties.getAccessTokenThreshold());
-      return cache;
+      return new RedisAccessTokenCache(
+          authProperties.getJwtCache(),
+          connectionFactory.getIfAvailable());
     }
   }
 

@@ -36,14 +36,14 @@ class AccessTokenCacheImplTest {
   /**
    * The Cache.
    */
-  static AccessTokenCacheImpl cache = new AccessTokenCacheImpl();
+  static AccessTokenCacheImpl cache;
 
   /**
    * Configure.
    */
   @BeforeAll
   static void configure() {
-    cache.setAccessTokenThreshold(Duration.ofSeconds(10L));
+    cache = new AccessTokenCacheImpl(Duration.ofSeconds(10L), null);
     cache.setExpiredBiFn((token, duration) -> false);
   }
 

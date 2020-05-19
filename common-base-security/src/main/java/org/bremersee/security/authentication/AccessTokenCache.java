@@ -27,6 +27,7 @@ import java.util.Objects;
 import java.util.Optional;
 import javax.validation.constraints.NotNull;
 import org.bremersee.exception.ServiceException;
+import org.springframework.cache.Cache;
 import org.springframework.validation.annotation.Validated;
 
 /**
@@ -113,6 +114,87 @@ public interface AccessTokenCache {
         } catch (Exception e2) {
           throw ServiceException.internalServerError("Parsing jwt failed.");
         }
+      }
+    }
+  }
+
+  /**
+   * Creates a new builder.
+   *
+   * @return the builder
+   */
+  static Builder builder() {
+    return new Builder.Impl();
+  }
+
+  /**
+   * The builder interface.
+   */
+  interface Builder {
+
+    /**
+     * With external cache.
+     *
+     * @param externalCache the external cache
+     * @return the builder
+     */
+    Builder withExternalCache(Cache externalCache);
+
+    /**
+     * With expiration time threshold.
+     *
+     * @param duration the duration
+     * @return the builder
+     */
+    Builder withExpirationTimeThreshold(Duration duration);
+
+    /**
+     * With key prefix.
+     *
+     * @param keyPrefix the key prefix
+     * @return the builder
+     */
+    Builder withKeyPrefix(String keyPrefix);
+
+    /**
+     * Build access token cache.
+     *
+     * @return the access token cache
+     */
+    AccessTokenCache build();
+
+    /**
+     * The builder implementation.
+     */
+    class Impl implements Builder {
+
+      private Cache externalCache;
+
+      private Duration expirationTimeThreshold;
+
+      private String keyPrefix;
+
+      @Override
+      public Builder withExternalCache(Cache externalCache) {
+        this.externalCache = externalCache;
+        return this;
+      }
+
+      @Override
+      public Builder withExpirationTimeThreshold(Duration duration) {
+        this.expirationTimeThreshold = duration;
+        return this;
+      }
+
+      @Override
+      public Builder withKeyPrefix(String keyPrefix) {
+        this.keyPrefix = keyPrefix;
+        return this;
+      }
+
+      @Override
+      public AccessTokenCache build() {
+        return new AccessTokenCacheImpl(externalCache, expirationTimeThreshold, keyPrefix);
       }
     }
   }

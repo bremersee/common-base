@@ -18,12 +18,12 @@ package org.bremersee.security.authentication;
 
 import java.time.Duration;
 import java.util.Date;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
 import javax.validation.constraints.NotNull;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.bremersee.security.authentication.AuthProperties.JwtCache;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.util.Assert;
@@ -36,10 +36,9 @@ import org.springframework.util.Assert;
 @Slf4j
 public class RedisAccessTokenCache implements AccessTokenCache {
 
-  private final StringRedisTemplate redis;
+  private final JwtCache jwtCacheProperties;
 
-  @Setter
-  private Duration accessTokenThreshold = Duration.ofSeconds(20L);
+  private final StringRedisTemplate redis;
 
   @Setter
   @NotNull
@@ -48,11 +47,15 @@ public class RedisAccessTokenCache implements AccessTokenCache {
   /**
    * Instantiates a new redis access token cache.
    *
+   * @param jwtCacheProperties the jwt cache properties
    * @param connectionFactory the connection factory
    */
   public RedisAccessTokenCache(
+      JwtCache jwtCacheProperties,
       RedisConnectionFactory connectionFactory) {
+    Assert.notNull(jwtCacheProperties, "Jwt cache properties must be present.");
     Assert.notNull(connectionFactory, "Redis connection factory must be present.");
+    this.jwtCacheProperties = jwtCacheProperties;
     this.redis = new StringRedisTemplate();
     this.redis.setConnectionFactory(connectionFactory);
     this.redis.afterPropertiesSet();
@@ -61,7 +64,7 @@ public class RedisAccessTokenCache implements AccessTokenCache {
   @Override
   public Optional<String> findAccessToken(String key) {
     try {
-      return Optional.ofNullable(redis.opsForValue().get(key));
+      return Optional.ofNullable(redis.opsForValue().get(jwtCacheProperties.addKeyPrefix(key)));
 
     } catch (RuntimeException e) {
       log.error("Getting access token from redis cache failed.", e);
@@ -72,14 +75,14 @@ public class RedisAccessTokenCache implements AccessTokenCache {
   @Override
   public void putAccessToken(String key, String accessToken) {
     try {
-      Duration duration = Objects
-          .requireNonNullElseGet(accessTokenThreshold, () -> Duration.ofSeconds(20L));
+      Duration duration = jwtCacheProperties.getExpirationTimeThreshold();
       long millis = System.currentTimeMillis() + duration.toMillis();
+      String dbKey = jwtCacheProperties.addKeyPrefix(key);
       Optional.ofNullable(findExpirationTimeFn.apply(accessToken))
           .filter(expirationTime -> expirationTime.getTime() > millis)
           .ifPresent(expirationTime -> {
-            redis.opsForValue().set(key, accessToken);
-            redis.expireAt(key, expirationTime);
+            redis.opsForValue().set(dbKey, accessToken);
+            redis.expireAt(dbKey, expirationTime);
           });
 
     } catch (RuntimeException e) {
