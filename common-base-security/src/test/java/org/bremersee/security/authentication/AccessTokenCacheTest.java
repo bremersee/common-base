@@ -21,6 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
 
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.PlainJWT;
@@ -28,6 +29,7 @@ import java.time.Duration;
 import java.util.Date;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
+import org.springframework.cache.Cache;
 
 /**
  * The access token cache test.
@@ -77,6 +79,19 @@ class AccessTokenCacheTest {
   void parse() {
     assertNotNull(AccessTokenCache.parse(signedAccessTokenWithoutExp));
     assertNotNull(AccessTokenCache.parse(plainAccessTokenWithExp));
+  }
+
+  /**
+   * Builder.
+   */
+  @Test
+  void builder() {
+    assertNotNull(AccessTokenCache.builder());
+    assertNotNull(AccessTokenCache.builder().build());
+    assertNotNull(AccessTokenCache.builder().withExternalCache(mock(Cache.class)).build());
+    assertNotNull(AccessTokenCache.builder().withKeyPrefix("jwt_").build());
+    assertNotNull(
+        AccessTokenCache.builder().withExpirationTimeThreshold(Duration.ofSeconds(30L)).build());
   }
 
 }

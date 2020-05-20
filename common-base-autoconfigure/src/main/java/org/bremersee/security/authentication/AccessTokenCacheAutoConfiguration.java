@@ -43,7 +43,7 @@ import org.springframework.util.ClassUtils;
  * @author Christian Bremer
  */
 @ConditionalOnClass(name = {
-    "org.bremersee.security.authentication.AccessTokenCache",
+    "org.bremersee.security.authentication.AccessTokenCache"
 })
 @ConditionalOnWebApplication(type = Type.SERVLET)
 @Conditional(JwtSupportCondition.class)
