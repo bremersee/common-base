@@ -17,6 +17,7 @@
 package org.bremersee.security.authentication;
 
 import java.io.IOException;
+import java.util.Optional;
 import net.minidev.json.JSONObject;
 import net.minidev.json.JSONValue;
 import org.bremersee.exception.AccessTokenRetrieverAuthenticationException;
@@ -35,10 +36,11 @@ import org.springframework.web.client.RestTemplate;
  *
  * @author Christian Bremer
  */
-public class RestTemplateAccessTokenRetriever implements
-    AccessTokenRetriever<String> {
+public class RestTemplateAccessTokenRetriever implements AccessTokenRetriever<String> {
 
-  private RestTemplate restTemplate;
+  private final RestTemplate restTemplate;
+
+  private final AccessTokenCache accessTokenCache;
 
   /**
    * Instantiates a new rest template access token retriever.
@@ -46,32 +48,54 @@ public class RestTemplateAccessTokenRetriever implements
    * @param restTemplate the rest template
    */
   public RestTemplateAccessTokenRetriever(RestTemplate restTemplate) {
+    this(restTemplate, null);
+  }
+
+  /**
+   * Instantiates a new rest template access token retriever.
+   *
+   * @param restTemplate the rest template
+   * @param accessTokenCache the access token cache
+   */
+  public RestTemplateAccessTokenRetriever(
+      RestTemplate restTemplate,
+      AccessTokenCache accessTokenCache) {
+
     this.restTemplate = restTemplate;
     this.restTemplate.setErrorHandler(new ErrorHandler());
+    this.accessTokenCache = accessTokenCache;
   }
 
   @Override
   public String retrieveAccessToken(AccessTokenRetrieverProperties input) {
-    final HttpHeaders headers = new HttpHeaders();
-    headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-    input.getBasicAuthProperties()
-        .ifPresent(basicAuthProperties -> headers.setBasicAuth(
-            basicAuthProperties.getUsername(),
-            basicAuthProperties.getPassword()));
-    final HttpEntity<?> request = new HttpEntity<>(input.createBody(), headers);
-    final String response = restTemplate.exchange(
-        input.getTokenEndpoint(),
-        HttpMethod.POST,
-        request,
-        String.class)
-        .getBody();
-    final JSONObject json = (JSONObject) JSONValue.parse(response);
-    final String accessToken = json.getAsString("access_token");
-    if (StringUtils.hasText(accessToken)) {
-      return accessToken;
-    }
-    throw new AccessTokenRetrieverAuthenticationException(HttpStatus.UNAUTHORIZED,
-        "There is no access token in the response: " + accessToken);
+    final String cacheKey = input.createCacheKeyHashed();
+    return Optional.ofNullable(accessTokenCache)
+        .flatMap(cache -> cache.findAccessToken(cacheKey))
+        .orElseGet(() -> {
+          final HttpHeaders headers = new HttpHeaders();
+          headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+          input.getBasicAuthProperties()
+              .ifPresent(basicAuthProperties -> headers.setBasicAuth(
+                  basicAuthProperties.getUsername(),
+                  basicAuthProperties.getPassword()));
+          final HttpEntity<?> request = new HttpEntity<>(input.createBody(), headers);
+          final String response = restTemplate.exchange(
+              input.getTokenEndpoint(),
+              HttpMethod.POST,
+              request,
+              String.class)
+              .getBody();
+          final JSONObject json = (JSONObject) JSONValue.parse(response);
+          final String accessToken = json.getAsString("access_token");
+          if (StringUtils.hasText(accessToken)) {
+            if (accessTokenCache != null) {
+              accessTokenCache.putAccessToken(cacheKey, accessToken);
+            }
+            return accessToken;
+          }
+          throw new AccessTokenRetrieverAuthenticationException(HttpStatus.UNAUTHORIZED,
+              "There is no access token in the response: " + accessToken);
+        });
   }
 
   private static class ErrorHandler extends DefaultResponseErrorHandler {

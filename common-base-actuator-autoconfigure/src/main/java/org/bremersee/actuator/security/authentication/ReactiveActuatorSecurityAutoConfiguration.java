@@ -16,6 +16,7 @@
 
 package org.bremersee.actuator.security.authentication;
 
+import java.util.Objects;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.bremersee.core.OrderedProxy;
@@ -223,11 +224,14 @@ public class ReactiveActuatorSecurityAutoConfiguration {
   }
 
   private PasswordFlowReactiveAuthenticationManager passwordFlowReactiveAuthenticationManager() {
+    WebClientAccessTokenRetriever tokenRetriever = tokenRetrieverProvider.getIfAvailable();
+    log.info("Creating actuator {} with token retriever {} ...",
+        PasswordFlowReactiveAuthenticationManager.class.getSimpleName(), tokenRetriever);
     return new PasswordFlowReactiveAuthenticationManager(
         actuatorAuthProperties.getPasswordFlow(),
         jwtDecoder(),
         jwtConverter(),
-        tokenRetrieverProvider.getIfAvailable(WebClientAccessTokenRetriever::new));
+        Objects.requireNonNullElseGet(tokenRetriever, WebClientAccessTokenRetriever::new));
   }
 
   private ReactiveJwtDecoder jwtDecoder() {

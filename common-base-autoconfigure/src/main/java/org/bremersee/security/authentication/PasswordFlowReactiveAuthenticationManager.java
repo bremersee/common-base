@@ -96,8 +96,7 @@ public class PasswordFlowReactiveAuthenticationManager implements ReactiveAuthen
         .username(authentication.getName())
         .password((String) authentication.getCredentials())
         .build();
-    return Mono.just(properties)
-        .flatMap(retriever::retrieveAccessToken)
+    return retriever.retrieveAccessToken(properties)
         .flatMap(jwtDecoder::decode)
         .flatMap(jwt -> Objects.requireNonNull(jwtConverter.convert(jwt)))
         .cast(Authentication.class)

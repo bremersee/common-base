@@ -1,0 +1,10 @@
+{
+  "properties": [
+    {
+      "name": "bremersee.redis.embedded",
+      "type": "java.lang.Boolean",
+      "description": "Flag to enable embedded redis server.",
+      "defaultValue": false
+    }
+  ]
+}

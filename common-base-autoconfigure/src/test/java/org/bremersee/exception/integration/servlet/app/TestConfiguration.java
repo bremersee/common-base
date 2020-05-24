@@ -19,6 +19,7 @@ package org.bremersee.exception.integration.servlet.app;
 import org.bremersee.exception.ServiceException;
 import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -30,7 +31,9 @@ import org.springframework.web.bind.annotation.RestController;
  * @author Christian Bremer
  */
 @SpringBootConfiguration
-@EnableAutoConfiguration
+@EnableAutoConfiguration(exclude = {
+    RedisAutoConfiguration.class
+})
 @ComponentScan(basePackageClasses = {TestConfiguration.class})
 public class TestConfiguration {
 

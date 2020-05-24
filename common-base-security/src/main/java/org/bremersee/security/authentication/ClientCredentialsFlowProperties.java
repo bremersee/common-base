@@ -66,6 +66,11 @@ public interface ClientCredentialsFlowProperties extends AccessTokenRetrieverPro
   }
 
   @Override
+  default String createCacheKey() {
+    return getTokenEndpoint() + ":" + getClientId() + ":" + getClientSecret();
+  }
+
+  @Override
   default MultiValueMap<String, String> createBody() {
     MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
     if (getAdditionalProperties() != null) {
@@ -180,7 +185,7 @@ public interface ClientCredentialsFlowProperties extends AccessTokenRetrieverPro
     @Getter
     @AllArgsConstructor(access = AccessLevel.PRIVATE)
     @ToString(exclude = {"clientSecret"})
-    @EqualsAndHashCode(exclude = {"clientSecret"})
+    @EqualsAndHashCode
     private static class Impl implements ClientCredentialsFlowProperties {
 
       private final String tokenEndpoint;

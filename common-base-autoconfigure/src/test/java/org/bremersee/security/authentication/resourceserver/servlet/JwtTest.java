@@ -22,7 +22,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import org.bremersee.security.authentication.resourceserver.servlet.app.TestConfiguration;
+import org.bremersee.security.authentication.resourceserver.servlet.withoutredis.TestConfiguration;
 import org.bremersee.test.security.authentication.WithJwtAuthenticationToken;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;

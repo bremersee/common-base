@@ -18,6 +18,7 @@ package org.bremersee.security.authentication;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -27,6 +28,7 @@ import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.event.EventListener;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
@@ -39,9 +41,6 @@ import org.springframework.util.ClassUtils;
  * @author Christian Bremer
  */
 @ConditionalOnWebApplication(type = Type.SERVLET)
-@ConditionalOnProperty(
-    prefix = "spring.security.oauth2.resourceserver.jwt",
-    name = "jwk-set-uri")
 @ConditionalOnClass({
     RestTemplateBuilder.class,
     JsonPathJwtConverter.class,
@@ -92,11 +91,14 @@ public class JwtSupportAutoConfiguration {
    *
    * @return the json path jwt converter
    */
+  @ConditionalOnProperty(
+      prefix = "spring.security.oauth2.resourceserver.jwt",
+      name = "jwk-set-uri")
   @ConditionalOnMissingBean
   @Bean
   @SuppressWarnings("DuplicatedCode")
   public JsonPathJwtConverter jsonPathJwtConverter() {
-    log.info("Creating {} ...", JsonPathJwtConverter.class.getSimpleName());
+    log.info("Creating application {} ...", JsonPathJwtConverter.class.getSimpleName());
     JsonPathJwtConverter converter = new JsonPathJwtConverter();
     converter.setNameJsonPath(properties.getNameJsonPath());
     converter.setRolePrefix(properties.getRolePrefix());
@@ -107,25 +109,32 @@ public class JwtSupportAutoConfiguration {
   }
 
   /**
-   * Creates a rest template access token retriever bean.
+   * Creates access token retriever.
    *
    * @param restTemplateBuilder the rest template builder
+   * @param accessTokenCache the access token cache
    * @return the rest template access token retriever
    */
+  @Conditional(JwtSupportCondition.class)
   @ConditionalOnMissingBean
   @Bean
   public RestTemplateAccessTokenRetriever restTemplateAccessTokenRetriever(
-      ObjectProvider<RestTemplateBuilder> restTemplateBuilder) {
+      ObjectProvider<RestTemplateBuilder> restTemplateBuilder,
+      ObjectProvider<AccessTokenCache> accessTokenCache) {
 
+    AccessTokenCache cache = accessTokenCache.getIfAvailable();
+    log.info("Creating common {} with cache {} ...",
+        RestTemplateAccessTokenRetriever.class.getSimpleName(), cache);
     Assert.notNull(
         restTemplateBuilder.getIfAvailable(),
         "Rest template builder must be present.");
-    log.info("Creating {} ...", RestTemplateAccessTokenRetriever.class.getSimpleName());
-    return new RestTemplateAccessTokenRetriever(restTemplateBuilder.getIfAvailable().build());
+    return new RestTemplateAccessTokenRetriever(
+        restTemplateBuilder.getIfAvailable().build(),
+        cache);
   }
 
   /**
-   * Creates a password flow authentication manager bean.
+   * Creates a password flow authentication manager.
    *
    * @param jwtDecoder the jwt decoder
    * @param jwtConverter the jwt converter
@@ -139,18 +148,19 @@ public class JwtSupportAutoConfiguration {
           "client-id",
           "client-secret"
       })
-  @ConditionalOnMissingBean
+  @ConditionalOnBean(JwtDecoder.class)
+  @ConditionalOnMissingBean(PasswordFlowAuthenticationManager.class)
   @Bean
   public PasswordFlowAuthenticationManager passwordFlowAuthenticationManager(
       ObjectProvider<JwtDecoder> jwtDecoder,
       JsonPathJwtConverter jwtConverter,
       RestTemplateAccessTokenRetriever tokenRetriever) {
 
+    log.info("Creating application {} ...",
+        PasswordFlowAuthenticationManager.class.getSimpleName());
     Assert.notNull(
         jwtDecoder.getIfAvailable(),
         "Jwt decoder must be present.");
-
-    log.info("Creating {} ...", PasswordFlowAuthenticationManager.class.getSimpleName());
     return new PasswordFlowAuthenticationManager(
         properties.getPasswordFlow(),
         jwtDecoder.getIfAvailable(),

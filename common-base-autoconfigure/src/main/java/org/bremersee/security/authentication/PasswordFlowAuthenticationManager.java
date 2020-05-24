@@ -67,6 +67,7 @@ public class PasswordFlowAuthenticationManager
       JwtDecoder jwtDecoder,
       @Nullable Converter<Jwt, ? extends AbstractAuthenticationToken> jwtAuthenticationConverter,
       AccessTokenRetriever<String> accessTokenRetriever) {
+
     this.passwordFlowProperties = passwordFlowProperties;
     this.jwtDecoder = jwtDecoder;
     this.jwtAuthenticationConverter = Objects.requireNonNullElseGet(
@@ -82,16 +83,15 @@ public class PasswordFlowAuthenticationManager
         .username(authentication.getName())
         .password((String) authentication.getCredentials())
         .build();
-    final String tokenStr = accessTokenRetriever.retrieveAccessToken(properties);
-    Jwt jwt;
     try {
-      jwt = this.jwtDecoder.decode(tokenStr);
+      return this.jwtAuthenticationConverter.convert(
+          jwtDecoder.decode(
+              accessTokenRetriever.retrieveAccessToken(properties)));
+
     } catch (JwtException failed) {
       final OAuth2Error invalidToken = invalidToken(failed.getMessage());
       throw new OAuth2AuthenticationException(invalidToken, invalidToken.getDescription(), failed);
     }
-
-    return this.jwtAuthenticationConverter.convert(jwt);
   }
 
   @Override

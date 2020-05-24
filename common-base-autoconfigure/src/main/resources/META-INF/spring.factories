@@ -9,6 +9,8 @@ org.bremersee.security.access.AccessControlAutoConfiguration,\
 org.bremersee.security.authentication.PasswordEncoderAutoConfiguration,\
 org.bremersee.security.authentication.InMemoryUserDetailsAutoConfiguration,\
 org.bremersee.security.authentication.ReactiveInMemoryUserDetailsAutoConfiguration,\
+org.bremersee.security.authentication.AccessTokenCacheAutoConfiguration,\
+org.bremersee.security.authentication.ReactiveAccessTokenCacheAutoConfiguration,\
 org.bremersee.security.authentication.JwtSupportAutoConfiguration,\
 org.bremersee.security.authentication.ReactiveJwtSupportAutoConfiguration,\
 org.bremersee.security.authentication.ResourceServerAutoConfiguration,\
@@ -25,4 +27,5 @@ org.bremersee.web.reactive.CorsAutoConfiguration,\
 org.bremersee.thymeleaf.AdditionalThymeleafAutoConfiguration,\
 \
 org.bremersee.data.ldaptive.UnboundIdProviderAutoConfiguration,\
-org.bremersee.data.ldaptive.LdaptiveAutoConfiguration
+org.bremersee.data.ldaptive.LdaptiveAutoConfiguration,\
+org.bremersee.data.redis.EmbeddedRedisAutoConfiguration

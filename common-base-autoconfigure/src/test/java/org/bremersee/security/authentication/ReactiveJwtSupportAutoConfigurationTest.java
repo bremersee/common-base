@@ -26,11 +26,11 @@ import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.security.oauth2.jwt.ReactiveJwtDecoder;
 
 /**
- * The reactive authentication support auto configuration test.
+ * The reactive jwt support auto configuration test.
  *
  * @author Christian Bremer
  */
-class ReactiveAuthenticationSupportAutoConfigurationTest {
+class ReactiveJwtSupportAutoConfigurationTest {
 
   private static ReactiveJwtSupportAutoConfiguration configuration;
 
@@ -57,7 +57,10 @@ class ReactiveAuthenticationSupportAutoConfigurationTest {
    */
   @Test
   void webClientAccessTokenRetriever() {
-    assertNotNull(configuration.webClientAccessTokenRetriever());
+    @SuppressWarnings("unchecked")
+    ObjectProvider<ReactiveAccessTokenCache> provider = mock(ObjectProvider.class);
+    when(provider.getIfAvailable()).thenReturn(null);
+    assertNotNull(configuration.webClientAccessTokenRetriever(provider));
   }
 
   /**
