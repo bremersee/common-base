@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>RedisAccessTokenCache.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">common-base-autoconfigure</a> &gt; <a href="index.source.html" class="el_package">org.bremersee.security.authentication</a> &gt; <span class="el_source">RedisAccessTokenCache.java</span></div><h1>RedisAccessTokenCache.java</h1><pre class="source lang-java linenums">/*
+ * Copyright 2020 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package org.bremersee.security.authentication;
+
+import java.time.Duration;
+import java.util.Date;
+import java.util.Optional;
+import java.util.function.Function;
+import javax.validation.constraints.NotNull;
+import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
+import org.bremersee.security.authentication.AuthProperties.JwtCache;
+import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.util.Assert;
+
+/**
+ * The redis access token cache.
+ *
+ * @author Christian Bremer
+ */
+<span class="fc" id="L36">@Slf4j</span>
+public class RedisAccessTokenCache implements AccessTokenCache {
+
+  private final JwtCache jwtCacheProperties;
+
+  private final StringRedisTemplate redis;
+
+<span class="fc" id="L43">  @Setter</span>
+  @NotNull
+  private Function&lt;String, Date&gt; findExpirationTimeFn = AccessTokenCache::getExpirationTime;
+
+  /**
+   * Instantiates a new redis access token cache.
+   *
+   * @param jwtCacheProperties the jwt cache properties
+   * @param connectionFactory the connection factory
+   */
+  public RedisAccessTokenCache(
+      JwtCache jwtCacheProperties,
+<span class="fc" id="L55">      RedisConnectionFactory connectionFactory) {</span>
+<span class="fc" id="L56">    Assert.notNull(jwtCacheProperties, &quot;Jwt cache properties must be present.&quot;);</span>
+<span class="fc" id="L57">    Assert.notNull(connectionFactory, &quot;Redis connection factory must be present.&quot;);</span>
+<span class="fc" id="L58">    this.jwtCacheProperties = jwtCacheProperties;</span>
+<span class="fc" id="L59">    this.redis = new StringRedisTemplate();</span>
+<span class="fc" id="L60">    this.redis.setConnectionFactory(connectionFactory);</span>
+<span class="fc" id="L61">    this.redis.afterPropertiesSet();</span>
+<span class="fc" id="L62">  }</span>
+
+  @Override
+  public Optional&lt;String&gt; findAccessToken(String key) {
+    try {
+<span class="nc" id="L67">      return Optional.ofNullable(redis.opsForValue().get(jwtCacheProperties.addKeyPrefix(key)));</span>
+
+<span class="fc" id="L69">    } catch (RuntimeException e) {</span>
+<span class="fc" id="L70">      log.error(&quot;Getting access token from redis cache failed.&quot;, e);</span>
+<span class="fc" id="L71">      return Optional.empty();</span>
+    }
+  }
+
+  @Override
+  public void putAccessToken(String key, String accessToken) {
+    try {
+<span class="fc" id="L78">      Duration duration = jwtCacheProperties.getExpirationTimeThreshold();</span>
+<span class="fc" id="L79">      long millis = System.currentTimeMillis() + duration.toMillis();</span>
+<span class="fc" id="L80">      String dbKey = jwtCacheProperties.addKeyPrefix(key);</span>
+<span class="fc" id="L81">      Optional.ofNullable(findExpirationTimeFn.apply(accessToken))</span>
+<span class="pc bpc" id="L82" title="1 of 2 branches missed.">          .filter(expirationTime -&gt; expirationTime.getTime() &gt; millis)</span>
+<span class="nc" id="L83">          .ifPresent(expirationTime -&gt; {</span>
+<span class="nc" id="L84">            redis.opsForValue().set(dbKey, accessToken);</span>
+<span class="nc" id="L85">            redis.expireAt(dbKey, expirationTime);</span>
+<span class="nc" id="L86">          });</span>
+
+<span class="fc" id="L88">    } catch (RuntimeException e) {</span>
+<span class="fc" id="L89">      log.error(&quot;Putting access token into the redis cache failed.&quot;, e);</span>
+<span class="nc" id="L90">    }</span>
+<span class="fc" id="L91">  }</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

@@ -16,7 +16,12 @@
 
 package org.bremersee.security.authentication;
 
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.Base64;
 import java.util.Optional;
+import org.bremersee.exception.ServiceException;
 import org.springframework.util.MultiValueMap;
 
 /**
@@ -39,7 +44,34 @@ public interface AccessTokenRetrieverProperties {
    * @return the basic auth properties or {@link Optional#empty()}, if no basic auth is required
    */
   default Optional&lt;BasicAuthProperties&gt; getBasicAuthProperties() {
-<span class="nc" id="L42">    return Optional.empty();</span>
+<span class="nc" id="L47">    return Optional.empty();</span>
+  }
+
+  /**
+   * Create cache key.
+   *
+   * @return the cache key
+   */
+  String createCacheKey();
+
+  /**
+   * Create an hashed cache key.
+   *
+   * @return the hashed cache key
+   */
+  default String createCacheKeyHashed() {
+<span class="fc" id="L63">    final String cacheKey = createCacheKey();</span>
+<span class="fc" id="L64">    return Optional.ofNullable(cacheKey)</span>
+<span class="fc" id="L65">        .map(key -&gt; {</span>
+          try {
+<span class="fc" id="L67">            MessageDigest md = MessageDigest.getInstance(&quot;SHA-256&quot;);</span>
+<span class="fc" id="L68">            byte[] hashBytes = md.digest(key.getBytes(StandardCharsets.UTF_8));</span>
+<span class="fc" id="L69">            return Base64.getEncoder().encodeToString(hashBytes);</span>
+<span class="nc" id="L70">          } catch (NoSuchAlgorithmException e) {</span>
+<span class="nc" id="L71">            throw ServiceException.internalServerError(&quot;Creating hash failed.&quot;, e);</span>
+          }
+        })
+<span class="fc" id="L74">        .orElse(cacheKey);</span>
   }
 
   /**

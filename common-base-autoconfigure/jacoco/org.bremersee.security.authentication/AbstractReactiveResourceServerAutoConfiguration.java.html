@@ -22,6 +22,7 @@ import org.bremersee.core.OrderedProxy;
 import org.bremersee.security.authentication.AuthProperties.PathMatcherProperties;
 import org.bremersee.web.CorsProperties;
 import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.core.env.Environment;
 import org.springframework.security.authentication.ReactiveAuthenticationManager;
 import org.springframework.security.authentication.UserDetailsRepositoryReactiveAuthenticationManager;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
@@ -34,14 +35,17 @@ import org.springframework.security.web.server.util.matcher.ServerWebExchangeMat
 import org.springframework.security.web.server.util.matcher.ServerWebExchangeMatchers;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
+import org.springframework.util.StringUtils;
 
 /**
  * The abstract reactive resource server security auto configuration.
  *
  * @author Christian Bremer
  */
-<span class="fc" id="L43">@Slf4j</span>
+<span class="fc" id="L45">@Slf4j</span>
 public abstract class AbstractReactiveResourceServerAutoConfiguration {
+
+  private final Environment environment;
 
   private final CorsProperties corsProperties;
 
@@ -56,6 +60,7 @@ public abstract class AbstractReactiveResourceServerAutoConfiguration {
   /**
    * Instantiates a new abstract reactive resource server security auto configuration.
    *
+   * @param environment the environment
    * @param corsProperties the cors properties
    * @param authProperties the authentication nad authorization properties
    * @param jwtConverterProvider the jwt converter provider
@@ -63,28 +68,41 @@ public abstract class AbstractReactiveResourceServerAutoConfiguration {
    * @param passwordEncoderProvider the password encoder provider
    */
   protected AbstractReactiveResourceServerAutoConfiguration(
+      Environment environment,
       CorsProperties corsProperties,
       AuthProperties authProperties,
       ObjectProvider&lt;JsonPathReactiveJwtConverter&gt; jwtConverterProvider,
       ObjectProvider&lt;ReactiveUserDetailsService&gt; userDetailsServiceProvider,
-<span class="fc" id="L70">      ObjectProvider&lt;PasswordEncoder&gt; passwordEncoderProvider) {</span>
-<span class="fc" id="L71">    this.corsProperties = corsProperties;</span>
-<span class="fc" id="L72">    this.authProperties = authProperties;</span>
-<span class="fc" id="L73">    this.jwtConverterProvider = jwtConverterProvider;</span>
-<span class="fc" id="L74">    this.userDetailsServiceProvider = userDetailsServiceProvider;</span>
-<span class="fc" id="L75">    this.passwordEncoderProvider = passwordEncoderProvider;</span>
-<span class="fc" id="L76">  }</span>
+<span class="fc" id="L76">      ObjectProvider&lt;PasswordEncoder&gt; passwordEncoderProvider) {</span>
+<span class="fc" id="L77">    this.environment = environment;</span>
+<span class="fc" id="L78">    this.corsProperties = corsProperties;</span>
+<span class="fc" id="L79">    this.authProperties = authProperties;</span>
+<span class="fc" id="L80">    this.jwtConverterProvider = jwtConverterProvider;</span>
+<span class="fc" id="L81">    this.userDetailsServiceProvider = userDetailsServiceProvider;</span>
+<span class="fc" id="L82">    this.passwordEncoderProvider = passwordEncoderProvider;</span>
+<span class="fc" id="L83">  }</span>
 
   /**
    * Init.
    */
   protected void init() {
-<span class="fc" id="L82">    log.info(&quot;\n&quot;</span>
+<span class="fc" id="L89">    final boolean hasJwkUriSet = StringUtils</span>
+<span class="fc" id="L90">        .hasText(environment.getProperty(&quot;spring.security.oauth2.resourceserver.jwt.jwk-set-uri&quot;));</span>
+<span class="fc" id="L91">    log.info(&quot;\n&quot;</span>
             + &quot;*********************************************************************************\n&quot;
             + &quot;* {}\n&quot;
+            + &quot;*********************************************************************************\n&quot;
+            + &quot;* enable = {}\n&quot;
+            + &quot;* order = {}\n&quot;
+            + &quot;* jwt = {}\n&quot;
+            + &quot;* cors = {}\n&quot;
             + &quot;*********************************************************************************&quot;,
-<span class="fc" id="L86">        ClassUtils.getUserClass(getClass()).getSimpleName());</span>
-<span class="fc" id="L87">  }</span>
+<span class="fc" id="L100">        ClassUtils.getUserClass(getClass()).getSimpleName(),</span>
+<span class="fc" id="L101">        authProperties.getResourceServer().name(),</span>
+<span class="fc" id="L102">        authProperties.getResourceServerOrder(),</span>
+<span class="fc" id="L103">        hasJwkUriSet,</span>
+<span class="fc" id="L104">        corsProperties.isEnable());</span>
+<span class="fc" id="L105">  }</span>
 
   /**
    * Init authorize exchange.
@@ -103,75 +121,75 @@ public abstract class AbstractReactiveResourceServerAutoConfiguration {
   protected SecurityWebFilterChain resourceServerFilterChain(
       ServerHttpSecurity serverHttpSecurity) {
 
-<span class="fc" id="L106">    ServerHttpSecurity http = serverHttpSecurity;</span>
-<span class="fc" id="L107">    Assert.notNull(http, &quot;Server http security must be present.&quot;);</span>
-<span class="fc" id="L108">    AuthorizeExchangeSpec spec = init(http);</span>
-<span class="fc bfc" id="L109" title="All 2 branches covered.">    if (authProperties.getResourceServer() == AutoSecurityMode.NONE) {</span>
-<span class="fc" id="L110">      http = spec</span>
-<span class="fc" id="L111">          .anyExchange().permitAll()</span>
-<span class="fc" id="L112">          .and()</span>
-<span class="fc" id="L113">          .httpBasic().disable();</span>
+<span class="fc" id="L124">    ServerHttpSecurity http = serverHttpSecurity;</span>
+<span class="fc" id="L125">    Assert.notNull(http, &quot;Server http security must be present.&quot;);</span>
+<span class="fc" id="L126">    AuthorizeExchangeSpec spec = init(http);</span>
+<span class="fc bfc" id="L127" title="All 2 branches covered.">    if (authProperties.getResourceServer() == AutoSecurityMode.NONE) {</span>
+<span class="fc" id="L128">      http = spec</span>
+<span class="fc" id="L129">          .anyExchange().permitAll()</span>
+<span class="fc" id="L130">          .and()</span>
+<span class="fc" id="L131">          .httpBasic().disable();</span>
     } else {
-<span class="fc" id="L115">      spec = configurePathMatchers(spec);</span>
-<span class="fc" id="L116">      http = configureAuthenticationManager(spec.and());</span>
+<span class="fc" id="L133">      spec = configurePathMatchers(spec);</span>
+<span class="fc" id="L134">      http = configureAuthenticationManager(spec.and());</span>
     }
-<span class="fc" id="L118">    http = http.csrf().disable();</span>
-<span class="pc bpc" id="L119" title="1 of 2 branches missed.">    if (!corsProperties.isEnable()) {</span>
-<span class="nc" id="L120">      http = http.cors().disable();</span>
+<span class="fc" id="L136">    http = http.csrf().disable();</span>
+<span class="pc bpc" id="L137" title="1 of 2 branches missed.">    if (!corsProperties.isEnable()) {</span>
+<span class="nc" id="L138">      http = http.cors().disable();</span>
     }
-<span class="fc" id="L122">    return OrderedProxy.create(</span>
-<span class="fc" id="L123">        http.build(),</span>
-<span class="fc" id="L124">        authProperties.getResourceServerOrder());</span>
+<span class="fc" id="L140">    return OrderedProxy.create(</span>
+<span class="fc" id="L141">        http.build(),</span>
+<span class="fc" id="L142">        authProperties.getResourceServerOrder());</span>
   }
 
   private AuthorizeExchangeSpec configurePathMatchers(AuthorizeExchangeSpec spec) {
 
-<span class="fc bfc" id="L129" title="All 2 branches covered.">    for (PathMatcherProperties props : authProperties.preparePathMatchers(corsProperties)) {</span>
-<span class="fc" id="L130">      log.info(&quot;Securing requests to {}&quot;, props);</span>
-<span class="fc bfc" id="L131" title="All 3 branches covered.">      switch (props.getAccessMode()) {</span>
+<span class="fc bfc" id="L147" title="All 2 branches covered.">    for (PathMatcherProperties props : authProperties.preparePathMatchers(corsProperties)) {</span>
+<span class="fc" id="L148">      log.info(&quot;Securing requests to {}&quot;, props);</span>
+<span class="fc bfc" id="L149" title="All 3 branches covered.">      switch (props.getAccessMode()) {</span>
         case DENY_ALL:
-<span class="fc" id="L133">          spec = spec.matchers(matcher(props)).denyAll();</span>
-<span class="fc" id="L134">          break;</span>
+<span class="fc" id="L151">          spec = spec.matchers(matcher(props)).denyAll();</span>
+<span class="fc" id="L152">          break;</span>
         case PERMIT_ALL:
-<span class="fc" id="L136">          spec = spec.matchers(matcher(props)).permitAll();</span>
-<span class="fc" id="L137">          break;</span>
+<span class="fc" id="L154">          spec = spec.matchers(matcher(props)).permitAll();</span>
+<span class="fc" id="L155">          break;</span>
         default:
-<span class="fc" id="L139">          spec = spec.matchers(matcher(props)).access(new RoleOrIpBasedAuthorizationManager(</span>
-<span class="fc" id="L140">              props.roles(authProperties::ensureRolePrefix),</span>
-<span class="fc" id="L141">              props.getIpAddresses()));</span>
+<span class="fc" id="L157">          spec = spec.matchers(matcher(props)).access(new RoleOrIpBasedAuthorizationManager(</span>
+<span class="fc" id="L158">              props.roles(authProperties::ensureRolePrefix),</span>
+<span class="fc" id="L159">              props.getIpAddresses()));</span>
       }
-<span class="fc" id="L143">    }</span>
-<span class="fc" id="L144">    return spec;</span>
+<span class="fc" id="L161">    }</span>
+<span class="fc" id="L162">    return spec;</span>
   }
 
   private ServerWebExchangeMatcher matcher(PathMatcherProperties props) {
-<span class="fc" id="L148">    return Optional.ofNullable(props.httpMethod())</span>
-<span class="fc" id="L149">        .map(method -&gt; ServerWebExchangeMatchers.pathMatchers(method, props.getAntPattern()))</span>
-<span class="fc" id="L150">        .orElseGet(() -&gt; ServerWebExchangeMatchers.pathMatchers(props.getAntPattern()));</span>
+<span class="fc" id="L166">    return Optional.ofNullable(props.httpMethod())</span>
+<span class="fc" id="L167">        .map(method -&gt; ServerWebExchangeMatchers.pathMatchers(method, props.getAntPattern()))</span>
+<span class="fc" id="L168">        .orElseGet(() -&gt; ServerWebExchangeMatchers.pathMatchers(props.getAntPattern()));</span>
   }
 
   private ServerHttpSecurity configureAuthenticationManager(ServerHttpSecurity http) {
 
-<span class="fc" id="L155">    return Optional.ofNullable(jwtConverterProvider.getIfAvailable())</span>
-<span class="fc" id="L156">        .map(jwtConverter -&gt; http</span>
-<span class="fc" id="L157">            .oauth2ResourceServer((rs) -&gt; rs</span>
-<span class="fc" id="L158">                .jwt()</span>
-<span class="fc" id="L159">                .jwtAuthenticationConverter(jwtConverter)</span>
-<span class="fc" id="L160">                .and()))</span>
-<span class="fc" id="L161">        .orElseGet(() -&gt; http</span>
-<span class="fc" id="L162">            .authenticationManager(userDetailsAuthenticationManager())</span>
-<span class="fc" id="L163">            .httpBasic()</span>
-<span class="fc" id="L164">            .and()</span>
-<span class="fc" id="L165">            .formLogin().disable());</span>
+<span class="fc" id="L173">    return Optional.ofNullable(jwtConverterProvider.getIfAvailable())</span>
+<span class="fc" id="L174">        .map(jwtConverter -&gt; http</span>
+<span class="fc" id="L175">            .oauth2ResourceServer((rs) -&gt; rs</span>
+<span class="fc" id="L176">                .jwt()</span>
+<span class="fc" id="L177">                .jwtAuthenticationConverter(jwtConverter)</span>
+<span class="fc" id="L178">                .and()))</span>
+<span class="fc" id="L179">        .orElseGet(() -&gt; http</span>
+<span class="fc" id="L180">            .authenticationManager(userDetailsAuthenticationManager())</span>
+<span class="fc" id="L181">            .httpBasic()</span>
+<span class="fc" id="L182">            .and()</span>
+<span class="fc" id="L183">            .formLogin().disable());</span>
   }
 
   private ReactiveAuthenticationManager userDetailsAuthenticationManager() {
 
-<span class="fc" id="L170">    return Optional.ofNullable(userDetailsServiceProvider.getIfAvailable())</span>
-<span class="fc" id="L171">        .map(UserDetailsRepositoryReactiveAuthenticationManager::new)</span>
-<span class="pc" id="L172">        .orElseGet(() -&gt; new UserDetailsRepositoryReactiveAuthenticationManager(</span>
+<span class="fc" id="L188">    return Optional.ofNullable(userDetailsServiceProvider.getIfAvailable())</span>
+<span class="fc" id="L189">        .map(UserDetailsRepositoryReactiveAuthenticationManager::new)</span>
+<span class="pc" id="L190">        .orElseGet(() -&gt; new UserDetailsRepositoryReactiveAuthenticationManager(</span>
             new MapReactiveUserDetailsService(authProperties
-<span class="nc" id="L174">                .buildBasicAuthUserDetails(passwordEncoderProvider.getIfAvailable()))));</span>
+<span class="nc" id="L192">                .buildBasicAuthUserDetails(passwordEncoderProvider.getIfAvailable()))));</span>
   }
 
 }

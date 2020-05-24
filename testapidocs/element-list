@@ -30,9 +30,13 @@ org.bremersee.security
 org.bremersee.security.access
 org.bremersee.security.authentication
 org.bremersee.security.authentication.resourceserver.reactive
-org.bremersee.security.authentication.resourceserver.reactive.app
+org.bremersee.security.authentication.resourceserver.reactive.components
+org.bremersee.security.authentication.resourceserver.reactive.withoutredis
+org.bremersee.security.authentication.resourceserver.reactive.withredis
 org.bremersee.security.authentication.resourceserver.servlet
-org.bremersee.security.authentication.resourceserver.servlet.app
+org.bremersee.security.authentication.resourceserver.servlet.components
+org.bremersee.security.authentication.resourceserver.servlet.withoutredis
+org.bremersee.security.authentication.resourceserver.servlet.withredis
 org.bremersee.security.core
 org.bremersee.test.security.authentication
 org.bremersee.test.web

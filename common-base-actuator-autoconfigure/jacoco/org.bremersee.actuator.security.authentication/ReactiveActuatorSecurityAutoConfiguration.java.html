@@ -16,6 +16,7 @@
 
 package org.bremersee.actuator.security.authentication;
 
+import java.util.Objects;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.bremersee.core.OrderedProxy;
@@ -79,7 +80,7 @@ import org.springframework.util.StringUtils;
     AuthProperties.class,
     ActuatorAuthProperties.class})
 @Configuration
-<span class="fc" id="L82">@Slf4j</span>
+<span class="fc" id="L83">@Slf4j</span>
 public class ReactiveActuatorSecurityAutoConfiguration {
 
   private final AuthProperties authProperties;
@@ -110,14 +111,14 @@ public class ReactiveActuatorSecurityAutoConfiguration {
       ObjectProvider&lt;JsonPathReactiveJwtConverter&gt; jsonPathJwtConverterProvider,
       ObjectProvider&lt;WebClientAccessTokenRetriever&gt; tokenRetrieverProvider,
       ObjectProvider&lt;ReactiveUserDetailsService&gt; userDetailsServiceProvider,
-<span class="fc" id="L113">      ObjectProvider&lt;PasswordEncoder&gt; passwordEncoderProvider) {</span>
-<span class="fc" id="L114">    this.authProperties = authProperties;</span>
-<span class="fc" id="L115">    this.actuatorAuthProperties = actuatorAuthProperties;</span>
-<span class="fc" id="L116">    this.jsonPathJwtConverterProvider = jsonPathJwtConverterProvider;</span>
-<span class="fc" id="L117">    this.tokenRetrieverProvider = tokenRetrieverProvider;</span>
-<span class="fc" id="L118">    this.userDetailsServiceProvider = userDetailsServiceProvider;</span>
-<span class="fc" id="L119">    this.passwordEncoderProvider = passwordEncoderProvider;</span>
-<span class="fc" id="L120">  }</span>
+<span class="fc" id="L114">      ObjectProvider&lt;PasswordEncoder&gt; passwordEncoderProvider) {</span>
+<span class="fc" id="L115">    this.authProperties = authProperties;</span>
+<span class="fc" id="L116">    this.actuatorAuthProperties = actuatorAuthProperties;</span>
+<span class="fc" id="L117">    this.jsonPathJwtConverterProvider = jsonPathJwtConverterProvider;</span>
+<span class="fc" id="L118">    this.tokenRetrieverProvider = tokenRetrieverProvider;</span>
+<span class="fc" id="L119">    this.userDetailsServiceProvider = userDetailsServiceProvider;</span>
+<span class="fc" id="L120">    this.passwordEncoderProvider = passwordEncoderProvider;</span>
+<span class="fc" id="L121">  }</span>
 
   /**
    * Init.
@@ -125,8 +126,8 @@ public class ReactiveActuatorSecurityAutoConfiguration {
   @EventListener(ApplicationReadyEvent.class)
   @SuppressWarnings(&quot;DuplicatedCode&quot;)
   public void init() {
-<span class="fc" id="L128">    final boolean hasJwkUriSet = StringUtils.hasText(actuatorAuthProperties.getJwkSetUri());</span>
-<span class="fc" id="L129">    log.info(&quot;\n&quot;</span>
+<span class="fc" id="L129">    final boolean hasJwkUriSet = StringUtils.hasText(actuatorAuthProperties.getJwkSetUri());</span>
+<span class="fc" id="L130">    log.info(&quot;\n&quot;</span>
             + &quot;*********************************************************************************\n&quot;
             + &quot;* {}\n&quot;
             + &quot;*********************************************************************************\n&quot;
@@ -135,20 +136,20 @@ public class ReactiveActuatorSecurityAutoConfiguration {
             + &quot;* jwt = {}\n&quot;
             + &quot;* cors = {}\n&quot;
             + &quot;*********************************************************************************&quot;,
-<span class="fc" id="L138">        ClassUtils.getUserClass(getClass()).getSimpleName(),</span>
-<span class="fc" id="L139">        actuatorAuthProperties.getEnable().name(),</span>
-<span class="fc" id="L140">        actuatorAuthProperties.getOrder(),</span>
-<span class="fc" id="L141">        hasJwkUriSet,</span>
-<span class="fc" id="L142">        actuatorAuthProperties.isEnableCors());</span>
-<span class="fc bfc" id="L143" title="All 2 branches covered.">    if (hasJwkUriSet) {</span>
-<span class="fc" id="L144">      Assert.hasText(actuatorAuthProperties.getPasswordFlow().getTokenEndpoint(),</span>
+<span class="fc" id="L139">        ClassUtils.getUserClass(getClass()).getSimpleName(),</span>
+<span class="fc" id="L140">        actuatorAuthProperties.getEnable().name(),</span>
+<span class="fc" id="L141">        actuatorAuthProperties.getOrder(),</span>
+<span class="fc" id="L142">        hasJwkUriSet,</span>
+<span class="fc" id="L143">        actuatorAuthProperties.isEnableCors());</span>
+<span class="fc bfc" id="L144" title="All 2 branches covered.">    if (hasJwkUriSet) {</span>
+<span class="fc" id="L145">      Assert.hasText(actuatorAuthProperties.getPasswordFlow().getTokenEndpoint(),</span>
           &quot;Token endpoint of actuator password flow must be present.&quot;);
-<span class="fc" id="L146">      Assert.hasText(actuatorAuthProperties.getPasswordFlow().getClientId(),</span>
+<span class="fc" id="L147">      Assert.hasText(actuatorAuthProperties.getPasswordFlow().getClientId(),</span>
           &quot;Client ID of actuator password flow must be present.&quot;);
-<span class="fc" id="L148">      Assert.notNull(actuatorAuthProperties.getPasswordFlow().getClientSecret(),</span>
+<span class="fc" id="L149">      Assert.notNull(actuatorAuthProperties.getPasswordFlow().getClientSecret(),</span>
           &quot;Client secret of actuator password flow must be present.&quot;);
     }
-<span class="fc" id="L151">  }</span>
+<span class="fc" id="L152">  }</span>
 
   /**
    * Actuator filter chain security web filter chain.
@@ -160,108 +161,111 @@ public class ReactiveActuatorSecurityAutoConfiguration {
   public SecurityWebFilterChain actuatorFilterChain(
       ObjectProvider&lt;ServerHttpSecurity&gt; httpProvider) {
 
-<span class="fc" id="L163">    ServerHttpSecurity http = httpProvider.getIfAvailable();</span>
-<span class="fc" id="L164">    Assert.notNull(http, &quot;Server http security must be present.&quot;);</span>
-<span class="fc" id="L165">    log.info(&quot;Securing requests to /actuator/**&quot;);</span>
-<span class="fc" id="L166">    AuthorizeExchangeSpec spec = http</span>
-<span class="fc" id="L167">        .securityMatcher(EndpointRequest.toAnyEndpoint())</span>
-<span class="fc" id="L168">        .authorizeExchange();</span>
-<span class="fc bfc" id="L169" title="All 2 branches covered.">    if (actuatorAuthProperties.getEnable() == AutoSecurityMode.NONE) {</span>
-<span class="fc" id="L170">      http = spec</span>
-<span class="fc" id="L171">          .anyExchange().permitAll()</span>
-<span class="fc" id="L172">          .and()</span>
-<span class="fc" id="L173">          .httpBasic().disable();</span>
+<span class="fc" id="L164">    ServerHttpSecurity http = httpProvider.getIfAvailable();</span>
+<span class="fc" id="L165">    Assert.notNull(http, &quot;Server http security must be present.&quot;);</span>
+<span class="fc" id="L166">    log.info(&quot;Securing requests to /actuator/**&quot;);</span>
+<span class="fc" id="L167">    AuthorizeExchangeSpec spec = http</span>
+<span class="fc" id="L168">        .securityMatcher(EndpointRequest.toAnyEndpoint())</span>
+<span class="fc" id="L169">        .authorizeExchange();</span>
+<span class="fc bfc" id="L170" title="All 2 branches covered.">    if (actuatorAuthProperties.getEnable() == AutoSecurityMode.NONE) {</span>
+<span class="fc" id="L171">      http = spec</span>
+<span class="fc" id="L172">          .anyExchange().permitAll()</span>
+<span class="fc" id="L173">          .and()</span>
+<span class="fc" id="L174">          .httpBasic().disable();</span>
     } else {
-<span class="pc bpc" id="L175" title="1 of 2 branches missed.">      if (actuatorAuthProperties.isEnableCors()) {</span>
-<span class="fc" id="L176">        spec = spec.pathMatchers(HttpMethod.OPTIONS, &quot;/**&quot;).permitAll();</span>
+<span class="pc bpc" id="L176" title="1 of 2 branches missed.">      if (actuatorAuthProperties.isEnableCors()) {</span>
+<span class="fc" id="L177">        spec = spec.pathMatchers(HttpMethod.OPTIONS, &quot;/**&quot;).permitAll();</span>
       }
-<span class="fc" id="L178">      http = spec</span>
-<span class="fc" id="L179">          .matchers(unauthenticatedEndpointMatchers()).permitAll()</span>
-<span class="fc" id="L180">          .matchers(new AndServerWebExchangeMatcher(</span>
-<span class="fc" id="L181">              EndpointRequest.toAnyEndpoint(),</span>
-<span class="fc" id="L182">              ServerWebExchangeMatchers.pathMatchers(HttpMethod.GET, &quot;/**&quot;)))</span>
-<span class="fc" id="L183">          .access(new RoleOrIpBasedAuthorizationManager(</span>
-<span class="fc" id="L184">              actuatorAuthProperties.rolesOrDefaults(),</span>
-<span class="fc" id="L185">              actuatorAuthProperties.getIpAddresses()))</span>
-<span class="fc" id="L186">          .anyExchange()</span>
-<span class="fc" id="L187">          .access(new RoleBasedAuthorizationManager(</span>
-<span class="fc" id="L188">              actuatorAuthProperties.adminRolesOrDefaults()))</span>
-<span class="fc" id="L189">          .and()</span>
-<span class="fc" id="L190">          .authenticationManager(authenticationManager())</span>
-<span class="fc" id="L191">          .httpBasic()</span>
-<span class="fc" id="L192">          .and()</span>
-<span class="fc" id="L193">          .formLogin().disable();</span>
+<span class="fc" id="L179">      http = spec</span>
+<span class="fc" id="L180">          .matchers(unauthenticatedEndpointMatchers()).permitAll()</span>
+<span class="fc" id="L181">          .matchers(new AndServerWebExchangeMatcher(</span>
+<span class="fc" id="L182">              EndpointRequest.toAnyEndpoint(),</span>
+<span class="fc" id="L183">              ServerWebExchangeMatchers.pathMatchers(HttpMethod.GET, &quot;/**&quot;)))</span>
+<span class="fc" id="L184">          .access(new RoleOrIpBasedAuthorizationManager(</span>
+<span class="fc" id="L185">              actuatorAuthProperties.rolesOrDefaults(),</span>
+<span class="fc" id="L186">              actuatorAuthProperties.getIpAddresses()))</span>
+<span class="fc" id="L187">          .anyExchange()</span>
+<span class="fc" id="L188">          .access(new RoleBasedAuthorizationManager(</span>
+<span class="fc" id="L189">              actuatorAuthProperties.adminRolesOrDefaults()))</span>
+<span class="fc" id="L190">          .and()</span>
+<span class="fc" id="L191">          .authenticationManager(authenticationManager())</span>
+<span class="fc" id="L192">          .httpBasic()</span>
+<span class="fc" id="L193">          .and()</span>
+<span class="fc" id="L194">          .formLogin().disable();</span>
     }
-<span class="fc" id="L195">    http = http</span>
-<span class="fc" id="L196">        .csrf().disable()</span>
-<span class="fc" id="L197">        .cors(customizer -&gt; {</span>
-<span class="pc bpc" id="L198" title="1 of 2 branches missed.">          if (!actuatorAuthProperties.isEnableCors()) {</span>
-<span class="nc" id="L199">            customizer.disable();</span>
+<span class="fc" id="L196">    http = http</span>
+<span class="fc" id="L197">        .csrf().disable()</span>
+<span class="fc" id="L198">        .cors(customizer -&gt; {</span>
+<span class="pc bpc" id="L199" title="1 of 2 branches missed.">          if (!actuatorAuthProperties.isEnableCors()) {</span>
+<span class="nc" id="L200">            customizer.disable();</span>
           }
-<span class="fc" id="L201">        });</span>
-<span class="fc" id="L202">    return OrderedProxy.create(http.build(), actuatorAuthProperties.getOrder());</span>
+<span class="fc" id="L202">        });</span>
+<span class="fc" id="L203">    return OrderedProxy.create(http.build(), actuatorAuthProperties.getOrder());</span>
   }
 
   private EndpointServerWebExchangeMatcher[] unauthenticatedEndpointMatchers() {
-<span class="fc" id="L206">    return actuatorAuthProperties.unauthenticatedEndpointsOrDefaults().stream()</span>
-<span class="fc" id="L207">        .map(EndpointRequest::to)</span>
-<span class="fc" id="L208">        .toArray(EndpointServerWebExchangeMatcher[]::new);</span>
+<span class="fc" id="L207">    return actuatorAuthProperties.unauthenticatedEndpointsOrDefaults().stream()</span>
+<span class="fc" id="L208">        .map(EndpointRequest::to)</span>
+<span class="fc" id="L209">        .toArray(EndpointServerWebExchangeMatcher[]::new);</span>
   }
 
   private ReactiveAuthenticationManager authenticationManager() {
-<span class="fc bfc" id="L212" title="All 2 branches covered.">    return StringUtils.hasText(actuatorAuthProperties.getJwkSetUri())</span>
-<span class="fc" id="L213">        ? passwordFlowReactiveAuthenticationManager()</span>
-<span class="fc" id="L214">        : userDetailsAuthenticationManager();</span>
+<span class="fc bfc" id="L213" title="All 2 branches covered.">    return StringUtils.hasText(actuatorAuthProperties.getJwkSetUri())</span>
+<span class="fc" id="L214">        ? passwordFlowReactiveAuthenticationManager()</span>
+<span class="fc" id="L215">        : userDetailsAuthenticationManager();</span>
   }
 
   private ReactiveAuthenticationManager userDetailsAuthenticationManager() {
-<span class="fc" id="L218">    return Optional.ofNullable(userDetailsServiceProvider.getIfAvailable())</span>
-<span class="fc" id="L219">        .map(UserDetailsRepositoryReactiveAuthenticationManager::new)</span>
-<span class="pc" id="L220">        .orElseGet(() -&gt; new UserDetailsRepositoryReactiveAuthenticationManager(</span>
+<span class="fc" id="L219">    return Optional.ofNullable(userDetailsServiceProvider.getIfAvailable())</span>
+<span class="fc" id="L220">        .map(UserDetailsRepositoryReactiveAuthenticationManager::new)</span>
+<span class="pc" id="L221">        .orElseGet(() -&gt; new UserDetailsRepositoryReactiveAuthenticationManager(</span>
             new MapReactiveUserDetailsService(authProperties
-<span class="nc" id="L222">                .buildBasicAuthUserDetails(passwordEncoderProvider.getIfAvailable()))));</span>
+<span class="nc" id="L223">                .buildBasicAuthUserDetails(passwordEncoderProvider.getIfAvailable()))));</span>
   }
 
   private PasswordFlowReactiveAuthenticationManager passwordFlowReactiveAuthenticationManager() {
-<span class="fc" id="L226">    return new PasswordFlowReactiveAuthenticationManager(</span>
-<span class="fc" id="L227">        actuatorAuthProperties.getPasswordFlow(),</span>
-<span class="fc" id="L228">        jwtDecoder(),</span>
-<span class="fc" id="L229">        jwtConverter(),</span>
-<span class="fc" id="L230">        tokenRetrieverProvider.getIfAvailable(WebClientAccessTokenRetriever::new));</span>
+<span class="fc" id="L227">    WebClientAccessTokenRetriever tokenRetriever = tokenRetrieverProvider.getIfAvailable();</span>
+<span class="fc" id="L228">    log.info(&quot;Creating actuator {} with token retriever {} ...&quot;,</span>
+<span class="fc" id="L229">        PasswordFlowReactiveAuthenticationManager.class.getSimpleName(), tokenRetriever);</span>
+<span class="fc" id="L230">    return new PasswordFlowReactiveAuthenticationManager(</span>
+<span class="fc" id="L231">        actuatorAuthProperties.getPasswordFlow(),</span>
+<span class="fc" id="L232">        jwtDecoder(),</span>
+<span class="fc" id="L233">        jwtConverter(),</span>
+<span class="fc" id="L234">        Objects.requireNonNullElseGet(tokenRetriever, WebClientAccessTokenRetriever::new));</span>
   }
 
   private ReactiveJwtDecoder jwtDecoder() {
-<span class="fc" id="L234">    NimbusReactiveJwtDecoder nimbusJwtDecoder = NimbusReactiveJwtDecoder</span>
-<span class="fc" id="L235">        .withJwkSetUri(actuatorAuthProperties.getJwkSetUri())</span>
-<span class="fc" id="L236">        .jwsAlgorithm(SignatureAlgorithm.from(actuatorAuthProperties.getJwsAlgorithm()))</span>
-<span class="fc" id="L237">        .build();</span>
-<span class="pc bpc" id="L238" title="1 of 2 branches missed.">    if (StringUtils.hasText(actuatorAuthProperties.getIssuerUri())) {</span>
-<span class="nc" id="L239">      nimbusJwtDecoder.setJwtValidator(</span>
-<span class="nc" id="L240">          JwtValidators.createDefaultWithIssuer(actuatorAuthProperties.getIssuerUri()));</span>
+<span class="fc" id="L238">    NimbusReactiveJwtDecoder nimbusJwtDecoder = NimbusReactiveJwtDecoder</span>
+<span class="fc" id="L239">        .withJwkSetUri(actuatorAuthProperties.getJwkSetUri())</span>
+<span class="fc" id="L240">        .jwsAlgorithm(SignatureAlgorithm.from(actuatorAuthProperties.getJwsAlgorithm()))</span>
+<span class="fc" id="L241">        .build();</span>
+<span class="pc bpc" id="L242" title="1 of 2 branches missed.">    if (StringUtils.hasText(actuatorAuthProperties.getIssuerUri())) {</span>
+<span class="nc" id="L243">      nimbusJwtDecoder.setJwtValidator(</span>
+<span class="nc" id="L244">          JwtValidators.createDefaultWithIssuer(actuatorAuthProperties.getIssuerUri()));</span>
     }
-<span class="fc" id="L242">    return nimbusJwtDecoder;</span>
+<span class="fc" id="L246">    return nimbusJwtDecoder;</span>
   }
 
   private JsonPathReactiveJwtConverter jwtConverter() {
-<span class="fc" id="L246">    JsonPathJwtConverter tmpJwtConverter = new JsonPathJwtConverter();</span>
-<span class="fc" id="L247">    tmpJwtConverter.setNameJsonPath(actuatorAuthProperties.getNameJsonPath());</span>
-<span class="fc" id="L248">    tmpJwtConverter.setRolePrefix(actuatorAuthProperties.getRolePrefix());</span>
-<span class="fc" id="L249">    tmpJwtConverter.setRolesJsonPath(actuatorAuthProperties.getRolesJsonPath());</span>
-<span class="fc" id="L250">    tmpJwtConverter.setRolesValueList(actuatorAuthProperties.isRolesValueList());</span>
-<span class="fc" id="L251">    tmpJwtConverter.setRolesValueSeparator(actuatorAuthProperties.getRolesValueSeparator());</span>
-<span class="fc" id="L252">    JsonPathReactiveJwtConverter internalJwtConverter = new JsonPathReactiveJwtConverter(</span>
+<span class="fc" id="L250">    JsonPathJwtConverter tmpJwtConverter = new JsonPathJwtConverter();</span>
+<span class="fc" id="L251">    tmpJwtConverter.setNameJsonPath(actuatorAuthProperties.getNameJsonPath());</span>
+<span class="fc" id="L252">    tmpJwtConverter.setRolePrefix(actuatorAuthProperties.getRolePrefix());</span>
+<span class="fc" id="L253">    tmpJwtConverter.setRolesJsonPath(actuatorAuthProperties.getRolesJsonPath());</span>
+<span class="fc" id="L254">    tmpJwtConverter.setRolesValueList(actuatorAuthProperties.isRolesValueList());</span>
+<span class="fc" id="L255">    tmpJwtConverter.setRolesValueSeparator(actuatorAuthProperties.getRolesValueSeparator());</span>
+<span class="fc" id="L256">    JsonPathReactiveJwtConverter internalJwtConverter = new JsonPathReactiveJwtConverter(</span>
         tmpJwtConverter);
-<span class="fc" id="L254">    JsonPathReactiveJwtConverter externalJwtConverter = jsonPathJwtConverterProvider</span>
-<span class="fc" id="L255">        .getIfAvailable();</span>
+<span class="fc" id="L258">    JsonPathReactiveJwtConverter externalJwtConverter = jsonPathJwtConverterProvider</span>
+<span class="fc" id="L259">        .getIfAvailable();</span>
     JsonPathReactiveJwtConverter jwtConverter;
-<span class="pc bpc" id="L257" title="1 of 2 branches missed.">    if (internalJwtConverter.equals(externalJwtConverter)) {</span>
-<span class="fc" id="L258">      log.info(&quot;Actuator security is using jwt converter from main application.&quot;);</span>
-<span class="fc" id="L259">      jwtConverter = externalJwtConverter;</span>
+<span class="pc bpc" id="L261" title="1 of 2 branches missed.">    if (internalJwtConverter.equals(externalJwtConverter)) {</span>
+<span class="fc" id="L262">      log.info(&quot;Actuator security is using jwt converter from main application.&quot;);</span>
+<span class="fc" id="L263">      jwtConverter = externalJwtConverter;</span>
     } else {
-<span class="nc" id="L261">      log.info(&quot;Actuator security is using it's own jwt converter.&quot;);</span>
-<span class="nc" id="L262">      jwtConverter = internalJwtConverter;</span>
+<span class="nc" id="L265">      log.info(&quot;Actuator security is using it's own jwt converter.&quot;);</span>
+<span class="nc" id="L266">      jwtConverter = internalJwtConverter;</span>
     }
-<span class="fc" id="L264">    return jwtConverter;</span>
+<span class="fc" id="L268">    return jwtConverter;</span>
   }
 
 }

@@ -4,6 +4,7 @@ org.bremersee.converter
 org.bremersee.core
 org.bremersee.data.convert
 org.bremersee.data.ldaptive
+org.bremersee.data.redis
 org.bremersee.exception
 org.bremersee.exception.annotation
 org.bremersee.exception.feign

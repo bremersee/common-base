@@ -25,9 +25,9 @@ under the License.
     <language>en-us</language>
     <copyright>&#169;2020 bremersee.org</copyright>
     <item>
-      <title>File: 100,
+      <title>File: 115,
              Errors: 0,
-             Warnings: 5,
+             Warnings: 7,
              Infos: 0
       </title>
             <link>https://github.com/bremersee/common-base/common-base-autoconfigure/checkstyle.html</link>
@@ -60,13 +60,27 @@ under the License.
               </tr>
                           <tr>
                 <td>
-                  <a href="https://github.com/bremersee/common-base/common-base-autoconfigure/checkstyle.html#org.bremersee.security.authentication.resourceserver.reactive.app.TestConfiguration.java">org/bremersee/security/authentication/resourceserver/reactive/app/TestConfiguration.java</a>
+                  <a href="https://github.com/bremersee/common-base/common-base-autoconfigure/checkstyle.html#org.bremersee.security.authentication.ReactiveJwtSupportAutoConfigurationTest.java">org/bremersee/security/authentication/ReactiveJwtSupportAutoConfigurationTest.java</a>
                 </td>
                 <td>
                   0
                 </td>
                 <td>
                   0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/bremersee/common-base/common-base-autoconfigure/checkstyle.html#org.bremersee.security.authentication.ReactiveAccessTokenCacheAutoConfiguration.java">org/bremersee/security/authentication/ReactiveAccessTokenCacheAutoConfiguration.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  1
                 </td>
                 <td>
                   0
@@ -116,6 +130,20 @@ under the License.
               </tr>
                           <tr>
                 <td>
+                  <a href="https://github.com/bremersee/common-base/common-base-autoconfigure/checkstyle.html#org.bremersee.security.authentication.RedisAccessTokenCache.java">org/bremersee/security/authentication/RedisAccessTokenCache.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
                   <a href="https://github.com/bremersee/common-base/common-base-autoconfigure/checkstyle.html#org.bremersee.web.reactive.ApiExceptionHandler.java">org/bremersee/web/reactive/ApiExceptionHandler.java</a>
                 </td>
                 <td>
@@ -145,6 +173,20 @@ under the License.
                           <tr>
                 <td>
                   <a href="https://github.com/bremersee/common-base/common-base-autoconfigure/checkstyle.html#org.bremersee.web.reactive.ApiExceptionHandlerAutoConfiguration.java">org/bremersee/web/reactive/ApiExceptionHandlerAutoConfiguration.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/bremersee/common-base/common-base-autoconfigure/checkstyle.html#org.bremersee.security.authentication.resourceserver.reactive.withredis.WithRedisTestConfiguration.java">org/bremersee/security/authentication/resourceserver/reactive/withredis/WithRedisTestConfiguration.java</a>
                 </td>
                 <td>
                   0
@@ -270,6 +312,34 @@ under the License.
               </tr>
                           <tr>
                 <td>
+                  <a href="https://github.com/bremersee/common-base/common-base-autoconfigure/checkstyle.html#org.bremersee.security.authentication.JwtSupportCondition.java">org/bremersee/security/authentication/JwtSupportCondition.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/bremersee/common-base/common-base-autoconfigure/checkstyle.html#org.bremersee.security.authentication.AccessTokenCacheAutoConfiguration.java">org/bremersee/security/authentication/AccessTokenCacheAutoConfiguration.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  1
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
                   <a href="https://github.com/bremersee/common-base/common-base-autoconfigure/checkstyle.html#org.bremersee.security.access.AccessControlProperties.java">org/bremersee/security/access/AccessControlProperties.java</a>
                 </td>
                 <td>
@@ -382,6 +452,20 @@ under the License.
               </tr>
                           <tr>
                 <td>
+                  <a href="https://github.com/bremersee/common-base/common-base-autoconfigure/checkstyle.html#org.bremersee.security.authentication.RedisCondition.java">org/bremersee/security/authentication/RedisCondition.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
                   <a href="https://github.com/bremersee/common-base/common-base-autoconfigure/checkstyle.html#org.bremersee.data.ldaptive.UnboundIdProviderAutoConfiguration.java">org/bremersee/data/ldaptive/UnboundIdProviderAutoConfiguration.java</a>
                 </td>
                 <td>
@@ -425,6 +509,20 @@ under the License.
                           <tr>
                 <td>
                   <a href="https://github.com/bremersee/common-base/common-base-autoconfigure/checkstyle.html#org.bremersee.data.ldaptive.LdaptivePropertiesTest.java">org/bremersee/data/ldaptive/LdaptivePropertiesTest.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/bremersee/common-base/common-base-autoconfigure/checkstyle.html#org.bremersee.security.authentication.resourceserver.servlet.JwtWithRedisTest.java">org/bremersee/security/authentication/resourceserver/servlet/JwtWithRedisTest.java</a>
                 </td>
                 <td>
                   0
@@ -564,7 +662,35 @@ under the License.
               </tr>
                           <tr>
                 <td>
+                  <a href="https://github.com/bremersee/common-base/common-base-autoconfigure/checkstyle.html#org.bremersee.security.authentication.resourceserver.servlet.RedisAccessTokenCacheExceptionTest.java">org/bremersee/security/authentication/resourceserver/servlet/RedisAccessTokenCacheExceptionTest.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
                   <a href="https://github.com/bremersee/common-base/common-base-autoconfigure/checkstyle.html#org.bremersee.data.ldaptive.app.PersonMapper.java">org/bremersee/data/ldaptive/app/PersonMapper.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/bremersee/common-base/common-base-autoconfigure/checkstyle.html#org.bremersee.security.authentication.resourceserver.servlet.withredis.WithRedisTestConfiguration.java">org/bremersee/security/authentication/resourceserver/servlet/withredis/WithRedisTestConfiguration.java</a>
                 </td>
                 <td>
                   0
@@ -774,7 +900,49 @@ under the License.
               </tr>
                           <tr>
                 <td>
+                  <a href="https://github.com/bremersee/common-base/common-base-autoconfigure/checkstyle.html#org.bremersee.security.authentication.resourceserver.reactive.ReactiveJwtWithRedisTest.java">org/bremersee/security/authentication/resourceserver/reactive/ReactiveJwtWithRedisTest.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/bremersee/common-base/common-base-autoconfigure/checkstyle.html#org.bremersee.security.authentication.resourceserver.reactive.ReactiveRedisAccessTokenCacheExceptionTest.java">org/bremersee/security/authentication/resourceserver/reactive/ReactiveRedisAccessTokenCacheExceptionTest.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
                   <a href="https://github.com/bremersee/common-base/common-base-autoconfigure/checkstyle.html#org.bremersee.web.reactive.CorsAutoConfiguration.java">org/bremersee/web/reactive/CorsAutoConfiguration.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/bremersee/common-base/common-base-autoconfigure/checkstyle.html#org.bremersee.security.authentication.JwtSupportAutoConfigurationTest.java">org/bremersee/security/authentication/JwtSupportAutoConfigurationTest.java</a>
                 </td>
                 <td>
                   0
@@ -803,20 +971,6 @@ under the License.
                           <tr>
                 <td>
                   <a href="https://github.com/bremersee/common-base/common-base-autoconfigure/checkstyle.html#org.bremersee.converter.integration.servlet.ConverterIntegrationTest.java">org/bremersee/converter/integration/servlet/ConverterIntegrationTest.java</a>
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-              </tr>
-                          <tr>
-                <td>
-                  <a href="https://github.com/bremersee/common-base/common-base-autoconfigure/checkstyle.html#org.bremersee.security.authentication.ReactiveAuthenticationSupportAutoConfigurationTest.java">org/bremersee/security/authentication/ReactiveAuthenticationSupportAutoConfigurationTest.java</a>
                 </td>
                 <td>
                   0
@@ -914,6 +1068,20 @@ under the License.
               </tr>
                           <tr>
                 <td>
+                  <a href="https://github.com/bremersee/common-base/common-base-autoconfigure/checkstyle.html#org.bremersee.security.authentication.resourceserver.reactive.withoutredis.TestConfiguration.java">org/bremersee/security/authentication/resourceserver/reactive/withoutredis/TestConfiguration.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
                   <a href="https://github.com/bremersee/common-base/common-base-autoconfigure/checkstyle.html#org.bremersee.exception.integration.servlet.app.TestConfiguration.java">org/bremersee/exception/integration/servlet/app/TestConfiguration.java</a>
                 </td>
                 <td>
@@ -970,20 +1138,6 @@ under the License.
               </tr>
                           <tr>
                 <td>
-                  <a href="https://github.com/bremersee/common-base/common-base-autoconfigure/checkstyle.html#org.bremersee.security.authentication.resourceserver.servlet.app.TestConfiguration.java">org/bremersee/security/authentication/resourceserver/servlet/app/TestConfiguration.java</a>
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-              </tr>
-                          <tr>
-                <td>
                   <a href="https://github.com/bremersee/common-base/common-base-autoconfigure/checkstyle.html#org.bremersee.exception.RestApiExceptionMapperImpl.java">org/bremersee/exception/RestApiExceptionMapperImpl.java</a>
                 </td>
                 <td>
@@ -1026,6 +1180,20 @@ under the License.
               </tr>
                           <tr>
                 <td>
+                  <a href="https://github.com/bremersee/common-base/common-base-autoconfigure/checkstyle.html#org.bremersee.security.authentication.resourceserver.servlet.withoutredis.TestConfiguration.java">org/bremersee/security/authentication/resourceserver/servlet/withoutredis/TestConfiguration.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
                   <a href="https://github.com/bremersee/common-base/common-base-autoconfigure/checkstyle.html#org.bremersee.exception.integration.servlet.ExceptionHandlingTest.java">org/bremersee/exception/integration/servlet/ExceptionHandlingTest.java</a>
                 </td>
                 <td>
@@ -1040,7 +1208,49 @@ under the License.
               </tr>
                           <tr>
                 <td>
+                  <a href="https://github.com/bremersee/common-base/common-base-autoconfigure/checkstyle.html#org.bremersee.security.authentication.resourceserver.reactive.components.TestController.java">org/bremersee/security/authentication/resourceserver/reactive/components/TestController.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/bremersee/common-base/common-base-autoconfigure/checkstyle.html#org.bremersee.data.redis.EmbeddedRedisAutoConfiguration.java">org/bremersee/data/redis/EmbeddedRedisAutoConfiguration.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
                   <a href="https://github.com/bremersee/common-base/common-base-autoconfigure/checkstyle.html#org.bremersee.data.ldaptive.LdaptiveConnectionConfigFactoryTest.java">org/bremersee/data/ldaptive/LdaptiveConnectionConfigFactoryTest.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/bremersee/common-base/common-base-autoconfigure/checkstyle.html#org.bremersee.security.authentication.resourceserver.servlet.components.TestController.java">org/bremersee/security/authentication/resourceserver/servlet/components/TestController.java</a>
                 </td>
                 <td>
                   0
@@ -1153,20 +1363,6 @@ under the License.
                           <tr>
                 <td>
                   <a href="https://github.com/bremersee/common-base/common-base-autoconfigure/checkstyle.html#org.bremersee.security.access.AclEntity.java">org/bremersee/security/access/AclEntity.java</a>
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-              </tr>
-                          <tr>
-                <td>
-                  <a href="https://github.com/bremersee/common-base/common-base-autoconfigure/checkstyle.html#org.bremersee.security.authentication.AuthenticationSupportAutoConfigurationTest.java">org/bremersee/security/authentication/AuthenticationSupportAutoConfigurationTest.java</a>
                 </td>
                 <td>
                   0
@@ -1335,6 +1531,20 @@ under the License.
                           <tr>
                 <td>
                   <a href="https://github.com/bremersee/common-base/common-base-autoconfigure/checkstyle.html#org.bremersee.data.ldaptive.LdaptiveProperties.java">org/bremersee/data/ldaptive/LdaptiveProperties.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/bremersee/common-base/common-base-autoconfigure/checkstyle.html#org.bremersee.security.authentication.ReactiveRedisAccessTokenCache.java">org/bremersee/security/authentication/ReactiveRedisAccessTokenCache.java</a>
                 </td>
                 <td>
                   0

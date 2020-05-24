@@ -37,6 +37,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.event.EventListener;
+import org.springframework.core.env.Environment;
 import org.springframework.security.authentication.ReactiveAuthenticationManager;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.config.web.server.ServerHttpSecurity.AuthorizeExchangeSpec;
@@ -61,39 +62,42 @@ import org.springframework.security.web.server.util.matcher.NegatedServerWebExch
 @AutoConfigureBefore(ReactiveResourceServerAutoConfiguration.class)
 @EnableConfigurationProperties({CorsProperties.class, AuthProperties.class})
 @Configuration
-<span class="fc" id="L64">@Slf4j</span>
+<span class="fc" id="L65">@Slf4j</span>
 public class ReactiveResourceServerWithActuatorAutoConfiguration
     extends AbstractReactiveResourceServerAutoConfiguration {
 
   /**
    * Instantiates a new reactive resource server with actuator security auto configuration.
    *
+   * @param environment the environment
+   * @param corsProperties the cors properties
    * @param securityProperties the security properties
    * @param jwtConverterProvider the jwt converter provider
    * @param userDetailsServiceProvider the user details service provider
    * @param passwordEncoderProvider the password encoder provider
    */
   public ReactiveResourceServerWithActuatorAutoConfiguration(
+      Environment environment,
       CorsProperties corsProperties,
       AuthProperties securityProperties,
       ObjectProvider&lt;JsonPathReactiveJwtConverter&gt; jwtConverterProvider,
       ObjectProvider&lt;ReactiveUserDetailsService&gt; userDetailsServiceProvider,
       ObjectProvider&lt;PasswordEncoder&gt; passwordEncoderProvider) {
-<span class="fc" id="L82">    super(corsProperties, securityProperties, jwtConverterProvider, userDetailsServiceProvider,</span>
-        passwordEncoderProvider);
-<span class="fc" id="L84">  }</span>
+<span class="fc" id="L86">    super(environment, corsProperties, securityProperties, jwtConverterProvider,</span>
+        userDetailsServiceProvider, passwordEncoderProvider);
+<span class="fc" id="L88">  }</span>
 
   @EventListener(ApplicationReadyEvent.class)
   @Override
   public void init() {
-<span class="fc" id="L89">    super.init();</span>
-<span class="fc" id="L90">  }</span>
+<span class="fc" id="L93">    super.init();</span>
+<span class="fc" id="L94">  }</span>
 
   @Override
   protected AuthorizeExchangeSpec init(ServerHttpSecurity http) {
-<span class="fc" id="L94">    return http</span>
-<span class="fc" id="L95">        .securityMatcher(new NegatedServerWebExchangeMatcher(EndpointRequest.toAnyEndpoint()))</span>
-<span class="fc" id="L96">        .authorizeExchange();</span>
+<span class="fc" id="L98">    return http</span>
+<span class="fc" id="L99">        .securityMatcher(new NegatedServerWebExchangeMatcher(EndpointRequest.toAnyEndpoint()))</span>
+<span class="fc" id="L100">        .authorizeExchange();</span>
   }
 
   /**
@@ -105,7 +109,7 @@ public class ReactiveResourceServerWithActuatorAutoConfiguration
   @Bean
   public SecurityWebFilterChain resourceServerFilterChain(
       ObjectProvider&lt;ServerHttpSecurity&gt; httpProvider) {
-<span class="fc" id="L108">    return super.resourceServerFilterChain(httpProvider.getIfAvailable());</span>
+<span class="fc" id="L112">    return super.resourceServerFilterChain(httpProvider.getIfAvailable());</span>
   }
 
 }

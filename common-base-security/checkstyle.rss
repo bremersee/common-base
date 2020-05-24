@@ -25,7 +25,7 @@ under the License.
     <language>en-us</language>
     <copyright>&#169;2020 bremersee.org</copyright>
     <item>
-      <title>File: 23,
+      <title>File: 29,
              Errors: 0,
              Warnings: 1,
              Infos: 0
@@ -46,7 +46,7 @@ under the License.
           <tbody>
                           <tr>
                 <td>
-                  <a href="https://github.com/bremersee/common-base/common-base-security/checkstyle.html#org.bremersee.security.authentication.AccessTokenRetrieverProperties.java">org/bremersee/security/authentication/AccessTokenRetrieverProperties.java</a>
+                  <a href="https://github.com/bremersee/common-base/common-base-security/checkstyle.html#org.bremersee.security.authentication.AccessTokenCacheImplWthExternalCacheTest.java">org/bremersee/security/authentication/AccessTokenCacheImplWthExternalCacheTest.java</a>
                 </td>
                 <td>
                   0
@@ -60,21 +60,7 @@ under the License.
               </tr>
                           <tr>
                 <td>
-                  <a href="https://github.com/bremersee/common-base/common-base-security/checkstyle.html#org.bremersee.security.core.AuthenticatedUserContextCallerTest.java">org/bremersee/security/core/AuthenticatedUserContextCallerTest.java</a>
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-              </tr>
-                          <tr>
-                <td>
-                  <a href="https://github.com/bremersee/common-base/common-base-security/checkstyle.html#org.bremersee.security.authentication.AccessTokenRetriever.java">org/bremersee/security/authentication/AccessTokenRetriever.java</a>
+                  <a href="https://github.com/bremersee/common-base/common-base-security/checkstyle.html#org.bremersee.security.authentication.AccessTokenCacheImpl.java">org/bremersee/security/authentication/AccessTokenCacheImpl.java</a>
                 </td>
                 <td>
                   0
@@ -102,77 +88,7 @@ under the License.
               </tr>
                           <tr>
                 <td>
-                  <a href="https://github.com/bremersee/common-base/common-base-security/checkstyle.html#org.bremersee.security.authentication.PasswordFlowPropertiesTest.java">org/bremersee/security/authentication/PasswordFlowPropertiesTest.java</a>
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-              </tr>
-                          <tr>
-                <td>
-                  <a href="https://github.com/bremersee/common-base/common-base-security/checkstyle.html#org.bremersee.security.authentication.JsonPathJwtConverterTest.java">org/bremersee/security/authentication/JsonPathJwtConverterTest.java</a>
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-              </tr>
-                          <tr>
-                <td>
-                  <a href="https://github.com/bremersee/common-base/common-base-security/checkstyle.html#org.bremersee.security.authentication.AccessTokenProvider.java">org/bremersee/security/authentication/AccessTokenProvider.java</a>
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-              </tr>
-                          <tr>
-                <td>
-                  <a href="https://github.com/bremersee/common-base/common-base-security/checkstyle.html#org.bremersee.security.authentication.ClientCredentialsFlowProperties.java">org/bremersee/security/authentication/ClientCredentialsFlowProperties.java</a>
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-              </tr>
-                          <tr>
-                <td>
                   <a href="https://github.com/bremersee/common-base/common-base-security/checkstyle.html#org.bremersee.security.authentication.BasicAuthPropertiesTest.java">org/bremersee/security/authentication/BasicAuthPropertiesTest.java</a>
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-              </tr>
-                          <tr>
-                <td>
-                  <a href="https://github.com/bremersee/common-base/common-base-security/checkstyle.html#org.bremersee.security.authentication.PasswordFlowProperties.java">org/bremersee/security/authentication/PasswordFlowProperties.java</a>
                 </td>
                 <td>
                   0
@@ -242,7 +158,7 @@ under the License.
               </tr>
                           <tr>
                 <td>
-                  <a href="https://github.com/bremersee/common-base/common-base-security/checkstyle.html#org.bremersee.security.authentication.ClientCredentialsFlowPropertiesTest.java">org/bremersee/security/authentication/ClientCredentialsFlowPropertiesTest.java</a>
+                  <a href="https://github.com/bremersee/common-base/common-base-security/checkstyle.html#org.bremersee.security.authentication.AccessTokenCacheTest.java">org/bremersee/security/authentication/AccessTokenCacheTest.java</a>
                 </td>
                 <td>
                   0
@@ -257,34 +173,6 @@ under the License.
                           <tr>
                 <td>
                   <a href="https://github.com/bremersee/common-base/common-base-security/checkstyle.html#org.bremersee.exception.AccessTokenRetrieverAuthenticationException.java">org/bremersee/exception/AccessTokenRetrieverAuthenticationException.java</a>
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-              </tr>
-                          <tr>
-                <td>
-                  <a href="https://github.com/bremersee/common-base/common-base-security/checkstyle.html#org.bremersee.security.authentication.RestTemplateAccessTokenRetrieverTest.java">org/bremersee/security/authentication/RestTemplateAccessTokenRetrieverTest.java</a>
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-              </tr>
-                          <tr>
-                <td>
-                  <a href="https://github.com/bremersee/common-base/common-base-security/checkstyle.html#org.bremersee.security.authentication.JsonPathJwtParser.java">org/bremersee/security/authentication/JsonPathJwtParser.java</a>
                 </td>
                 <td>
                   0
@@ -327,6 +215,202 @@ under the License.
                           <tr>
                 <td>
                   <a href="https://github.com/bremersee/common-base/common-base-security/checkstyle.html#org.bremersee.exception.AccessTokenRetrieverAuthenticationExceptionTest.java">org/bremersee/exception/AccessTokenRetrieverAuthenticationExceptionTest.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/bremersee/common-base/common-base-security/checkstyle.html#org.bremersee.security.authentication.AccessTokenCache.java">org/bremersee/security/authentication/AccessTokenCache.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/bremersee/common-base/common-base-security/checkstyle.html#org.bremersee.security.authentication.AccessTokenRetrieverProperties.java">org/bremersee/security/authentication/AccessTokenRetrieverProperties.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/bremersee/common-base/common-base-security/checkstyle.html#org.bremersee.security.core.AuthenticatedUserContextCallerTest.java">org/bremersee/security/core/AuthenticatedUserContextCallerTest.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/bremersee/common-base/common-base-security/checkstyle.html#org.bremersee.security.authentication.AccessTokenRetriever.java">org/bremersee/security/authentication/AccessTokenRetriever.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/bremersee/common-base/common-base-security/checkstyle.html#org.bremersee.security.authentication.PasswordFlowPropertiesTest.java">org/bremersee/security/authentication/PasswordFlowPropertiesTest.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/bremersee/common-base/common-base-security/checkstyle.html#org.bremersee.security.authentication.JsonPathJwtConverterTest.java">org/bremersee/security/authentication/JsonPathJwtConverterTest.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/bremersee/common-base/common-base-security/checkstyle.html#org.bremersee.security.authentication.AccessTokenProvider.java">org/bremersee/security/authentication/AccessTokenProvider.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/bremersee/common-base/common-base-security/checkstyle.html#org.bremersee.security.authentication.ClientCredentialsFlowProperties.java">org/bremersee/security/authentication/ClientCredentialsFlowProperties.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/bremersee/common-base/common-base-security/checkstyle.html#org.bremersee.security.authentication.PasswordFlowProperties.java">org/bremersee/security/authentication/PasswordFlowProperties.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/bremersee/common-base/common-base-security/checkstyle.html#org.bremersee.security.authentication.ClientCredentialsFlowPropertiesTest.java">org/bremersee/security/authentication/ClientCredentialsFlowPropertiesTest.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/bremersee/common-base/common-base-security/checkstyle.html#org.bremersee.security.authentication.AccessTokenCacheImplWthExternalExceptionCacheTest.java">org/bremersee/security/authentication/AccessTokenCacheImplWthExternalExceptionCacheTest.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/bremersee/common-base/common-base-security/checkstyle.html#org.bremersee.security.authentication.AccessTokenCacheImplTest.java">org/bremersee/security/authentication/AccessTokenCacheImplTest.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/bremersee/common-base/common-base-security/checkstyle.html#org.bremersee.security.authentication.RestTemplateAccessTokenRetrieverTest.java">org/bremersee/security/authentication/RestTemplateAccessTokenRetrieverTest.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/bremersee/common-base/common-base-security/checkstyle.html#org.bremersee.security.authentication.JsonPathJwtParser.java">org/bremersee/security/authentication/JsonPathJwtParser.java</a>
                 </td>
                 <td>
                   0

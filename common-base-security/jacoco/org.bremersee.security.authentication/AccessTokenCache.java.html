@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AccessTokenCache.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">common-base-security</a> &gt; <a href="index.source.html" class="el_package">org.bremersee.security.authentication</a> &gt; <span class="el_source">AccessTokenCache.java</span></div><h1>AccessTokenCache.java</h1><pre class="source lang-java linenums">/*
+ * Copyright 2020 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package org.bremersee.security.authentication;
+
+import com.nimbusds.jwt.EncryptedJWT;
+import com.nimbusds.jwt.JWT;
+import com.nimbusds.jwt.PlainJWT;
+import com.nimbusds.jwt.SignedJWT;
+import java.text.ParseException;
+import java.time.Duration;
+import java.util.Date;
+import java.util.Objects;
+import java.util.Optional;
+import javax.validation.constraints.NotNull;
+import org.bremersee.exception.ServiceException;
+import org.springframework.cache.Cache;
+import org.springframework.validation.annotation.Validated;
+
+/**
+ * The access token cache interface.
+ *
+ * @author Christian Bremer
+ */
+@Validated
+public interface AccessTokenCache {
+
+  /**
+   * The constant CACHE_NAME.
+   */
+  String CACHE_NAME = &quot;jwt&quot;;
+
+  /**
+   * Find not expired access token from cache.
+   *
+   * @param key the key
+   * @return the access token
+   */
+  Optional&lt;String&gt; findAccessToken(@NotNull String key);
+
+  /**
+   * Put new access token into the cache.
+   *
+   * @param key the key
+   * @param accessToken the access token
+   */
+  void putAccessToken(@NotNull String key, @NotNull String accessToken);
+
+  /**
+   * Checks whether the access token is expired. If no expiration claim is present, the result will
+   * always be {@code true}.
+   *
+   * @param tokenValue the token value
+   * @param accessTokenThreshold the access token threshold
+   * @return the boolean
+   */
+  static boolean isExpired(@NotNull String tokenValue, Duration accessTokenThreshold) {
+<span class="fc" id="L71">    Duration duration = Objects</span>
+<span class="fc" id="L72">        .requireNonNullElseGet(accessTokenThreshold, () -&gt; Duration.ofSeconds(20L));</span>
+<span class="fc" id="L73">    long millis = System.currentTimeMillis() + duration.toMillis();</span>
+<span class="fc" id="L74">    return Optional.ofNullable(getExpirationTime(tokenValue))</span>
+<span class="pc bpc" id="L75" title="1 of 2 branches missed.">        .map(date -&gt; date.getTime() &lt; millis)</span>
+<span class="fc" id="L76">        .orElse(true);</span>
+  }
+
+  /**
+   * Gets expiration time.
+   *
+   * @param tokenValue the token value
+   * @return the expiration time or {@code null} if there is no expiration claim
+   */
+  static Date getExpirationTime(@NotNull String tokenValue) {
+<span class="fc" id="L86">    JWT jwt = parse(tokenValue);</span>
+    try {
+<span class="pc bpc" id="L88" title="1 of 2 branches missed.">      if (jwt.getJWTClaimsSet() != null</span>
+<span class="fc bfc" id="L89" title="All 2 branches covered.">          &amp;&amp; jwt.getJWTClaimsSet().getExpirationTime() != null) {</span>
+<span class="fc" id="L90">        return jwt.getJWTClaimsSet().getExpirationTime();</span>
+      }
+
+<span class="nc" id="L93">    } catch (ParseException e) {</span>
+      // ignored
+<span class="fc" id="L95">    }</span>
+<span class="fc" id="L96">    return null;</span>
+  }
+
+  /**
+   * Parse jwt.
+   *
+   * @param tokenValue the token value
+   * @return the jwt
+   */
+  static JWT parse(@NotNull String tokenValue) {
+    try {
+<span class="fc" id="L107">      return SignedJWT.parse(tokenValue);</span>
+<span class="fc" id="L108">    } catch (Exception e0) {</span>
+      try {
+<span class="nc" id="L110">        return EncryptedJWT.parse(tokenValue);</span>
+<span class="fc" id="L111">      } catch (Exception e1) {</span>
+        try {
+<span class="fc" id="L113">          return PlainJWT.parse(tokenValue);</span>
+<span class="nc" id="L114">        } catch (Exception e2) {</span>
+<span class="nc" id="L115">          throw ServiceException.internalServerError(&quot;Parsing jwt failed.&quot;);</span>
+        }
+      }
+    }
+  }
+
+  /**
+   * Creates a new builder.
+   *
+   * @return the builder
+   */
+  static Builder builder() {
+<span class="fc" id="L127">    return new Builder.Impl();</span>
+  }
+
+  /**
+   * The builder interface.
+   */
+  interface Builder {
+
+    /**
+     * With external cache.
+     *
+     * @param externalCache the external cache
+     * @return the builder
+     */
+    Builder withExternalCache(Cache externalCache);
+
+    /**
+     * With expiration time threshold.
+     *
+     * @param duration the duration
+     * @return the builder
+     */
+    Builder withExpirationTimeThreshold(Duration duration);
+
+    /**
+     * With key prefix.
+     *
+     * @param keyPrefix the key prefix
+     * @return the builder
+     */
+    Builder withKeyPrefix(String keyPrefix);
+
+    /**
+     * Build access token cache.
+     *
+     * @return the access token cache
+     */
+    AccessTokenCache build();
+
+    /**
+     * The builder implementation.
+     */
+<span class="fc" id="L169">    class Impl implements Builder {</span>
+
+      private Cache externalCache;
+
+      private Duration expirationTimeThreshold;
+
+      private String keyPrefix;
+
+      @Override
+      public Builder withExternalCache(Cache externalCache) {
+<span class="fc" id="L179">        this.externalCache = externalCache;</span>
+<span class="fc" id="L180">        return this;</span>
+      }
+
+      @Override
+      public Builder withExpirationTimeThreshold(Duration duration) {
+<span class="fc" id="L185">        this.expirationTimeThreshold = duration;</span>
+<span class="fc" id="L186">        return this;</span>
+      }
+
+      @Override
+      public Builder withKeyPrefix(String keyPrefix) {
+<span class="fc" id="L191">        this.keyPrefix = keyPrefix;</span>
+<span class="fc" id="L192">        return this;</span>
+      }
+
+      @Override
+      public AccessTokenCache build() {
+<span class="fc" id="L197">        return new AccessTokenCacheImpl(externalCache, expirationTimeThreshold, keyPrefix);</span>
+      }
+    }
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

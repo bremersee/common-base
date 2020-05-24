@@ -17,6 +17,7 @@
 package org.bremersee.security.authentication;
 
 import java.io.IOException;
+import java.util.Optional;
 import net.minidev.json.JSONObject;
 import net.minidev.json.JSONValue;
 import org.bremersee.exception.AccessTokenRetrieverAuthenticationException;
@@ -35,43 +36,66 @@ import org.springframework.web.client.RestTemplate;
  *
  * @author Christian Bremer
  */
-public class RestTemplateAccessTokenRetriever implements
-    AccessTokenRetriever&lt;String&gt; {
+public class RestTemplateAccessTokenRetriever implements AccessTokenRetriever&lt;String&gt; {
 
-  private RestTemplate restTemplate;
+  private final RestTemplate restTemplate;
+
+  private final AccessTokenCache accessTokenCache;
 
   /**
    * Instantiates a new rest template access token retriever.
    *
    * @param restTemplate the rest template
    */
-<span class="fc" id="L48">  public RestTemplateAccessTokenRetriever(RestTemplate restTemplate) {</span>
-<span class="fc" id="L49">    this.restTemplate = restTemplate;</span>
-<span class="fc" id="L50">    this.restTemplate.setErrorHandler(new ErrorHandler());</span>
-<span class="fc" id="L51">  }</span>
+  public RestTemplateAccessTokenRetriever(RestTemplate restTemplate) {
+<span class="fc" id="L51">    this(restTemplate, null);</span>
+<span class="fc" id="L52">  }</span>
+
+  /**
+   * Instantiates a new rest template access token retriever.
+   *
+   * @param restTemplate the rest template
+   * @param accessTokenCache the access token cache
+   */
+  public RestTemplateAccessTokenRetriever(
+      RestTemplate restTemplate,
+<span class="fc" id="L62">      AccessTokenCache accessTokenCache) {</span>
+
+<span class="fc" id="L64">    this.restTemplate = restTemplate;</span>
+<span class="fc" id="L65">    this.restTemplate.setErrorHandler(new ErrorHandler());</span>
+<span class="fc" id="L66">    this.accessTokenCache = accessTokenCache;</span>
+<span class="fc" id="L67">  }</span>
 
   @Override
   public String retrieveAccessToken(AccessTokenRetrieverProperties input) {
-<span class="fc" id="L55">    final HttpHeaders headers = new HttpHeaders();</span>
-<span class="fc" id="L56">    headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);</span>
-<span class="fc" id="L57">    input.getBasicAuthProperties()</span>
-<span class="pc" id="L58">        .ifPresent(basicAuthProperties -&gt; headers.setBasicAuth(</span>
-<span class="nc" id="L59">            basicAuthProperties.getUsername(),</span>
-<span class="nc" id="L60">            basicAuthProperties.getPassword()));</span>
-<span class="fc" id="L61">    final HttpEntity&lt;?&gt; request = new HttpEntity&lt;&gt;(input.createBody(), headers);</span>
-<span class="fc" id="L62">    final String response = restTemplate.exchange(</span>
-<span class="fc" id="L63">        input.getTokenEndpoint(),</span>
-        HttpMethod.POST,
-        request,
-        String.class)
-<span class="fc" id="L67">        .getBody();</span>
-<span class="fc" id="L68">    final JSONObject json = (JSONObject) JSONValue.parse(response);</span>
-<span class="fc" id="L69">    final String accessToken = json.getAsString(&quot;access_token&quot;);</span>
-<span class="fc bfc" id="L70" title="All 2 branches covered.">    if (StringUtils.hasText(accessToken)) {</span>
-<span class="fc" id="L71">      return accessToken;</span>
-    }
-<span class="fc" id="L73">    throw new AccessTokenRetrieverAuthenticationException(HttpStatus.UNAUTHORIZED,</span>
-        &quot;There is no access token in the response: &quot; + accessToken);
+<span class="fc" id="L71">    final String cacheKey = input.createCacheKeyHashed();</span>
+<span class="fc" id="L72">    return Optional.ofNullable(accessTokenCache)</span>
+<span class="pc" id="L73">        .flatMap(cache -&gt; cache.findAccessToken(cacheKey))</span>
+<span class="fc" id="L74">        .orElseGet(() -&gt; {</span>
+<span class="fc" id="L75">          final HttpHeaders headers = new HttpHeaders();</span>
+<span class="fc" id="L76">          headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);</span>
+<span class="fc" id="L77">          input.getBasicAuthProperties()</span>
+<span class="pc" id="L78">              .ifPresent(basicAuthProperties -&gt; headers.setBasicAuth(</span>
+<span class="nc" id="L79">                  basicAuthProperties.getUsername(),</span>
+<span class="nc" id="L80">                  basicAuthProperties.getPassword()));</span>
+<span class="fc" id="L81">          final HttpEntity&lt;?&gt; request = new HttpEntity&lt;&gt;(input.createBody(), headers);</span>
+<span class="fc" id="L82">          final String response = restTemplate.exchange(</span>
+<span class="fc" id="L83">              input.getTokenEndpoint(),</span>
+              HttpMethod.POST,
+              request,
+              String.class)
+<span class="fc" id="L87">              .getBody();</span>
+<span class="fc" id="L88">          final JSONObject json = (JSONObject) JSONValue.parse(response);</span>
+<span class="fc" id="L89">          final String accessToken = json.getAsString(&quot;access_token&quot;);</span>
+<span class="fc bfc" id="L90" title="All 2 branches covered.">          if (StringUtils.hasText(accessToken)) {</span>
+<span class="pc bpc" id="L91" title="1 of 2 branches missed.">            if (accessTokenCache != null) {</span>
+<span class="nc" id="L92">              accessTokenCache.putAccessToken(cacheKey, accessToken);</span>
+            }
+<span class="fc" id="L94">            return accessToken;</span>
+          }
+<span class="fc" id="L96">          throw new AccessTokenRetrieverAuthenticationException(HttpStatus.UNAUTHORIZED,</span>
+              &quot;There is no access token in the response: &quot; + accessToken);
+        });
   }
 
   private static class ErrorHandler extends DefaultResponseErrorHandler {
@@ -79,8 +103,8 @@ public class RestTemplateAccessTokenRetriever implements
     @Override
     protected void handleError(final ClientHttpResponse response, final HttpStatus statusCode)
         throws IOException {
-<span class="nc" id="L82">      final String statusText = response.getStatusText();</span>
-<span class="nc" id="L83">      throw new AccessTokenRetrieverAuthenticationException(statusCode, statusText);</span>
+<span class="nc" id="L106">      final String statusText = response.getStatusText();</span>
+<span class="nc" id="L107">      throw new AccessTokenRetrieverAuthenticationException(statusCode, statusText);</span>
     }
   }
 
