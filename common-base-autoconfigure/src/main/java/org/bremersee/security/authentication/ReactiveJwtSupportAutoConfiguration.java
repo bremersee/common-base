@@ -18,11 +18,13 @@ package org.bremersee.security.authentication;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication.Type;
+import org.springframework.boot.autoconfigure.security.oauth2.resource.reactive.ReactiveOAuth2ResourceServerAutoConfiguration;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -44,8 +46,9 @@ import org.springframework.web.reactive.function.client.WebClient;
     JsonPathReactiveJwtConverter.class,
     WebClientAccessTokenRetriever.class
 })
-@EnableConfigurationProperties(AuthProperties.class)
 @Configuration
+@AutoConfigureAfter(ReactiveOAuth2ResourceServerAutoConfiguration.class)
+@EnableConfigurationProperties(AuthProperties.class)
 @Slf4j
 public class ReactiveJwtSupportAutoConfiguration {
 
