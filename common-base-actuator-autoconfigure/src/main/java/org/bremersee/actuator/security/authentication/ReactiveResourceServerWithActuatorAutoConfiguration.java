@@ -37,6 +37,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.event.EventListener;
+import org.springframework.core.env.Environment;
 import org.springframework.security.authentication.ReactiveAuthenticationManager;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.config.web.server.ServerHttpSecurity.AuthorizeExchangeSpec;
@@ -68,19 +69,22 @@ public class ReactiveResourceServerWithActuatorAutoConfiguration
   /**
    * Instantiates a new reactive resource server with actuator security auto configuration.
    *
+   * @param environment the environment
+   * @param corsProperties the cors properties
    * @param securityProperties the security properties
    * @param jwtConverterProvider the jwt converter provider
    * @param userDetailsServiceProvider the user details service provider
    * @param passwordEncoderProvider the password encoder provider
    */
   public ReactiveResourceServerWithActuatorAutoConfiguration(
+      Environment environment,
       CorsProperties corsProperties,
       AuthProperties securityProperties,
       ObjectProvider<JsonPathReactiveJwtConverter> jwtConverterProvider,
       ObjectProvider<ReactiveUserDetailsService> userDetailsServiceProvider,
       ObjectProvider<PasswordEncoder> passwordEncoderProvider) {
-    super(corsProperties, securityProperties, jwtConverterProvider, userDetailsServiceProvider,
-        passwordEncoderProvider);
+    super(environment, corsProperties, securityProperties, jwtConverterProvider,
+        userDetailsServiceProvider, passwordEncoderProvider);
   }
 
   @EventListener(ApplicationReadyEvent.class)

@@ -32,6 +32,7 @@ import org.springframework.security.config.annotation.web.configurers.Expression
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.util.ClassUtils;
+import org.springframework.util.StringUtils;
 
 /**
  * The abstract resource server security auto configuration.
@@ -95,11 +96,22 @@ public abstract class AbstractResourceServerAutoConfiguration extends WebSecurit
    * Init.
    */
   protected void init() {
+    final boolean hasJwkUriSet = StringUtils
+        .hasText(environment.getProperty("spring.security.oauth2.resourceserver.jwt.jwk-set-uri"));
     log.info("\n"
             + "*********************************************************************************\n"
             + "* {}\n"
+            + "*********************************************************************************\n"
+            + "* enable = {}\n"
+            + "* order = {}\n"
+            + "* jwt = {}\n"
+            + "* cors = {}\n"
             + "*********************************************************************************",
-        ClassUtils.getUserClass(getClass()).getSimpleName());
+        ClassUtils.getUserClass(getClass()).getSimpleName(),
+        authProperties.getResourceServer().name(),
+        authProperties.getResourceServerOrder(),
+        hasJwkUriSet,
+        corsProperties.isEnable());
   }
 
   /**

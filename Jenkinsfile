@@ -5,7 +5,7 @@ pipeline {
   environment {
     CODECOV_TOKEN = credentials('common-base-codecov-token')
     DEPLOY = true
-    SNAPSHOT_SITE = false
+    SNAPSHOT_SITE = true
     RELEASE_SITE = true
     DEPLOY_FEATURE = true
   }

@@ -22,6 +22,7 @@ import org.bremersee.core.OrderedProxy;
 import org.bremersee.security.authentication.AuthProperties.PathMatcherProperties;
 import org.bremersee.web.CorsProperties;
 import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.core.env.Environment;
 import org.springframework.security.authentication.ReactiveAuthenticationManager;
 import org.springframework.security.authentication.UserDetailsRepositoryReactiveAuthenticationManager;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
@@ -34,6 +35,7 @@ import org.springframework.security.web.server.util.matcher.ServerWebExchangeMat
 import org.springframework.security.web.server.util.matcher.ServerWebExchangeMatchers;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
+import org.springframework.util.StringUtils;
 
 /**
  * The abstract reactive resource server security auto configuration.
@@ -42,6 +44,8 @@ import org.springframework.util.ClassUtils;
  */
 @Slf4j
 public abstract class AbstractReactiveResourceServerAutoConfiguration {
+
+  private final Environment environment;
 
   private final CorsProperties corsProperties;
 
@@ -56,6 +60,7 @@ public abstract class AbstractReactiveResourceServerAutoConfiguration {
   /**
    * Instantiates a new abstract reactive resource server security auto configuration.
    *
+   * @param environment the environment
    * @param corsProperties the cors properties
    * @param authProperties the authentication nad authorization properties
    * @param jwtConverterProvider the jwt converter provider
@@ -63,11 +68,13 @@ public abstract class AbstractReactiveResourceServerAutoConfiguration {
    * @param passwordEncoderProvider the password encoder provider
    */
   protected AbstractReactiveResourceServerAutoConfiguration(
+      Environment environment,
       CorsProperties corsProperties,
       AuthProperties authProperties,
       ObjectProvider<JsonPathReactiveJwtConverter> jwtConverterProvider,
       ObjectProvider<ReactiveUserDetailsService> userDetailsServiceProvider,
       ObjectProvider<PasswordEncoder> passwordEncoderProvider) {
+    this.environment = environment;
     this.corsProperties = corsProperties;
     this.authProperties = authProperties;
     this.jwtConverterProvider = jwtConverterProvider;
@@ -79,11 +86,22 @@ public abstract class AbstractReactiveResourceServerAutoConfiguration {
    * Init.
    */
   protected void init() {
+    final boolean hasJwkUriSet = StringUtils
+        .hasText(environment.getProperty("spring.security.oauth2.resourceserver.jwt.jwk-set-uri"));
     log.info("\n"
             + "*********************************************************************************\n"
             + "* {}\n"
+            + "*********************************************************************************\n"
+            + "* enable = {}\n"
+            + "* order = {}\n"
+            + "* jwt = {}\n"
+            + "* cors = {}\n"
             + "*********************************************************************************",
-        ClassUtils.getUserClass(getClass()).getSimpleName());
+        ClassUtils.getUserClass(getClass()).getSimpleName(),
+        authProperties.getResourceServer().name(),
+        authProperties.getResourceServerOrder(),
+        hasJwkUriSet,
+        corsProperties.isEnable());
   }
 
   /**
