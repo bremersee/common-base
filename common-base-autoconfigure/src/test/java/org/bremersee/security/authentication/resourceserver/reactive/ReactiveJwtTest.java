@@ -17,13 +17,16 @@
 package org.bremersee.security.authentication.resourceserver.reactive;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
+import org.bremersee.security.authentication.PasswordFlowReactiveAuthenticationManager;
 import org.bremersee.security.authentication.resourceserver.reactive.withoutredis.TestConfiguration;
 import org.bremersee.test.security.authentication.WithJwtAuthenticationToken;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.TestInstance.Lifecycle;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
@@ -45,6 +48,9 @@ import org.springframework.web.reactive.function.BodyInserters;
         "spring.application.name=resourceserver-jwt",
         "spring.security.oauth2.resourceserver.jwt.jwk-set-uri=http://localhost/jwk",
         "bremersee.auth.resource-server=auto",
+        "bremersee.auth.password-flow.token-endpoint=http://localhost/jwt/token",
+        "bremersee.auth.password-flow.client-id=changeit",
+        "bremersee.auth.password-flow.client-secret=changeit",
         "bremersee.auth.any-access-mode=deny_all",
         "bremersee.auth.path-matchers[0].ant-pattern=/public/**",
         "bremersee.auth.path-matchers[0].access-mode=permit_all",
@@ -72,6 +78,12 @@ public class ReactiveJwtTest {
   WebTestClient webClient;
 
   /**
+   * The authentication manager provider.
+   */
+  @Autowired
+  ObjectProvider<PasswordFlowReactiveAuthenticationManager> authenticationManagerProvider;
+
+  /**
    * Setup tests.
    */
   @BeforeAll
@@ -81,6 +93,14 @@ public class ReactiveJwtTest {
         .bindToApplicationContext(this.context)
         .configureClient()
         .build();
+  }
+
+  /**
+   * Authentication manager is present.
+   */
+  @Test
+  void authenticationManagerPresent() {
+    assertNotNull(authenticationManagerProvider.getIfAvailable());
   }
 
   /**
