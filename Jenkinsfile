@@ -13,6 +13,9 @@ pipeline {
     jdk 'jdk11'
     maven 'm3'
   }
+  options {
+    buildDiscarder(logRotator(numToKeepStr: '10', artifactNumToKeepStr: '10'))
+  }
   stages {
     stage('Tools') {
       steps {
