@@ -14,7 +14,7 @@ pipeline {
     maven 'm3'
   }
   options {
-    buildDiscarder(logRotator(numToKeepStr: '10', artifactNumToKeepStr: '10'))
+    buildDiscarder(logRotator(numToKeepStr: '8', artifactNumToKeepStr: '8'))
   }
   stages {
     stage('Tools') {
