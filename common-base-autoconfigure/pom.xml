@@ -54,6 +54,13 @@
 
     <dependency>
       <groupId>org.bremersee</groupId>
+      <artifactId>common-base-minio</artifactId>
+      <version>${project.version}</version>
+      <optional>true</optional>
+    </dependency>
+
+    <dependency>
+      <groupId>org.bremersee</groupId>
       <artifactId>common-base-security</artifactId>
       <version>${project.version}</version>
       <optional>true</optional>
