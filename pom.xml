@@ -28,6 +28,7 @@
     <module>common-base-webflux</module>
     <module>common-base-feign</module>
     <module>common-base-ldaptive</module>
+    <module>common-base-minio</module>
     <module>common-base-thymeleaf</module>
 
     <module>common-base-autoconfigure</module>
@@ -35,6 +36,7 @@
 
     <module>common-base-starter</module>
     <module>common-base-ldaptive-starter</module>
+    <module>common-base-minio-starter</module>
     <module>common-base-web-starter</module>
     <module>common-base-webflux-starter</module>
     <module>common-base-webmvc-starter</module>
