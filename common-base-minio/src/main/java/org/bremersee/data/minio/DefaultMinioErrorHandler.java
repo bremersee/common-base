@@ -16,6 +16,7 @@
 
 package org.bremersee.data.minio;
 
+import io.minio.ErrorCode;
 import io.minio.errors.BucketPolicyTooLargeException;
 import io.minio.errors.ErrorResponseException;
 import io.minio.errors.InsufficientDataException;
@@ -27,7 +28,9 @@ import io.minio.errors.InvalidPortException;
 import io.minio.errors.InvalidResponseException;
 import io.minio.errors.RegionConflictException;
 import io.minio.errors.XmlParserException;
+import io.minio.messages.ErrorResponse;
 import java.io.IOException;
+import java.util.Optional;
 import org.springframework.util.StringUtils;
 
 /**
@@ -108,49 +111,58 @@ public class DefaultMinioErrorHandler extends AbstractMinioErrorHandler {
   }
 
   private int getStatus(ErrorResponseException e) {
-    if (e.errorResponse() != null && e.errorResponse().errorCode() != null) {
-      switch (e.errorResponse().errorCode()) {
-        case NO_SUCH_OBJECT:
-        case RESOURCE_NOT_FOUND:
-        case NO_SUCH_BUCKET:
-        case NO_SUCH_KEY:
-        case NO_SUCH_UPLOAD:
-        case NO_SUCH_VERSION:
-        case NO_SUCH_LIFECYCLE_CONFIGURATION:
-        case NO_SUCH_BUCKET_POLICY:
-        case NO_SUCH_OBJECT_LOCK_CONFIGURATION:
-          return 404;
-        case RESOURCE_CONFLICT:
-        case BUCKET_ALREADY_EXISTS:
-        case BUCKET_ALREADY_OWNED_BY_YOU:
-        case BUCKET_NOT_EMPTY:
-          return 409;
-        case INTERNAL_ERROR:
-        case NOT_IMPLEMENTED:
-        case OPERATION_ABORTED:
-        case RESTORE_ALREADY_IN_PROGRESS:
-        case SERVICE_UNAVAILABLE:
-        case SLOW_DOWN:
-          return 500;
-        default:
-          return 400;
-      }
+    return Optional.of(e)
+        .map(ErrorResponseException::errorResponse)
+        .map(ErrorResponse::errorCode)
+        .map(this::getStatus)
+        .orElse(500);
+  }
+
+  private int getStatus(ErrorCode errorCode) {
+    switch (errorCode) {
+      case NO_SUCH_OBJECT:
+      case RESOURCE_NOT_FOUND:
+      case NO_SUCH_BUCKET:
+      case NO_SUCH_KEY:
+      case NO_SUCH_UPLOAD:
+      case NO_SUCH_VERSION:
+      case NO_SUCH_LIFECYCLE_CONFIGURATION:
+      case NO_SUCH_BUCKET_POLICY:
+      case NO_SUCH_OBJECT_LOCK_CONFIGURATION:
+        return 404;
+      case RESOURCE_CONFLICT:
+      case BUCKET_ALREADY_EXISTS:
+      case BUCKET_ALREADY_OWNED_BY_YOU:
+      case BUCKET_NOT_EMPTY:
+        return 409;
+      case INTERNAL_ERROR:
+      case NOT_IMPLEMENTED:
+      case OPERATION_ABORTED:
+      case RESTORE_ALREADY_IN_PROGRESS:
+      case SERVICE_UNAVAILABLE:
+      case SLOW_DOWN:
+        return 500;
+      default:
+        return 400;
     }
-    return 500;
   }
 
   private String getErrorCode(ErrorResponseException e) {
-    if (e.errorResponse() != null && e.errorResponse().errorCode() != null) {
-      return ERROR_CODE_PREFIX + e.errorResponse().errorCode().name();
-    }
-    return ERROR_CODE_PREFIX + "UNSPECIFIED_ERROR_RESPONSE";
+    return Optional.of(e)
+        .map(ErrorResponseException::errorResponse)
+        .map(ErrorResponse::errorCode)
+        .map(ErrorCode::name)
+        .orElse(ERROR_CODE_PREFIX + "UNSPECIFIED_ERROR_RESPONSE");
   }
 
   private String getMessage(ErrorResponseException e) {
-    if (e.errorResponse() != null && e.errorResponse().errorCode() != null) {
-      return e.errorResponse().errorCode().message();
-    }
-    return StringUtils.hasText(e.getMessage()) ? e.getMessage() : "Unspecified error response.";
+    return Optional.of(e)
+        .map(ErrorResponseException::errorResponse)
+        .map(ErrorResponse::errorCode)
+        .map(ErrorCode::message)
+        .orElseGet(() -> StringUtils.hasText(e.getMessage())
+            ? e.getMessage()
+            : "Unspecified error response.");
   }
 
 }
