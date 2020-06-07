@@ -14,23 +14,20 @@
  * limitations under the License.
  */
 
-package org.bremersee.data.minio;
+package org.bremersee.data.minio.app;
 
-import static org.junit.jupiter.api.Assertions.*;
-
-import org.junit.jupiter.api.Test;
+import org.springframework.boot.SpringBootConfiguration;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.context.annotation.ComponentScan;
 
 /**
- * The default minio error handler test.
+ * The test configuration to test the minio template.
  *
  * @author Christian Bremer
  */
-class DefaultMinioErrorHandlerTest {
+@SpringBootConfiguration
+@EnableAutoConfiguration
+@ComponentScan(basePackageClasses = {TestConfiguration.class})
+public class TestConfiguration {
 
-  /**
-   * Map.
-   */
-  @Test
-  void map() {
-  }
 }

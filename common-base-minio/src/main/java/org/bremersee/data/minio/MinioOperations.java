@@ -112,8 +112,8 @@ public interface MinioOperations {
    *
    * @param bucketName Name of the bucket.
    */
-  default void makeBucket(String bucketName) {
-    this.makeBucket(bucketName, null, false);
+  default void makeBucket(@NotEmpty String bucketName) {
+    this.makeBucket(bucketName, null);
   }
 
   /**
@@ -126,7 +126,9 @@ public interface MinioOperations {
    * @param bucketName Name of the bucket.
    * @param region Region in which the bucket will be created.
    */
-  default void makeBucket(String bucketName, String region) {
+  default void makeBucket(
+      @NotEmpty String bucketName,
+      @Nullable String region) {
     this.makeBucket(bucketName, region, false);
   }
 
@@ -141,7 +143,10 @@ public interface MinioOperations {
    * @param region Region in which the bucket will be created.
    * @param objectLock Flag to enable object lock feature.
    */
-  default void makeBucket(String bucketName, String region, boolean objectLock) {
+  default void makeBucket(
+      @NotEmpty String bucketName,
+      @Nullable String region,
+      boolean objectLock) {
     execute((MinioClientCallbackWithoutResult) minioClient -> minioClient
         .makeBucket(bucketName, region, objectLock));
   }
@@ -155,7 +160,7 @@ public interface MinioOperations {
    *
    * @param bucketName Name of the bucket.
    */
-  default void enableVersioning(String bucketName) {
+  default void enableVersioning(@NotEmpty String bucketName) {
     execute((MinioClientCallbackWithoutResult) minioClient -> minioClient
         .enableVersioning(bucketName));
   }
@@ -169,7 +174,7 @@ public interface MinioOperations {
    *
    * @param bucketName Name of the bucket.
    */
-  default void disableVersioning(String bucketName) {
+  default void disableVersioning(@NotEmpty String bucketName) {
     execute((MinioClientCallbackWithoutResult) minioClient -> minioClient
         .disableVersioning(bucketName));
   }
@@ -186,7 +191,7 @@ public interface MinioOperations {
    * @param bucketName Name of the bucket.
    * @param config Object lock configuration.
    */
-  default void setDefaultRetention(String bucketName, ObjectLockConfiguration config) {
+  default void setDefaultRetention(@NotEmpty String bucketName, ObjectLockConfiguration config) {
     execute((MinioClientCallbackWithoutResult) minioClient -> minioClient
         .setDefaultRetention(bucketName, config));
   }
