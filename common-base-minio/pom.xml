@@ -16,7 +16,7 @@
   <description>Common Base Minio</description>
 
   <properties>
-    <minio.version>7.0.2</minio.version>
+    <playtika-testcontainers.version>1.62</playtika-testcontainers.version>
   </properties>
 
   <dependencies>
@@ -34,7 +34,6 @@
     <dependency>
       <groupId>io.minio</groupId>
       <artifactId>minio</artifactId>
-      <version>${minio.version}</version>
       <exclusions>
         <exclusion>
           <groupId>com.google.guava</groupId>
@@ -120,7 +119,7 @@
     <dependency>
       <groupId>com.playtika.testcontainers</groupId>
       <artifactId>embedded-minio</artifactId>
-      <version>1.62</version>
+      <version>${playtika-testcontainers.version}</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
