@@ -38,12 +38,15 @@ import io.minio.messages.ObjectLockConfiguration;
 import io.minio.messages.OutputSerialization;
 import io.minio.messages.Retention;
 import io.minio.messages.Upload;
+import java.io.File;
 import java.io.InputStream;
+import java.nio.file.Path;
 import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import org.springframework.validation.annotation.Validated;
 
 /**
@@ -826,13 +829,136 @@ public interface MinioOperations {
    * @param options {@link PutObjectOptions} to be used during upload.
    */
   default void putObject(
-      String bucketName,
-      String objectName,
-      InputStream in,
-      PutObjectOptions options) {
+      @NotNull String bucketName,
+      @NotNull String objectName,
+      @NotNull InputStream in,
+      @NotNull PutObjectOptions options) {
 
     execute((MinioClientCallbackWithoutResult) minioClient -> minioClient
         .putObject(bucketName, objectName, in, options));
+  }
+
+  /**
+   * Uploads data from a file to an object.
+   *
+   * <pre>Example:{@code
+   * minioOperations.putObject("my-bucketname", "my-objectname", "my-filename");
+   * }</pre>
+   *
+   * @param bucketName Name of the bucket.
+   * @param objectName Object name in the bucket.
+   * @param file Name of file to upload.
+   */
+  default void putObject(
+      @NotNull String bucketName,
+      @NotNull String objectName,
+      @NotNull String file) {
+
+    putObject(bucketName, objectName, file, null);
+  }
+
+  /**
+   * Uploads data from a file to an object using {@link PutObjectOptions}.
+   *
+   * <pre>Example:{@code
+   * minioOperations.putObject("my-bucketname", "my-objectname", "my-filename", null);
+   * }</pre>
+   *
+   * @param bucketName Name of the bucket.
+   * @param objectName Object name in the bucket.
+   * @param file Name of file to upload.
+   * @param options {@link PutObjectOptions} to be used during upload.
+   */
+  default void putObject(
+      @NotNull String bucketName,
+      @NotNull String objectName,
+      @NotNull String file,
+      @Nullable PutObjectOptions options) {
+
+    execute((MinioClientCallbackWithoutResult) minioClient -> minioClient
+        .putObject(bucketName, objectName, file, options));
+  }
+
+  /**
+   * Uploads data from a file to an object.
+   *
+   * <pre>Example:{@code
+   * minioOperations.putObject("my-bucketname", "my-objectname", my-file);
+   * }</pre>
+   *
+   * @param bucketName Name of the bucket.
+   * @param objectName Object name in the bucket.
+   * @param file File to upload.
+   */
+  default void putObject(
+      @NotNull String bucketName,
+      @NotNull String objectName,
+      @NotNull File file) {
+
+    putObject(bucketName, objectName, file, null);
+  }
+
+  /**
+   * Uploads data from a file to an object using {@link PutObjectOptions}.
+   *
+   * <pre>Example:{@code
+   * minioOperations.putObject("my-bucketname", "my-objectname", my-file, null);
+   * }</pre>
+   *
+   * @param bucketName Name of the bucket.
+   * @param objectName Object name in the bucket.
+   * @param file File to upload.
+   * @param options {@link PutObjectOptions} to be used during upload.
+   */
+  default void putObject(
+      @NotNull String bucketName,
+      @NotNull String objectName,
+      @NotNull File file,
+      @Nullable PutObjectOptions options) {
+
+    execute((MinioClientCallbackWithoutResult) minioClient -> minioClient
+        .putObject(bucketName, objectName, file.getAbsolutePath(), options));
+  }
+
+  /**
+   * Uploads data from a file to an object.
+   *
+   * <pre>Example:{@code
+   * minioOperations.putObject("my-bucketname", "my-objectname", my-file);
+   * }</pre>
+   *
+   * @param bucketName Name of the bucket.
+   * @param objectName Object name in the bucket.
+   * @param file File to upload.
+   */
+  default void putObject(
+      @NotNull String bucketName,
+      @NotNull String objectName,
+      @NotNull Path file) {
+
+    putObject(bucketName, objectName, file, null);
+  }
+
+  /**
+   * Uploads data from a file to an object using {@link PutObjectOptions}.
+   *
+   * <pre>Example:{@code
+   * minioOperations.putObject("my-bucketname", "my-objectname", my-file, null);
+   * }</pre>
+   *
+   * @param bucketName Name of the bucket.
+   * @param objectName Object name in the bucket.
+   * @param file File to upload.
+   * @param options {@link PutObjectOptions} to be used during upload.
+   */
+  default void putObject(
+      @NotNull String bucketName,
+      @NotNull String objectName,
+      @NotNull Path file,
+      @Nullable PutObjectOptions options) {
+
+    execute((MinioClientCallbackWithoutResult) minioClient -> minioClient
+        .putObject(bucketName, objectName, file.toFile().getAbsolutePath(), options));
   }
 
   /**
@@ -1286,4 +1412,5 @@ public interface MinioOperations {
     execute((MinioClientCallbackWithoutResult) minioClient -> minioClient
         .composeObject(bucketName, objectName, sources, headerMap, sse));
   }
+
 }
