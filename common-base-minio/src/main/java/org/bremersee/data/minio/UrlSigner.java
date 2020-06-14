@@ -18,6 +18,7 @@ package org.bremersee.data.minio;
 
 import io.minio.http.Method;
 import java.time.Duration;
+import java.util.Map;
 import java.util.function.Function;
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
@@ -25,31 +26,52 @@ import org.springframework.util.StringUtils;
 import org.springframework.validation.annotation.Validated;
 
 /**
- * The presigned url provider.
+ * The url signer.
  *
  * @author Christian Bremer
  */
 @Validated
-public interface PresignedUrlProvider extends Function<String, String> {
+public interface UrlSigner extends Function<String, String> {
 
   @Override
   String apply(String objectName);
 
   /**
-   * Creates new presigned url provider instance.
+   * Created default url signer.
    *
    * @param minioOperations the minio operations
    * @param method the method
    * @param bucketName the bucket name
    * @param expires the expires
    * @param defaultUrl the default url
-   * @return the presigned url provider
+   * @return the url signer
    */
-  static PresignedUrlProvider newInstance(
+  static UrlSigner defaultSigner(
       @Nullable MinioOperations minioOperations,
       @NotNull Method method,
       @NotNull String bucketName,
       @Nullable Duration expires,
+      @Nullable String defaultUrl) {
+    return defaultSigner(minioOperations, method, bucketName, expires, null, defaultUrl);
+  }
+
+  /**
+   * Created default url signer.
+   *
+   * @param minioOperations the minio operations
+   * @param method the method
+   * @param bucketName the bucket name
+   * @param expires the expires
+   * @param reqParams the req params
+   * @param defaultUrl the default url
+   * @return the presigned url provider
+   */
+  static UrlSigner defaultSigner(
+      @Nullable MinioOperations minioOperations,
+      @NotNull Method method,
+      @NotNull String bucketName,
+      @Nullable Duration expires,
+      @Nullable Map<String, String> reqParams,
       @Nullable String defaultUrl) {
 
     return objectName -> {
@@ -57,7 +79,8 @@ public interface PresignedUrlProvider extends Function<String, String> {
         return defaultUrl;
       }
       try {
-        return minioOperations.getPresignedObjectUrl(method, bucketName, objectName, expires, null);
+        return minioOperations
+            .getPresignedObjectUrl(method, bucketName, objectName, expires, reqParams);
 
       } catch (MinioException e) {
         if (e.status() == 404) {

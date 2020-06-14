@@ -20,10 +20,13 @@ import io.minio.MinioClient;
 import io.minio.errors.InvalidEndpointException;
 import io.minio.errors.InvalidPortException;
 import lombok.extern.slf4j.Slf4j;
+import org.bremersee.data.minio.http.ReactivePutObjectBuilder;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication.Type;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -84,6 +87,8 @@ public class MinioAutoConfiguration {
   @ConditionalOnMissingBean
   @Bean
   public MinioClient minioClient() throws InvalidPortException, InvalidEndpointException {
+
+    log.info("Creating {} ...", MinioClient.class.getSimpleName());
     MinioClient minioClient = new MinioClient(
         properties.getUrl(),
         properties.getAccessKey(),
@@ -109,9 +114,23 @@ public class MinioAutoConfiguration {
       MinioClient minioClient,
       ObjectProvider<MinioErrorHandler> errorHandlerProvider) {
 
+    log.info("Creating {} ...", MinioTemplate.class.getSimpleName());
     MinioTemplate minioTemplate = new MinioTemplate(minioClient);
     minioTemplate.setErrorHandler(errorHandlerProvider.getIfAvailable());
     return minioTemplate;
+  }
+
+  /**
+   * Creates reactive put object builder.
+   *
+   * @return the reactive put object builder
+   */
+  @ConditionalOnWebApplication(type = Type.REACTIVE)
+  @ConditionalOnMissingBean
+  @Bean
+  public ReactivePutObjectBuilder reactivePutObjectBuilder() {
+    log.info("Creating {} ...", ReactivePutObjectBuilder.class.getSimpleName());
+    return new ReactivePutObjectBuilder.Default(properties.getTmpDir());
   }
 
 }

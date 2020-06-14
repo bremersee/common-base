@@ -16,6 +16,7 @@
 
 package org.bremersee.data.minio;
 
+import java.io.File;
 import java.time.Duration;
 import javax.validation.constraints.NotNull;
 import lombok.EqualsAndHashCode;
@@ -72,6 +73,9 @@ public class MinioProperties {
    */
   @NotNull
   private Duration readTimeout = Duration.ofSeconds(10);
+
+  @NotNull
+  private File tmpDir = new File(System.getProperty("java.io.tmpdir"));
 
   /**
    * Metric configuration prefix which are registered on Actuator.
