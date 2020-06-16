@@ -32,6 +32,19 @@ public interface PutObject<T> {
   PutObject<?> EMPTY = InMemoryPutObject.empty();
 
   /**
+   * Checks whether this put object is empty.
+   *
+   * @return {@code true} if it is empty, otherwise {@code false}
+   */
+  default boolean isEmpty() {
+    T obj = getObject();
+    if (obj instanceof byte[]) {
+      return ((byte[]) obj).length == 0;
+    }
+    return obj == null;
+  }
+
+  /**
    * Gets object.
    *
    * @return the object

@@ -38,6 +38,8 @@ public class MultipartNames {
 
   private String filenamePart;
 
+  private boolean required;
+
   /**
    * Instantiates a multipart names.
    *
@@ -45,14 +47,24 @@ public class MultipartNames {
    * @param contentTypePart the content type part
    * @param filenamePart the filename part
    */
-  @Builder(toBuilder = true)
   public MultipartNames(
       String contentPart,
       String contentTypePart,
       String filenamePart) {
 
+    this(contentPart, contentTypePart, filenamePart, false);
+  }
+
+  @Builder(toBuilder = true)
+  public MultipartNames(
+      String contentPart,
+      String contentTypePart,
+      String filenamePart,
+      boolean required) {
+
     this.contentPart = contentPart;
     this.contentTypePart = contentTypePart;
     this.filenamePart = filenamePart;
+    this.required = required;
   }
 }
