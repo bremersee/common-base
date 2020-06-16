@@ -41,7 +41,7 @@ public class MultipartNames {
   private boolean required;
 
   /**
-   * Instantiates a multipart names.
+   * Instantiates new multipart names.
    *
    * @param contentPart the content part
    * @param contentTypePart the content type part
@@ -55,6 +55,14 @@ public class MultipartNames {
     this(contentPart, contentTypePart, filenamePart, false);
   }
 
+  /**
+   * Instantiates new multipart names.
+   *
+   * @param contentPart the content part
+   * @param contentTypePart the content type part
+   * @param filenamePart the filename part
+   * @param required the required
+   */
   @Builder(toBuilder = true)
   public MultipartNames(
       String contentPart,

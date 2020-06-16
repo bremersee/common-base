@@ -52,6 +52,9 @@ import reactor.util.function.Tuple2;
  */
 public interface ReactivePutObjectBuilder {
 
+  /**
+   * The constant MISSING_REQUIRED_PART_ERROR_CODE.
+   */
   String MISSING_REQUIRED_PART_ERROR_CODE = "MULTIPART_PARAMETER_IS_REQUIRED";
 
   /**
@@ -78,6 +81,13 @@ public interface ReactivePutObjectBuilder {
       @NotNull MultiValueMap<String, Part> multiPartData,
       MultipartNames... partNames);
 
+  /**
+   * Build list of all flux.
+   *
+   * @param multiPartData the multi part data
+   * @param partNames the part names
+   * @return the flux
+   */
   Flux<List<PutObject<?>>> buildListOfAll(
       @NotNull MultiValueMap<String, Part> multiPartData,
       MultipartNames... partNames);
@@ -93,6 +103,13 @@ public interface ReactivePutObjectBuilder {
       @NotNull MultiValueMap<String, Part> multiPartData,
       MultipartNames... partNames);
 
+  /**
+   * Build map of all mono.
+   *
+   * @param multiPartData the multi part data
+   * @param partNames the part names
+   * @return the mono
+   */
   Mono<MultiValueMap<String, PutObject<?>>> buildMapOfAll(
       @NotNull MultiValueMap<String, Part> multiPartData,
       MultipartNames... partNames);
