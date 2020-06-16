@@ -43,9 +43,9 @@ public class MultipartNames {
   /**
    * Instantiates new multipart names.
    *
-   * @param contentPart the content part
-   * @param contentTypePart the content type part
-   * @param filenamePart the filename part
+   * @param contentPart the content part name
+   * @param contentTypePart the content type part name
+   * @param filenamePart the filename part name
    */
   public MultipartNames(
       String contentPart,
@@ -58,10 +58,11 @@ public class MultipartNames {
   /**
    * Instantiates new multipart names.
    *
-   * @param contentPart the content part
-   * @param contentTypePart the content type part
-   * @param filenamePart the filename part
-   * @param required the required
+   * @param contentPart the content part name
+   * @param contentTypePart the content type part name
+   * @param filenamePart the filename part name
+   * @param required specifies whether the multi part of the content part name must be present
+   *     or not
    */
   @Builder(toBuilder = true)
   public MultipartNames(

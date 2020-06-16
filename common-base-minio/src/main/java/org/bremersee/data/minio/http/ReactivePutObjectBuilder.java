@@ -17,33 +17,17 @@
 package org.bremersee.data.minio.http;
 
 import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.Collections;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
-import lombok.extern.slf4j.Slf4j;
-import org.bremersee.data.minio.FileSystemPutObject;
-import org.bremersee.data.minio.InMemoryPutObject;
 import org.bremersee.data.minio.PutObject;
 import org.bremersee.exception.ServiceException;
-import org.springframework.http.codec.multipart.FilePart;
-import org.springframework.http.codec.multipart.FormFieldPart;
 import org.springframework.http.codec.multipart.Part;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MimeType;
 import org.springframework.util.MultiValueMap;
-import org.springframework.util.StringUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.util.function.Tuple2;
 
 /**
  * The reactive put object builder.
@@ -58,12 +42,16 @@ public interface ReactivePutObjectBuilder {
   String MISSING_REQUIRED_PART_ERROR_CODE = "MULTIPART_PARAMETER_IS_REQUIRED";
 
   /**
-   * Build put object.
+   * Build put object from multi parts.
    *
-   * @param contentPart the content part
-   * @param contentTypePart the content type part
-   * @param filenamePart the filename part
-   * @return the put object
+   * @param contentPart the multi part with the uploaded content, can be a {@code FilePart} or a
+   *     {@code FormFieldPart} with a base64 coded content
+   * @param contentTypePart the multi part with the content type; it will be used, if the
+   *     content part is a {@code FormFieldPart}
+   * @param filenamePart the multi part with the file name; it will be used, if the content part
+   *     is a {@code FormFieldPart}
+   * @return the put object; if the content part is {@code null}, an empty {@link PutObject} will be
+   *     returned
    */
   Mono<PutObject<?>> build(
       @Nullable Part contentPart,
@@ -71,51 +59,52 @@ public interface ReactivePutObjectBuilder {
       @Nullable Part filenamePart);
 
   /**
-   * Build list of put objects.
+   * Build list of put objects from the given multi part data.
    *
    * @param multiPartData the multi part data
    * @param partNames the part names
    * @return the list of put objects
    */
-  Mono<List<PutObject<?>>> buildListOfFirst(
+  Mono<List<PutObject<?>>> buildFromFirstParameterValue(
       @NotNull MultiValueMap<String, Part> multiPartData,
       MultipartNames... partNames);
 
   /**
-   * Build list of all flux.
+   * Build list (flux) of lists of put objects from the given multi part data.
    *
    * @param multiPartData the multi part data
    * @param partNames the part names
-   * @return the flux
+   * @return the list (flux) of lists of put objects
    */
-  Flux<List<PutObject<?>>> buildListOfAll(
+  Flux<List<PutObject<?>>> buildFromAllParameterValues(
       @NotNull MultiValueMap<String, Part> multiPartData,
       MultipartNames... partNames);
 
   /**
-   * Build map of put objects.
+   * Build map of put objects from the given multi part data.
    *
    * @param multiPartData the multi part data
    * @param partNames the part names
    * @return the map of put objects
    */
-  Mono<Map<String, PutObject<?>>> buildMapOfFirst(
+  Mono<Map<String, PutObject<?>>> buildMapFromFirstParameterValue(
       @NotNull MultiValueMap<String, Part> multiPartData,
       MultipartNames... partNames);
 
   /**
-   * Build map of all mono.
+   * Build multi value map of put objects from the given multi part data.
    *
    * @param multiPartData the multi part data
    * @param partNames the part names
    * @return the mono
    */
-  Mono<MultiValueMap<String, PutObject<?>>> buildMapOfAll(
+  Mono<MultiValueMap<String, PutObject<?>>> buildMapFromAllParameterValues(
       @NotNull MultiValueMap<String, Part> multiPartData,
       MultipartNames... partNames);
 
   /**
-   * Gets put object.
+   * Gets put object with the specified index. If the list is smaller than the index, an empty
+   * {@link PutObject} will be returned.
    *
    * @param list the list
    * @param index the index
@@ -126,10 +115,11 @@ public interface ReactivePutObjectBuilder {
   }
 
   /**
-   * Gets put object.
+   * Gets put object with the specified request parameter name. If no such put object exists, an
+   * empty one will be returned.
    *
    * @param map the map
-   * @param name the name
+   * @param name the request parameter name
    * @return the put object
    */
   static PutObject<?> getPutObject(Map<String, PutObject<?>> map, String name) {
@@ -142,243 +132,49 @@ public interface ReactivePutObjectBuilder {
    * @return the reactive put object builder
    */
   static ReactivePutObjectBuilder defaultBuilder() {
-    return new Default();
+    return new ReactivePutObjectBuilderImpl();
   }
 
   /**
-   * The default implementation.
+   * Default reactive put object builder.
+   *
+   * @param tmpDir the tmp dir
+   * @return the reactive put object builder
    */
-  @Slf4j
-  class Default implements ReactivePutObjectBuilder {
+  static ReactivePutObjectBuilder defaultBuilder(String tmpDir) {
+    return new ReactivePutObjectBuilderImpl(tmpDir);
+  }
 
-    private static final Path DEFAULT_TMP_DIR = Paths.get(System.getProperty("java.io.tmpdir"));
+  /**
+   * Default reactive put object builder.
+   *
+   * @param tmpDir the tmp dir
+   * @return the reactive put object builder
+   */
+  static ReactivePutObjectBuilder defaultBuilder(Path tmpDir) {
+    return new ReactivePutObjectBuilderImpl(tmpDir);
+  }
 
-    private final Path tmpDir;
+  /**
+   * Default reactive put object builder.
+   *
+   * @param tmpDir the tmp dir
+   * @return the reactive put object builder
+   */
+  static ReactivePutObjectBuilder defaultBuilder(File tmpDir) {
+    return new ReactivePutObjectBuilderImpl(tmpDir);
+  }
 
-    /**
-     * Instantiates a new default implementation.
-     */
-    public Default() {
-      this(DEFAULT_TMP_DIR);
-    }
-
-    /**
-     * Instantiates a new default implementation.
-     *
-     * @param tmpDir the tmp dir
-     */
-    public Default(String tmpDir) {
-      this(StringUtils.hasText(tmpDir) ? Paths.get(tmpDir) : DEFAULT_TMP_DIR);
-    }
-
-    /**
-     * Instantiates a new default implementation.
-     *
-     * @param tmpDir the tmp dir
-     */
-    public Default(Path tmpDir) {
-      this.tmpDir = tmpDir != null ? tmpDir : DEFAULT_TMP_DIR;
-      if (!Files.exists(this.tmpDir)) {
-        try {
-          Files.createDirectories(this.tmpDir);
-        } catch (IOException e) {
-          throw ServiceException.internalServerError("Creating tmp dir failed.", e);
-        }
-      }
-      if (!Files.isDirectory(this.tmpDir)) {
-        throw ServiceException.internalServerError(this.tmpDir + " must be a directory.");
-      }
-      if (!Files.isWritable(this.tmpDir)) {
-        throw ServiceException.internalServerError(this.tmpDir + " must be writable.");
-      }
-    }
-
-    /**
-     * Instantiates a new default implementation.
-     *
-     * @param tmpDir the tmp dir
-     */
-    public Default(File tmpDir) {
-      this(tmpDir != null ? tmpDir.toPath() : DEFAULT_TMP_DIR);
-    }
-
-    @Override
-    public Mono<List<PutObject<?>>> buildListOfFirst(
-        MultiValueMap<String, Part> multiPartData,
-        MultipartNames... partNames) {
-
-      if (partNames == null || partNames.length == 0) {
-        return Mono.empty();
-      }
-      return Flux.fromArray(partNames)
-          .flatMap(names -> build(
-              getPart(multiPartData, names.getContentPart(), names.isRequired()),
-              getPart(multiPartData, names.getContentTypePart(), false),
-              getPart(multiPartData, names.getFilenamePart(), false)))
-          .collectList();
-    }
-
-    @Override
-    public Flux<List<PutObject<?>>> buildListOfAll(
-        @NotNull MultiValueMap<String, Part> multiPartData,
-        MultipartNames... partNames) {
-
-      if (partNames == null || partNames.length == 0) {
-        return Flux.empty();
-      }
-      return Flux.fromArray(partNames)
-          .flatMap(names -> build(multiPartData, names));
-    }
-
-    @Override
-    public Mono<Map<String, PutObject<?>>> buildMapOfFirst(
-        MultiValueMap<String, Part> multiPartData,
-        MultipartNames... partNames) {
-
-      if (partNames == null || partNames.length == 0) {
-        return Mono.empty();
-      }
-      return Flux.fromArray(partNames)
-          .flatMap(names -> build(
-              getPart(multiPartData, names.getContentPart(), names.isRequired()),
-              getPart(multiPartData, names.getContentTypePart(), false),
-              getPart(multiPartData, names.getFilenamePart(), false))
-              .zipWith(Mono.just(names.getContentPart())))
-          .collectMap(Tuple2::getT2, Tuple2::getT1, LinkedHashMap::new);
-    }
-
-    @Override
-    public Mono<MultiValueMap<String, PutObject<?>>> buildMapOfAll(
-        @NotNull MultiValueMap<String, Part> multiPartData,
-        MultipartNames... partNames) {
-
-      if (partNames == null || partNames.length == 0) {
-        return Mono.empty();
-      }
-      return Flux.fromArray(partNames)
-          .flatMap(names -> build(multiPartData, names)
-              .zipWith(Mono.just(names.getContentPart())))
-          .collectMap(Tuple2::getT2, Tuple2::getT1, LinkedHashMap::new)
-          .map(LinkedMultiValueMap::new);
-    }
-
-    private Part getPart(MultiValueMap<String, Part> multiPartData, String name, boolean required) {
-      return Optional.ofNullable(name)
-          .map(key -> {
-            Part part = multiPartData.getFirst(key);
-            if (required && part == null) {
-              throw ServiceException.badRequest(
-                  "Parameter '" + name + "' of multipart request is required.",
-                  MISSING_REQUIRED_PART_ERROR_CODE + ":" + name);
-            }
-            return part;
-          })
-          .orElse(null);
-    }
-
-    private Part getPart(MultiValueMap<String, Part> multiPartData, String name, int index) {
-      return Optional.ofNullable(name)
-          .map(multiPartData::get)
-          .map(parts -> parts.size() > index ? parts.get(index) : null)
-          .orElse(null);
-    }
-
-    @Override
-    public Mono<PutObject<?>> build(Part contentPart, Part contentTypePart, Part filenamePart) {
-      if (contentPart instanceof FilePart) {
-        return build((FilePart) contentPart);
-      }
-      if (contentPart instanceof FormFieldPart) {
-        return build((FormFieldPart) contentPart, contentTypePart, filenamePart);
-      }
-      return Mono.just(PutObject.EMPTY);
-    }
-
-    private Mono<List<PutObject<?>>> build(
-        MultiValueMap<String, Part> multiPartData,
-        MultipartNames names) {
-
-      List<Part> contentParts = multiPartData
-          .getOrDefault(names.getContentPart(), Collections.emptyList());
-      if (names.isRequired() && contentParts.isEmpty()) {
-        return Mono.error(() -> ServiceException.badRequest(
-            "Parameter '" + names.getContentPart() + "' of multipart request is required.",
-            MISSING_REQUIRED_PART_ERROR_CODE + ":" + names.getContentPart()));
-      }
-      return Flux.fromIterable(contentParts)
-          .index()
-          .flatMap(tuple -> {
-            int index = tuple.getT1().intValue();
-            Part contentPart = tuple.getT2();
-            Part contentTypePart = getPart(multiPartData, names.getContentTypePart(), index);
-            Part filenamePart = getPart(multiPartData, names.getFilenamePart(), index);
-            return build(contentPart, contentTypePart, filenamePart);
-          })
-          .collectList();
-    }
-
-    private Mono<PutObject<?>> build(FilePart part) {
-      if (part == null) {
-        return Mono.just(PutObject.EMPTY);
-      }
-      return Mono.just(part)
-          .flatMap(filePart -> {
-            File file = new File(tmpDir.toFile(), getRandomFilename());
-            while (file.exists()) {
-              file = new File(tmpDir.toFile(), getRandomFilename());
-            }
-            try {
-              return filePart.transferTo(file)
-                  .then(Mono.just(new FileSystemPutObject(
-                      file, getContentType(filePart), getFilename(filePart))));
-            } catch (Exception e) {
-              if (file.exists() && !file.delete()) {
-                log.warn("Temporary file [{}] was not deleted.", file);
-              }
-              return Mono.error(e);
-            }
-          });
-    }
-
-    private String getRandomFilename() {
-      String t = String.valueOf(System.currentTimeMillis());
-      return "put-" + UUID.randomUUID() + "-" + t.substring(t.length() - 5) + ".tmp";
-    }
-
-    private Mono<PutObject<?>> build(FormFieldPart part, Part contentType, Part name) {
-      if (part == null) {
-        return Mono.just(PutObject.EMPTY);
-      }
-      return Mono.just(part)
-          .map(formFieldPart -> new InMemoryPutObject(
-              formFieldPart.value(),
-              false,
-              getContentType(contentType),
-              getFilename(name)));
-    }
-
-    private String getContentType(Part part) {
-      if (part instanceof FormFieldPart) {
-        return ((FormFieldPart) part).value();
-      }
-      return Optional.ofNullable(part)
-          .map(filePart -> filePart.headers().getContentType())
-          .map(MimeType::toString)
-          .orElse(null);
-    }
-
-    private String getFilename(Part part) {
-      if (part instanceof FormFieldPart) {
-        return ((FormFieldPart) part).value();
-      } else if (part instanceof FilePart) {
-        FilePart filePart = (FilePart) part;
-        return Optional.of(filePart)
-            .map(FilePart::filename)
-            .orElse(null);
-      } else {
-        return null;
-      }
-    }
+  /**
+   * Build missing required part exception.
+   *
+   * @param partName the part name
+   * @return the service exception
+   */
+  static ServiceException buildMissingRequiredPartException(String partName) {
+    return ServiceException.badRequest(
+        "Parameter '" + partName + "' of multipart request is required.",
+        MISSING_REQUIRED_PART_ERROR_CODE + ":" + partName);
   }
 
 }

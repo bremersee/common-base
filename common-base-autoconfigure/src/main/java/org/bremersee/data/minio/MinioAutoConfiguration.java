@@ -21,6 +21,7 @@ import io.minio.errors.InvalidEndpointException;
 import io.minio.errors.InvalidPortException;
 import lombok.extern.slf4j.Slf4j;
 import org.bremersee.data.minio.http.ReactivePutObjectBuilder;
+import org.bremersee.data.minio.http.ReactivePutObjectBuilderImpl;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -130,7 +131,7 @@ public class MinioAutoConfiguration {
   @Bean
   public ReactivePutObjectBuilder reactivePutObjectBuilder() {
     log.info("Creating {} ...", ReactivePutObjectBuilder.class.getSimpleName());
-    return new ReactivePutObjectBuilder.Default(properties.getTmpDir());
+    return new ReactivePutObjectBuilderImpl(properties.getTmpDir());
   }
 
 }
