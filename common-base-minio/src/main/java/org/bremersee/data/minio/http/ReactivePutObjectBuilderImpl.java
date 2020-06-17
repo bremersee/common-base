@@ -203,7 +203,7 @@ public class ReactivePutObjectBuilderImpl implements ReactivePutObjectBuilder {
     return Mono.just(part)
         .map(formFieldPart -> new InMemoryPutObject(
             formFieldPart.value(),
-            false,
+            true, // TODO configure some how
             findContentType(contentType),
             findFilename(name)));
   }
