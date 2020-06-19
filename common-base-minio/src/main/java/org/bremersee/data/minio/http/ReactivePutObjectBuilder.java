@@ -45,62 +45,55 @@ public interface ReactivePutObjectBuilder {
    * Build put object from multi parts.
    *
    * @param contentPart the multi part with the uploaded content, can be a {@code FilePart} or a
-   *     {@code FormFieldPart} with a base64 coded content
-   * @param contentTypePart the multi part with the content type; it will be used, if the
-   *     content part is a {@code FormFieldPart}
-   * @param filenamePart the multi part with the file name; it will be used, if the content part
-   *     is a {@code FormFieldPart}
+   *     {@code FormFieldPart} with a RFC 2397 data uri
    * @return the put object; if the content part is {@code null}, an empty {@link PutObject} will be
    *     returned
    */
-  Mono<PutObject<?>> build(
-      @Nullable Part contentPart,
-      @Nullable Part contentTypePart,
-      @Nullable Part filenamePart);
+  Mono<PutObject<?>> build(@Nullable Part contentPart);
 
   /**
    * Build list of put objects from the given multi part data.
    *
    * @param multiPartData the multi part data
-   * @param partNames the part names
+   * @param requestParameters the request parameters
    * @return the list of put objects
    */
   Mono<List<PutObject<?>>> buildFromFirstParameterValue(
       @NotNull MultiValueMap<String, Part> multiPartData,
-      MultipartNames... partNames);
+      ReqParam... requestParameters);
 
   /**
    * Build list (flux) of lists of put objects from the given multi part data.
    *
    * @param multiPartData the multi part data
-   * @param partNames the part names
+   * @param requestParameters the request parameters
    * @return the list (flux) of lists of put objects
    */
   Flux<List<PutObject<?>>> buildFromAllParameterValues(
       @NotNull MultiValueMap<String, Part> multiPartData,
-      MultipartNames... partNames);
+      ReqParam... requestParameters);
 
   /**
    * Build map of put objects from the given multi part data.
    *
    * @param multiPartData the multi part data
-   * @param partNames the part names
+   * @param requestParameters the request parameters
    * @return the map of put objects
    */
   Mono<Map<String, PutObject<?>>> buildMapFromFirstParameterValue(
       @NotNull MultiValueMap<String, Part> multiPartData,
-      MultipartNames... partNames);
+      ReqParam... requestParameters);
 
   /**
    * Build multi value map of put objects from the given multi part data.
    *
    * @param multiPartData the multi part data
-   * @param partNames the part names
+   * @param requestParameters the request parameters
    * @return the mono
    */
   Mono<MultiValueMap<String, PutObject<?>>> buildMapFromAllParameterValues(
       @NotNull MultiValueMap<String, Part> multiPartData,
-      MultipartNames... partNames);
+      ReqParam... requestParameters);
 
   /**
    * Gets put object with the specified index. If the list is smaller than the index, an empty

@@ -47,6 +47,8 @@ import reactor.util.function.Tuple2;
 
 /**
  * The reactive put object builder implementation.
+ *
+ * @author Christian Bremer
  */
 @Slf4j
 public class ReactivePutObjectBuilderImpl implements ReactivePutObjectBuilder {
@@ -103,12 +105,12 @@ public class ReactivePutObjectBuilderImpl implements ReactivePutObjectBuilder {
   }
 
   @Override
-  public Mono<PutObject<?>> build(Part contentPart, Part contentTypePart, Part filenamePart) {
+  public Mono<PutObject<?>> build(Part contentPart) {
     if (contentPart instanceof FilePart) {
       return create((FilePart) contentPart);
     }
     if (contentPart instanceof FormFieldPart) {
-      return create((FormFieldPart) contentPart, contentTypePart, filenamePart);
+      return create((FormFieldPart) contentPart);
     }
     return Mono.just(PutObject.EMPTY);
   }
@@ -116,59 +118,53 @@ public class ReactivePutObjectBuilderImpl implements ReactivePutObjectBuilder {
   @Override
   public Mono<List<PutObject<?>>> buildFromFirstParameterValue(
       MultiValueMap<String, Part> multiPartData,
-      MultipartNames... partNames) {
+      ReqParam... requestParameters) {
 
-    if (partNames == null || partNames.length == 0) {
+    if (requestParameters == null || requestParameters.length == 0) {
       return Mono.empty();
     }
-    return Flux.fromArray(partNames)
-        .flatMap(names -> build(
-            findPart(multiPartData, names.getContentPart(), names.isRequired()),
-            findPart(multiPartData, names.getContentTypePart(), false),
-            findPart(multiPartData, names.getFilenamePart(), false)))
+    return Flux.fromArray(requestParameters)
+        .flatMap(requestParameter -> build(findPart(multiPartData, requestParameter)))
         .collectList();
   }
 
   @Override
   public Flux<List<PutObject<?>>> buildFromAllParameterValues(
       MultiValueMap<String, Part> multiPartData,
-      MultipartNames... partNames) {
+      ReqParam... requestParameters) {
 
-    if (partNames == null || partNames.length == 0) {
+    if (requestParameters == null || requestParameters.length == 0) {
       return Flux.empty();
     }
-    return Flux.fromArray(partNames)
-        .flatMap(names -> createFromAllParameterValues(multiPartData, names));
+    return Flux.fromArray(requestParameters)
+        .flatMap(requestParameter -> createFromAllParameterValues(multiPartData, requestParameter));
   }
 
   @Override
   public Mono<Map<String, PutObject<?>>> buildMapFromFirstParameterValue(
       MultiValueMap<String, Part> multiPartData,
-      MultipartNames... partNames) {
+      ReqParam... requestParameters) {
 
-    if (partNames == null || partNames.length == 0) {
+    if (requestParameters == null || requestParameters.length == 0) {
       return Mono.empty();
     }
-    return Flux.fromArray(partNames)
-        .flatMap(names -> build(
-            findPart(multiPartData, names.getContentPart(), names.isRequired()),
-            findPart(multiPartData, names.getContentTypePart(), false),
-            findPart(multiPartData, names.getFilenamePart(), false))
-            .zipWith(Mono.just(names.getContentPart())))
+    return Flux.fromArray(requestParameters)
+        .flatMap(requestParameter -> build(findPart(multiPartData, requestParameter))
+            .zipWith(Mono.just(requestParameter.getName())))
         .collectMap(Tuple2::getT2, Tuple2::getT1, LinkedHashMap::new);
   }
 
   @Override
   public Mono<MultiValueMap<String, PutObject<?>>> buildMapFromAllParameterValues(
       MultiValueMap<String, Part> multiPartData,
-      MultipartNames... partNames) {
+      ReqParam... requestParameters) {
 
-    if (partNames == null || partNames.length == 0) {
+    if (requestParameters == null || requestParameters.length == 0) {
       return Mono.empty();
     }
-    return Flux.fromArray(partNames)
-        .flatMap(names -> createFromAllParameterValues(multiPartData, names)
-            .zipWith(Mono.just(names.getContentPart())))
+    return Flux.fromArray(requestParameters)
+        .flatMap(requestParameter -> createFromAllParameterValues(multiPartData, requestParameter)
+            .zipWith(Mono.just(requestParameter.getName())))
         .collectMap(Tuple2::getT2, Tuple2::getT1, LinkedHashMap::new)
         .map(LinkedMultiValueMap::new);
   }
@@ -196,36 +192,25 @@ public class ReactivePutObjectBuilderImpl implements ReactivePutObjectBuilder {
         });
   }
 
-  private Mono<PutObject<?>> create(FormFieldPart part, Part contentType, Part name) {
+  private Mono<PutObject<?>> create(FormFieldPart part) {
     if (part == null) {
       return Mono.just(PutObject.EMPTY);
     }
     return Mono.just(part)
-        .map(formFieldPart -> new InMemoryPutObject(
-            formFieldPart.value(),
-            true, // TODO configure some how
-            findContentType(contentType),
-            findFilename(name)));
+        .map(formFieldPart -> new InMemoryPutObject(formFieldPart.value(), null));
   }
 
   private Mono<List<PutObject<?>>> createFromAllParameterValues(
       MultiValueMap<String, Part> multiPartData,
-      MultipartNames names) {
+      ReqParam requestParameter) {
 
     List<Part> contentParts = multiPartData
-        .getOrDefault(names.getContentPart(), Collections.emptyList());
-    if (names.isRequired() && contentParts.isEmpty()) {
-      return Mono.error(() -> buildMissingRequiredPartException(names.getContentPart()));
+        .getOrDefault(requestParameter.getName(), Collections.emptyList());
+    if (requestParameter.isRequired() && contentParts.isEmpty()) {
+      return Mono.error(() -> buildMissingRequiredPartException(requestParameter.getName()));
     }
     return Flux.fromIterable(contentParts)
-        .index()
-        .flatMap(tuple -> {
-          int index = tuple.getT1().intValue();
-          Part contentPart = tuple.getT2();
-          Part contentTypePart = findPart(multiPartData, names.getContentTypePart(), index);
-          Part filenamePart = findPart(multiPartData, names.getFilenamePart(), index);
-          return build(contentPart, contentTypePart, filenamePart);
-        })
+        .flatMap(this::build)
         .collectList();
   }
 
@@ -252,22 +237,15 @@ public class ReactivePutObjectBuilderImpl implements ReactivePutObjectBuilder {
     }
   }
 
-  private Part findPart(MultiValueMap<String, Part> multiPartData, String name, boolean required) {
-    return Optional.ofNullable(name)
+  private Part findPart(MultiValueMap<String, Part> multiPartData, ReqParam requestParameter) {
+    return Optional.ofNullable(requestParameter)
         .map(key -> {
-          Part part = multiPartData.getFirst(key);
-          if (required && part == null) {
-            throw buildMissingRequiredPartException(name);
+          Part part = multiPartData.getFirst(requestParameter.getName());
+          if (requestParameter.isRequired() && part == null) {
+            throw buildMissingRequiredPartException(requestParameter.getName());
           }
           return part;
         })
-        .orElse(null);
-  }
-
-  private Part findPart(MultiValueMap<String, Part> multiPartData, String name, int index) {
-    return Optional.ofNullable(name)
-        .map(multiPartData::get)
-        .map(parts -> parts.size() > index ? parts.get(index) : null)
         .orElse(null);
   }
 

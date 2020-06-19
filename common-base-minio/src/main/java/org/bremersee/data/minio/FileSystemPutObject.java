@@ -24,15 +24,20 @@ import static java.nio.file.StandardOpenOption.CREATE;
 import static java.nio.file.StandardOpenOption.TRUNCATE_EXISTING;
 import static java.nio.file.StandardOpenOption.WRITE;
 
+import eu.maxschuster.dataurl.DataUrl;
+import eu.maxschuster.dataurl.DataUrlSerializer;
 import io.minio.PutObjectOptions;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import javax.annotation.Nullable;
 import lombok.extern.slf4j.Slf4j;
 import org.bremersee.exception.ServiceException;
+import org.springframework.util.StringUtils;
 
 /**
  * The file system put object.
@@ -42,11 +47,11 @@ import org.bremersee.exception.ServiceException;
 @Slf4j
 public class FileSystemPutObject implements PutObject<Path> {
 
-  private final Path object;
+  private Path object;
 
-  private final String contentType;
+  private String contentType;
 
-  private final String name;
+  private String name;
 
   private FileSystemPutObject() {
     this.object = null;
@@ -61,7 +66,8 @@ public class FileSystemPutObject implements PutObject<Path> {
    * @param contentType the content type
    * @param name the name
    */
-  public FileSystemPutObject(@Nullable File file, @Nullable String contentType, @Nullable String name) {
+  public FileSystemPutObject(@Nullable File file, @Nullable String contentType,
+      @Nullable String name) {
     this(file != null ? file.toPath() : null, contentType, name);
   }
 
@@ -72,7 +78,8 @@ public class FileSystemPutObject implements PutObject<Path> {
    * @param contentType the content type
    * @param name the name
    */
-  public FileSystemPutObject(@Nullable Path path, @Nullable String contentType, @Nullable String name) {
+  public FileSystemPutObject(@Nullable Path path, @Nullable String contentType,
+      @Nullable String name) {
     if (path == null) {
       this.object = null;
     } else if (Files.isReadable(path) && Files.isRegularFile(path)) {
@@ -85,40 +92,117 @@ public class FileSystemPutObject implements PutObject<Path> {
   }
 
   /**
-   * Instantiates a new file system put object.
+   * Instantiates a new File system put object.
    *
-   * @param inputStream the object input stream
+   * @param content the content
    * @param contentType the content type
    * @param name the name
    */
   public FileSystemPutObject(
-      @Nullable InputStream inputStream,
+      @Nullable byte[] content,
       @Nullable String contentType,
       @Nullable String name) {
-    this(inputStream, null, contentType, name);
+    this(content, contentType, name, null);
+  }
+
+  /**
+   * Instantiates a new File system put object.
+   *
+   * @param content the content
+   * @param contentType the content type
+   * @param name the name
+   * @param directory the directory
+   */
+  public FileSystemPutObject(
+      @Nullable byte[] content,
+      @Nullable String contentType,
+      @Nullable String name,
+      @Nullable Path directory) {
+    this(content != null ? new ByteArrayInputStream(content) : null, contentType, name, directory);
+  }
+
+  /**
+   * Instantiates a new file system put object.
+   *
+   * @param dataUri the RFC 2397 data uri
+   * @param name the name
+   */
+  public FileSystemPutObject(
+      @Nullable String dataUri,
+      @Nullable String name) {
+    this(dataUri, name, null);
+  }
+
+  /**
+   * Instantiates a new file system put object.
+   *
+   * @param dataUri the RFC 2397 data uri
+   * @param name the name
+   * @param directory the directory
+   */
+  public FileSystemPutObject(
+      @Nullable String dataUri,
+      @Nullable String name,
+      @Nullable Path directory) {
+
+    if (StringUtils.hasText(dataUri)) {
+      DataUrl data;
+      try {
+        data = new DataUrlSerializer().unserialize(dataUri);
+      } catch (IllegalArgumentException | MalformedURLException e) {
+        throw ServiceException.badRequest("Parsing data uri failed.", e);
+      }
+      init(
+          new ByteArrayInputStream(data.getData()),
+          data.getMimeType(),
+          name,
+          directory);
+    }
   }
 
   /**
    * Instantiates a new file system put object.
    *
    * @param inputStream the object input stream
-   * @param directory the directory
    * @param contentType the content type
    * @param name the name
    */
   public FileSystemPutObject(
       @Nullable InputStream inputStream,
-      @Nullable Path directory,
       @Nullable String contentType,
       @Nullable String name) {
+    this(inputStream, contentType, name, null);
+  }
+
+  /**
+   * Instantiates a new file system put object.
+   *
+   * @param inputStream the object input stream
+   * @param contentType the content type
+   * @param name the name
+   * @param directory the directory
+   */
+  public FileSystemPutObject(
+      @Nullable InputStream inputStream,
+      @Nullable String contentType,
+      @Nullable String name,
+      @Nullable Path directory) {
+    init(inputStream, contentType, name, directory);
+  }
+
+  private void init(
+      InputStream inputStream,
+      String contentType,
+      String name,
+      Path directory) {
 
     Path path = null;
     if (inputStream != null) {
       try (InputStream in = inputStream) {
         if (directory == null) {
-          path = createTempFile(get(System.getProperty("java.io.tmpdir")), "put", "obj");
+          path = createTempFile(get(System.getProperty("java.io.tmpdir")), "put-", ".tmp");
         } else {
-          path = createTempFile(createDirectories(directory), "put", "obj");
+          path = createTempFile(createDirectories(directory), "put-", ".tmp");
         }
         try (OutputStream out = newOutputStream(path, CREATE, TRUNCATE_EXISTING, WRITE)) {
           int len;
@@ -199,6 +283,11 @@ public class FileSystemPutObject implements PutObject<Path> {
     }
   }
 
+  /**
+   * Empty file system put object.
+   *
+   * @return the file system put object
+   */
   public static FileSystemPutObject empty() {
     return new FileSystemPutObject();
   }

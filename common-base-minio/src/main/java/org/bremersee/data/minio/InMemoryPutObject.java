@@ -16,12 +16,14 @@
 
 package org.bremersee.data.minio;
 
+import eu.maxschuster.dataurl.DataUrl;
+import eu.maxschuster.dataurl.DataUrlSerializer;
 import io.minio.PutObjectOptions;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Base64;
+import java.net.MalformedURLException;
 import javax.annotation.Nullable;
 import org.bremersee.exception.ServiceException;
 import org.springframework.util.StringUtils;
@@ -65,27 +67,26 @@ public class InMemoryPutObject implements PutObject<byte[]> {
   /**
    * Instantiates a new in memory put object.
    *
-   * @param base64 the base 64
-   * @param urlEncoded the url encoded
-   * @param contentType the content type
+   * @param dataUri the RFC 2397 data uri
    * @param name the name
    */
   public InMemoryPutObject(
-      @Nullable String base64,
-      boolean urlEncoded,
-      @Nullable String contentType,
+      @Nullable String dataUri,
       @Nullable String name) {
 
-    if (StringUtils.hasText(base64)) {
-      if (urlEncoded) {
-        this.object = Base64.getUrlDecoder().decode(base64);
-      } else {
-        this.object = Base64.getDecoder().decode(base64);
+    if (StringUtils.hasText(dataUri)) {
+      try {
+        DataUrl data = new DataUrlSerializer().unserialize(dataUri);
+        this.object = data.getData();
+        this.contentType = data.getMimeType();
+
+      } catch (IllegalArgumentException | MalformedURLException e) {
+        throw ServiceException.badRequest("Parsing data uri failed.", e);
       }
     } else {
       this.object = null;
+      this.contentType = null;
     }
-    this.contentType = contentType;
     this.name = name;
   }
 
@@ -176,6 +177,11 @@ public class InMemoryPutObject implements PutObject<byte[]> {
     }
   }
 
+  /**
+   * Empty in memory put object.
+   *
+   * @return the in memory put object
+   */
   public static InMemoryPutObject empty() {
     return new InMemoryPutObject();
   }

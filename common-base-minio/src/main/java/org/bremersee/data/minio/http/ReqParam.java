@@ -20,9 +20,10 @@ import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
+import org.springframework.util.Assert;
 
 /**
- * The multipart names.
+ * The request parameter.
  *
  * @author Christian Bremer
  */
@@ -30,50 +31,32 @@ import lombok.ToString;
 @ToString
 @EqualsAndHashCode
 @SuppressWarnings("FieldMayBeFinal")
-public class MultipartNames {
+public class ReqParam {
 
-  private String contentPart;
-
-  private String contentTypePart;
-
-  private String filenamePart;
+  private String name;
 
   private boolean required;
 
   /**
-   * Instantiates new multipart names.
+   * Instantiates a new request parameter.
    *
-   * @param contentPart the content part name
-   * @param contentTypePart the content type part name
-   * @param filenamePart the filename part name
+   * @param name the parameter name
    */
-  public MultipartNames(
-      String contentPart,
-      String contentTypePart,
-      String filenamePart) {
-
-    this(contentPart, contentTypePart, filenamePart, false);
+  public ReqParam(String name) {
+    this(name, false);
   }
 
   /**
-   * Instantiates new multipart names.
+   * Instantiates a new request parameter.
    *
-   * @param contentPart the content part name
-   * @param contentTypePart the content type part name
-   * @param filenamePart the filename part name
+   * @param name the parameter name
    * @param required specifies whether the multi part of the content part name must be present
    *     or not
    */
   @Builder(toBuilder = true)
-  public MultipartNames(
-      String contentPart,
-      String contentTypePart,
-      String filenamePart,
-      boolean required) {
-
-    this.contentPart = contentPart;
-    this.contentTypePart = contentTypePart;
-    this.filenamePart = filenamePart;
+  public ReqParam(String name, boolean required) {
+    Assert.notNull(name, "Request parameter name is required.");
+    this.name = name;
     this.required = required;
   }
 }
