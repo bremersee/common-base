@@ -20,14 +20,10 @@ import io.minio.MinioClient;
 import io.minio.errors.InvalidEndpointException;
 import io.minio.errors.InvalidPortException;
 import lombok.extern.slf4j.Slf4j;
-import org.bremersee.data.minio.http.ReactivePutObjectBuilder;
-import org.bremersee.data.minio.http.ReactivePutObjectBuilderImpl;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication.Type;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -119,19 +115,6 @@ public class MinioAutoConfiguration {
     MinioTemplate minioTemplate = new MinioTemplate(minioClient);
     minioTemplate.setErrorHandler(errorHandlerProvider.getIfAvailable());
     return minioTemplate;
-  }
-
-  /**
-   * Creates reactive put object builder.
-   *
-   * @return the reactive put object builder
-   */
-  @ConditionalOnWebApplication(type = Type.REACTIVE)
-  @ConditionalOnMissingBean
-  @Bean
-  public ReactivePutObjectBuilder reactivePutObjectBuilder() {
-    log.info("Creating {} ...", ReactivePutObjectBuilder.class.getSimpleName());
-    return new ReactivePutObjectBuilderImpl(properties.getTmpDir());
   }
 
 }

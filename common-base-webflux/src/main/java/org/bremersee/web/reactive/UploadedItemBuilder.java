@@ -14,27 +14,28 @@
  * limitations under the License.
  */
 
-package org.bremersee.data.minio.http;
+package org.bremersee.web.reactive;
 
 import java.io.File;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
-import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
-import org.bremersee.data.minio.PutObject;
 import org.bremersee.exception.ServiceException;
+import org.bremersee.web.ReqParam;
+import org.bremersee.web.UploadedItem;
 import org.springframework.http.codec.multipart.Part;
+import org.springframework.lang.Nullable;
 import org.springframework.util.MultiValueMap;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 /**
- * The reactive put object builder.
+ * The reactive uploaded item builder.
  *
  * @author Christian Bremer
  */
-public interface ReactivePutObjectBuilder {
+public interface UploadedItemBuilder {
 
   /**
    * The constant MISSING_REQUIRED_PART_ERROR_CODE.
@@ -46,10 +47,10 @@ public interface ReactivePutObjectBuilder {
    *
    * @param contentPart the multi part with the uploaded content, can be a {@code FilePart} or a
    *     {@code FormFieldPart} with a RFC 2397 data uri
-   * @return the put object; if the content part is {@code null}, an empty {@link PutObject} will be
-   *     returned
+   * @return the put object; if the content part is {@code null}, an empty {@link UploadedItem} will
+   *     be     returned
    */
-  Mono<PutObject<?>> build(@Nullable Part contentPart);
+  Mono<UploadedItem<?>> build(@Nullable Part contentPart);
 
   /**
    * Build list of put objects from the given multi part data.
@@ -58,7 +59,7 @@ public interface ReactivePutObjectBuilder {
    * @param requestParameters the request parameters
    * @return the list of put objects
    */
-  Mono<List<PutObject<?>>> buildFromFirstParameterValue(
+  Mono<List<UploadedItem<?>>> buildFromFirstParameterValue(
       @NotNull MultiValueMap<String, Part> multiPartData,
       ReqParam... requestParameters);
 
@@ -69,7 +70,7 @@ public interface ReactivePutObjectBuilder {
    * @param requestParameters the request parameters
    * @return the list (flux) of lists of put objects
    */
-  Flux<List<PutObject<?>>> buildFromAllParameterValues(
+  Flux<List<UploadedItem<?>>> buildFromAllParameterValues(
       @NotNull MultiValueMap<String, Part> multiPartData,
       ReqParam... requestParameters);
 
@@ -80,7 +81,7 @@ public interface ReactivePutObjectBuilder {
    * @param requestParameters the request parameters
    * @return the map of put objects
    */
-  Mono<Map<String, PutObject<?>>> buildMapFromFirstParameterValue(
+  Mono<Map<String, UploadedItem<?>>> buildMapFromFirstParameterValue(
       @NotNull MultiValueMap<String, Part> multiPartData,
       ReqParam... requestParameters);
 
@@ -91,20 +92,20 @@ public interface ReactivePutObjectBuilder {
    * @param requestParameters the request parameters
    * @return the mono
    */
-  Mono<MultiValueMap<String, PutObject<?>>> buildMapFromAllParameterValues(
+  Mono<MultiValueMap<String, UploadedItem<?>>> buildMapFromAllParameterValues(
       @NotNull MultiValueMap<String, Part> multiPartData,
       ReqParam... requestParameters);
 
   /**
    * Gets put object with the specified index. If the list is smaller than the index, an empty
-   * {@link PutObject} will be returned.
+   * {@link UploadedItem} will be returned.
    *
    * @param list the list
    * @param index the index
    * @return the put object
    */
-  static PutObject<?> getPutObject(List<PutObject<?>> list, int index) {
-    return list != null && index >= 0 && list.size() > index ? list.get(index) : PutObject.EMPTY;
+  static UploadedItem<?> getUploadedItem(List<UploadedItem<?>> list, int index) {
+    return list != null && index >= 0 && list.size() > index ? list.get(index) : UploadedItem.EMPTY;
   }
 
   /**
@@ -115,8 +116,9 @@ public interface ReactivePutObjectBuilder {
    * @param name the request parameter name
    * @return the put object
    */
-  static PutObject<?> getPutObject(Map<String, PutObject<?>> map, String name) {
-    return map != null && name != null ? map.getOrDefault(name, PutObject.EMPTY) : PutObject.EMPTY;
+  static UploadedItem<?> getUploadedItem(Map<String, UploadedItem<?>> map, String name) {
+    return map != null && name != null ? map.getOrDefault(name, UploadedItem.EMPTY)
+        : UploadedItem.EMPTY;
   }
 
   /**
@@ -124,18 +126,8 @@ public interface ReactivePutObjectBuilder {
    *
    * @return the reactive put object builder
    */
-  static ReactivePutObjectBuilder defaultBuilder() {
-    return new ReactivePutObjectBuilderImpl();
-  }
-
-  /**
-   * Default reactive put object builder.
-   *
-   * @param tmpDir the tmp dir
-   * @return the reactive put object builder
-   */
-  static ReactivePutObjectBuilder defaultBuilder(String tmpDir) {
-    return new ReactivePutObjectBuilderImpl(tmpDir);
+  static UploadedItemBuilder defaultBuilder() {
+    return new UploadedItemBuilderImpl();
   }
 
   /**
@@ -144,8 +136,8 @@ public interface ReactivePutObjectBuilder {
    * @param tmpDir the tmp dir
    * @return the reactive put object builder
    */
-  static ReactivePutObjectBuilder defaultBuilder(Path tmpDir) {
-    return new ReactivePutObjectBuilderImpl(tmpDir);
+  static UploadedItemBuilder defaultBuilder(String tmpDir) {
+    return new UploadedItemBuilderImpl(tmpDir);
   }
 
   /**
@@ -154,8 +146,18 @@ public interface ReactivePutObjectBuilder {
    * @param tmpDir the tmp dir
    * @return the reactive put object builder
    */
-  static ReactivePutObjectBuilder defaultBuilder(File tmpDir) {
-    return new ReactivePutObjectBuilderImpl(tmpDir);
+  static UploadedItemBuilder defaultBuilder(Path tmpDir) {
+    return new UploadedItemBuilderImpl(tmpDir);
+  }
+
+  /**
+   * Default reactive put object builder.
+   *
+   * @param tmpDir the tmp dir
+   * @return the reactive put object builder
+   */
+  static UploadedItemBuilder defaultBuilder(File tmpDir) {
+    return new UploadedItemBuilderImpl(tmpDir);
   }
 
   /**

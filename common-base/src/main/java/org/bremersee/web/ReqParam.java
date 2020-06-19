@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.bremersee.data.minio.http;
+package org.bremersee.web;
 
 import lombok.Builder;
 import lombok.EqualsAndHashCode;

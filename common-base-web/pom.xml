@@ -44,6 +44,11 @@
     </dependency>
 
     <dependency>
+      <groupId>eu.maxschuster</groupId>
+      <artifactId>dataurl</artifactId>
+    </dependency>
+
+    <dependency>
       <groupId>org.projectlombok</groupId>
       <artifactId>lombok</artifactId>
       <optional>true</optional>

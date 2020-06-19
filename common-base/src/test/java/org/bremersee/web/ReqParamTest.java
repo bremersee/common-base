@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.bremersee.data.minio.http;
+package org.bremersee.web;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;

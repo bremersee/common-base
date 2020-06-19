@@ -14,68 +14,31 @@
  * limitations under the License.
  */
 
-package org.bremersee.data.minio;
+package org.bremersee.web;
 
-import java.time.Duration;
+import java.io.File;
 import javax.validation.constraints.NotNull;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.validation.annotation.Validated;
 
 /**
- * The minio properties.
+ * The upload properties.
  *
  * @author Christian Bremer
  */
-@ConfigurationProperties(prefix = "bremersee.minio")
+@ConfigurationProperties(prefix = "bremersee.upload")
 @Getter
 @Setter
-@ToString(exclude = {"accessKey", "secretKey"})
+@ToString
 @EqualsAndHashCode
-@NoArgsConstructor
 @Validated
-public class MinioProperties {
+public class UploadProperties {
 
-  /**
-   * The minio url.
-   */
-  private String url;
-
-  /**
-   * The access key.
-   */
-  private String accessKey;
-
-  /**
-   * The secret key.
-   */
-  private String secretKey;
-
-  /**
-   * The connect timeout.
-   */
   @NotNull
-  private Duration connectTimeout = Duration.ofSeconds(10);
-
-  /**
-   * The write timeout.
-   */
-  @NotNull
-  private Duration writeTimeout = Duration.ofSeconds(60);
-
-  /**
-   * The read timeout.
-   */
-  @NotNull
-  private Duration readTimeout = Duration.ofSeconds(10);
-
-  /**
-   * Metric configuration prefix which are registered on Actuator.
-   */
-  private String metricName = "minio.storage";
+  private File tmpDir = new File(System.getProperty("java.io.tmpdir"));
 
 }

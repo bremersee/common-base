@@ -14,12 +14,15 @@
  * limitations under the License.
  */
 
-package org.bremersee.data.minio.http;
+package org.bremersee.web.reactive;
 
-import static org.bremersee.data.minio.http.ReactivePutObjectBuilder.buildMissingRequiredPartException;
+import static org.bremersee.web.reactive.UploadedItemBuilder.buildMissingRequiredPartException;
 
+import eu.maxschuster.dataurl.DataUrl;
+import eu.maxschuster.dataurl.DataUrlSerializer;
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -30,10 +33,12 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
-import org.bremersee.data.minio.FileSystemPutObject;
-import org.bremersee.data.minio.InMemoryPutObject;
-import org.bremersee.data.minio.PutObject;
 import org.bremersee.exception.ServiceException;
+import org.bremersee.web.ReqParam;
+import org.bremersee.web.UploadedByteArray;
+import org.bremersee.web.UploadedFile;
+import org.bremersee.web.UploadedItem;
+import org.springframework.http.MediaType;
 import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.http.codec.multipart.FormFieldPart;
 import org.springframework.http.codec.multipart.Part;
@@ -46,39 +51,39 @@ import reactor.core.publisher.Mono;
 import reactor.util.function.Tuple2;
 
 /**
- * The reactive put object builder implementation.
+ * The reactive uploaded item builder implementation.
  *
  * @author Christian Bremer
  */
 @Slf4j
-public class ReactivePutObjectBuilderImpl implements ReactivePutObjectBuilder {
+public class UploadedItemBuilderImpl implements UploadedItemBuilder {
 
   private static final Path DEFAULT_TMP_DIR = Paths.get(System.getProperty("java.io.tmpdir"));
 
   private final Path tmpDir;
 
   /**
-   * Instantiates a new reactive put object builder implementation.
+   * Instantiates a new reactive uploaded item builder implementation.
    */
-  public ReactivePutObjectBuilderImpl() {
+  public UploadedItemBuilderImpl() {
     this(DEFAULT_TMP_DIR);
   }
 
   /**
-   * Instantiates a new reactive put object builder implementation.
+   * Instantiates a new reactive uploaded item builder implementation.
    *
    * @param tmpDir the tmp dir
    */
-  public ReactivePutObjectBuilderImpl(String tmpDir) {
+  public UploadedItemBuilderImpl(String tmpDir) {
     this(StringUtils.hasText(tmpDir) ? Paths.get(tmpDir) : DEFAULT_TMP_DIR);
   }
 
   /**
-   * Instantiates a new reactive put object builder implementation.
+   * Instantiates a new reactive uploaded item builder implementation.
    *
    * @param tmpDir the tmp dir
    */
-  public ReactivePutObjectBuilderImpl(Path tmpDir) {
+  public UploadedItemBuilderImpl(Path tmpDir) {
     this.tmpDir = tmpDir != null ? tmpDir : DEFAULT_TMP_DIR;
     if (!Files.exists(this.tmpDir)) {
       try {
@@ -96,27 +101,27 @@ public class ReactivePutObjectBuilderImpl implements ReactivePutObjectBuilder {
   }
 
   /**
-   * Instantiates a new reactive put object builder implementation.
+   * Instantiates a new reactive uploaded item builder implementation.
    *
    * @param tmpDir the tmp dir
    */
-  public ReactivePutObjectBuilderImpl(File tmpDir) {
+  public UploadedItemBuilderImpl(File tmpDir) {
     this(tmpDir != null ? tmpDir.toPath() : DEFAULT_TMP_DIR);
   }
 
   @Override
-  public Mono<PutObject<?>> build(Part contentPart) {
+  public Mono<UploadedItem<?>> build(Part contentPart) {
     if (contentPart instanceof FilePart) {
       return create((FilePart) contentPart);
     }
     if (contentPart instanceof FormFieldPart) {
       return create((FormFieldPart) contentPart);
     }
-    return Mono.just(PutObject.EMPTY);
+    return Mono.just(UploadedItem.EMPTY);
   }
 
   @Override
-  public Mono<List<PutObject<?>>> buildFromFirstParameterValue(
+  public Mono<List<UploadedItem<?>>> buildFromFirstParameterValue(
       MultiValueMap<String, Part> multiPartData,
       ReqParam... requestParameters) {
 
@@ -129,7 +134,7 @@ public class ReactivePutObjectBuilderImpl implements ReactivePutObjectBuilder {
   }
 
   @Override
-  public Flux<List<PutObject<?>>> buildFromAllParameterValues(
+  public Flux<List<UploadedItem<?>>> buildFromAllParameterValues(
       MultiValueMap<String, Part> multiPartData,
       ReqParam... requestParameters) {
 
@@ -141,7 +146,7 @@ public class ReactivePutObjectBuilderImpl implements ReactivePutObjectBuilder {
   }
 
   @Override
-  public Mono<Map<String, PutObject<?>>> buildMapFromFirstParameterValue(
+  public Mono<Map<String, UploadedItem<?>>> buildMapFromFirstParameterValue(
       MultiValueMap<String, Part> multiPartData,
       ReqParam... requestParameters) {
 
@@ -155,7 +160,7 @@ public class ReactivePutObjectBuilderImpl implements ReactivePutObjectBuilder {
   }
 
   @Override
-  public Mono<MultiValueMap<String, PutObject<?>>> buildMapFromAllParameterValues(
+  public Mono<MultiValueMap<String, UploadedItem<?>>> buildMapFromAllParameterValues(
       MultiValueMap<String, Part> multiPartData,
       ReqParam... requestParameters) {
 
@@ -169,9 +174,9 @@ public class ReactivePutObjectBuilderImpl implements ReactivePutObjectBuilder {
         .map(LinkedMultiValueMap::new);
   }
 
-  private Mono<PutObject<?>> create(FilePart part) {
+  private Mono<UploadedItem<?>> create(FilePart part) {
     if (part == null) {
-      return Mono.just(PutObject.EMPTY);
+      return Mono.just(UploadedItem.EMPTY);
     }
     return Mono.just(part)
         .flatMap(filePart -> {
@@ -181,7 +186,7 @@ public class ReactivePutObjectBuilderImpl implements ReactivePutObjectBuilder {
           }
           try {
             return filePart.transferTo(file)
-                .then(Mono.just(new FileSystemPutObject(
+                .then(Mono.just(new UploadedFile(
                     file, findContentType(filePart), findFilename(filePart))));
           } catch (Exception e) {
             if (file.exists() && !file.delete()) {
@@ -192,15 +197,37 @@ public class ReactivePutObjectBuilderImpl implements ReactivePutObjectBuilder {
         });
   }
 
-  private Mono<PutObject<?>> create(FormFieldPart part) {
+  private Mono<UploadedItem<?>> create(FormFieldPart part) {
     if (part == null) {
-      return Mono.just(PutObject.EMPTY);
+      return Mono.just(UploadedItem.EMPTY);
     }
     return Mono.just(part)
-        .map(formFieldPart -> new InMemoryPutObject(formFieldPart.value(), null));
+        .map(formFieldPart -> {
+          String value = formFieldPart.value();
+          byte[] data = null;
+          String contentType = null;
+          if (value.toLowerCase().startsWith("data:") && value.indexOf(',') > -1) {
+            DataUrl dataUrl = null;
+            try {
+              dataUrl = new DataUrlSerializer().unserialize(value);
+            } catch (Exception e) {
+              log.debug("Parsing form field as data url failed, "
+                  + "treating value as plain/text (value = {}).", value);
+            }
+            if (dataUrl != null) {
+              data = dataUrl.getData();
+              contentType = dataUrl.getMimeType();
+            }
+          }
+          if (data == null) {
+            data = value.getBytes(StandardCharsets.UTF_8);
+            contentType = MediaType.TEXT_PLAIN_VALUE;
+          }
+          return new UploadedByteArray(data, contentType, null);
+        });
   }
 
-  private Mono<List<PutObject<?>>> createFromAllParameterValues(
+  private Mono<List<UploadedItem<?>>> createFromAllParameterValues(
       MultiValueMap<String, Part> multiPartData,
       ReqParam requestParameter) {
 
