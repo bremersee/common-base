@@ -43,50 +43,50 @@ public interface UploadedItemBuilder {
   String MISSING_REQUIRED_PART_ERROR_CODE = "MULTIPART_PARAMETER_IS_REQUIRED";
 
   /**
-   * Build put object from multi parts.
+   * Build uploaded item from multi parts.
    *
    * @param contentPart the multi part with the uploaded content, can be a {@code FilePart} or a
    *     {@code FormFieldPart} with a RFC 2397 data uri
-   * @return the put object; if the content part is {@code null}, an empty {@link UploadedItem} will
-   *     be     returned
+   * @return the uploaded item; if the content part is {@code null}, an empty {@link UploadedItem}
+   *     will be returned
    */
   Mono<UploadedItem<?>> build(@Nullable Part contentPart);
 
   /**
-   * Build list of put objects from the given multi part data.
+   * Build list of uploaded items from the given multi part data.
    *
    * @param multiPartData the multi part data
    * @param requestParameters the request parameters
-   * @return the list of put objects
+   * @return the list of uploaded items
    */
   Mono<List<UploadedItem<?>>> buildFromFirstParameterValue(
       @NotNull MultiValueMap<String, Part> multiPartData,
       ReqParam... requestParameters);
 
   /**
-   * Build list (flux) of lists of put objects from the given multi part data.
+   * Build list (flux) of lists of uploaded items from the given multi part data.
    *
    * @param multiPartData the multi part data
    * @param requestParameters the request parameters
-   * @return the list (flux) of lists of put objects
+   * @return the list (flux) of lists of uploaded items
    */
   Flux<List<UploadedItem<?>>> buildFromAllParameterValues(
       @NotNull MultiValueMap<String, Part> multiPartData,
       ReqParam... requestParameters);
 
   /**
-   * Build map of put objects from the given multi part data.
+   * Build map of uploaded items from the given multi part data.
    *
    * @param multiPartData the multi part data
    * @param requestParameters the request parameters
-   * @return the map of put objects
+   * @return the map of uploaded items
    */
   Mono<Map<String, UploadedItem<?>>> buildMapFromFirstParameterValue(
       @NotNull MultiValueMap<String, Part> multiPartData,
       ReqParam... requestParameters);
 
   /**
-   * Build multi value map of put objects from the given multi part data.
+   * Build multi value map of uploaded items from the given multi part data.
    *
    * @param multiPartData the multi part data
    * @param requestParameters the request parameters
@@ -97,24 +97,24 @@ public interface UploadedItemBuilder {
       ReqParam... requestParameters);
 
   /**
-   * Gets put object with the specified index. If the list is smaller than the index, an empty
+   * Gets uploaded item with the specified index. If the list is smaller than the index, an empty
    * {@link UploadedItem} will be returned.
    *
    * @param list the list
    * @param index the index
-   * @return the put object
+   * @return the uploaded item
    */
   static UploadedItem<?> getUploadedItem(List<UploadedItem<?>> list, int index) {
     return list != null && index >= 0 && list.size() > index ? list.get(index) : UploadedItem.EMPTY;
   }
 
   /**
-   * Gets put object with the specified request parameter name. If no such put object exists, an
-   * empty one will be returned.
+   * Gets uploaded item with the specified request parameter name. If no such uploaded item exists,
+   * an empty one will be returned.
    *
    * @param map the map
    * @param name the request parameter name
-   * @return the put object
+   * @return the uploaded item
    */
   static UploadedItem<?> getUploadedItem(Map<String, UploadedItem<?>> map, String name) {
     return map != null && name != null ? map.getOrDefault(name, UploadedItem.EMPTY)
@@ -122,39 +122,39 @@ public interface UploadedItemBuilder {
   }
 
   /**
-   * Default reactive put object builder.
+   * Default reactive uploaded item builder.
    *
-   * @return the reactive put object builder
+   * @return the reactive uploaded item builder
    */
   static UploadedItemBuilder defaultBuilder() {
     return new UploadedItemBuilderImpl();
   }
 
   /**
-   * Default reactive put object builder.
+   * Default reactive uploaded item builder.
    *
    * @param tmpDir the tmp dir
-   * @return the reactive put object builder
+   * @return the reactive uploaded item builder
    */
   static UploadedItemBuilder defaultBuilder(String tmpDir) {
     return new UploadedItemBuilderImpl(tmpDir);
   }
 
   /**
-   * Default reactive put object builder.
+   * Default reactive uploaded item builder.
    *
    * @param tmpDir the tmp dir
-   * @return the reactive put object builder
+   * @return the reactive uploaded item builder
    */
   static UploadedItemBuilder defaultBuilder(Path tmpDir) {
     return new UploadedItemBuilderImpl(tmpDir);
   }
 
   /**
-   * Default reactive put object builder.
+   * Default reactive uploaded item builder.
    *
    * @param tmpDir the tmp dir
-   * @return the reactive put object builder
+   * @return the reactive uploaded item builder
    */
   static UploadedItemBuilder defaultBuilder(File tmpDir) {
     return new UploadedItemBuilderImpl(tmpDir);

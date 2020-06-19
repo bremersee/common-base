@@ -83,7 +83,7 @@ public class UploadedFile implements UploadedItem<Path> {
     } else if (Files.isReadable(path) && Files.isRegularFile(path)) {
       this.file = path;
     } else {
-      throw ServiceException.internalServerError("Put object " + path + " is not readable.");
+      throw ServiceException.internalServerError("Uploaded file " + path + " is not readable.");
     }
     this.contentType = contentType;
     this.filename = filename;
