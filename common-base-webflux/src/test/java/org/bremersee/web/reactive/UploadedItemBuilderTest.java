@@ -393,20 +393,6 @@ class UploadedItemBuilderTest {
         .defaultBuilder(Paths.get("java.io.tmpdir")));
   }
 
-  /**
-   * Build missing required part exception.
-   */
-  @Test
-  void buildMissingRequiredPartException() {
-    String part = UUID.randomUUID().toString();
-    ServiceException e = UploadedItemBuilder.buildMissingRequiredPartException(part);
-    assertNotNull(e);
-    assertNotNull(e.getMessage());
-    assertNotNull(e.getErrorCode());
-    assertTrue(e.getMessage().contains(part));
-    assertTrue(e.getErrorCode().contains(part));
-  }
-
   private FilePart createFilePart(byte[] content, MediaType contentType, String filename) {
     FilePart part = mock(FilePart.class);
     when(part.filename()).thenReturn(filename);

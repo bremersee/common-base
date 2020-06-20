@@ -16,8 +16,6 @@
 
 package org.bremersee.web.reactive;
 
-import static org.bremersee.web.reactive.UploadedItemBuilder.buildMissingRequiredPartException;
-
 import eu.maxschuster.dataurl.DataUrl;
 import eu.maxschuster.dataurl.DataUrlSerializer;
 import java.io.File;
@@ -26,6 +24,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -58,6 +57,12 @@ import reactor.util.function.Tuple2;
 public class UploadedItemBuilderImpl implements UploadedItemBuilder {
 
   private static final Path DEFAULT_TMP_DIR = Paths.get(System.getProperty("java.io.tmpdir"));
+
+  private static final String MISSING_REQUIRED_PART_ERROR_CODE = "MULTIPART_PARAMETER_IS_REQUIRED";
+
+  private static final String MAX_SIZE_EXCEEDED_ERROR_CODE = "MULTIPART_SIZE_IS_EXCEEDED";
+
+  private static final String ILLEGAL_CONTENT_TYPE_ERROR_CODE = "MULTIPART_CONTENT_TYPE_IS_ILLEGAL";
 
   private final Path tmpDir;
 
@@ -128,10 +133,7 @@ public class UploadedItemBuilderImpl implements UploadedItemBuilder {
       MultiValueMap<String, Part> multiPartData,
       ReqParam... requestParameters) {
 
-    if (requestParameters == null || requestParameters.length == 0) {
-      return Mono.empty();
-    }
-    return Flux.fromArray(requestParameters)
+    return Flux.fromArray(Optional.ofNullable(requestParameters).orElseGet(() -> new ReqParam[0]))
         .flatMap(requestParameter -> build(
             findPart(multiPartData, requestParameter), requestParameter))
         .collectList();
@@ -142,11 +144,8 @@ public class UploadedItemBuilderImpl implements UploadedItemBuilder {
       MultiValueMap<String, Part> multiPartData,
       ReqParam... requestParameters) {
 
-    if (requestParameters == null || requestParameters.length == 0) {
-      return Flux.empty();
-    }
-    return Flux.fromArray(requestParameters)
-        .flatMap(requestParameter -> createFromAllParameterValues(multiPartData, requestParameter));
+    return Flux.fromArray(Optional.ofNullable(requestParameters).orElseGet(() -> new ReqParam[0]))
+        .flatMap(reqParam -> createFromAllParameterValues(multiPartData, reqParam));
   }
 
   @Override
@@ -154,10 +153,7 @@ public class UploadedItemBuilderImpl implements UploadedItemBuilder {
       MultiValueMap<String, Part> multiPartData,
       ReqParam... requestParameters) {
 
-    if (requestParameters == null || requestParameters.length == 0) {
-      return Mono.empty();
-    }
-    return Flux.fromArray(requestParameters)
+    return Flux.fromArray(Optional.ofNullable(requestParameters).orElseGet(() -> new ReqParam[0]))
         .flatMap(reqParam -> build(findPart(multiPartData, reqParam), reqParam)
             .zipWith(Mono.just(reqParam.getName())))
         .collectMap(Tuple2::getT2, Tuple2::getT1, LinkedHashMap::new);
@@ -168,12 +164,9 @@ public class UploadedItemBuilderImpl implements UploadedItemBuilder {
       MultiValueMap<String, Part> multiPartData,
       ReqParam... requestParameters) {
 
-    if (requestParameters == null || requestParameters.length == 0) {
-      return Mono.empty();
-    }
-    return Flux.fromArray(requestParameters)
-        .flatMap(requestParameter -> createFromAllParameterValues(multiPartData, requestParameter)
-            .zipWith(Mono.just(requestParameter.getName())))
+    return Flux.fromArray(Optional.ofNullable(requestParameters).orElseGet(() -> new ReqParam[0]))
+        .flatMap(reqParam -> createFromAllParameterValues(multiPartData, reqParam)
+            .zipWith(Mono.just(reqParam.getName())))
         .collectMap(Tuple2::getT2, Tuple2::getT1, LinkedHashMap::new)
         .map(LinkedMultiValueMap::new);
   }
@@ -225,8 +218,7 @@ public class UploadedItemBuilderImpl implements UploadedItemBuilder {
     }
     if (reqParam.getMaxSize() > 0 && item.getLength() > reqParam.getMaxSize()) {
       item.delete();
-      throw UploadedItemBuilder
-          .buildMaxSizeExceededException(reqParam.getName(), reqParam.getMaxSize());
+      throw buildMaxSizeExceededException(reqParam.getName(), reqParam.getMaxSize());
     }
     MediaType uploadedMediaType = StringUtils.hasText(item.getContentType())
         ? MediaType.parseMediaType(item.getContentType())
@@ -237,8 +229,7 @@ public class UploadedItemBuilderImpl implements UploadedItemBuilder {
       }
     }
     item.delete();
-    throw UploadedItemBuilder.buildIllegalContentTypeException(
-        reqParam.getName(), reqParam.getAllowedMediaTypes());
+    throw buildIllegalContentTypeException(reqParam.getName(), reqParam.getAllowedMediaTypes());
   }
 
   private Mono<List<UploadedItem<?>>> createFromAllParameterValues(
@@ -299,4 +290,57 @@ public class UploadedItemBuilderImpl implements UploadedItemBuilder {
   }
 
   // TODO job that deletes tmp files
+
+  /**
+   * Build missing required part exception.
+   *
+   * @param partName the part name
+   * @return the service exception
+   */
+  private static ServiceException buildMissingRequiredPartException(String partName) {
+    return ServiceException.badRequest(
+        "Parameter '" + partName + "' of multipart request is required.",
+        MISSING_REQUIRED_PART_ERROR_CODE + ":" + partName);
+  }
+
+  /**
+   * Build max size exceeded exception service exception.
+   *
+   * @param partName the part name
+   * @param maxSize the max size
+   * @return the service exception
+   */
+  private static ServiceException buildMaxSizeExceededException(String partName, long maxSize) {
+    final String max;
+    if (maxSize > 1024 * 1024 * 1024) {
+      max = (maxSize / (1024 * 1024 * 1024)) + " GB";
+    } else if (maxSize > 1024 * 1024) {
+      max = (maxSize / (1024 * 1024)) + " MB";
+    } else if (maxSize > 1024) {
+      max = (maxSize / 1024) + " KB";
+    } else {
+      max = maxSize + " Bytes";
+    }
+    return ServiceException.badRequest(
+        "The maximum size (" + max + ") of the multipart '"
+            + partName + "' is exceeded.",
+        MAX_SIZE_EXCEEDED_ERROR_CODE + ":" + partName);
+  }
+
+  /**
+   * Build illegal content type exception service exception.
+   *
+   * @param partName the part name
+   * @param allowedContentType the allowed content type
+   * @return the service exception
+   */
+  private static ServiceException buildIllegalContentTypeException(
+      String partName,
+      String[] allowedContentType) {
+    return ServiceException.badRequest(
+        "Multipart '" + partName + "' has an illegal content type. It must be one of "
+            + Arrays.toString(allowedContentType) + ".",
+        ILLEGAL_CONTENT_TYPE_ERROR_CODE + ":" + partName);
+  }
+
 }
