@@ -31,7 +31,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.bremersee.exception.ServiceException;
 import org.bremersee.web.ReqParam;
@@ -111,11 +110,15 @@ public class UploadedItemBuilderImpl implements UploadedItemBuilder {
 
   @Override
   public Mono<UploadedItem<?>> build(Part contentPart) {
+    return build(contentPart, null);
+  }
+
+  public Mono<UploadedItem<?>> build(Part contentPart, ReqParam reqParam) {
     if (contentPart instanceof FilePart) {
-      return create((FilePart) contentPart);
+      return create((FilePart) contentPart, reqParam);
     }
     if (contentPart instanceof FormFieldPart) {
-      return create((FormFieldPart) contentPart);
+      return create((FormFieldPart) contentPart, reqParam);
     }
     return Mono.just(UploadedItem.EMPTY);
   }
@@ -129,7 +132,8 @@ public class UploadedItemBuilderImpl implements UploadedItemBuilder {
       return Mono.empty();
     }
     return Flux.fromArray(requestParameters)
-        .flatMap(requestParameter -> build(findPart(multiPartData, requestParameter)))
+        .flatMap(requestParameter -> build(
+            findPart(multiPartData, requestParameter), requestParameter))
         .collectList();
   }
 
@@ -154,8 +158,8 @@ public class UploadedItemBuilderImpl implements UploadedItemBuilder {
       return Mono.empty();
     }
     return Flux.fromArray(requestParameters)
-        .flatMap(requestParameter -> build(findPart(multiPartData, requestParameter))
-            .zipWith(Mono.just(requestParameter.getName())))
+        .flatMap(reqParam -> build(findPart(multiPartData, reqParam), reqParam)
+            .zipWith(Mono.just(reqParam.getName())))
         .collectMap(Tuple2::getT2, Tuple2::getT1, LinkedHashMap::new);
   }
 
@@ -174,30 +178,17 @@ public class UploadedItemBuilderImpl implements UploadedItemBuilder {
         .map(LinkedMultiValueMap::new);
   }
 
-  private Mono<UploadedItem<?>> create(FilePart part) {
+  private Mono<UploadedItem<?>> create(FilePart part, ReqParam reqParam) {
     if (part == null) {
       return Mono.just(UploadedItem.EMPTY);
     }
-    return Mono.just(part)
-        .flatMap(filePart -> {
-          File file = new File(tmpDir.toFile(), getRandomFilename());
-          while (file.exists()) {
-            file = new File(tmpDir.toFile(), getRandomFilename());
-          }
-          try {
-            return filePart.transferTo(file)
-                .then(Mono.just(new UploadedFile(
-                    file, findContentType(filePart), findFilename(filePart))));
-          } catch (Exception e) {
-            if (file.exists() && !file.delete()) {
-              log.warn("Temporary file [{}] was not deleted.", file);
-            }
-            return Mono.error(e);
-          }
-        });
+    final Path file = getTmpFile();
+    return part.transferTo(file)
+        .then(Mono.just(new UploadedFile(file, findContentType(part), findFilename(part))))
+        .map(uploadedFile -> validate(uploadedFile, reqParam));
   }
 
-  private Mono<UploadedItem<?>> create(FormFieldPart part) {
+  private Mono<UploadedItem<?>> create(FormFieldPart part, ReqParam reqParam) {
     if (part == null) {
       return Mono.just(UploadedItem.EMPTY);
     }
@@ -223,8 +214,31 @@ public class UploadedItemBuilderImpl implements UploadedItemBuilder {
             data = value.getBytes(StandardCharsets.UTF_8);
             contentType = MediaType.TEXT_PLAIN_VALUE;
           }
-          return new UploadedByteArray(data, contentType, null);
+          UploadedItem<?> item = new UploadedByteArray(data, contentType, null);
+          return validate(item, reqParam);
         });
+  }
+
+  private UploadedItem<?> validate(UploadedItem<?> item, ReqParam reqParam) {
+    if (reqParam == null) {
+      return item;
+    }
+    if (reqParam.getMaxSize() > 0 && item.getLength() > reqParam.getMaxSize()) {
+      item.delete();
+      throw UploadedItemBuilder
+          .buildMaxSizeExceededException(reqParam.getName(), reqParam.getMaxSize());
+    }
+    MediaType uploadedMediaType = StringUtils.hasText(item.getContentType())
+        ? MediaType.parseMediaType(item.getContentType())
+        : MediaType.APPLICATION_OCTET_STREAM;
+    for (String allowedContentType : reqParam.getAllowedMediaTypes()) {
+      if (MediaType.parseMediaType(allowedContentType).includes(uploadedMediaType)) {
+        return item;
+      }
+    }
+    item.delete();
+    throw UploadedItemBuilder.buildIllegalContentTypeException(
+        reqParam.getName(), reqParam.getAllowedMediaTypes());
   }
 
   private Mono<List<UploadedItem<?>>> createFromAllParameterValues(
@@ -237,7 +251,7 @@ public class UploadedItemBuilderImpl implements UploadedItemBuilder {
       return Mono.error(() -> buildMissingRequiredPartException(requestParameter.getName()));
     }
     return Flux.fromIterable(contentParts)
-        .flatMap(this::build)
+        .flatMap(part -> build(part, requestParameter))
         .collectList();
   }
 
@@ -276,9 +290,13 @@ public class UploadedItemBuilderImpl implements UploadedItemBuilder {
         .orElse(null);
   }
 
-  private String getRandomFilename() {
-    String t = String.valueOf(System.currentTimeMillis());
-    return "put-" + UUID.randomUUID() + "-" + t.substring(t.length() - 5) + ".tmp";
+  private Path getTmpFile() {
+    try {
+      return Files.createTempFile(tmpDir, "obuib-", ".tmp");
+    } catch (Exception e) {
+      throw ServiceException.internalServerError("Creating tmp file failed.", e);
+    }
   }
 
+  // TODO job that deletes tmp files
 }

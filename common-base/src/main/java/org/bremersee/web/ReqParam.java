@@ -30,12 +30,15 @@ import org.springframework.util.Assert;
 @Getter
 @ToString
 @EqualsAndHashCode
-@SuppressWarnings("FieldMayBeFinal")
 public class ReqParam {
 
-  private String name;
+  private final String name;
 
-  private boolean required;
+  private final boolean required;
+
+  private final long maxSize;
+
+  private final String[] allowedMediaTypes;
 
   /**
    * Instantiates a new request parameter.
@@ -53,10 +56,28 @@ public class ReqParam {
    * @param required specifies whether the multi part of the content part name must be present
    *     or not
    */
-  @Builder(toBuilder = true)
   public ReqParam(String name, boolean required) {
+    this(name, required, -1L, null);
+  }
+
+  /**
+   * Instantiates a new request parameter.
+   *
+   * @param name the parameter name
+   * @param required specifies whether the multi part of the content part name must be present
+   *     or not
+   * @param maxSize the max size
+   * @param allowedMediaTypes the allowed media types
+   */
+  @Builder(toBuilder = true)
+  public ReqParam(String name, boolean required, Long maxSize, String[] allowedMediaTypes) {
     Assert.notNull(name, "Request parameter name is required.");
     this.name = name;
     this.required = required;
+    this.maxSize = maxSize != null ? maxSize : -1L;
+    this.allowedMediaTypes = allowedMediaTypes == null || allowedMediaTypes.length == 0
+        ? new String[]{"*/*"}
+        : allowedMediaTypes;
   }
+
 }

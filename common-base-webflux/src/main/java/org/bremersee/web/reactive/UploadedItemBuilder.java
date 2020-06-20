@@ -18,6 +18,7 @@ package org.bremersee.web.reactive;
 
 import java.io.File;
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import javax.validation.constraints.NotNull;
@@ -41,6 +42,16 @@ public interface UploadedItemBuilder {
    * The constant MISSING_REQUIRED_PART_ERROR_CODE.
    */
   String MISSING_REQUIRED_PART_ERROR_CODE = "MULTIPART_PARAMETER_IS_REQUIRED";
+
+  /**
+   * The constant MAX_SIZE_EXCEEDED_ERROR_CODE.
+   */
+  String MAX_SIZE_EXCEEDED_ERROR_CODE = "MULTIPART_SIZE_IS_EXCEEDED";
+
+  /**
+   * The constant ILLEGAL_CONTENT_TYPE_ERROR_CODE.
+   */
+  String ILLEGAL_CONTENT_TYPE_ERROR_CODE = "MULTIPART_CONTENT_TYPE_IS_ILLEGAL";
 
   /**
    * Build uploaded item from multi parts.
@@ -170,6 +181,46 @@ public interface UploadedItemBuilder {
     return ServiceException.badRequest(
         "Parameter '" + partName + "' of multipart request is required.",
         MISSING_REQUIRED_PART_ERROR_CODE + ":" + partName);
+  }
+
+  /**
+   * Build max size exceeded exception service exception.
+   *
+   * @param partName the part name
+   * @param maxSize the max size
+   * @return the service exception
+   */
+  static ServiceException buildMaxSizeExceededException(String partName, long maxSize) {
+    final String max;
+    if (maxSize > 1024 * 1024 * 1024) {
+      max = (maxSize / (1024 * 1024 * 1024)) + " GB";
+    } else if (maxSize > 1024 * 1024) {
+      max = (maxSize / (1024 * 1024)) + " MB";
+    } else if (maxSize > 1024) {
+      max = (maxSize / 1024) + " KB";
+    } else {
+      max = maxSize + " Bytes";
+    }
+    return ServiceException.badRequest(
+        "The maximum size (" + max + ") of the multipart '"
+            + partName + "' is exceeded.",
+        MAX_SIZE_EXCEEDED_ERROR_CODE + ":" + partName);
+  }
+
+  /**
+   * Build illegal content type exception service exception.
+   *
+   * @param partName the part name
+   * @param allowedContentType the allowed content type
+   * @return the service exception
+   */
+  static ServiceException buildIllegalContentTypeException(
+      String partName,
+      String[] allowedContentType) {
+    return ServiceException.badRequest(
+        "Multipart '" + partName + "' has an illegal content type. It must be one of "
+            + Arrays.toString(allowedContentType) + ".",
+        ILLEGAL_CONTENT_TYPE_ERROR_CODE + ":" + partName);
   }
 
 }
