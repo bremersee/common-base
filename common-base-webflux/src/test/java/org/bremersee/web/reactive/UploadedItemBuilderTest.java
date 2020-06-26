@@ -390,7 +390,7 @@ class UploadedItemBuilderTest {
   @Test
   void defaultBuilderFromPath() {
     assertNotNull(UploadedItemBuilder
-        .defaultBuilder(Paths.get("java.io.tmpdir")));
+        .defaultBuilder(Paths.get(System.getProperty("java.io.tmpdir"))));
   }
 
   private FilePart createFilePart(byte[] content, MediaType contentType, String filename) {
@@ -399,6 +399,7 @@ class UploadedItemBuilderTest {
     when(part.transferTo(any(File.class))).then(invocationOnMock -> {
       try {
         File file = invocationOnMock.getArgument(0);
+        file.deleteOnExit();
         Files.write(
             file.toPath(),
             content,
@@ -411,6 +412,7 @@ class UploadedItemBuilderTest {
     when(part.transferTo(any(Path.class))).then(invocationOnMock -> {
       try {
         Path file = invocationOnMock.getArgument(0);
+        file.toFile().deleteOnExit();
         Files.write(
             file,
             content,
