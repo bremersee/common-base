@@ -56,7 +56,7 @@ public class UploadedFile implements UploadedItem<Path> {
    *
    * @param file the file
    * @param contentType the content type
-   * @param filename the filename
+   * @param filename the file name
    */
   public UploadedFile(
       @Nullable File file,
@@ -71,7 +71,7 @@ public class UploadedFile implements UploadedItem<Path> {
    *
    * @param path the path
    * @param contentType the content type
-   * @param filename the filename
+   * @param filename the file name
    */
   public UploadedFile(
       @Nullable Path path,
@@ -94,13 +94,13 @@ public class UploadedFile implements UploadedItem<Path> {
    *
    * @param content the content
    * @param contentType the content type
-   * @param name the name
+   * @param filename the file name
    */
   public UploadedFile(
       @Nullable byte[] content,
       @Nullable String contentType,
-      @Nullable String name) {
-    this(content, contentType, name, null);
+      @Nullable String filename) {
+    this(content, contentType, filename, null);
   }
 
   /**
