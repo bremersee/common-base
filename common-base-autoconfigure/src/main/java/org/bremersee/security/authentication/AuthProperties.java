@@ -24,6 +24,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -88,6 +89,10 @@ public class AuthProperties {
    * Specifies whether the roles value is a list (json array) or a simple string.
    */
   private boolean rolesValueList = true;
+
+  private String preferredLanguageJsonPath = "$.preferred_language";
+
+  private String preferredTimeZoneJsonPath = "$.preferred_time_zone";
 
   /**
    * The role value separator to use if the role value is a simple string.

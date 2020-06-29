@@ -20,7 +20,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 import lombok.extern.slf4j.Slf4j;
-import org.bremersee.common.model.JavaLocale;
 import org.springframework.boot.autoconfigure.AutoConfigureBefore;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -32,7 +31,6 @@ import org.springframework.context.support.AbstractResourceBasedMessageSource;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
 import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.util.ClassUtils;
-import org.springframework.util.StringUtils;
 
 /**
  * The message source configuration.
@@ -113,10 +111,7 @@ public class MessageSourceAutoConfiguration {
   }
 
   private void configure(AbstractResourceBasedMessageSource messageSource) {
-    if (StringUtils.hasText(properties.getDefaultLocale())) {
-      JavaLocale javaLocale = JavaLocale.fromValue(properties.getDefaultLocale());
-      messageSource.setDefaultLocale(javaLocale.toLocale());
-    }
+    messageSource.setDefaultLocale(properties.defaultLocale());
     messageSource.setFallbackToSystemLocale(properties.isFallbackToSystemLocale());
     messageSource.setDefaultEncoding(properties.getDefaultEncoding());
     final List<String> baseNames = getBaseNames();

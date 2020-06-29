@@ -2,10 +2,13 @@ package org.bremersee.context;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Locale;
+import java.util.TimeZone;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
 
@@ -171,4 +174,27 @@ class MessageSourcePropertiesTest {
     assertEquals(expected, actual);
     assertTrue(expected.toString().contains(value));
   }
+
+  /**
+   * Default locale.
+   */
+  @Test
+  void defaultLocale() {
+    MessageSourceProperties properties = new MessageSourceProperties();
+    properties.setDefaultLocale("en-GB");
+    assertNotNull(properties.defaultLocale());
+    assertEquals(new Locale("en", "GB"), properties.defaultLocale());
+  }
+
+  /**
+   * Default time zone.
+   */
+  @Test
+  void defaultTimeZone() {
+    MessageSourceProperties properties = new MessageSourceProperties();
+    properties.setDefaultTimeZone("America/Santiago");
+    assertNotNull(properties.defaultLocale());
+    assertEquals(TimeZone.getTimeZone("America/Santiago"), properties.defaultTimeZone());
+  }
+
 }
