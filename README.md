@@ -6,4 +6,4 @@
 
 - [Release](https://bremersee.github.io/common-base/index.html)
 
-- [Snapshot](https://nexus.bremersee.org/repository/maven-sites/common-base/2.1.5-SNAPSHOT/index.html)
+- [Snapshot](https://nexus.bremersee.org/repository/maven-sites/common-base/2.2.0-SNAPSHOT/index.html)
