@@ -23,16 +23,29 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import io.minio.MinioClient;
+import io.minio.Result;
 import io.minio.errors.InvalidEndpointException;
 import io.minio.errors.InvalidPortException;
 import io.minio.messages.Bucket;
+import io.minio.messages.EventType;
+import io.minio.messages.NotificationConfiguration;
 import io.minio.messages.ObjectLockConfiguration;
+import io.minio.messages.QueueConfiguration;
+import io.minio.messages.Retention;
 import io.minio.messages.RetentionDurationDays;
 import io.minio.messages.RetentionMode;
+import io.minio.messages.Upload;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.time.ZonedDateTime;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.bremersee.data.minio.app.TestConfiguration;
+import org.bremersee.web.UploadedByteArray;
+import org.bremersee.web.UploadedItem;
+import org.bremersee.web.UploadedItem.DeleteMode;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
@@ -43,6 +56,7 @@ import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
+import org.springframework.http.MediaType;
 import org.springframework.util.StringUtils;
 
 /**
@@ -177,21 +191,90 @@ public class MinioTemplateTest {
   void defaultRetention() {
     final String bucketName = UUID.randomUUID().toString();
     minioTemplate.makeBucket(bucketName, null, true);
-    ObjectLockConfiguration config = new ObjectLockConfiguration(
-        RetentionMode.COMPLIANCE,
-        new RetentionDurationDays(5));
-    minioTemplate.setDefaultRetention(bucketName, config);
+    try {
+      ObjectLockConfiguration config = new ObjectLockConfiguration(
+          RetentionMode.COMPLIANCE,
+          new RetentionDurationDays(5));
+      minioTemplate.setDefaultRetention(bucketName, config);
 
-    ObjectLockConfiguration readConfig = minioTemplate.getDefaultRetention(bucketName);
-    assertNotNull(readConfig);
+      ObjectLockConfiguration readConfig = minioTemplate.getDefaultRetention(bucketName);
+      assertNotNull(readConfig);
 
-    minioTemplate.removeBucket(bucketName);
+    } finally {
+      minioTemplate.removeBucket(bucketName);
+    }
+  }
+
+  @Order(40)
+  @Test
+  void objectRetention() {
+    final String bucketName = UUID.randomUUID().toString();
+    minioTemplate.makeBucket(bucketName);
+
+    final String objectName = UUID.randomUUID().toString() + ".txt";
+    final UploadedItem<?> item = new UploadedByteArray(
+        "Hello".getBytes(StandardCharsets.UTF_8),
+        MediaType.TEXT_PLAIN_VALUE,
+        objectName);
+    minioTemplate.putObject(
+        bucketName,
+        objectName,
+        item,
+        DeleteMode.ALWAYS);
+    try {
+      // We need a https connection
+      Retention config = new Retention(RetentionMode.COMPLIANCE, ZonedDateTime.now().plusYears(1));
+      assertThrows(
+          MinioException.class,
+          () -> minioTemplate.setObjectRetention(bucketName, objectName, null, config, true));
+
+      Retention retention = minioTemplate.getObjectRetention(bucketName, objectName, null);
+      assertNotNull(retention);
+
+    } finally {
+      minioTemplate.removeObject(bucketName, objectName);
+      minioTemplate.removeBucket(bucketName);
+    }
+  }
+
+  @Order(50)
+  @Test
+  void objectLegalHold() {
+    final String bucketName = UUID.randomUUID().toString();
+    minioTemplate.makeBucket(bucketName);
+
+    final String objectName = UUID.randomUUID().toString() + ".txt";
+    final UploadedItem<?> item = new UploadedByteArray(
+        "Hello".getBytes(StandardCharsets.UTF_8),
+        MediaType.TEXT_PLAIN_VALUE,
+        objectName);
+    minioTemplate.putObject(
+        bucketName,
+        objectName,
+        item,
+        DeleteMode.ALWAYS);
+    try {
+      // We need a https connection
+      assertThrows(
+          MinioException.class,
+          () -> minioTemplate.enableObjectLegalHold(bucketName, objectName, null));
+      assertThrows(
+          MinioException.class,
+          () -> minioTemplate.disableObjectLegalHold(bucketName, objectName, null));
+      assertThrows(
+          MinioException.class,
+          () -> minioTemplate.isObjectLegalHoldEnabled(bucketName, objectName, null));
+
+    } finally {
+      minioTemplate.removeObject(bucketName, objectName);
+      minioTemplate.removeBucket(bucketName);
+    }
   }
 
   /**
    * Bucket policy.
    */
-  @Order(40)
+  @Order(60)
   @Test
   void bucketPolicy() {
     final String bucketName = UUID.randomUUID().toString();
@@ -204,7 +287,7 @@ public class MinioTemplateTest {
   /**
    * Bucket life cycle.
    */
-  @Order(50)
+  @Order(70)
   @Test
   void bucketLifeCycle() {
     final String bucketName = UUID.randomUUID().toString();
@@ -218,8 +301,7 @@ public class MinioTemplateTest {
         + "<Days>30</Days>"
         + "</Expiration>"
         + "</Rule>"
-        + "</LifecycleConfiguration>"
-        ;
+        + "</LifecycleConfiguration>";
     minioTemplate.makeBucket(bucketName);
     minioTemplate.setBucketLifeCycle(bucketName, lifecycle);
     String readLifecycle = minioTemplate.getBucketLifeCycle(bucketName);
@@ -227,6 +309,79 @@ public class MinioTemplateTest {
     assertTrue(readLifecycle.contains("30"));
     minioTemplate.deleteBucketLifeCycle(bucketName);
     minioTemplate.removeBucket(bucketName);
+  }
+
+  @Order(80)
+  @Test
+  void bucketNotification() {
+    final String bucketName = UUID.randomUUID().toString();
+    minioTemplate.makeBucket(bucketName);
+    try {
+      NotificationConfiguration config = minioTemplate.getBucketNotification(bucketName);
+      assertNotNull(config);
+
+      List<EventType> eventList = new LinkedList<>();
+      eventList.add(EventType.OBJECT_CREATED_PUT);
+      eventList.add(EventType.OBJECT_CREATED_COPY);
+
+      QueueConfiguration queueConfiguration = new QueueConfiguration();
+      queueConfiguration.setQueue("arn:minio:sqs::1:webhook");
+      queueConfiguration.setEvents(eventList);
+      queueConfiguration.setPrefixRule("images");
+      queueConfiguration.setSuffixRule("pg");
+
+      List<QueueConfiguration> queueConfigurationList = new LinkedList<>();
+      queueConfigurationList.add(queueConfiguration);
+
+      NotificationConfiguration newConfig = new NotificationConfiguration();
+      newConfig.setQueueConfigurationList(queueConfigurationList);
+
+      assertThrows(
+          MinioException.class,
+          () -> minioTemplate.setBucketNotification(bucketName, newConfig));
+
+      minioTemplate.removeAllBucketNotification(bucketName);
+
+      assertThrows(MinioException.class, () -> minioTemplate.listenBucketNotification(
+          bucketName,
+          "images",
+          ".png",
+          new String[]{EventType.OBJECT_CREATED_PUT.name()}));
+
+    } finally {
+      minioTemplate.removeBucket(bucketName);
+    }
+  }
+
+  @Order(90)
+  @Test
+  void listIncompleteUploads() {
+    final String bucketName = UUID.randomUUID().toString();
+    minioTemplate.makeBucket(bucketName);
+    try {
+      Iterable<Result<Upload>> results = minioTemplate.listIncompleteUploads(bucketName);
+      assertNotNull(results);
+      results = minioTemplate.listIncompleteUploads(bucketName, "images");
+      assertNotNull(results);
+      results = minioTemplate.listIncompleteUploads(bucketName, "images", true);
+      assertNotNull(results);
+
+    } finally {
+      minioTemplate.removeBucket(bucketName);
+    }
+  }
+
+  @Order(100)
+  @Test
+  void removeIncompleteUpload() {
+    final String bucketName = UUID.randomUUID().toString();
+    minioTemplate.makeBucket(bucketName);
+    try {
+      minioTemplate.removeIncompleteUpload(bucketName, "unknown");
+
+    } finally {
+      minioTemplate.removeBucket(bucketName);
+    }
   }
 
 }

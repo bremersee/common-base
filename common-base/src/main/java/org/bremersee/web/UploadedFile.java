@@ -16,6 +16,7 @@
 
 package org.bremersee.web;
 
+import static java.lang.System.getProperty;
 import static java.nio.file.Files.createDirectories;
 import static java.nio.file.Files.createTempFile;
 import static java.nio.file.Files.newOutputStream;
@@ -32,6 +33,8 @@ import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 import org.bremersee.exception.ServiceException;
 import org.springframework.lang.Nullable;
@@ -43,6 +46,8 @@ import org.springframework.util.Assert;
  * @author Christian Bremer
  */
 @Slf4j
+@ToString
+@EqualsAndHashCode
 public class UploadedFile implements UploadedItem<Path> {
 
   private final Path file;
@@ -63,7 +68,8 @@ public class UploadedFile implements UploadedItem<Path> {
       @Nullable String contentType,
       @Nullable String filename) {
 
-    this(file != null ? file.toPath() : null, contentType, filename);
+    //noinspection RedundantCast
+    this(file != null ? file.toPath() : (Path) null, contentType, filename);
   }
 
   /**
@@ -152,7 +158,7 @@ public class UploadedFile implements UploadedItem<Path> {
     if (inputStream != null) {
       try (InputStream in = inputStream) {
         if (directory == null) {
-          path = createTempFile(get(System.getProperty("java.io.tmpdir")), "upload-", ".tmp");
+          path = createTempFile(get(getProperty("java.io.tmpdir")), "upload-", ".tmp");
         } else {
           path = createTempFile(createDirectories(directory), "upload-", ".tmp");
         }

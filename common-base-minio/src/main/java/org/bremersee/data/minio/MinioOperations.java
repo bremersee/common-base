@@ -84,7 +84,7 @@ public interface MinioOperations {
    * for (Bucket bucket : bucketList) {
    *   System.out.println(bucket.creationDate() + ", " + bucket.name());
    * }
-   * }****</pre>
+   * }</pre>
    *
    * @return List &ltBucket&gt - List of bucket information.
    */
@@ -102,12 +102,12 @@ public interface MinioOperations {
    * } else {
    *   System.out.println("my-bucketname does not exist");
    * }
-   * }****</pre>
+   * }</pre>
    *
    * @param bucketName Name of the bucket.
    * @return boolean - True if the bucket exists.
    */
-  default boolean bucketExists(String bucketName) {
+  default boolean bucketExists(@NotEmpty String bucketName) {
     return execute(minioClient -> minioClient.bucketExists(bucketName));
   }
 
@@ -116,7 +116,7 @@ public interface MinioOperations {
    *
    * <pre>Example:{@code
    * minioOperations.makeBucket("my-bucketname");
-   * }****</pre>
+   * }</pre>
    *
    * @param bucketName Name of the bucket.
    */
@@ -129,7 +129,7 @@ public interface MinioOperations {
    *
    * <pre>Example:{@code
    * minioOperations.makeBucket("my-bucketname", "eu-west-1");
-   * }****</pre>
+   * }</pre>
    *
    * @param bucketName Name of the bucket.
    * @param region Region in which the bucket will be created.
@@ -145,7 +145,7 @@ public interface MinioOperations {
    *
    * <pre>Example:{@code
    * minioOperations.makeBucket("my-bucketname", "eu-west-2", true);
-   * }****</pre>
+   * }</pre>
    *
    * @param bucketName Name of the bucket.
    * @param region Region in which the bucket will be created.
@@ -164,7 +164,7 @@ public interface MinioOperations {
    *
    * <pre>Example:{@code
    * minioOperations.enableVersioning("my-bucketname");
-   * }****</pre>
+   * }</pre>
    *
    * @param bucketName Name of the bucket.
    */
@@ -178,7 +178,7 @@ public interface MinioOperations {
    *
    * <pre>Example:{@code
    * minioOperations.disableVersioning("my-bucketname");
-   * }****</pre>
+   * }</pre>
    *
    * @param bucketName Name of the bucket.
    */
@@ -194,7 +194,7 @@ public interface MinioOperations {
    * ObjectLockConfiguration config = new ObjectLockConfiguration(
    *     RetentionMode.COMPLIANCE, new RetentionDurationDays(100));
    * minioOperations.setDefaultRetention("my-bucketname", config);
-   * }****</pre>
+   * }</pre>
    *
    * @param bucketName Name of the bucket.
    * @param config Object lock configuration.
@@ -214,12 +214,12 @@ public interface MinioOperations {
    * System.out.println("Mode: " + config.mode());
    * System.out.println(
    *     "Duration: " + config.duration().duration() + " " + config.duration().unit());
-   * }****</pre>
+   * }</pre>
    *
    * @param bucketName Name of the bucket.
    * @return {@link ObjectLockConfiguration} - Default retention configuration.
    */
-  default ObjectLockConfiguration getDefaultRetention(String bucketName) {
+  default ObjectLockConfiguration getDefaultRetention(@NotEmpty String bucketName) {
     return execute(minioClient -> minioClient.getDefaultRetention(bucketName));
   }
 
@@ -231,7 +231,7 @@ public interface MinioOperations {
    *     new Retention(RetentionMode.COMPLIANCE, ZonedDateTime.now().plusYears(1));
    * minioOperations.setObjectRetention(
    *     "my-bucketname", "my-objectname", null, retention, true);
-   * }****</pre>
+   * }</pre>
    *
    * @param bucketName Name of the bucket.
    * @param objectName Object name in the bucket.
@@ -240,8 +240,8 @@ public interface MinioOperations {
    * @param bypassGovernanceRetention Bypass Governance retention.
    */
   default void setObjectRetention(
-      String bucketName,
-      String objectName,
+      @NotEmpty String bucketName,
+      @NotEmpty String objectName,
       String versionId,
       Retention config,
       boolean bypassGovernanceRetention) {
@@ -257,14 +257,17 @@ public interface MinioOperations {
    *     minioOperations.getObjectRetention("my-bucketname", "my-objectname", null);
    * System.out.println(
    *     "mode: " + retention.mode() + "until: " + retention.retainUntilDate());
-   * }****</pre>
+   * }</pre>
    *
    * @param bucketName Name of the bucket.
    * @param objectName Object name in the bucket.
    * @param versionId Version ID of the object.
    * @return object retention configuration.
    */
-  default Retention getObjectRetention(String bucketName, String objectName, String versionId) {
+  default Retention getObjectRetention(
+      @NotEmpty String bucketName,
+      @NotEmpty String objectName,
+      String versionId) {
     return execute(minioClient -> minioClient
         .getObjectRetention(bucketName, objectName, versionId));
   }
@@ -274,13 +277,16 @@ public interface MinioOperations {
    *
    * <pre>Example:{@code
    * minioOperations.enableObjectLegalHold("my-bucketname", "my-object", null);
-   * }****</pre>
+   * }</pre>
    *
    * @param bucketName Name of the bucket.
    * @param objectName Object name in the bucket.
    * @param versionId Version ID of the object.
    */
-  default void enableObjectLegalHold(String bucketName, String objectName, String versionId) {
+  default void enableObjectLegalHold(
+      @NotEmpty String bucketName,
+      @NotEmpty String objectName,
+      String versionId) {
     execute((MinioClientCallbackWithoutResult) minioClient -> minioClient
         .enableObjectLegalHold(bucketName, objectName, versionId));
   }
@@ -290,13 +296,16 @@ public interface MinioOperations {
    *
    * <pre>Example:{@code
    * minioOperations.disableObjectLegalHold("my-bucketname", "my-object", null);
-   * }****</pre>
+   * }</pre>
    *
    * @param bucketName Name of the bucket.
    * @param objectName Object name in the bucket.
    * @param versionId Version ID of the object.
    */
-  default void disableObjectLegalHold(String bucketName, String objectName, String versionId) {
+  default void disableObjectLegalHold(
+      @NotEmpty String bucketName,
+      @NotEmpty String objectName,
+      String versionId) {
     execute((MinioClientCallbackWithoutResult) minioClient -> minioClient
         .disableObjectLegalHold(bucketName, objectName, versionId));
   }
@@ -312,14 +321,17 @@ public interface MinioOperations {
    * } else {
    *   System.out.println("Legal hold is off");
    * }
-   * }****</pre>
+   * }</pre>
    *
    * @param bucketName Name of the bucket.
    * @param objectName Object name in the bucket.
    * @param versionId Version ID of the object.
    * @return boolean - True if legal hold is enabled.
    */
-  default boolean isObjectLegalHoldEnabled(String bucketName, String objectName, String versionId) {
+  default boolean isObjectLegalHoldEnabled(
+      @NotEmpty String bucketName,
+      @NotEmpty String objectName,
+      String versionId) {
     return execute(minioClient -> minioClient
         .isObjectLegalHoldEnabled(bucketName, objectName, versionId));
   }
@@ -329,11 +341,11 @@ public interface MinioOperations {
    *
    * <pre>Example:{@code
    * minioOperations.removeBucket("my-bucketname");
-   * }****</pre>
+   * }</pre>
    *
    * @param bucketName Name of the bucket.
    */
-  default void removeBucket(String bucketName) {
+  default void removeBucket(@NotEmpty String bucketName) {
     execute((MinioClientCallbackWithoutResult) minioClient -> minioClient
         .removeBucket(bucketName));
   }
@@ -343,12 +355,12 @@ public interface MinioOperations {
    *
    * <pre>Example:{@code
    * String config = minioOperations.getBucketPolicy("my-bucketname");
-   * }****</pre>
+   * }</pre>
    *
    * @param bucketName Name of the bucket.
    * @return String - Bucket policy configuration as JSON string.
    */
-  default String getBucketPolicy(String bucketName) {
+  default String getBucketPolicy(@NotEmpty String bucketName) {
     return execute(minioClient -> minioClient.getBucketPolicy(bucketName));
   }
 
@@ -379,12 +391,12 @@ public interface MinioOperations {
    * // }
    * //
    * minioOperations.setBucketPolicy("my-bucketname", policyJson);
-   * }****</pre>
+   * }</pre>
    *
    * @param bucketName Name of the bucket.
    * @param policy Bucket policy configuration as JSON string.
    */
-  default void setBucketPolicy(String bucketName, String policy) {
+  default void setBucketPolicy(@NotEmpty String bucketName, @NotEmpty String policy) {
     execute((MinioClientCallbackWithoutResult) minioClient -> minioClient
         .setBucketPolicy(bucketName, policy));
   }
@@ -406,12 +418,12 @@ public interface MinioOperations {
    * // </LifecycleConfiguration>
    * //
    * minioOperations.setBucketLifecycle("my-bucketname", lifeCycleXml);
-   * }****</pre>
+   * }</pre>
    *
    * @param bucketName Name of the bucket.
    * @param lifeCycle Life cycle configuraion as XML string.
    */
-  default void setBucketLifeCycle(String bucketName, String lifeCycle) {
+  default void setBucketLifeCycle(@NotEmpty String bucketName, @NotEmpty String lifeCycle) {
     execute((MinioClientCallbackWithoutResult) minioClient -> minioClient
         .setBucketLifeCycle(bucketName, lifeCycle));
   }
@@ -421,11 +433,11 @@ public interface MinioOperations {
    *
    * <pre>Example:{@code
    * deleteBucketLifeCycle("my-bucketname");
-   * }****</pre>
+   * }</pre>
    *
    * @param bucketName Name of the bucket.
    */
-  default void deleteBucketLifeCycle(String bucketName) {
+  default void deleteBucketLifeCycle(@NotEmpty String bucketName) {
     execute((MinioClientCallbackWithoutResult) minioClient -> minioClient
         .deleteBucketLifeCycle(bucketName));
   }
@@ -435,12 +447,12 @@ public interface MinioOperations {
    *
    * <pre>Example:{@code
    * String lifecycle = minioOperations.getBucketLifecycle("my-bucketname");
-   * }****</pre>
+   * }</pre>
    *
    * @param bucketName Name of the bucket.
    * @return String - Life cycle configuration as XML string.
    */
-  default String getBucketLifeCycle(String bucketName) {
+  default String getBucketLifeCycle(@NotEmpty String bucketName) {
     return execute(minioClient -> minioClient.getBucketLifeCycle(bucketName));
   }
 
@@ -450,12 +462,12 @@ public interface MinioOperations {
    * <pre>Example:{@code
    * NotificationConfiguration config =
    *     minioOperations.getBucketNotification("my-bucketname");
-   * }****</pre>
+   * }</pre>
    *
    * @param bucketName Name of the bucket.
    * @return {@link NotificationConfiguration} - Notification configuration.
    */
-  default NotificationConfiguration getBucketNotification(String bucketName) {
+  default NotificationConfiguration getBucketNotification(@NotEmpty String bucketName) {
     return execute(minioClient -> minioClient.getBucketNotification(bucketName));
   }
 
@@ -480,13 +492,14 @@ public interface MinioOperations {
    * config.setQueueConfigurationList(queueConfigurationList);
    *
    * minioOperations.setBucketNotification("my-bucketname", config);
-   * }****</pre>
+   * }</pre>
    *
    * @param bucketName Name of the bucket.
    * @param notificationConfiguration {@link NotificationConfiguration} to be set.
    */
   default void setBucketNotification(
-      String bucketName, NotificationConfiguration notificationConfiguration) {
+      @NotEmpty String bucketName,
+      @NotNull NotificationConfiguration notificationConfiguration) {
     execute((MinioClientCallbackWithoutResult) minioClient -> minioClient
         .setBucketNotification(bucketName, notificationConfiguration));
   }
@@ -496,11 +509,11 @@ public interface MinioOperations {
    *
    * <pre>Example:{@code
    * minioOperations.removeAllBucketNotification("my-bucketname");
-   * }****</pre>
+   * }</pre>
    *
    * @param bucketName Name of the bucket.
    */
-  default void removeAllBucketNotification(String bucketName) {
+  default void removeAllBucketNotification(@NotEmpty String bucketName) {
     execute((MinioClientCallbackWithoutResult) minioClient -> minioClient
         .removeAllBucketNotification(bucketName));
   }
@@ -515,7 +528,7 @@ public interface MinioOperations {
    *   Upload upload = result.get();
    *   System.out.println(upload.uploadId() + ", " + upload.objectName());
    * }
-   * }****</pre>
+   * }</pre>
    *
    * @param bucketName Name of the bucket.
    * @return Iterable &ltResult&ltUpload&gt&gt - Lazy iterator contains object upload information.
@@ -523,7 +536,7 @@ public interface MinioOperations {
    *     boolean)#listIncompleteUploads(String, String,     boolean)#listIncompleteUploads(String,
    *     String,     boolean)#listIncompleteUploads(String,     String,     boolean)
    */
-  default Iterable<Result<Upload>> listIncompleteUploads(String bucketName) {
+  default Iterable<Result<Upload>> listIncompleteUploads(@NotEmpty String bucketName) {
     return execute(minioClient -> minioClient.listIncompleteUploads(bucketName));
   }
 
@@ -537,7 +550,7 @@ public interface MinioOperations {
    *   Upload upload = result.get();
    *   System.out.println(upload.uploadId() + ", " + upload.objectName());
    * }
-   * }****</pre>
+   * }</pre>
    *
    * @param bucketName Name of the bucket.
    * @param prefix Object name starts with prefix.
@@ -546,7 +559,9 @@ public interface MinioOperations {
    *     boolean)#listIncompleteUploads(String, String,     boolean)#listIncompleteUploads(String,
    *     String,     boolean)#listIncompleteUploads(String,     String,     boolean)
    */
-  default Iterable<Result<Upload>> listIncompleteUploads(String bucketName, String prefix) {
+  default Iterable<Result<Upload>> listIncompleteUploads(
+      @NotEmpty String bucketName,
+      String prefix) {
     return execute(minioClient -> minioClient.listIncompleteUploads(bucketName, prefix));
   }
 
@@ -560,7 +575,7 @@ public interface MinioOperations {
    *   Upload upload = result.get();
    *   System.out.println(upload.uploadId() + ", " + upload.objectName());
    * }
-   * }****</pre>
+   * }</pre>
    *
    * @param bucketName Name of the bucket.
    * @param prefix Object name starts with prefix.
@@ -575,7 +590,10 @@ public interface MinioOperations {
    *     prefix)#listIncompleteUploads(String     bucketName, String prefix)
    */
   default Iterable<Result<Upload>> listIncompleteUploads(
-      String bucketName, String prefix, boolean recursive) {
+      @NotEmpty String bucketName,
+      String prefix,
+      boolean recursive) {
+
     return execute(minioClient -> minioClient.listIncompleteUploads(bucketName, prefix, recursive));
   }
 
@@ -584,12 +602,15 @@ public interface MinioOperations {
    *
    * <pre>Example:{@code
    * minioOperations.removeIncompleteUpload("my-bucketname", "my-objectname");
-   * }****</pre>
+   * }</pre>
    *
    * @param bucketName Name of the bucket.
    * @param objectName Object name in the bucket.
    */
-  default void removeIncompleteUpload(String bucketName, String objectName) {
+  default void removeIncompleteUpload(
+      @NotEmpty String bucketName,
+      @NotEmpty String objectName) {
+
     execute((MinioClientCallbackWithoutResult) minioClient -> minioClient
         .removeIncompleteUpload(bucketName, objectName));
   }
@@ -612,7 +633,7 @@ public interface MinioOperations {
    *     }
    *   }
    * }
-   * }****</pre>
+   * }</pre>
    *
    * @param bucketName Name of the bucket.
    * @param prefix Listen events of object starts with prefix.
@@ -622,7 +643,11 @@ public interface MinioOperations {
    *     contains event records.
    */
   default CloseableIterator<Result<NotificationRecords>> listenBucketNotification(
-      String bucketName, String prefix, String suffix, String[] events) {
+      @NotEmpty String bucketName,
+      String prefix,
+      String suffix,
+      @NotNull String[] events) {
+
     return execute(minioClient -> minioClient
         .listenBucketNotification(bucketName, prefix, suffix, events));
   }
@@ -651,7 +676,7 @@ public interface MinioOperations {
    * System.out.println("bytes returned: " + stats.bytesReturned());
    *
    * stream.close();
-   * }****</pre>
+   * }</pre>
    *
    * @param bucketName Name of the bucket.
    * @param objectName Object name in the bucket.
@@ -665,8 +690,8 @@ public interface MinioOperations {
    * @return contains filtered records and progress.
    */
   default SelectResponseStream selectObjectContent(
-      String bucketName,
-      String objectName,
+      @NotEmpty String bucketName,
+      @NotEmpty String objectName,
       String sqlExpression,
       InputSerialization is,
       OutputSerialization os,
@@ -697,13 +722,12 @@ public interface MinioOperations {
    *   System.out.println(
    *       item.lastModified() + ", " + item.size() + ", " + item.objectName());
    * }
-   * }****</pre>
+   * }</pre>
    *
    * @param bucketName Name of the bucket.
    * @return Iterable &ltResult&ltItem&gt&gt - Lazy iterator contains object information.
-   * @throws XmlParserException the xml parser exception
    */
-  default Iterable<Result<Item>> listObjects(final String bucketName) throws XmlParserException {
+  default Iterable<Result<Item>> listObjects(@NotEmpty String bucketName) {
     return listObjects(bucketName, null);
   }
 
@@ -717,15 +741,13 @@ public interface MinioOperations {
    *   System.out.println(
    *       item.lastModified() + ", " + item.size() + ", " + item.objectName());
    * }
-   * }****</pre>
+   * }</pre>
    *
    * @param bucketName Name of the bucket.
    * @param prefix Object name starts with prefix.
    * @return Iterable &ltResult&ltItem&gt&gt - Lazy iterator contains object information.
-   * @throws XmlParserException the xml parser exception
    */
-  default Iterable<Result<Item>> listObjects(final String bucketName, final String prefix)
-      throws XmlParserException {
+  default Iterable<Result<Item>> listObjects(@NotEmpty String bucketName, String prefix) {
     // list all objects recursively
     return listObjects(bucketName, prefix, true);
   }
@@ -741,7 +763,7 @@ public interface MinioOperations {
    *   System.out.println(
    *       item.lastModified() + ", " + item.size() + ", " + item.objectName());
    * }
-   * }****</pre>
+   * }</pre>
    *
    * @param bucketName Name of the bucket.
    * @param prefix Object name starts with prefix.
@@ -759,7 +781,7 @@ public interface MinioOperations {
    *     #listObjects(String bucketName, String prefix, boolean recursive, boolean useVersion1)
    */
   default Iterable<Result<Item>> listObjects(
-      final String bucketName, final String prefix, final boolean recursive) {
+      @NotEmpty String bucketName, String prefix, boolean recursive) {
     return listObjects(bucketName, prefix, recursive, false);
   }
 
@@ -774,7 +796,7 @@ public interface MinioOperations {
    *   System.out.println(
    *       item.lastModified() + ", " + item.size() + ", " + item.objectName());
    * }
-   * }****</pre>
+   * }</pre>
    *
    * @param bucketName Name of the bucket.
    * @param prefix Object name starts with prefix.
@@ -792,10 +814,11 @@ public interface MinioOperations {
    *     recursive)#listObjects(String     bucketName, String     prefix, boolean     recursive)
    */
   default Iterable<Result<Item>> listObjects(
-      final String bucketName,
-      final String prefix,
-      final boolean recursive,
-      final boolean useVersion1) {
+      @NotEmpty String bucketName,
+      String prefix,
+      boolean recursive,
+      boolean useVersion1) {
+
     return listObjects(bucketName, prefix, recursive, false, false);
   }
 
@@ -811,7 +834,7 @@ public interface MinioOperations {
    *   System.out.println(
    *       item.lastModified() + ", " + item.size() + ", " + item.objectName());
    * }
-   * }****</pre>
+   * }</pre>
    *
    * @param bucketName Name of the bucket.
    * @param prefix Object name starts with prefix.
@@ -831,11 +854,12 @@ public interface MinioOperations {
    *     recursive)#listObjects(String     bucketName, String     prefix, boolean     recursive)
    */
   default Iterable<Result<Item>> listObjects(
-      String bucketName,
+      @NotEmpty String bucketName,
       String prefix,
       boolean recursive,
       boolean includeUserMetadata,
       boolean useVersion1) {
+
     return execute(minioClient -> minioClient
         .listObjects(bucketName, prefix, recursive, includeUserMetadata, useVersion1));
   }
@@ -845,7 +869,7 @@ public interface MinioOperations {
    *
    * <pre>Example:{@code
    * minioOperations.putObject("my-bucketname", "my-objectname", "my-filename", null);
-   * }****</pre>
+   * }</pre>
    *
    * @param bucketName Name of the bucket.
    * @param objectName Object name in the bucket.
@@ -853,8 +877,8 @@ public interface MinioOperations {
    * @param options {@link PutObjectOptions} to be used during upload.
    */
   default void putObject(
-      @NotNull String bucketName,
-      @NotNull String objectName,
+      @NotEmpty String bucketName,
+      @NotEmpty String objectName,
       @NotNull InputStream in,
       @NotNull PutObjectOptions options) {
 
@@ -878,9 +902,9 @@ public interface MinioOperations {
    * @param file Name of file to upload.
    */
   default void putObject(
-      @NotNull String bucketName,
-      @NotNull String objectName,
-      @NotNull String file) {
+      @NotEmpty String bucketName,
+      @NotEmpty String objectName,
+      @NotEmpty String file) {
 
     putObject(bucketName, objectName, file, null);
   }
@@ -898,9 +922,9 @@ public interface MinioOperations {
    * @param options {@link PutObjectOptions} to be used during upload.
    */
   default void putObject(
-      @NotNull String bucketName,
-      @NotNull String objectName,
-      @NotNull String file,
+      @NotEmpty String bucketName,
+      @NotEmpty String objectName,
+      @NotEmpty String file,
       @Nullable PutObjectOptions options) {
 
     execute((MinioClientCallbackWithoutResult) minioClient -> minioClient
@@ -919,8 +943,8 @@ public interface MinioOperations {
    * @param file File to upload.
    */
   default void putObject(
-      @NotNull String bucketName,
-      @NotNull String objectName,
+      @NotEmpty String bucketName,
+      @NotEmpty String objectName,
       @NotNull File file) {
 
     putObject(bucketName, objectName, file, null);
@@ -939,8 +963,8 @@ public interface MinioOperations {
    * @param options {@link PutObjectOptions} to be used during upload.
    */
   default void putObject(
-      @NotNull String bucketName,
-      @NotNull String objectName,
+      @NotEmpty String bucketName,
+      @NotEmpty String objectName,
       @NotNull File file,
       @Nullable PutObjectOptions options) {
 
@@ -960,8 +984,8 @@ public interface MinioOperations {
    * @param file File to upload.
    */
   default void putObject(
-      @NotNull String bucketName,
-      @NotNull String objectName,
+      @NotEmpty String bucketName,
+      @NotEmpty String objectName,
       @NotNull Path file) {
 
     putObject(bucketName, objectName, file, null);
@@ -980,8 +1004,8 @@ public interface MinioOperations {
    * @param options {@link PutObjectOptions} to be used during upload.
    */
   default void putObject(
-      @NotNull String bucketName,
-      @NotNull String objectName,
+      @NotEmpty String bucketName,
+      @NotEmpty String objectName,
       @NotNull Path file,
       @Nullable PutObjectOptions options) {
 
@@ -999,8 +1023,8 @@ public interface MinioOperations {
    * @return {@code true} if the item was uploaded, otherwise {@code false}
    */
   default boolean putObject(
-      @NotNull String bucketName,
-      @NotNull String objectName,
+      @NotEmpty String bucketName,
+      @NotEmpty String objectName,
       @Nullable UploadedItem<?> uploadedItem,
       @NotNull DeleteMode deleteMode) {
 
@@ -1036,8 +1060,8 @@ public interface MinioOperations {
    * @return {@code true} if the item was uploaded, otherwise {@code false}
    */
   default boolean putObject(
-      @NotNull String bucketName,
-      @NotNull String objectName,
+      @NotEmpty String bucketName,
+      @NotEmpty String objectName,
       @Nullable MultipartFile multipartFile) {
 
     if (multipartFile != null && multipartFile.getSize() > 0) {
@@ -1064,13 +1088,13 @@ public interface MinioOperations {
    *     minioOperations.getObject("my-bucketname", "my-objectname")) {
    *   // Read data from stream
    * }
-   * }****</pre>
+   * }</pre>
    *
    * @param bucketName Name of the bucket.
    * @param objectName Object name in the bucket.
    * @return {@link InputStream} - Contains object data.
    */
-  default InputStream getObject(String bucketName, String objectName) {
+  default InputStream getObject(@NotEmpty String bucketName, @NotEmpty String objectName) {
     return getObject(bucketName, objectName, null, null, null);
   }
 
@@ -1083,14 +1107,17 @@ public interface MinioOperations {
    *     minioOperations.getObject("my-bucketname", "my-objectname", ssec)) {
    *   // Read data from stream
    * }
-   * }****</pre>
+   * }</pre>
    *
    * @param bucketName Name of the bucket.
    * @param objectName Object name in the bucket.
    * @param sse SSE-C type server-side encryption.
    * @return {@link InputStream} - Contains object data.
    */
-  default InputStream getObject(String bucketName, String objectName, ServerSideEncryption sse) {
+  default InputStream getObject(
+      @NotEmpty String bucketName,
+      @NotEmpty String objectName,
+      @NotNull ServerSideEncryption sse) {
     return getObject(bucketName, objectName, null, null, sse);
   }
 
@@ -1103,14 +1130,17 @@ public interface MinioOperations {
    *     minioOperations.getObject("my-bucketname", "my-objectname", 1024L)) {
    *   // Read data from stream
    * }
-   * }****</pre>
+   * }</pre>
    *
    * @param bucketName Name of the bucket.
    * @param objectName Object name in the bucket.
    * @param offset Start byte position of object data.
    * @return {@link InputStream} - Contains object data.
    */
-  default InputStream getObject(String bucketName, String objectName, long offset) {
+  default InputStream getObject(
+      @NotEmpty String bucketName,
+      @NotEmpty String objectName,
+      long offset) {
     return getObject(bucketName, objectName, offset, null, null);
   }
 
@@ -1123,7 +1153,7 @@ public interface MinioOperations {
    *     minioOperations.getObject("my-bucketname", "my-objectname", 1024L, 4096L)) {
    *   // Read data from stream
    * }
-   * }****</pre>
+   * }</pre>
    *
    * @param bucketName Name of the bucket.
    * @param objectName Object name in the bucket.
@@ -1131,7 +1161,12 @@ public interface MinioOperations {
    * @param length Number of bytes of object data from offset.
    * @return {@link InputStream} - Contains object data.
    */
-  default InputStream getObject(String bucketName, String objectName, long offset, Long length) {
+  default InputStream getObject(
+      @NotEmpty String bucketName,
+      @NotEmpty String objectName,
+      long offset,
+      Long length) {
+
     return getObject(bucketName, objectName, offset, length, null);
   }
 
@@ -1144,7 +1179,7 @@ public interface MinioOperations {
    *     minioOperations.getObject("my-bucketname", "my-objectname", 1024L, 4096L, ssec)) {
    *   // Read data from stream
    * }
-   * }****</pre>
+   * }</pre>
    *
    * @param bucketName Name of the bucket.
    * @param objectName Object name in the bucket.
@@ -1169,13 +1204,13 @@ public interface MinioOperations {
    *
    * <pre>Example:{@code
    * ObjectStat objectStat = minioOperations.statObject("my-bucketname", "my-objectname");
-   * }****</pre>
+   * }</pre>
    *
    * @param bucketName Name of the bucket.
    * @param objectName Object name in the bucket.
    * @return populated object information and metadata.
    */
-  default ObjectStat statObject(String bucketName, String objectName) {
+  default ObjectStat statObject(@NotEmpty String bucketName, @NotEmpty String objectName) {
     return statObject(bucketName, objectName, null);
   }
 
@@ -1185,7 +1220,7 @@ public interface MinioOperations {
    * <pre>Example:{@code
    * ObjectStat objectStat =
    *     minioOperations.statObject("my-bucketname", "my-objectname", ssec);
-   * }****</pre>
+   * }</pre>
    *
    * @param bucketName Name of the bucket.
    * @param objectName Object name in the bucket.
@@ -1204,7 +1239,7 @@ public interface MinioOperations {
    *
    * <pre>Example:{@code
    * String url = minioOperations.getObjectUrl("my-bucketname", "my-objectname");
-   * }****</pre>
+   * }</pre>
    *
    * @param bucketName Name of the bucket.
    * @param objectName Object name in the bucket.
@@ -1220,7 +1255,7 @@ public interface MinioOperations {
    * <pre>Example:{@code
    * String url = minioOperations.getPresignedObjectUrl(Method.DELETE, "my-bucketname",
    *     "my-objectname", 24 * 60 * 60, reqParams);
-   * }****</pre>
+   * }</pre>
    *
    * @param method HTTP {@link Method} to generate presigned URL.
    * @param bucketName Name of the bucket.
@@ -1255,7 +1290,7 @@ public interface MinioOperations {
    * // parameters.
    * String url = minioOperations.presignedGetObject("my-bucketname", "my-objectname",
    *     24 * 60 * 60, reqParams);
-   * }****</pre>
+   * }</pre>
    *
    * @param bucketName Name of the bucket.
    * @param objectName Object name in the bucket.
@@ -1276,7 +1311,7 @@ public interface MinioOperations {
    * // Get presigned URL to download my-objectname data with one day expiry.
    * String url = minioOperations.presignedGetObject("my-bucketname", "my-objectname",
    *     24 * 60 * 60);
-   * }****</pre>
+   * }</pre>
    *
    * @param bucketName Name of the bucket.
    * @param objectName Object name in the bucket.
@@ -1292,7 +1327,7 @@ public interface MinioOperations {
    *
    * <pre>Example:{@code
    * String url = minioOperations.presignedGetObject("my-bucketname", "my-objectname");
-   * }****</pre>
+   * }</pre>
    *
    * @param bucketName Name of the bucket.
    * @param objectName Object name in the bucket.
@@ -1309,7 +1344,7 @@ public interface MinioOperations {
    * // Get presigned URL to upload data to my-objectname with one day expiry.
    * String url =
    *     minioOperations.presignedPutObject("my-bucketname", "my-objectname", 24 * 60 * 60);
-   * }****</pre>
+   * }</pre>
    *
    * @param bucketName Name of the bucket.
    * @param objectName Object name in the bucket.
@@ -1325,7 +1360,7 @@ public interface MinioOperations {
    *
    * <pre>Example:{@code
    * String url = minioOperations.presignedPutObject("my-bucketname", "my-objectname");
-   * }****</pre>
+   * }</pre>
    *
    * @param bucketName Name of the bucket.
    * @param objectName Object name in the bucket.
@@ -1356,7 +1391,7 @@ public interface MinioOperations {
    *   System.out.print(" -F " + entry.getKey() + "=" + entry.getValue());
    * }
    * System.out.println(" -F file=@/tmp/userpic.png https://play.min.io/my-bucketname");
-   * }****</pre>
+   * }</pre>
    *
    * @param policy Post policy of an object.
    * @return Map &ltString, String&gt - Contains form-data to upload an object using POST method.
@@ -1370,7 +1405,7 @@ public interface MinioOperations {
    *
    * <pre>Example:{@code
    * minioOperations.removeObject("my-bucketname", "my-objectname");
-   * }****</pre>
+   * }</pre>
    *
    * @param bucketName Name of the bucket.
    * @param objectName Object name in the bucket.
@@ -1396,7 +1431,7 @@ public interface MinioOperations {
    *   System.out.println(
    *       "Error in deleting object " + error.objectName() + "; " + error.message());
    * }
-   * }****</pre>
+   * }</pre>
    *
    * @param bucketName Name of the bucket.
    * @param objectNames List of Object names in the bucket.
@@ -1434,7 +1469,7 @@ public interface MinioOperations {
    * // with user metadata and copy conditions.
    * minioOperations.copyObject("my-bucketname", "my-objectname", headers, null,
    *     "my-source-bucketname", null, null, conditions);
-   * }****</pre>
+   * }</pre>
    *
    * @param bucketName Name of the bucket.
    * @param objectName Object name to be created.
@@ -1488,7 +1523,7 @@ public interface MinioOperations {
    * // by combining source object list.
    * minioOperations.composeObject("my-bucketname", "my-objectname", sourceObjectList,
    *     userMetadata, sse);
-   * }****</pre>
+   * }</pre>
    *
    * @param bucketName Destination Bucket to be created upon compose.
    * @param objectName Destination Object to be created upon compose.

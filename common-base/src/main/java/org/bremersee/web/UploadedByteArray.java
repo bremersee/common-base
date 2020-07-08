@@ -20,6 +20,8 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 import org.bremersee.exception.ServiceException;
 import org.springframework.lang.Nullable;
@@ -31,6 +33,8 @@ import org.springframework.util.Assert;
  * @author Christian Bremer
  */
 @Slf4j
+@ToString(exclude = {"bytes"})
+@EqualsAndHashCode
 public class UploadedByteArray implements UploadedItem<byte[]> {
 
   private final byte[] bytes;
