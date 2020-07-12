@@ -18,6 +18,8 @@ package org.bremersee.web.reactive;
 
 import lombok.extern.slf4j.Slf4j;
 import org.bremersee.web.UploadProperties;
+import org.bremersee.web.reactive.multipart.MultipartFileBuilder;
+import org.bremersee.web.reactive.multipart.MultipartFileBuilderImpl;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
@@ -30,25 +32,25 @@ import org.springframework.context.event.EventListener;
 import org.springframework.util.ClassUtils;
 
 /**
- * The upload auto configuration.
+ * The multipart file builder auto configuration.
  *
  * @author Christian Bremer
  */
 @ConditionalOnWebApplication(type = Type.REACTIVE)
-@ConditionalOnClass(UploadedItemBuilder.class)
+@ConditionalOnClass(MultipartFileBuilder.class)
 @EnableConfigurationProperties(UploadProperties.class)
 @Configuration
 @Slf4j
-public class UploadAutoConfiguration {
+public class MultipartFileBuilderAutoConfiguration {
 
   private final UploadProperties properties;
 
   /**
-   * Instantiates a new upload auto configuration.
+   * Instantiates a new multipart file builder auto configuration.
    *
    * @param properties the properties
    */
-  public UploadAutoConfiguration(UploadProperties properties) {
+  public MultipartFileBuilderAutoConfiguration(UploadProperties properties) {
     this.properties = properties;
   }
 
@@ -67,15 +69,14 @@ public class UploadAutoConfiguration {
   }
 
   /**
-   * Creates reactive upload item builder.
+   * Multipart file builder multipart file builder.
    *
-   * @return the reactive upload item builder
+   * @return the multipart file builder
    */
   @ConditionalOnMissingBean
   @Bean
-  public UploadedItemBuilder uploadedItemBuilder() {
-    log.info("Creating {} ...", UploadedItemBuilder.class.getSimpleName());
-    return new UploadedItemBuilderImpl(properties.getTmpDir());
+  public MultipartFileBuilder multipartFileBuilder() {
+    return new MultipartFileBuilderImpl(properties.getTmpDir());
   }
 
 }

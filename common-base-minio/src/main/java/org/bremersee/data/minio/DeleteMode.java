@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 the original author or authors.
+ * Copyright 2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,23 +14,22 @@
  * limitations under the License.
  */
 
-package org.bremersee.converter;
+package org.bremersee.data.minio;
 
-import lombok.ToString;
-import org.bremersee.common.model.JavaLocale;
-import org.springframework.core.convert.converter.Converter;
-import org.springframework.lang.NonNull;
+public enum DeleteMode {
 
-/**
- * The string to java locale converter.
- *
- * @author Christian Bremer
- */
-@ToString
-public class StringToJavaLocaleConverter implements Converter<String, JavaLocale> {
+  /**
+   * Never delete mode.
+   */
+  NEVER,
 
-  @Override
-  public JavaLocale convert(@NonNull String source) {
-    return JavaLocale.fromValue(source);
-  }
+  /**
+   * On success delete mode.
+   */
+  ON_SUCCESS,
+
+  /**
+   * Always delete mode.
+   */
+  ALWAYS
 }

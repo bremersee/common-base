@@ -23,7 +23,7 @@ org.bremersee.web.servlet.CorsAutoConfiguration,\
 org.bremersee.web.reactive.ApiExceptionHandlerAutoConfiguration,\
 org.bremersee.web.reactive.BaseCommonConvertersAutoConfiguration,\
 org.bremersee.web.reactive.CorsAutoConfiguration,\
-org.bremersee.web.reactive.UploadAutoConfiguration,\
+org.bremersee.web.reactive.MultipartFileBuilderAutoConfiguration,\
 \
 org.bremersee.thymeleaf.AdditionalThymeleafAutoConfiguration,\
 \

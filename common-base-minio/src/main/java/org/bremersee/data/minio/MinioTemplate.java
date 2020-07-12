@@ -16,8 +16,13 @@
 
 package org.bremersee.data.minio;
 
+import io.minio.GetObjectArgs;
 import io.minio.MinioClient;
+import java.io.IOException;
+import java.io.InputStream;
+import org.springframework.util.ClassUtils;
 import org.springframework.util.ErrorHandler;
+import org.springframework.util.StringUtils;
 
 /**
  * The minio template.
@@ -76,6 +81,29 @@ public class MinioTemplate implements MinioOperations, Cloneable {
     } catch (Exception e) {
       errorHandler.handleError(e);
       return null;
+    }
+  }
+
+  // @Override
+  public boolean objectExists(GetObjectArgs args) {
+    MinioTemplate template = ClassUtils
+        .getUserClass(errorHandler.getClass())
+        .isAssignableFrom(DefaultMinioErrorHandler.class)
+        ? this
+        : clone(new DefaultMinioErrorHandler());
+    try (InputStream in = template.getObject(args)) {
+      return in != null;
+    } catch (IOException e) {
+      throw new MinioException(
+          500,
+          DefaultMinioErrorHandler.ERROR_CODE_PREFIX + "IO_ERROR",
+          StringUtils.hasText(e.getMessage()) ? e.getMessage() : "IO operation failed.",
+          e);
+    } catch (MinioException e) {
+      if (404 == e.status()) {
+        return false;
+      }
+      throw e;
     }
   }
 

@@ -16,43 +16,76 @@
 
 package org.bremersee.data.minio;
 
+import io.minio.BucketExistsArgs;
 import io.minio.CloseableIterator;
-import io.minio.ComposeSource;
-import io.minio.CopyConditions;
+import io.minio.ComposeObjectArgs;
+import io.minio.CopyObjectArgs;
+import io.minio.DeleteBucketEncryptionArgs;
+import io.minio.DeleteBucketNotificationArgs;
+import io.minio.DeleteBucketPolicyArgs;
+import io.minio.DeleteBucketTagsArgs;
+import io.minio.DeleteDefaultRetentionArgs;
+import io.minio.DeleteObjectTagsArgs;
+import io.minio.DisableObjectLegalHoldArgs;
+import io.minio.DisableVersioningArgs;
+import io.minio.DownloadObjectArgs;
+import io.minio.EnableObjectLegalHoldArgs;
+import io.minio.EnableVersioningArgs;
+import io.minio.GetBucketEncryptionArgs;
+import io.minio.GetBucketLifeCycleArgs;
+import io.minio.GetBucketNotificationArgs;
+import io.minio.GetBucketPolicyArgs;
+import io.minio.GetBucketTagsArgs;
+import io.minio.GetDefaultRetentionArgs;
+import io.minio.GetObjectArgs;
+import io.minio.GetObjectRetentionArgs;
+import io.minio.GetObjectTagsArgs;
+import io.minio.GetPresignedObjectUrlArgs;
+import io.minio.IsObjectLegalHoldEnabledArgs;
+import io.minio.IsVersioningEnabledArgs;
+import io.minio.ListIncompleteUploadsArgs;
+import io.minio.ListObjectsArgs;
+import io.minio.ListenBucketNotificationArgs;
+import io.minio.MakeBucketArgs;
 import io.minio.MinioClient;
 import io.minio.ObjectStat;
+import io.minio.ObjectWriteResponse;
 import io.minio.PostPolicy;
-import io.minio.PutObjectOptions;
+import io.minio.PutObjectArgs;
+import io.minio.RemoveBucketArgs;
+import io.minio.RemoveIncompleteUploadArgs;
+import io.minio.RemoveObjectArgs;
+import io.minio.RemoveObjectsArgs;
 import io.minio.Result;
+import io.minio.SelectObjectContentArgs;
 import io.minio.SelectResponseStream;
-import io.minio.ServerSideEncryption;
-import io.minio.errors.XmlParserException;
-import io.minio.http.Method;
+import io.minio.SetBucketEncryptionArgs;
+import io.minio.SetBucketLifeCycleArgs;
+import io.minio.SetBucketNotificationArgs;
+import io.minio.SetBucketPolicyArgs;
+import io.minio.SetBucketTagsArgs;
+import io.minio.SetDefaultRetentionArgs;
+import io.minio.SetObjectRetentionArgs;
+import io.minio.SetObjectTagsArgs;
+import io.minio.StatObjectArgs;
+import io.minio.UploadObjectArgs;
 import io.minio.messages.Bucket;
 import io.minio.messages.DeleteError;
-import io.minio.messages.InputSerialization;
 import io.minio.messages.Item;
 import io.minio.messages.NotificationConfiguration;
 import io.minio.messages.NotificationRecords;
 import io.minio.messages.ObjectLockConfiguration;
-import io.minio.messages.OutputSerialization;
 import io.minio.messages.Retention;
+import io.minio.messages.SseConfiguration;
+import io.minio.messages.Tags;
 import io.minio.messages.Upload;
-import java.io.File;
 import java.io.InputStream;
+import java.nio.file.Files;
 import java.nio.file.Path;
-import java.time.Duration;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
-import org.bremersee.web.UploadedItem;
-import org.bremersee.web.UploadedItem.DeleteMode;
-import org.springframework.http.MediaType;
-import org.springframework.lang.Nullable;
-import org.springframework.util.StringUtils;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.multipart.MultipartFile;
 
 /**
  * The minio operations.
@@ -63,11 +96,6 @@ import org.springframework.web.multipart.MultipartFile;
 public interface MinioOperations {
 
   /**
-   * The constant DEFAULT_EXPIRY_TIME.
-   */
-  int DEFAULT_EXPIRY_TIME = 7 * 24 * 3600;
-
-  /**
    * Execute minio callback.
    *
    * @param <T> the type of the result
@@ -75,6 +103,75 @@ public interface MinioOperations {
    * @return the result
    */
   <T> T execute(MinioClientCallback<T> callback);
+
+  // Bucket operations
+
+  default boolean bucketExists(BucketExistsArgs args) {
+    return execute(minioClient -> minioClient.bucketExists(args));
+  }
+
+  default void deleteBucketEncryption(DeleteBucketEncryptionArgs args) {
+    execute((MinioClientCallbackWithoutResult) minioClient -> minioClient
+        .deleteBucketEncryption(args));
+  }
+
+  default void deleteBucketTags(DeleteBucketTagsArgs args) {
+    execute((MinioClientCallbackWithoutResult) minioClient -> minioClient
+        .deleteBucketTags(args));
+  }
+
+  default void deleteBucketPolicy(DeleteBucketPolicyArgs args) {
+    execute((MinioClientCallbackWithoutResult) minioClient -> minioClient
+        .deleteBucketPolicy(args));
+  }
+
+  default void deleteBucketNotification(DeleteBucketNotificationArgs args) {
+    execute((MinioClientCallbackWithoutResult) minioClient -> minioClient
+        .deleteBucketNotification(args));
+  }
+
+  default void deleteDefaultRetention(DeleteDefaultRetentionArgs args) {
+    execute((MinioClientCallbackWithoutResult) minioClient -> minioClient
+        .deleteDefaultRetention(args));
+  }
+
+  default void disableVersioning(DisableVersioningArgs args) {
+    execute((MinioClientCallbackWithoutResult) minioClient -> minioClient
+        .disableVersioning(args));
+  }
+
+  default void enableVersioning(EnableVersioningArgs args) {
+    execute((MinioClientCallbackWithoutResult) minioClient -> minioClient
+        .enableVersioning(args));
+  }
+
+  default boolean isVersioningEnabled(IsVersioningEnabledArgs args) {
+    return execute(minioClient -> minioClient.isVersioningEnabled(args));
+  }
+
+  default SseConfiguration getBucketEncryption(GetBucketEncryptionArgs args) {
+    return execute(minioClient -> minioClient.getBucketEncryption(args));
+  }
+
+  default String getBucketLifeCycle(GetBucketLifeCycleArgs args) {
+    return execute(minioClient -> minioClient.getBucketLifeCycle(args));
+  }
+
+  default NotificationConfiguration getBucketNotification(GetBucketNotificationArgs args) {
+    return execute(minioClient -> minioClient.getBucketNotification(args));
+  }
+
+  default String getBucketPolicy(GetBucketPolicyArgs args) {
+    return execute(minioClient -> minioClient.getBucketPolicy(args));
+  }
+
+  default Tags getBucketTags(GetBucketTagsArgs args) {
+    return execute(minioClient -> minioClient.getBucketTags(args));
+  }
+
+  default ObjectLockConfiguration getDefaultRetention(GetDefaultRetentionArgs args) {
+    return execute(minioClient -> minioClient.getDefaultRetention(args));
+  }
 
   /**
    * Lists bucket information of all buckets.
@@ -84,7 +181,8 @@ public interface MinioOperations {
    * for (Bucket bucket : bucketList) {
    *   System.out.println(bucket.creationDate() + ", " + bucket.name());
    * }
-   * }</pre>
+   * }
+   * </pre>
    *
    * @return List &ltBucket&gt - List of bucket information.
    */
@@ -92,1454 +190,168 @@ public interface MinioOperations {
     return execute(MinioClient::listBuckets);
   }
 
-  /**
-   * Checks if a bucket exists.
-   *
-   * <pre>Example:{@code
-   * boolean found = minioOperations.bucketExists("my-bucketname");
-   * if (found) {
-   *   System.out.println("my-bucketname exists");
-   * } else {
-   *   System.out.println("my-bucketname does not exist");
-   * }
-   * }</pre>
-   *
-   * @param bucketName Name of the bucket.
-   * @return boolean - True if the bucket exists.
-   */
-  default boolean bucketExists(@NotEmpty String bucketName) {
-    return execute(minioClient -> minioClient.bucketExists(bucketName));
-  }
-
-  /**
-   * Creates a bucket with default region.
-   *
-   * <pre>Example:{@code
-   * minioOperations.makeBucket("my-bucketname");
-   * }</pre>
-   *
-   * @param bucketName Name of the bucket.
-   */
-  default void makeBucket(@NotEmpty String bucketName) {
-    this.makeBucket(bucketName, null);
-  }
-
-  /**
-   * Creates a bucket with given region.
-   *
-   * <pre>Example:{@code
-   * minioOperations.makeBucket("my-bucketname", "eu-west-1");
-   * }</pre>
-   *
-   * @param bucketName Name of the bucket.
-   * @param region Region in which the bucket will be created.
-   */
-  default void makeBucket(
-      @NotEmpty String bucketName,
-      @Nullable String region) {
-    this.makeBucket(bucketName, region, false);
-  }
-
-  /**
-   * Creates a bucket with object lock feature enabled.
-   *
-   * <pre>Example:{@code
-   * minioOperations.makeBucket("my-bucketname", "eu-west-2", true);
-   * }</pre>
-   *
-   * @param bucketName Name of the bucket.
-   * @param region Region in which the bucket will be created.
-   * @param objectLock Flag to enable object lock feature.
-   */
-  default void makeBucket(
-      @NotEmpty String bucketName,
-      @Nullable String region,
-      boolean objectLock) {
-    execute((MinioClientCallbackWithoutResult) minioClient -> minioClient
-        .makeBucket(bucketName, region, objectLock));
-  }
-
-  /**
-   * Enables object versioning feature in a bucket.
-   *
-   * <pre>Example:{@code
-   * minioOperations.enableVersioning("my-bucketname");
-   * }</pre>
-   *
-   * @param bucketName Name of the bucket.
-   */
-  default void enableVersioning(@NotEmpty String bucketName) {
-    execute((MinioClientCallbackWithoutResult) minioClient -> minioClient
-        .enableVersioning(bucketName));
-  }
-
-  /**
-   * Disables object versioning feature in a bucket.
-   *
-   * <pre>Example:{@code
-   * minioOperations.disableVersioning("my-bucketname");
-   * }</pre>
-   *
-   * @param bucketName Name of the bucket.
-   */
-  default void disableVersioning(@NotEmpty String bucketName) {
-    execute((MinioClientCallbackWithoutResult) minioClient -> minioClient
-        .disableVersioning(bucketName));
-  }
-
-  /**
-   * Sets default object retention in a bucket.
-   *
-   * <pre>Example:{@code
-   * ObjectLockConfiguration config = new ObjectLockConfiguration(
-   *     RetentionMode.COMPLIANCE, new RetentionDurationDays(100));
-   * minioOperations.setDefaultRetention("my-bucketname", config);
-   * }</pre>
-   *
-   * @param bucketName Name of the bucket.
-   * @param config Object lock configuration.
-   */
-  default void setDefaultRetention(@NotEmpty String bucketName, ObjectLockConfiguration config) {
-    execute((MinioClientCallbackWithoutResult) minioClient -> minioClient
-        .setDefaultRetention(bucketName, config));
-  }
-
-  /**
-   * Gets default object retention in a bucket.
-   *
-   * <pre>Example:{@code
-   * // bucket must be created with object lock enabled.
-   * minioOperations.makeBucket("my-bucketname", null, true);
-   * ObjectLockConfiguration config = minioOperations.getDefaultRetention("my-bucketname");
-   * System.out.println("Mode: " + config.mode());
-   * System.out.println(
-   *     "Duration: " + config.duration().duration() + " " + config.duration().unit());
-   * }</pre>
-   *
-   * @param bucketName Name of the bucket.
-   * @return {@link ObjectLockConfiguration} - Default retention configuration.
-   */
-  default ObjectLockConfiguration getDefaultRetention(@NotEmpty String bucketName) {
-    return execute(minioClient -> minioClient.getDefaultRetention(bucketName));
-  }
-
-  /**
-   * Sets retention configuration to an object.
-   *
-   * <pre>Example:{@code
-   * Retention retention =
-   *     new Retention(RetentionMode.COMPLIANCE, ZonedDateTime.now().plusYears(1));
-   * minioOperations.setObjectRetention(
-   *     "my-bucketname", "my-objectname", null, retention, true);
-   * }</pre>
-   *
-   * @param bucketName Name of the bucket.
-   * @param objectName Object name in the bucket.
-   * @param versionId Version ID of the object.
-   * @param config Object retention configuration.
-   * @param bypassGovernanceRetention Bypass Governance retention.
-   */
-  default void setObjectRetention(
-      @NotEmpty String bucketName,
-      @NotEmpty String objectName,
-      String versionId,
-      Retention config,
-      boolean bypassGovernanceRetention) {
-    execute((MinioClientCallbackWithoutResult) minioClient -> minioClient
-        .setObjectRetention(bucketName, objectName, versionId, config, bypassGovernanceRetention));
-  }
-
-  /**
-   * Gets retention configuration of an object.
-   *
-   * <pre>Example:{@code
-   * Retention retention =
-   *     minioOperations.getObjectRetention("my-bucketname", "my-objectname", null);
-   * System.out.println(
-   *     "mode: " + retention.mode() + "until: " + retention.retainUntilDate());
-   * }</pre>
-   *
-   * @param bucketName Name of the bucket.
-   * @param objectName Object name in the bucket.
-   * @param versionId Version ID of the object.
-   * @return object retention configuration.
-   */
-  default Retention getObjectRetention(
-      @NotEmpty String bucketName,
-      @NotEmpty String objectName,
-      String versionId) {
-    return execute(minioClient -> minioClient
-        .getObjectRetention(bucketName, objectName, versionId));
-  }
-
-  /**
-   * Enables legal hold on an object.
-   *
-   * <pre>Example:{@code
-   * minioOperations.enableObjectLegalHold("my-bucketname", "my-object", null);
-   * }</pre>
-   *
-   * @param bucketName Name of the bucket.
-   * @param objectName Object name in the bucket.
-   * @param versionId Version ID of the object.
-   */
-  default void enableObjectLegalHold(
-      @NotEmpty String bucketName,
-      @NotEmpty String objectName,
-      String versionId) {
-    execute((MinioClientCallbackWithoutResult) minioClient -> minioClient
-        .enableObjectLegalHold(bucketName, objectName, versionId));
-  }
-
-  /**
-   * Disables legal hold on an object.
-   *
-   * <pre>Example:{@code
-   * minioOperations.disableObjectLegalHold("my-bucketname", "my-object", null);
-   * }</pre>
-   *
-   * @param bucketName Name of the bucket.
-   * @param objectName Object name in the bucket.
-   * @param versionId Version ID of the object.
-   */
-  default void disableObjectLegalHold(
-      @NotEmpty String bucketName,
-      @NotEmpty String objectName,
-      String versionId) {
-    execute((MinioClientCallbackWithoutResult) minioClient -> minioClient
-        .disableObjectLegalHold(bucketName, objectName, versionId));
-  }
-
-  /**
-   * Returns true if legal hold is enabled on an object.
-   *
-   * <pre>Example:{@code
-   * boolean status =
-   *     s3Client.isObjectLegalHoldEnabled("my-bucketname", "my-objectname", null);
-   * if (status) {
-   *   System.out.println("Legal hold is on");
-   * } else {
-   *   System.out.println("Legal hold is off");
-   * }
-   * }</pre>
-   *
-   * @param bucketName Name of the bucket.
-   * @param objectName Object name in the bucket.
-   * @param versionId Version ID of the object.
-   * @return boolean - True if legal hold is enabled.
-   */
-  default boolean isObjectLegalHoldEnabled(
-      @NotEmpty String bucketName,
-      @NotEmpty String objectName,
-      String versionId) {
-    return execute(minioClient -> minioClient
-        .isObjectLegalHoldEnabled(bucketName, objectName, versionId));
-  }
-
-  /**
-   * Removes an empty bucket.
-   *
-   * <pre>Example:{@code
-   * minioOperations.removeBucket("my-bucketname");
-   * }</pre>
-   *
-   * @param bucketName Name of the bucket.
-   */
-  default void removeBucket(@NotEmpty String bucketName) {
-    execute((MinioClientCallbackWithoutResult) minioClient -> minioClient
-        .removeBucket(bucketName));
-  }
-
-  /**
-   * Gets bucket policy configuration of a bucket.
-   *
-   * <pre>Example:{@code
-   * String config = minioOperations.getBucketPolicy("my-bucketname");
-   * }</pre>
-   *
-   * @param bucketName Name of the bucket.
-   * @return String - Bucket policy configuration as JSON string.
-   */
-  default String getBucketPolicy(@NotEmpty String bucketName) {
-    return execute(minioClient -> minioClient.getBucketPolicy(bucketName));
-  }
-
-  /**
-   * Sets bucket policy configuration to a bucket.
-   *
-   * <pre>Example:{@code
-   * // Assume policyJson contains below JSON string;
-   * // {
-   * //     "Statement": [
-   * //         {
-   * //             "Action": [
-   * //                 "s3:GetBucketLocation",
-   * //                 "s3:ListBucket"
-   * //             ],
-   * //             "Effect": "Allow",
-   * //             "Principal": "*",
-   * //             "Resource": "arn:aws:s3:::my-bucketname"
-   * //         },
-   * //         {
-   * //             "Action": "s3:GetObject",
-   * //             "Effect": "Allow",
-   * //             "Principal": "*",
-   * //             "Resource": "arn:aws:s3:::my-bucketname/myobject*"
-   * //         }
-   * //     ],
-   * //     "Version": "2012-10-17"
-   * // }
-   * //
-   * minioOperations.setBucketPolicy("my-bucketname", policyJson);
-   * }</pre>
-   *
-   * @param bucketName Name of the bucket.
-   * @param policy Bucket policy configuration as JSON string.
-   */
-  default void setBucketPolicy(@NotEmpty String bucketName, @NotEmpty String policy) {
-    execute((MinioClientCallbackWithoutResult) minioClient -> minioClient
-        .setBucketPolicy(bucketName, policy));
-  }
-
-  /**
-   * Sets life cycle configuration to a bucket.
-   *
-   * <pre>Example:{@code
-   * // Lets consider variable 'lifeCycleXml' contains below XML String;
-   * // <LifecycleConfiguration>
-   * //   <Rule>
-   * //     <ID>expire-bucket</ID>
-   * //     <Prefix></Prefix>
-   * //     <Status>Enabled</Status>
-   * //     <Expiration>
-   * //       <Days>365</Days>
-   * //     </Expiration>
-   * //   </Rule>
-   * // </LifecycleConfiguration>
-   * //
-   * minioOperations.setBucketLifecycle("my-bucketname", lifeCycleXml);
-   * }</pre>
-   *
-   * @param bucketName Name of the bucket.
-   * @param lifeCycle Life cycle configuraion as XML string.
-   */
-  default void setBucketLifeCycle(@NotEmpty String bucketName, @NotEmpty String lifeCycle) {
-    execute((MinioClientCallbackWithoutResult) minioClient -> minioClient
-        .setBucketLifeCycle(bucketName, lifeCycle));
-  }
-
-  /**
-   * Deletes life cycle configuration of a bucket.
-   *
-   * <pre>Example:{@code
-   * deleteBucketLifeCycle("my-bucketname");
-   * }</pre>
-   *
-   * @param bucketName Name of the bucket.
-   */
-  default void deleteBucketLifeCycle(@NotEmpty String bucketName) {
-    execute((MinioClientCallbackWithoutResult) minioClient -> minioClient
-        .deleteBucketLifeCycle(bucketName));
-  }
-
-  /**
-   * Gets life cycle configuration of a bucket.
-   *
-   * <pre>Example:{@code
-   * String lifecycle = minioOperations.getBucketLifecycle("my-bucketname");
-   * }</pre>
-   *
-   * @param bucketName Name of the bucket.
-   * @return String - Life cycle configuration as XML string.
-   */
-  default String getBucketLifeCycle(@NotEmpty String bucketName) {
-    return execute(minioClient -> minioClient.getBucketLifeCycle(bucketName));
-  }
-
-  /**
-   * Gets notification configuration of a bucket.
-   *
-   * <pre>Example:{@code
-   * NotificationConfiguration config =
-   *     minioOperations.getBucketNotification("my-bucketname");
-   * }</pre>
-   *
-   * @param bucketName Name of the bucket.
-   * @return {@link NotificationConfiguration} - Notification configuration.
-   */
-  default NotificationConfiguration getBucketNotification(@NotEmpty String bucketName) {
-    return execute(minioClient -> minioClient.getBucketNotification(bucketName));
-  }
-
-  /**
-   * Sets notification configuration to a bucket.
-   *
-   * <pre>Example:{@code
-   * List<EventType> eventList = new LinkedList<>();
-   * eventList.add(EventType.OBJECT_CREATED_PUT);
-   * eventList.add(EventType.OBJECT_CREATED_COPY);
-   *
-   * QueueConfiguration queueConfiguration = new QueueConfiguration();
-   * queueConfiguration.setQueue("arn:minio:sqs::1:webhook");
-   * queueConfiguration.setEvents(eventList);
-   * queueConfiguration.setPrefixRule("images");
-   * queueConfiguration.setSuffixRule("pg");
-   *
-   * List<QueueConfiguration> queueConfigurationList = new LinkedList<>();
-   * queueConfigurationList.add(queueConfiguration);
-   *
-   * NotificationConfiguration config = new NotificationConfiguration();
-   * config.setQueueConfigurationList(queueConfigurationList);
-   *
-   * minioOperations.setBucketNotification("my-bucketname", config);
-   * }</pre>
-   *
-   * @param bucketName Name of the bucket.
-   * @param notificationConfiguration {@link NotificationConfiguration} to be set.
-   */
-  default void setBucketNotification(
-      @NotEmpty String bucketName,
-      @NotNull NotificationConfiguration notificationConfiguration) {
-    execute((MinioClientCallbackWithoutResult) minioClient -> minioClient
-        .setBucketNotification(bucketName, notificationConfiguration));
-  }
-
-  /**
-   * Removes notification configuration of a bucket.
-   *
-   * <pre>Example:{@code
-   * minioOperations.removeAllBucketNotification("my-bucketname");
-   * }</pre>
-   *
-   * @param bucketName Name of the bucket.
-   */
-  default void removeAllBucketNotification(@NotEmpty String bucketName) {
-    execute((MinioClientCallbackWithoutResult) minioClient -> minioClient
-        .removeAllBucketNotification(bucketName));
-  }
-
-  /**
-   * Lists incomplete object upload information of a bucket.
-   *
-   * <pre>Example:{@code
-   * Iterable<Result<Upload>> results =
-   *     minioOperations.listIncompleteUploads("my-bucketname");
-   * for (Result<Upload> result : results) {
-   *   Upload upload = result.get();
-   *   System.out.println(upload.uploadId() + ", " + upload.objectName());
-   * }
-   * }</pre>
-   *
-   * @param bucketName Name of the bucket.
-   * @return Iterable &ltResult&ltUpload&gt&gt - Lazy iterator contains object upload information.
-   * @see #listIncompleteUploads(String, String, boolean) #listIncompleteUploads(String, String,
-   *     boolean)#listIncompleteUploads(String, String,     boolean)#listIncompleteUploads(String,
-   *     String,     boolean)#listIncompleteUploads(String,     String,     boolean)
-   */
-  default Iterable<Result<Upload>> listIncompleteUploads(@NotEmpty String bucketName) {
-    return execute(minioClient -> minioClient.listIncompleteUploads(bucketName));
-  }
-
-  /**
-   * Lists incomplete object upload information of a bucket for prefix.
-   *
-   * <pre>Example:{@code
-   * Iterable<Result<Upload>> results =
-   *     minioOperations.listIncompleteUploads("my-bucketname", "my-obj");
-   * for (Result<Upload> result : results) {
-   *   Upload upload = result.get();
-   *   System.out.println(upload.uploadId() + ", " + upload.objectName());
-   * }
-   * }</pre>
-   *
-   * @param bucketName Name of the bucket.
-   * @param prefix Object name starts with prefix.
-   * @return Iterable &ltResult&ltUpload&gt&gt - Lazy iterator contains object upload information.
-   * @see #listIncompleteUploads(String, String, boolean) #listIncompleteUploads(String, String,
-   *     boolean)#listIncompleteUploads(String, String,     boolean)#listIncompleteUploads(String,
-   *     String,     boolean)#listIncompleteUploads(String,     String,     boolean)
-   */
-  default Iterable<Result<Upload>> listIncompleteUploads(
-      @NotEmpty String bucketName,
-      String prefix) {
-    return execute(minioClient -> minioClient.listIncompleteUploads(bucketName, prefix));
-  }
-
-  /**
-   * Lists incomplete object upload information of a bucket for prefix recursively.
-   *
-   * <pre>Example:{@code
-   * Iterable<Result<Upload>> results =
-   *     minioOperations.listIncompleteUploads("my-bucketname", "my-obj", true);
-   * for (Result<Upload> result : results) {
-   *   Upload upload = result.get();
-   *   System.out.println(upload.uploadId() + ", " + upload.objectName());
-   * }
-   * }</pre>
-   *
-   * @param bucketName Name of the bucket.
-   * @param prefix Object name starts with prefix.
-   * @param recursive List recursively than directory structure emulation.
-   * @return Iterable &ltResult&ltUpload&gt&gt - Lazy iterator contains object upload information.
-   * @see #listIncompleteUploads(String bucketName) #listIncompleteUploads(String
-   *     bucketName)#listIncompleteUploads(String     bucketName)#listIncompleteUploads(String
-   *     bucketName)#listIncompleteUploads(String     bucketName)
-   * @see #listIncompleteUploads(String bucketName, String prefix) #listIncompleteUploads(String
-   *     bucketName, String prefix)#listIncompleteUploads(String     bucketName, String
-   *     prefix)#listIncompleteUploads(String     bucketName, String
-   *     prefix)#listIncompleteUploads(String     bucketName, String prefix)
-   */
-  default Iterable<Result<Upload>> listIncompleteUploads(
-      @NotEmpty String bucketName,
-      String prefix,
-      boolean recursive) {
-
-    return execute(minioClient -> minioClient.listIncompleteUploads(bucketName, prefix, recursive));
-  }
-
-  /**
-   * Removes incomplete uploads of an object.
-   *
-   * <pre>Example:{@code
-   * minioOperations.removeIncompleteUpload("my-bucketname", "my-objectname");
-   * }</pre>
-   *
-   * @param bucketName Name of the bucket.
-   * @param objectName Object name in the bucket.
-   */
-  default void removeIncompleteUpload(
-      @NotEmpty String bucketName,
-      @NotEmpty String objectName) {
-
-    execute((MinioClientCallbackWithoutResult) minioClient -> minioClient
-        .removeIncompleteUpload(bucketName, objectName));
-  }
-
-  /**
-   * Listens events of object prefix and suffix of a bucket. The returned closable iterator is
-   * lazily evaluated hence its required to iterate to get new records and must be used with
-   * try-with-resource to release underneath network resources.
-   *
-   * <pre>Example:{@code
-   * String[] events = {"s3:ObjectCreated:*", "s3:ObjectAccessed:*"};
-   * try (CloseableIterator<Result<NotificationInfo>> ci =
-   *     minioOperations.listenBucketNotification("bcketName", "", "", events)) {
-   *   while (ci.hasNext()) {
-   *     NotificationRecords records = ci.next().get();
-   *     for (Event event : records.events()) {
-   *       System.out.println("Event " + event.eventType() + " occurred at "
-   *           + event.eventTime() + " for " + event.bucketName() + "/"
-   *           + event.objectName());
-   *     }
-   *   }
-   * }
-   * }</pre>
-   *
-   * @param bucketName Name of the bucket.
-   * @param prefix Listen events of object starts with prefix.
-   * @param suffix Listen events of object ends with suffix.
-   * @param events Events to listen.
-   * @return CloseableIterator &ltResult&ltNotificationRecords&gt&gt - Lazy closable iterator
-   *     contains event records.
-   */
   default CloseableIterator<Result<NotificationRecords>> listenBucketNotification(
-      @NotEmpty String bucketName,
-      String prefix,
-      String suffix,
-      @NotNull String[] events) {
-
-    return execute(minioClient -> minioClient
-        .listenBucketNotification(bucketName, prefix, suffix, events));
+      ListenBucketNotificationArgs args) {
+    return execute(minioClient -> minioClient.listenBucketNotification(args));
   }
 
-  /**
-   * Selects content of a object by SQL expression.
-   *
-   * <pre>Example:{@code
-   * String sqlExpression = "select * from S3Object";
-   * InputSerialization is =
-   *     new InputSerialization(null, false, null, null, FileHeaderInfo.USE, null, null,
-   *         null);
-   * OutputSerialization os =
-   *     new OutputSerialization(null, null, null, QuoteFields.ASNEEDED, null);
-   * SelectResponseStream stream =
-   *     minioOperations.selectObjectContent("my-bucketname", "my-objectName", sqlExpression,
-   *         is, os, true, null, null, null);
-   *
-   * byte[] buf = new byte[512];
-   * int bytesRead = stream.read(buf, 0, buf.length);
-   * System.out.println(new String(buf, 0, bytesRead, StandardCharsets.UTF_8));
-   *
-   * Stats stats = stream.stats();
-   * System.out.println("bytes scanned: " + stats.bytesScanned());
-   * System.out.println("bytes processed: " + stats.bytesProcessed());
-   * System.out.println("bytes returned: " + stats.bytesReturned());
-   *
-   * stream.close();
-   * }</pre>
-   *
-   * @param bucketName Name of the bucket.
-   * @param objectName Object name in the bucket.
-   * @param sqlExpression SQL expression.
-   * @param is Input specification of object data.
-   * @param os Output specification of result.
-   * @param requestProgress Flag to request progress information.
-   * @param scanStartRange scan start range of the object.
-   * @param scanEndRange scan end range of the object.
-   * @param sse SSE-C type server-side encryption.
-   * @return contains filtered records and progress.
-   */
-  default SelectResponseStream selectObjectContent(
-      @NotEmpty String bucketName,
-      @NotEmpty String objectName,
-      String sqlExpression,
-      InputSerialization is,
-      OutputSerialization os,
-      boolean requestProgress,
-      Long scanStartRange,
-      Long scanEndRange,
-      ServerSideEncryption sse) {
-
-    return execute(minioClient -> minioClient.selectObjectContent(
-        bucketName,
-        objectName,
-        sqlExpression,
-        is,
-        os,
-        requestProgress,
-        scanStartRange,
-        scanEndRange,
-        sse));
+  default Iterable<Result<Upload>> listIncompleteUploads(ListIncompleteUploadsArgs args) {
+    return execute(minioClient -> minioClient.listIncompleteUploads(args));
   }
 
-  /**
-   * Lists object information of a bucket.
-   *
-   * <pre>Example:{@code
-   * Iterable<Result<Item>> results = minioOperations.listObjects("my-bucketname");
-   * for (Result<Item> result : results) {
-   *   Item item = result.get();
-   *   System.out.println(
-   *       item.lastModified() + ", " + item.size() + ", " + item.objectName());
-   * }
-   * }</pre>
-   *
-   * @param bucketName Name of the bucket.
-   * @return Iterable &ltResult&ltItem&gt&gt - Lazy iterator contains object information.
-   */
-  default Iterable<Result<Item>> listObjects(@NotEmpty String bucketName) {
-    return listObjects(bucketName, null);
+  default Iterable<Result<Item>> listObjects(ListObjectsArgs args) {
+    return execute(minioClient -> minioClient.listObjects(args));
   }
 
-  /**
-   * Lists object information of a bucket for prefix.
-   *
-   * <pre>Example:{@code
-   * Iterable<Result<Item>> results = minioOperations.listObjects("my-bucketname", "my-obj");
-   * for (Result<Item> result : results) {
-   *   Item item = result.get();
-   *   System.out.println(
-   *       item.lastModified() + ", " + item.size() + ", " + item.objectName());
-   * }
-   * }</pre>
-   *
-   * @param bucketName Name of the bucket.
-   * @param prefix Object name starts with prefix.
-   * @return Iterable &ltResult&ltItem&gt&gt - Lazy iterator contains object information.
-   */
-  default Iterable<Result<Item>> listObjects(@NotEmpty String bucketName, String prefix) {
-    // list all objects recursively
-    return listObjects(bucketName, prefix, true);
-  }
-
-  /**
-   * Lists object information of a bucket for prefix recursively.
-   *
-   * <pre>Example:{@code
-   * Iterable<Result<Item>> results =
-   *     minioOperations.listObjects("my-bucketname", "my-obj", true);
-   * for (Result<Item> result : results) {
-   *   Item item = result.get();
-   *   System.out.println(
-   *       item.lastModified() + ", " + item.size() + ", " + item.objectName());
-   * }
-   * }</pre>
-   *
-   * @param bucketName Name of the bucket.
-   * @param prefix Object name starts with prefix.
-   * @param recursive List recursively than directory structure emulation.
-   * @return Iterable &ltResult&ltItem&gt&gt - Lazy iterator contains object information.
-   * @see #listObjects(String bucketName) #listObjects(String bucketName)#listObjects(String
-   *     bucketName)#listObjects(String     bucketName)#listObjects(String     bucketName)
-   * @see #listObjects(String bucketName, String prefix) #listObjects(String bucketName, String
-   *     prefix)#listObjects(String bucketName, String     prefix)#listObjects(String bucketName,
-   *     String     prefix)#listObjects(String bucketName,     String     prefix)
-   * @see #listObjects(String bucketName, String prefix, boolean recursive, boolean useVersion1)
-   *     #listObjects(String bucketName, String prefix, boolean recursive, boolean useVersion1)
-   *     #listObjects(String bucketName, String prefix, boolean recursive, boolean useVersion1)
-   *     #listObjects(String bucketName, String prefix, boolean recursive, boolean useVersion1)
-   *     #listObjects(String bucketName, String prefix, boolean recursive, boolean useVersion1)
-   */
-  default Iterable<Result<Item>> listObjects(
-      @NotEmpty String bucketName, String prefix, boolean recursive) {
-    return listObjects(bucketName, prefix, recursive, false);
-  }
-
-  /**
-   * Lists object information of a bucket for prefix recursively using S3 API version 1.
-   *
-   * <pre>Example:{@code
-   * Iterable<Result<Item>> results =
-   *     minioOperations.listObjects("my-bucketname", "my-obj", true, true);
-   * for (Result<Item> result : results) {
-   *   Item item = result.get();
-   *   System.out.println(
-   *       item.lastModified() + ", " + item.size() + ", " + item.objectName());
-   * }
-   * }</pre>
-   *
-   * @param bucketName Name of the bucket.
-   * @param prefix Object name starts with prefix.
-   * @param recursive List recursively than directory structure emulation.
-   * @param useVersion1 when true, version 1 of REST API is used.
-   * @return Iterable &ltResult&ltItem&gt&gt - Lazy iterator contains object information.
-   * @see #listObjects(String bucketName) #listObjects(String bucketName)#listObjects(String
-   *     bucketName)#listObjects(String     bucketName)#listObjects(String     bucketName)
-   * @see #listObjects(String bucketName, String prefix) #listObjects(String bucketName, String
-   *     prefix)#listObjects(String bucketName, String     prefix)#listObjects(String bucketName,
-   *     String     prefix)#listObjects(String bucketName,     String     prefix)
-   * @see #listObjects(String bucketName, String prefix, boolean recursive) #listObjects(String
-   *     bucketName, String prefix, boolean recursive)#listObjects(String     bucketName, String
-   *     prefix, boolean recursive)#listObjects(String     bucketName, String     prefix, boolean
-   *     recursive)#listObjects(String     bucketName, String     prefix, boolean     recursive)
-   */
-  default Iterable<Result<Item>> listObjects(
-      @NotEmpty String bucketName,
-      String prefix,
-      boolean recursive,
-      boolean useVersion1) {
-
-    return listObjects(bucketName, prefix, recursive, false, false);
-  }
-
-  /**
-   * Lists object information with user metadata of a bucket for prefix recursively using S3 API
-   * version 1.
-   *
-   * <pre>Example:{@code
-   * Iterable<Result<Item>> results =
-   *     minioOperations.listObjects("my-bucketname", "my-obj", true, true, false);
-   * for (Result<Item> result : results) {
-   *   Item item = result.get();
-   *   System.out.println(
-   *       item.lastModified() + ", " + item.size() + ", " + item.objectName());
-   * }
-   * }</pre>
-   *
-   * @param bucketName Name of the bucket.
-   * @param prefix Object name starts with prefix.
-   * @param recursive List recursively than directory structure emulation.
-   * @param includeUserMetadata include user metadata of each object. This is MinIO specific
-   *     extension to ListObjectsV2.
-   * @param useVersion1 when true, version 1 of REST API is used.
-   * @return Iterable &ltResult&ltItem&gt&gt - Lazy iterator contains object information.
-   * @see #listObjects(String bucketName) #listObjects(String bucketName)#listObjects(String
-   *     bucketName)#listObjects(String     bucketName)#listObjects(String     bucketName)
-   * @see #listObjects(String bucketName, String prefix) #listObjects(String bucketName, String
-   *     prefix)#listObjects(String bucketName, String     prefix)#listObjects(String bucketName,
-   *     String     prefix)#listObjects(String bucketName,     String     prefix)
-   * @see #listObjects(String bucketName, String prefix, boolean recursive) #listObjects(String
-   *     bucketName, String prefix, boolean recursive)#listObjects(String     bucketName, String
-   *     prefix, boolean recursive)#listObjects(String     bucketName, String     prefix, boolean
-   *     recursive)#listObjects(String     bucketName, String     prefix, boolean     recursive)
-   */
-  default Iterable<Result<Item>> listObjects(
-      @NotEmpty String bucketName,
-      String prefix,
-      boolean recursive,
-      boolean includeUserMetadata,
-      boolean useVersion1) {
-
-    return execute(minioClient -> minioClient
-        .listObjects(bucketName, prefix, recursive, includeUserMetadata, useVersion1));
-  }
-
-  /**
-   * Uploads data from a file to an object using {@link PutObjectOptions}.
-   *
-   * <pre>Example:{@code
-   * minioOperations.putObject("my-bucketname", "my-objectname", "my-filename", null);
-   * }</pre>
-   *
-   * @param bucketName Name of the bucket.
-   * @param objectName Object name in the bucket.
-   * @param in Stream contains object data.
-   * @param options {@link PutObjectOptions} to be used during upload.
-   */
-  default void putObject(
-      @NotEmpty String bucketName,
-      @NotEmpty String objectName,
-      @NotNull InputStream in,
-      @NotNull PutObjectOptions options) {
-
-    execute((MinioClientCallbackWithoutResult) minioClient -> {
-      if (!StringUtils.hasText(options.contentType())) {
-        options.setContentType(MediaType.APPLICATION_OCTET_STREAM_VALUE);
-      }
-      minioClient.putObject(bucketName, objectName, in, options);
-    });
-  }
-
-  /**
-   * Uploads data from a file to an object.
-   *
-   * <pre>Example:{@code
-   * minioOperations.putObject("my-bucketname", "my-objectname", "my-filename");
-   * }***</pre>
-   *
-   * @param bucketName Name of the bucket.
-   * @param objectName Object name in the bucket.
-   * @param file Name of file to upload.
-   */
-  default void putObject(
-      @NotEmpty String bucketName,
-      @NotEmpty String objectName,
-      @NotEmpty String file) {
-
-    putObject(bucketName, objectName, file, null);
-  }
-
-  /**
-   * Uploads data from a file to an object using {@link PutObjectOptions}.
-   *
-   * <pre>Example:{@code
-   * minioOperations.putObject("my-bucketname", "my-objectname", "my-filename", null);
-   * }***</pre>
-   *
-   * @param bucketName Name of the bucket.
-   * @param objectName Object name in the bucket.
-   * @param file Name of file to upload.
-   * @param options {@link PutObjectOptions} to be used during upload.
-   */
-  default void putObject(
-      @NotEmpty String bucketName,
-      @NotEmpty String objectName,
-      @NotEmpty String file,
-      @Nullable PutObjectOptions options) {
-
+  default void makeBucket(MakeBucketArgs args) {
     execute((MinioClientCallbackWithoutResult) minioClient -> minioClient
-        .putObject(bucketName, objectName, file, options));
+        .makeBucket(args));
   }
 
-  /**
-   * Uploads data from a file to an object.
-   *
-   * <pre>Example:{@code
-   * minioOperations.putObject("my-bucketname", "my-objectname", my-file);
-   * }***</pre>
-   *
-   * @param bucketName Name of the bucket.
-   * @param objectName Object name in the bucket.
-   * @param file File to upload.
-   */
-  default void putObject(
-      @NotEmpty String bucketName,
-      @NotEmpty String objectName,
-      @NotNull File file) {
-
-    putObject(bucketName, objectName, file, null);
-  }
-
-  /**
-   * Uploads data from a file to an object using {@link PutObjectOptions}.
-   *
-   * <pre>Example:{@code
-   * minioOperations.putObject("my-bucketname", "my-objectname", my-file, null);
-   * }***</pre>
-   *
-   * @param bucketName Name of the bucket.
-   * @param objectName Object name in the bucket.
-   * @param file File to upload.
-   * @param options {@link PutObjectOptions} to be used during upload.
-   */
-  default void putObject(
-      @NotEmpty String bucketName,
-      @NotEmpty String objectName,
-      @NotNull File file,
-      @Nullable PutObjectOptions options) {
-
+  default void removeBucket(RemoveBucketArgs args) {
     execute((MinioClientCallbackWithoutResult) minioClient -> minioClient
-        .putObject(bucketName, objectName, file.getAbsolutePath(), options));
+        .removeBucket(args));
   }
 
-  /**
-   * Uploads data from a file to an object.
-   *
-   * <pre>Example:{@code
-   * minioOperations.putObject("my-bucketname", "my-objectname", my-file);
-   * }***</pre>
-   *
-   * @param bucketName Name of the bucket.
-   * @param objectName Object name in the bucket.
-   * @param file File to upload.
-   */
-  default void putObject(
-      @NotEmpty String bucketName,
-      @NotEmpty String objectName,
-      @NotNull Path file) {
-
-    putObject(bucketName, objectName, file, null);
-  }
-
-  /**
-   * Uploads data from a file to an object using {@link PutObjectOptions}.
-   *
-   * <pre>Example:{@code
-   * minioOperations.putObject("my-bucketname", "my-objectname", my-file, null);
-   * }***</pre>
-   *
-   * @param bucketName Name of the bucket.
-   * @param objectName Object name in the bucket.
-   * @param file File to upload.
-   * @param options {@link PutObjectOptions} to be used during upload.
-   */
-  default void putObject(
-      @NotEmpty String bucketName,
-      @NotEmpty String objectName,
-      @NotNull Path file,
-      @Nullable PutObjectOptions options) {
-
+  default void removeIncompleteUpload(RemoveIncompleteUploadArgs args) {
     execute((MinioClientCallbackWithoutResult) minioClient -> minioClient
-        .putObject(bucketName, objectName, file.toFile().getAbsolutePath(), options));
+        .removeIncompleteUpload(args));
   }
 
-  /**
-   * Uploads data from an uploaded item.
-   *
-   * @param bucketName Name of the bucket.
-   * @param objectName Object name in the bucket.
-   * @param uploadedItem The item to upload
-   * @param deleteMode The delete mode
-   * @return {@code true} if the item was uploaded, otherwise {@code false}
-   */
-  default boolean putObject(
-      @NotEmpty String bucketName,
-      @NotEmpty String objectName,
-      @Nullable UploadedItem<?> uploadedItem,
-      @NotNull DeleteMode deleteMode) {
-
-    if (uploadedItem != null && !uploadedItem.isEmpty()) {
-      return execute(minioClient -> {
-        try {
-          PutObjectOptions options = new PutObjectOptions(uploadedItem.getLength(), -1);
-          options.setContentType(StringUtils.hasText(uploadedItem.getContentType())
-              ? uploadedItem.getContentType()
-              : MediaType.APPLICATION_OCTET_STREAM_VALUE);
-          minioClient.putObject(bucketName, objectName, uploadedItem.getInputStream(), options);
-          if (DeleteMode.ON_SUCCESS == deleteMode) {
-            uploadedItem.delete();
-          }
-          return true;
-
-        } finally {
-          if (DeleteMode.ALWAYS == deleteMode) {
-            uploadedItem.delete();
-          }
-        }
-      });
-    }
-    return false;
+  default void setBucketEncryption(SetBucketEncryptionArgs args) {
+    execute((MinioClientCallbackWithoutResult) minioClient -> minioClient
+        .setBucketEncryption(args));
   }
 
-  /**
-   * Uploads multipart file.
-   *
-   * @param bucketName the bucket name
-   * @param objectName the object name
-   * @param multipartFile the multipart file
-   * @return {@code true} if the item was uploaded, otherwise {@code false}
-   */
-  default boolean putObject(
-      @NotEmpty String bucketName,
-      @NotEmpty String objectName,
-      @Nullable MultipartFile multipartFile) {
-
-    if (multipartFile != null && multipartFile.getSize() > 0) {
-      return execute(minioClient -> {
-        PutObjectOptions options = new PutObjectOptions(multipartFile.getSize(), -1);
-        options.setContentType(StringUtils.hasText(multipartFile.getContentType())
-            ? multipartFile.getContentType()
-            : MediaType.APPLICATION_OCTET_STREAM_VALUE);
-        try (InputStream in = multipartFile.getInputStream()) {
-          minioClient.putObject(bucketName, objectName, in, options);
-        }
-        return true;
-      });
-    }
-    return false;
+  default void setBucketLifeCycle(SetBucketLifeCycleArgs args) {
+    execute((MinioClientCallbackWithoutResult) minioClient -> minioClient
+        .setBucketLifeCycle(args));
   }
 
-  /**
-   * Gets data of an object. Returned {@link InputStream} must be closed after use to release
-   * network resources.
-   *
-   * <pre>Example:{@code
-   * try (InputStream stream =
-   *     minioOperations.getObject("my-bucketname", "my-objectname")) {
-   *   // Read data from stream
-   * }
-   * }</pre>
-   *
-   * @param bucketName Name of the bucket.
-   * @param objectName Object name in the bucket.
-   * @return {@link InputStream} - Contains object data.
-   */
-  default InputStream getObject(@NotEmpty String bucketName, @NotEmpty String objectName) {
-    return getObject(bucketName, objectName, null, null, null);
+  default void setBucketNotification(SetBucketNotificationArgs args) {
+    execute((MinioClientCallbackWithoutResult) minioClient -> minioClient
+        .setBucketNotification(args));
   }
 
-  /**
-   * Gets data of a SSE-C encrypted object. Returned {@link InputStream} must be closed after use to
-   * release network resources.
-   *
-   * <pre>Example:{@code
-   * try (InputStream stream =
-   *     minioOperations.getObject("my-bucketname", "my-objectname", ssec)) {
-   *   // Read data from stream
-   * }
-   * }</pre>
-   *
-   * @param bucketName Name of the bucket.
-   * @param objectName Object name in the bucket.
-   * @param sse SSE-C type server-side encryption.
-   * @return {@link InputStream} - Contains object data.
-   */
-  default InputStream getObject(
-      @NotEmpty String bucketName,
-      @NotEmpty String objectName,
-      @NotNull ServerSideEncryption sse) {
-    return getObject(bucketName, objectName, null, null, sse);
+  default void setBucketPolicy(SetBucketPolicyArgs args) {
+    execute((MinioClientCallbackWithoutResult) minioClient -> minioClient
+        .setBucketPolicy(args));
   }
 
-  /**
-   * Gets data from offset of an object. Returned {@link InputStream} must be closed after use to
-   * release network resources.
-   *
-   * <pre>Example:{@code
-   * try (InputStream stream =
-   *     minioOperations.getObject("my-bucketname", "my-objectname", 1024L)) {
-   *   // Read data from stream
-   * }
-   * }</pre>
-   *
-   * @param bucketName Name of the bucket.
-   * @param objectName Object name in the bucket.
-   * @param offset Start byte position of object data.
-   * @return {@link InputStream} - Contains object data.
-   */
-  default InputStream getObject(
-      @NotEmpty String bucketName,
-      @NotEmpty String objectName,
-      long offset) {
-    return getObject(bucketName, objectName, offset, null, null);
+  default void setBucketTags(SetBucketTagsArgs args) {
+    execute((MinioClientCallbackWithoutResult) minioClient -> minioClient
+        .setBucketTags(args));
   }
 
-  /**
-   * Gets data from offset to length of an object. Returned {@link InputStream} must be closed after
-   * use to release network resources.
-   *
-   * <pre>Example:{@code
-   * try (InputStream stream =
-   *     minioOperations.getObject("my-bucketname", "my-objectname", 1024L, 4096L)) {
-   *   // Read data from stream
-   * }
-   * }</pre>
-   *
-   * @param bucketName Name of the bucket.
-   * @param objectName Object name in the bucket.
-   * @param offset Start byte position of object data.
-   * @param length Number of bytes of object data from offset.
-   * @return {@link InputStream} - Contains object data.
-   */
-  default InputStream getObject(
-      @NotEmpty String bucketName,
-      @NotEmpty String objectName,
-      long offset,
-      Long length) {
-
-    return getObject(bucketName, objectName, offset, length, null);
+  default void setDefaultRetention(SetDefaultRetentionArgs args) {
+    execute((MinioClientCallbackWithoutResult) minioClient -> minioClient
+        .setDefaultRetention(args));
   }
 
-  /**
-   * Gets data from offset to length of a SSE-C encrypted object. Returned {@link InputStream} must
-   * be closed after use to release network resources.
-   *
-   * <pre>Example:{@code
-   * try (InputStream stream =
-   *     minioOperations.getObject("my-bucketname", "my-objectname", 1024L, 4096L, ssec)) {
-   *   // Read data from stream
-   * }
-   * }</pre>
-   *
-   * @param bucketName Name of the bucket.
-   * @param objectName Object name in the bucket.
-   * @param offset Start byte position of object data.
-   * @param length Number of bytes of object data from offset.
-   * @param sse SSE-C type server-side encryption.
-   * @return {@link InputStream} - Contains object data.
-   */
-  default InputStream getObject(
-      @NotEmpty String bucketName,
-      @NotEmpty String objectName,
-      @Nullable Long offset,
-      @Nullable Long length,
-      @Nullable ServerSideEncryption sse) {
+  // Object operations
 
-    return execute(minioClient -> minioClient
-        .getObject(bucketName, objectName, offset, length, sse));
+  default ObjectWriteResponse composeObject(ComposeObjectArgs args) {
+    return execute(minioClient -> minioClient.composeObject(args));
   }
 
-  /**
-   * Gets object information and metadata of an object.
-   *
-   * <pre>Example:{@code
-   * ObjectStat objectStat = minioOperations.statObject("my-bucketname", "my-objectname");
-   * }</pre>
-   *
-   * @param bucketName Name of the bucket.
-   * @param objectName Object name in the bucket.
-   * @return populated object information and metadata.
-   */
-  default ObjectStat statObject(@NotEmpty String bucketName, @NotEmpty String objectName) {
-    return statObject(bucketName, objectName, null);
+  default ObjectWriteResponse copyObject(CopyObjectArgs args) {
+    return execute(minioClient -> minioClient.copyObject(args));
   }
 
-  /**
-   * Gets object information and metadata of a SSE-C encrypted object.
-   *
-   * <pre>Example:{@code
-   * ObjectStat objectStat =
-   *     minioOperations.statObject("my-bucketname", "my-objectname", ssec);
-   * }</pre>
-   *
-   * @param bucketName Name of the bucket.
-   * @param objectName Object name in the bucket.
-   * @param sse SSE-C type server-side encryption.
-   * @return populated object information and metadata.
-   */
-  default ObjectStat statObject(
-      @NotEmpty String bucketName,
-      @NotEmpty String objectName,
-      @Nullable ServerSideEncryption sse) {
-    return execute(minioClient -> minioClient.statObject(bucketName, objectName, sse));
+  default void deleteObjectTags(DeleteObjectTagsArgs args) {
+    execute((MinioClientCallbackWithoutResult) minioClient -> minioClient
+        .deleteObjectTags(args));
   }
 
-  /**
-   * Gets URL of an object useful when this object has public read access.
-   *
-   * <pre>Example:{@code
-   * String url = minioOperations.getObjectUrl("my-bucketname", "my-objectname");
-   * }</pre>
-   *
-   * @param bucketName Name of the bucket.
-   * @param objectName Object name in the bucket.
-   * @return String - URL string.
-   */
+  default void disableObjectLegalHold(DisableObjectLegalHoldArgs args) {
+    execute((MinioClientCallbackWithoutResult) minioClient -> minioClient
+        .disableObjectLegalHold(args));
+  }
+
+  default void enableObjectLegalHold(EnableObjectLegalHoldArgs args) {
+    execute((MinioClientCallbackWithoutResult) minioClient -> minioClient
+        .enableObjectLegalHold(args));
+  }
+
+  default InputStream getObject(GetObjectArgs args) {
+    return execute(minioClient -> minioClient.getObject(args));
+  }
+
+  default void downloadObject(DownloadObjectArgs args) {
+    execute((MinioClientCallbackWithoutResult) minioClient -> minioClient
+        .downloadObject(args));
+  }
+
+  default Retention getObjectRetention(GetObjectRetentionArgs args) {
+    return execute(minioClient -> minioClient.getObjectRetention(args));
+  }
+
+  default Tags getObjectTags(GetObjectTagsArgs args) {
+    return execute(minioClient -> minioClient.getObjectTags(args));
+  }
+
   default String getObjectUrl(String bucketName, String objectName) {
     return execute(minioClient -> minioClient.getObjectUrl(bucketName, objectName));
   }
 
-  /**
-   * Gets presigned URL of an object for HTTP method, expiry time and custom request parameters.
-   *
-   * <pre>Example:{@code
-   * String url = minioOperations.getPresignedObjectUrl(Method.DELETE, "my-bucketname",
-   *     "my-objectname", 24 * 60 * 60, reqParams);
-   * }</pre>
-   *
-   * @param method HTTP {@link Method} to generate presigned URL.
-   * @param bucketName Name of the bucket.
-   * @param objectName Object name in the bucket.
-   * @param expires Expiry duration; defaults to 7 days.
-   * @param reqParams Request parameters to override. Supported headers are response-expires,
-   *     response-content-type, response-cache-control and response-content-disposition.
-   * @return String - URL string.
-   */
-  default String getPresignedObjectUrl(
-      Method method,
-      String bucketName,
-      String objectName,
-      Duration expires,
-      Map<String, String> reqParams) {
-
-    final int expireSecs;
-    if (expires == null || expires.toSeconds() < 1L || expires.toSeconds() > DEFAULT_EXPIRY_TIME) {
-      expireSecs = DEFAULT_EXPIRY_TIME;
-    } else {
-      expireSecs = (int) expires.toSeconds();
-    }
-    return execute(minioClient -> minioClient
-        .getPresignedObjectUrl(method, bucketName, objectName, expireSecs, reqParams));
+  default String getPresignedObjectUrl(GetPresignedObjectUrlArgs args) {
+    return execute(minioClient -> minioClient.getPresignedObjectUrl(args));
   }
 
-  /**
-   * Gets presigned URL of an object to download its data for expiry time and request parameters.
-   *
-   * <pre>Example:{@code
-   * // Get presigned URL to download my-objectname data with one day expiry and request
-   * // parameters.
-   * String url = minioOperations.presignedGetObject("my-bucketname", "my-objectname",
-   *     24 * 60 * 60, reqParams);
-   * }</pre>
-   *
-   * @param bucketName Name of the bucket.
-   * @param objectName Object name in the bucket.
-   * @param expires Expiry in seconds; defaults to 7 days.
-   * @param reqParams Request parameters to override. Supported headers are response-expires,
-   *     response-content-type, response-cache-control and response-content-disposition.
-   * @return String - URL string to download the object.
-   */
-  default String presignedGetObject(
-      String bucketName, String objectName, Duration expires, Map<String, String> reqParams) {
-    return getPresignedObjectUrl(Method.GET, bucketName, objectName, expires, reqParams);
+  default boolean isObjectLegalHoldEnabled(IsObjectLegalHoldEnabledArgs args) {
+    return execute(minioClient -> minioClient.isObjectLegalHoldEnabled(args));
   }
 
-  /**
-   * Gets presigned URL of an object to download its data for expiry time.
-   *
-   * <pre>Example:{@code
-   * // Get presigned URL to download my-objectname data with one day expiry.
-   * String url = minioOperations.presignedGetObject("my-bucketname", "my-objectname",
-   *     24 * 60 * 60);
-   * }</pre>
-   *
-   * @param bucketName Name of the bucket.
-   * @param objectName Object name in the bucket.
-   * @param expires Expiry in seconds; defaults to 7 days.
-   * @return String - URL string to download the object.
-   */
-  default String presignedGetObject(String bucketName, String objectName, Duration expires) {
-    return presignedGetObject(bucketName, objectName, expires, null);
-  }
-
-  /**
-   * Gets presigned URL of an object to download its data for 7 days.
-   *
-   * <pre>Example:{@code
-   * String url = minioOperations.presignedGetObject("my-bucketname", "my-objectname");
-   * }</pre>
-   *
-   * @param bucketName Name of the bucket.
-   * @param objectName Object name in the bucket.
-   * @return String - URL string to download the object.
-   */
-  default String presignedGetObject(String bucketName, String objectName) {
-    return presignedGetObject(bucketName, objectName, null, null);
-  }
-
-  /**
-   * Gets presigned URL of an object to upload data for expiry time.
-   *
-   * <pre>Example:{@code
-   * // Get presigned URL to upload data to my-objectname with one day expiry.
-   * String url =
-   *     minioOperations.presignedPutObject("my-bucketname", "my-objectname", 24 * 60 * 60);
-   * }</pre>
-   *
-   * @param bucketName Name of the bucket.
-   * @param objectName Object name in the bucket.
-   * @param expires Expiry in seconds; defaults to 7 days.
-   * @return String - URL string to upload an object.
-   */
-  default String presignedPutObject(String bucketName, String objectName, Duration expires) {
-    return getPresignedObjectUrl(Method.PUT, bucketName, objectName, expires, null);
-  }
-
-  /**
-   * Gets presigned URL of an object to upload data for 7 days.
-   *
-   * <pre>Example:{@code
-   * String url = minioOperations.presignedPutObject("my-bucketname", "my-objectname");
-   * }</pre>
-   *
-   * @param bucketName Name of the bucket.
-   * @param objectName Object name in the bucket.
-   * @return String - URL string to upload an object.
-   */
-  default String presignedPutObject(String bucketName, String objectName) {
-    return presignedPutObject(bucketName, objectName, null);
-  }
-
-  /**
-   * Gets form-data of {@link PostPolicy} of an object to upload its data using POST method.
-   *
-   * <pre>Example:{@code
-   * PostPolicy policy = new PostPolicy("my-bucketname", "my-objectname",
-   *     ZonedDateTime.now().plusDays(7));
-   *
-   * // 'my-objectname' should be 'image/png' content type
-   * policy.setContentType("image/png");
-   *
-   * // set success action status to 201 to receive XML document
-   * policy.setSuccessActionStatus(201);
-   *
-   * Map<String,String> formData = minioOperations.presignedPostPolicy(policy);
-   *
-   * // Print curl command to be executed by anonymous user to upload /tmp/userpic.png.
-   * System.out.print("curl -X POST ");
-   * for (Map.Entry<String,String> entry : formData.entrySet()) {
-   *   System.out.print(" -F " + entry.getKey() + "=" + entry.getValue());
-   * }
-   * System.out.println(" -F file=@/tmp/userpic.png https://play.min.io/my-bucketname");
-   * }</pre>
-   *
-   * @param policy Post policy of an object.
-   * @return Map &ltString, String&gt - Contains form-data to upload an object using POST method.
-   */
   default Map<String, String> presignedPostPolicy(PostPolicy policy) {
     return execute(minioClient -> minioClient.presignedPostPolicy(policy));
   }
 
-  /**
-   * Removes an object.
-   *
-   * <pre>Example:{@code
-   * minioOperations.removeObject("my-bucketname", "my-objectname");
-   * }</pre>
-   *
-   * @param bucketName Name of the bucket.
-   * @param objectName Object name in the bucket.
-   */
-  default void removeObject(String bucketName, String objectName) {
+  default ObjectWriteResponse putObject(PutObjectArgs args) {
+    return execute(minioClient -> minioClient.putObject(args));
+  }
+
+  default void uploadObject(UploadObjectArgs args, DeleteMode deleteMode) {
+    final Path file = Paths.get(args.filename());
+    try {
+      execute((MinioClientCallbackWithoutResult) minioClient -> {
+        minioClient.uploadObject(args);
+        if (DeleteMode.ON_SUCCESS == deleteMode) {
+          Files.delete(file);
+        }
+      });
+
+    } finally {
+      if (DeleteMode.ALWAYS == deleteMode) {
+        execute((MinioClientCallbackWithoutResult) minioClient -> Files.delete(file));
+      }
+    }
+  }
+
+  default void removeObject(RemoveObjectArgs args) {
     execute((MinioClientCallbackWithoutResult) minioClient -> minioClient
-        .removeObject(bucketName, objectName));
+        .removeObject(args));
   }
 
-  /**
-   * Removes multiple objects lazily. Its required to iterate the returned Iterable to perform
-   * removal.
-   *
-   * <pre>Example:{@code
-   * List<String> myObjectNames = new LinkedList<String>();
-   * objectNames.add("my-objectname1");
-   * objectNames.add("my-objectname2");
-   * objectNames.add("my-objectname3");
-   * Iterable<Result<DeleteError>> results =
-   *     minioOperations.removeObjects("my-bucketname", myObjectNames);
-   * for (Result<DeleteError> result : results) {
-   *   DeleteError error = errorResult.get();
-   *   System.out.println(
-   *       "Error in deleting object " + error.objectName() + "; " + error.message());
-   * }
-   * }</pre>
-   *
-   * @param bucketName Name of the bucket.
-   * @param objectNames List of Object names in the bucket.
-   * @return Iterable &ltResult&ltDeleteError&gt&gt - Lazy iterator contains object removal status.
-   */
-  default Iterable<Result<DeleteError>> removeObjects(
-      final String bucketName, final Iterable<String> objectNames) {
-    return execute(minioClient -> minioClient.removeObjects(bucketName, objectNames));
+  default Iterable<Result<DeleteError>> removeObjects(RemoveObjectsArgs args) {
+    return execute(minioClient -> minioClient.removeObjects(args));
   }
 
-  /**
-   * Creates an object by server-side copying data from another object.
-   *
-   * <pre>Example:{@code
-   * // Copy data from my-source-bucketname/my-objectname to my-bucketname/my-objectname.
-   * minioOperations.copyObject("my-bucketname", "my-objectname", null, null,
-   *     "my-source-bucketname", null, null, null);
-   *
-   * // Copy data from my-source-bucketname/my-source-objectname to
-   * // my-bucketname/my-objectname.
-   * minioOperations.copyObject("my-bucketname", "my-objectname", null, null,
-   *     "my-source-bucketname", "my-source-objectname", null, null);
-   *
-   * // Copy data from my-source-bucketname/my-objectname to my-bucketname/my-objectname
-   * // by server-side encryption.
-   * minioOperations.copyObject("my-bucketname", "my-objectname", null, sse,
-   *     "my-source-bucketname", null, null, null);
-   *
-   * // Copy data from SSE-C encrypted my-source-bucketname/my-objectname to
-   * // my-bucketname/my-objectname.
-   * minioOperations.copyObject("my-bucketname", "my-objectname", null, null,
-   *     "my-source-bucketname", null, srcSsec, null);
-   *
-   * // Copy data from my-source-bucketname/my-objectname to my-bucketname/my-objectname
-   * // with user metadata and copy conditions.
-   * minioOperations.copyObject("my-bucketname", "my-objectname", headers, null,
-   *     "my-source-bucketname", null, null, conditions);
-   * }</pre>
-   *
-   * @param bucketName Name of the bucket.
-   * @param objectName Object name to be created.
-   * @param headerMap (Optional) User metadata.
-   * @param sse (Optional) Server-side encryption.
-   * @param srcBucketName Source bucket name.
-   * @param srcObjectName (Optional) Source object name.
-   * @param srcSse (Optional) SSE-C type server-side encryption of source object.
-   * @param copyConditions (Optional) Conditiions to be used in copy operation.
-   */
-  default void copyObject(
-      @NotEmpty String bucketName,
-      @NotEmpty String objectName,
-      @Nullable Map<String, String> headerMap,
-      @Nullable ServerSideEncryption sse,
-      @NotEmpty String srcBucketName,
-      @Nullable String srcObjectName,
-      @Nullable ServerSideEncryption srcSse,
-      @Nullable CopyConditions copyConditions) {
-
-    execute((MinioClientCallbackWithoutResult) minioClient -> minioClient.copyObject(
-        bucketName,
-        objectName,
-        headerMap,
-        sse,
-        srcBucketName,
-        srcObjectName,
-        srcSse,
-        copyConditions));
+  default SelectResponseStream selectObjectContent(SelectObjectContentArgs args) {
+    return execute(minioClient -> minioClient.selectObjectContent(args));
   }
 
-  /**
-   * Creates an object by combining data from different source objects using server-side copy.
-   *
-   * <pre>Example:{@code
-   * List<ComposeSource> sourceObjectList = new ArrayList<ComposeSource>();
-   * sourceObjectList.add(new ComposeSource("my-job-bucket", "my-objectname-part-one"));
-   * sourceObjectList.add(new ComposeSource("my-job-bucket", "my-objectname-part-two"));
-   * sourceObjectList.add(new ComposeSource("my-job-bucket", "my-objectname-part-three"));
-   *
-   * // Create my-bucketname/my-objectname by combining source object list.
-   * minioOperations.composeObject("my-bucketname", "my-objectname", sourceObjectList,
-   *     null, null);
-   *
-   * // Create my-bucketname/my-objectname with user metadata by combining source object
-   * // list.
-   * minioOperations.composeObject("my-bucketname", "my-objectname", sourceObjectList,
-   *     userMetadata, null);
-   *
-   * // Create my-bucketname/my-objectname with user metadata and server-side encryption
-   * // by combining source object list.
-   * minioOperations.composeObject("my-bucketname", "my-objectname", sourceObjectList,
-   *     userMetadata, sse);
-   * }</pre>
-   *
-   * @param bucketName Destination Bucket to be created upon compose.
-   * @param objectName Destination Object to be created upon compose.
-   * @param sources List of Source Objects used to compose Object.
-   * @param headerMap User Meta data.
-   * @param sse Server Side Encryption.
-   */
-  default void composeObject(
-      @NotEmpty String bucketName,
-      @NotEmpty String objectName,
-      List<ComposeSource> sources,
-      Map<String, String> headerMap,
-      ServerSideEncryption sse) {
-
+  default void setObjectRetention(SetObjectRetentionArgs args) {
     execute((MinioClientCallbackWithoutResult) minioClient -> minioClient
-        .composeObject(bucketName, objectName, sources, headerMap, sse));
+        .setObjectRetention(args));
+  }
+
+  default void setObjectTags(SetObjectTagsArgs args) {
+    execute((MinioClientCallbackWithoutResult) minioClient -> minioClient
+        .setObjectTags(args));
+  }
+
+  default ObjectStat statObject(StatObjectArgs args) {
+    return execute(minioClient -> minioClient.statObject(args));
   }
 
 }

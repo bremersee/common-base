@@ -17,9 +17,8 @@
 package org.bremersee.data.minio;
 
 import io.minio.MinioClient;
-import io.minio.errors.InvalidEndpointException;
-import io.minio.errors.InvalidPortException;
 import lombok.extern.slf4j.Slf4j;
+import okhttp3.HttpUrl;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -78,18 +77,16 @@ public class MinioAutoConfiguration {
    * Creates minio client.
    *
    * @return the minio client
-   * @throws InvalidPortException the invalid port exception
-   * @throws InvalidEndpointException the invalid endpoint exception
    */
   @ConditionalOnMissingBean
   @Bean
-  public MinioClient minioClient() throws InvalidPortException, InvalidEndpointException {
+  public MinioClient minioClient() {
 
     log.info("Creating {} ...", MinioClient.class.getSimpleName());
-    MinioClient minioClient = new MinioClient(
-        properties.getUrl(),
-        properties.getAccessKey(),
-        properties.getSecretKey());
+    MinioClient minioClient = MinioClient.builder()
+        .credentials(properties.getAccessKey(), properties.getSecretKey())
+        .endpoint(HttpUrl.get(properties.getUrl()))
+        .build();
     minioClient.setTimeout(
         properties.getConnectTimeout().toMillis(),
         properties.getWriteTimeout().toMillis(),

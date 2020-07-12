@@ -40,7 +40,7 @@ import org.springframework.util.StringUtils;
  */
 public class DefaultMinioErrorHandler extends AbstractMinioErrorHandler {
 
-  private static final String ERROR_CODE_PREFIX = "MINIO_";
+  static final String ERROR_CODE_PREFIX = "MINIO_";
 
   @Override
   public MinioException map(Throwable t) {
