@@ -20,8 +20,11 @@ import io.minio.BucketExistsArgs;
 import io.minio.GetPresignedObjectUrlArgs;
 import io.minio.MakeBucketArgs;
 import io.minio.MinioClient;
+import io.minio.ObjectStat;
 import io.minio.ObjectWriteResponse;
 import io.minio.PutObjectArgs;
+import io.minio.RemoveObjectArgs;
+import io.minio.StatObjectArgs;
 import io.minio.http.Method;
 import java.io.IOException;
 import java.io.InputStream;
@@ -88,18 +91,8 @@ public class MinioRepositoryImpl implements MinioRepository {
     return minio;
   }
 
-  public String getPresignedObjectUrl(Method method, String objectName, Duration duration) {
-    Duration expiry = duration != null ? validateDuration(duration) : presignedObjectUrlDuration;
-    return minio.getPresignedObjectUrl(GetPresignedObjectUrlArgs.builder()
-        .expiry((int)expiry.toSeconds())
-        .method(method)
-        .bucket(bucket)
-        .object(objectName)
-        .build());
-  }
-
   @Override
-  public Optional<ObjectWriteResponse> putObject(
+  public Optional<ObjectWriteResponse> save(
       MultipartFile multipartFile,
       String objectName,
       DeleteMode deleteMode) {
@@ -131,4 +124,41 @@ public class MinioRepositoryImpl implements MinioRepository {
           }
         });
   }
+
+  @Override
+  public Optional<MultipartFile> findOne(String objectName) {
+    try {
+      ObjectStat objectStat = minio.statObject(StatObjectArgs.builder()
+          .bucket(bucket)
+          .object(objectName)
+          .build());
+      return Optional.of(new MinioMultipartFile(minio, objectStat));
+
+    } catch (MinioException e) {
+      if (404 == e.status()) {
+        return Optional.empty();
+      }
+      throw e;
+    }
+  }
+
+  @Override
+  public void delete(String objectName) {
+    minio.removeObject(RemoveObjectArgs.builder()
+        .bucket(bucket)
+        .object(objectName)
+        .build());
+  }
+
+  @Override
+  public String getPresignedObjectUrl(Method method, String objectName, Duration duration) {
+    Duration expiry = duration != null ? validateDuration(duration) : presignedObjectUrlDuration;
+    return minio.getPresignedObjectUrl(GetPresignedObjectUrlArgs.builder()
+        .expiry((int) expiry.toSeconds())
+        .method(method)
+        .bucket(bucket)
+        .object(objectName)
+        .build());
+  }
+
 }

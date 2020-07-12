@@ -166,7 +166,9 @@ public class FileAwareMultipartFile implements MultipartFile {
 
   @Override
   public String getOriginalFilename() {
-    return originalFilename;
+    return !StringUtils.hasText(originalFilename) && file != null
+        ? file.getName()
+        : originalFilename;
   }
 
   @Override

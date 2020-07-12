@@ -32,18 +32,22 @@ public interface MinioRepository {
   @NotNull
   MinioOperations getMinioOperations();
 
-  default String getPresignedObjectUrl(@NotNull Method method, @NotNull String objectName) {
+  Optional<ObjectWriteResponse> save(
+      @Nullable MultipartFile multipartFile,
+      @NotEmpty String objectName,
+      @NotNull DeleteMode deleteMode);
+
+  Optional<MultipartFile> findOne(@NotEmpty String objectName);
+
+  void delete(@NotEmpty String objectName);
+
+  default String getPresignedObjectUrl(@NotNull Method method, @NotEmpty String objectName) {
     return getPresignedObjectUrl(method, objectName, null);
   }
 
   String getPresignedObjectUrl(
       @NotNull Method method,
-      @NotNull String objectName,
-      @Nullable Duration duration);
-
-  Optional<ObjectWriteResponse> putObject(
-      @Nullable MultipartFile multipartFile,
       @NotEmpty String objectName,
-      @NotNull DeleteMode deleteMode);
+      @Nullable Duration duration);
 
 }
