@@ -21,7 +21,7 @@ import org.springframework.util.ErrorHandler;
 import org.springframework.validation.annotation.Validated;
 
 /**
- * The inio error handler.
+ * The minio error handler.
  *
  * @author Christian Bremer
  */
@@ -31,7 +31,7 @@ public interface MinioErrorHandler extends ErrorHandler {
   /**
    * Map minio exception.
    *
-   * @param t the t
+   * @param t the throwable
    * @return the minio exception
    */
   @NotNull

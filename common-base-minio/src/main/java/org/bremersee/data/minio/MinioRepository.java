@@ -26,25 +26,77 @@ import org.springframework.lang.Nullable;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.multipart.MultipartFile;
 
+/**
+ * The minio repository interface.
+ *
+ * @author Christian Bremer
+ */
 @Validated
 public interface MinioRepository {
 
+  /**
+   * Gets minio operations.
+   *
+   * @return the minio operations
+   */
   @NotNull
   MinioOperations getMinioOperations();
 
+  /**
+   * Save multipart file.
+   *
+   * @param multipartFile the multipart file
+   * @param objectName the object name
+   * @param deleteMode the delete mode
+   * @return the write response; will be empty, if the multipart file is {@code null} or empty
+   */
   Optional<ObjectWriteResponse> save(
       @Nullable MultipartFile multipartFile,
       @NotEmpty String objectName,
       @NotNull DeleteMode deleteMode);
 
+  /**
+   * Checks whether an object with the specified name exists or not.
+   *
+   * @param objectName the object name
+   * @return {@code true} if the object exists, otherwise {@code false}
+   */
+  boolean exists(@NotEmpty String objectName);
+
+  /**
+   * Find one.
+   *
+   * @param objectName the object name
+   * @return the multipart file
+   */
   Optional<MultipartFile> findOne(@NotEmpty String objectName);
 
+  /**
+   * Delete.
+   *
+   * @param objectName the object name
+   */
   void delete(@NotEmpty String objectName);
 
+  /**
+   * Gets presigned object url.
+   *
+   * @param method the method
+   * @param objectName the object name
+   * @return the presigned object url
+   */
   default String getPresignedObjectUrl(@NotNull Method method, @NotEmpty String objectName) {
     return getPresignedObjectUrl(method, objectName, null);
   }
 
+  /**
+   * Gets presigned object url.
+   *
+   * @param method the method
+   * @param objectName the object name
+   * @param duration the duration
+   * @return the presigned object url
+   */
   String getPresignedObjectUrl(
       @NotNull Method method,
       @NotEmpty String objectName,

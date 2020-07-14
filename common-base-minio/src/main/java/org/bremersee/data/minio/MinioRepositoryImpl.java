@@ -37,6 +37,9 @@ import org.springframework.http.MediaType;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
+/**
+ * The minio repository implementation.
+ */
 public class MinioRepositoryImpl implements MinioRepository {
 
   private final MinioOperations minio;
@@ -45,6 +48,14 @@ public class MinioRepositoryImpl implements MinioRepository {
 
   private final Duration presignedObjectUrlDuration;
 
+  /**
+   * Instantiates a new minio repository.
+   *
+   * @param minioOperations the minio operations
+   * @param bucket the bucket
+   * @param create the create
+   * @param presignedObjectUrlDuration the presigned object url duration
+   */
   public MinioRepositoryImpl(
       MinioOperations minioOperations,
       String bucket,
@@ -59,6 +70,14 @@ public class MinioRepositoryImpl implements MinioRepository {
     }
   }
 
+  /**
+   * Instantiates a new minio repository.
+   *
+   * @param minioClient the minio client
+   * @param bucket the bucket
+   * @param create the create
+   * @param presignedObjectUrlDuration the presigned object url duration
+   */
   public MinioRepositoryImpl(
       MinioClient minioClient,
       String bucket,
@@ -123,6 +142,14 @@ public class MinioRepositoryImpl implements MinioRepository {
             }
           }
         });
+  }
+
+  @Override
+  public boolean exists(String objectName) {
+    return minio.objectExists(StatObjectArgs.builder()
+        .bucket(bucket)
+        .object(objectName)
+        .build());
   }
 
   @Override
