@@ -17,20 +17,34 @@
 package org.bremersee.data.minio;
 
 import io.minio.BucketExistsArgs;
+import io.minio.EnableVersioningArgs;
 import io.minio.GetPresignedObjectUrlArgs;
+import io.minio.IsVersioningEnabledArgs;
+import io.minio.ListObjectsArgs;
 import io.minio.MakeBucketArgs;
 import io.minio.MinioClient;
 import io.minio.ObjectStat;
 import io.minio.ObjectWriteResponse;
 import io.minio.PutObjectArgs;
 import io.minio.RemoveObjectArgs;
+import io.minio.RemoveObjectsArgs;
+import io.minio.Result;
 import io.minio.StatObjectArgs;
 import io.minio.http.Method;
+import io.minio.messages.DeleteError;
+import io.minio.messages.DeleteObject;
+import io.minio.messages.Item;
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import lombok.Getter;
 import org.bremersee.exception.ServiceException;
 import org.bremersee.web.multipart.FileAwareMultipartFile;
 import org.springframework.http.MediaType;
@@ -39,12 +53,20 @@ import org.springframework.web.multipart.MultipartFile;
 
 /**
  * The minio repository implementation.
+ *
+ * @author Christian Bremer
  */
 public class MinioRepositoryImpl implements MinioRepository {
 
   private final MinioOperations minio;
 
+  @Getter
+  private final String region;
+
+  @Getter
   private final String bucket;
+
+  private final boolean enableVersioning;
 
   private final Duration presignedObjectUrlDuration;
 
@@ -52,18 +74,24 @@ public class MinioRepositoryImpl implements MinioRepository {
    * Instantiates a new minio repository.
    *
    * @param minioOperations the minio operations
+   * @param region the region
    * @param bucket the bucket
+   * @param enableVersioning the enable versioning
    * @param create the create
    * @param presignedObjectUrlDuration the presigned object url duration
    */
   public MinioRepositoryImpl(
       MinioOperations minioOperations,
+      String region,
       String bucket,
+      boolean enableVersioning,
       boolean create,
       Duration presignedObjectUrlDuration) {
 
     this.minio = minioOperations;
+    this.region = region;
     this.bucket = bucket;
+    this.enableVersioning = enableVersioning;
     this.presignedObjectUrlDuration = validateDuration(presignedObjectUrlDuration);
     if (create) {
       createBucket();
@@ -74,22 +102,27 @@ public class MinioRepositoryImpl implements MinioRepository {
    * Instantiates a new minio repository.
    *
    * @param minioClient the minio client
+   * @param region the region
    * @param bucket the bucket
+   * @param enableVersioning the enable versioning
    * @param create the create
    * @param presignedObjectUrlDuration the presigned object url duration
    */
   public MinioRepositoryImpl(
       MinioClient minioClient,
+      String region,
       String bucket,
+      boolean enableVersioning,
       boolean create,
       Duration presignedObjectUrlDuration) {
 
-    this.minio = new MinioTemplate(minioClient);
-    this.bucket = bucket;
-    this.presignedObjectUrlDuration = validateDuration(presignedObjectUrlDuration);
-    if (create) {
-      createBucket();
-    }
+    this(
+        new MinioTemplate(minioClient),
+        region,
+        bucket,
+        enableVersioning,
+        create,
+        presignedObjectUrlDuration);
   }
 
   private static Duration validateDuration(Duration presignedObjectUrlDuration) {
@@ -101,7 +134,19 @@ public class MinioRepositoryImpl implements MinioRepository {
 
   private void createBucket() {
     if (!minio.bucketExists(BucketExistsArgs.builder().bucket(bucket).build())) {
-      minio.makeBucket(MakeBucketArgs.builder().bucket(bucket).build());
+      minio.makeBucket(MakeBucketArgs.builder()
+          .region(region)
+          .bucket(bucket)
+          .build());
+    }
+    if (enableVersioning && !minio.isVersioningEnabled(IsVersioningEnabledArgs.builder()
+        .region(region)
+        .bucket(bucket)
+        .build())) {
+      minio.enableVersioning(EnableVersioningArgs.builder()
+          .region(region)
+          .bucket(bucket)
+          .build());
     }
   }
 
@@ -111,9 +156,14 @@ public class MinioRepositoryImpl implements MinioRepository {
   }
 
   @Override
+  public boolean isVersioningEnabled() {
+    return enableVersioning;
+  }
+
+  @Override
   public Optional<ObjectWriteResponse> save(
+      MinioObjectId id,
       MultipartFile multipartFile,
-      String objectName,
       DeleteMode deleteMode) {
 
     return Optional.ofNullable(multipartFile)
@@ -125,8 +175,9 @@ public class MinioRepositoryImpl implements MinioRepository {
                     ? file.getContentType()
                     : MediaType.APPLICATION_OCTET_STREAM_VALUE)
                 .stream(in, file.getSize(), -1)
+                .region(region)
                 .bucket(bucket)
-                .object(objectName)
+                .object(id.getName())
                 .build());
             if (DeleteMode.ON_SUCCESS == deleteMode) {
               FileAwareMultipartFile.delete(file);
@@ -145,21 +196,25 @@ public class MinioRepositoryImpl implements MinioRepository {
   }
 
   @Override
-  public boolean exists(String objectName) {
+  public boolean exists(MinioObjectId id) {
     return minio.objectExists(StatObjectArgs.builder()
+        .region(region)
         .bucket(bucket)
-        .object(objectName)
+        .object(id.getName())
+        .versionId(id.getVersionId())
         .build());
   }
 
   @Override
-  public Optional<MultipartFile> findOne(String objectName) {
+  public Optional<MinioMultipartFile> findOne(MinioObjectId id) {
     try {
       ObjectStat objectStat = minio.statObject(StatObjectArgs.builder()
+          .region(region)
           .bucket(bucket)
-          .object(objectName)
+          .object(id.getName())
+          .versionId(id.getVersionId())
           .build());
-      return Optional.of(new MinioMultipartFile(minio, objectStat));
+      return Optional.of(new MinioMultipartFileImpl(minio, region, objectStat, id.getVersionId()));
 
     } catch (MinioException e) {
       if (404 == e.status()) {
@@ -170,21 +225,76 @@ public class MinioRepositoryImpl implements MinioRepository {
   }
 
   @Override
-  public void delete(String objectName) {
-    minio.removeObject(RemoveObjectArgs.builder()
+  public List<MinioMultipartFile> findAll(String prefix) {
+    Iterable<Result<Item>> results = minio.listObjects(ListObjectsArgs.builder()
+        .region(region)
         .bucket(bucket)
-        .object(objectName)
+        .includeVersions(enableVersioning)
+        .recursive(true)
+        .prefix(prefix)
+        .build());
+    List<MinioMultipartFile> fileList = new ArrayList<>();
+    for (Result<Item> result : results) {
+      try {
+        Item item = result.get();
+        if (!item.isDir() && !item.isDeleteMarker()) {
+          fileList.add(new MinioMultipartFileImpl(
+              getMinioOperations(),
+              region,
+              bucket,
+              item));
+        }
+      } catch (Exception ignored) {
+        // ignored
+      }
+    }
+    return fileList;
+  }
+
+  @Override
+  public void delete(MinioObjectId id) {
+    minio.removeObject(RemoveObjectArgs.builder()
+        .region(region)
+        .bucket(bucket)
+        .object(id.getName())
+        .versionId(id.getVersionId())
         .build());
   }
 
   @Override
-  public String getPresignedObjectUrl(Method method, String objectName, Duration duration) {
+  public List<DeleteError> deleteAll(Collection<MinioObjectId> ids) {
+
+    if (ids == null || ids.isEmpty()) {
+      return Collections.emptyList();
+    }
+    Iterable<Result<DeleteError>> errors = minio.removeObjects(RemoveObjectsArgs.builder()
+        .region(region)
+        .bucket(bucket)
+        .objects(ids.stream()
+            .map(id -> new DeleteObject(id.getName(), id.getVersionId()))
+            .collect(Collectors.toSet()))
+        .build());
+    List<DeleteError> errorList = new ArrayList<>();
+    for (Result<DeleteError> error : errors) {
+      try {
+        errorList.add(error.get());
+      } catch (Exception ignored) {
+        // ignored
+      }
+    }
+    return errorList;
+  }
+
+  @Override
+  public String getPresignedObjectUrl(MinioObjectId id, Method method, Duration duration) {
     Duration expiry = duration != null ? validateDuration(duration) : presignedObjectUrlDuration;
     return minio.getPresignedObjectUrl(GetPresignedObjectUrlArgs.builder()
         .expiry((int) expiry.toSeconds())
         .method(method)
+        .region(region)
         .bucket(bucket)
-        .object(objectName)
+        .object(id.getName())
+        .versionId(id.getVersionId())
         .build());
   }
 

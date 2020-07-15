@@ -16,84 +16,13 @@
 
 package org.bremersee.data.minio;
 
-import io.minio.GetObjectArgs;
-import io.minio.ObjectStat;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.Files;
-import org.springframework.lang.NonNull;
-import org.springframework.util.Assert;
-import org.springframework.util.FileCopyUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 /**
- * The minio multipart file.
+ * The minio multipart file interface.
  *
  * @author Christian Bremer
  */
-public class MinioMultipartFile implements MultipartFile {
+public interface MinioMultipartFile extends MinioObjectInfo, MultipartFile {
 
-  private final MinioOperations minioOperations;
-
-  private final ObjectStat objectStatus;
-
-  /**
-   * Instantiates a new minio multipart file.
-   *
-   * @param minioOperations the minio operations
-   * @param objectStatus the object status
-   */
-  public MinioMultipartFile(MinioOperations minioOperations, ObjectStat objectStatus) {
-    Assert.notNull(minioOperations, "Minio operations must not be null.");
-    Assert.notNull(objectStatus, "Object status must not be null.");
-    this.minioOperations = minioOperations;
-    this.objectStatus = objectStatus;
-  }
-
-  @NonNull
-  @Override
-  public String getName() {
-    return objectStatus.bucketName();
-  }
-
-  @Override
-  public String getOriginalFilename() {
-    return objectStatus.name();
-  }
-
-  @Override
-  public String getContentType() {
-    return objectStatus.contentType();
-  }
-
-  @Override
-  public boolean isEmpty() {
-    return getSize() <= 0;
-  }
-
-  @Override
-  public long getSize() {
-    return objectStatus.length();
-  }
-
-  @NonNull
-  @Override
-  public byte[] getBytes() throws IOException {
-    return FileCopyUtils.copyToByteArray(getInputStream());
-  }
-
-  @NonNull
-  @Override
-  public InputStream getInputStream() {
-    return minioOperations.getObject(GetObjectArgs.builder()
-        .bucket(objectStatus.bucketName())
-        .object(objectStatus.name())
-        .build());
-  }
-
-  @Override
-  public void transferTo(@NonNull File dest) throws IOException, IllegalStateException {
-    FileCopyUtils.copy(getInputStream(), Files.newOutputStream(dest.toPath()));
-  }
 }

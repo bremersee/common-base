@@ -16,13 +16,8 @@
 
 package org.bremersee.data.minio;
 
-import io.minio.GetObjectArgs;
 import io.minio.MinioClient;
-import java.io.IOException;
-import java.io.InputStream;
-import org.springframework.util.ClassUtils;
 import org.springframework.util.ErrorHandler;
-import org.springframework.util.StringUtils;
 
 /**
  * The minio template.

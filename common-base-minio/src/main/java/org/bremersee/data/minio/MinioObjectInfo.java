@@ -16,25 +16,41 @@
 
 package org.bremersee.data.minio;
 
+import java.time.OffsetDateTime;
+
 /**
- * The delete mode enum.
+ * The minio object info interface.
  *
  * @author Christian Bremer
  */
-public enum DeleteMode {
+public interface MinioObjectInfo extends MinioObjectId {
 
   /**
-   * Never delete mode.
+   * Gets bucket.
+   *
+   * @return the bucket
    */
-  NEVER,
+  String getBucket();
 
   /**
-   * On success delete mode.
+   * Gets region.
+   *
+   * @return the region
    */
-  ON_SUCCESS,
+  String getRegion();
 
   /**
-   * Always delete mode.
+   * Gets etag.
+   *
+   * @return the etag
    */
-  ALWAYS
+  String getEtag();
+
+  /**
+   * Gets created time.
+   *
+   * @return the created time
+   */
+  OffsetDateTime getCreatedTime();
+
 }
