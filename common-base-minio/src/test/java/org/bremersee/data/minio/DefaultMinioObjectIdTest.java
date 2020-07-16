@@ -52,10 +52,10 @@ class DefaultMinioObjectIdTest {
   @Test
   void equalsAndHashCode() {
     MinioObjectId id0 = new DefaultMinioObjectId("a-name", "a-version");
-    MinioObjectId id1 = new DefaultMinioObjectId(id0);
     assertTrue(id0.equals(id0));
     assertFalse(id0.equals(null));
     assertFalse(id0.equals(new Object()));
+    MinioObjectId id1 = new DefaultMinioObjectId(id0);
     assertTrue(id0.equals(id1));
     assertEquals(id0.hashCode(), id1.hashCode());
     assertEquals(id0.toString(), id1.toString());

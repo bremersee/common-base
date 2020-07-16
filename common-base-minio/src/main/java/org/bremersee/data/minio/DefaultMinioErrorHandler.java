@@ -64,7 +64,7 @@ public class DefaultMinioErrorHandler extends AbstractMinioErrorHandler {
     return new MinioException(
         500,
         ERROR_CODE_PREFIX + "UNSPECIFIED",
-        StringUtils.hasText(t.getMessage()) ? t.getMessage() : "Unmapped minio error",
+        StringUtils.hasText(t.getMessage()) ? t.getMessage() : "Unmapped minio error.",
         t);
   }
 

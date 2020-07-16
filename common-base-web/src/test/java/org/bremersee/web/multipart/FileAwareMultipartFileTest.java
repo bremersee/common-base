@@ -72,10 +72,10 @@ class FileAwareMultipartFileTest {
     assertNotNull(file);
     assertTrue(file.isEmpty());
 
-    Resource resource1 = file.getResource();
     assertFalse(resource0.equals(null));
     assertFalse(resource0.equals(new Object()));
     assertTrue(resource0.equals(resource0));
+    Resource resource1 = file.getResource();
     assertTrue(resource0.equals(resource1));
     assertEquals(resource0.hashCode(), resource1.hashCode());
     assertEquals(resource0.toString(), resource1.toString());
@@ -316,11 +316,10 @@ class FileAwareMultipartFileTest {
         "foo",
         "bar.txt",
         MediaType.TEXT_PLAIN_VALUE);
-    MultipartFile file1 = new FileAwareMultipartFile(file0);
-
     assertFalse(file0.equals(null));
     assertFalse(file0.equals(new Object()));
     assertTrue(file0.equals(file0));
+    MultipartFile file1 = new FileAwareMultipartFile(file0);
     assertTrue(file0.equals(file1));
     assertEquals(file0.hashCode(), file1.hashCode());
     assertEquals(file0.toString(), file1.toString());

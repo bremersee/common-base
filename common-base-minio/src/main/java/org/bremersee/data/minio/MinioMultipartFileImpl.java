@@ -127,6 +127,7 @@ public class MinioMultipartFileImpl implements MinioMultipartFile {
       String bucket,
       Item item) {
 
+    Assert.notNull(minioOperations, "Minio operations must not be null.");
     Assert.hasText(bucket, "Bucket must be present.");
     Assert.notNull(item, "Item must not be null.");
     this.minioOperations = minioOperations;

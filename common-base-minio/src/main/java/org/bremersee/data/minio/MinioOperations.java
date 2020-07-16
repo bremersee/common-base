@@ -541,7 +541,7 @@ public interface MinioOperations {
   }
 
   /**
-   * Removes an empty bucket using arguments
+   * Removes an empty bucket using arguments.
    *
    * <pre>Example:{@code
    * minioClient.removeBucket(RemoveBucketArgs.builder().bucket("my-bucketname").build());
@@ -975,9 +975,8 @@ public interface MinioOperations {
    *   System.out.println("Legal hold is off");
    *  }
    * }</pre>
-   * <p>
-   * args {@link IsObjectLegalHoldEnabledArgs} object.
    *
+   * @param  args {@link IsObjectLegalHoldEnabledArgs} object.
    * @return boolean - True if legal hold is enabled.
    */
   default boolean isObjectLegalHoldEnabled(IsObjectLegalHoldEnabledArgs args) {

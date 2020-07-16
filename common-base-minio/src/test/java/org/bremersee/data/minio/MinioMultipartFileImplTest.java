@@ -21,16 +21,30 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import io.minio.GetObjectArgs;
 import io.minio.ObjectStat;
+import io.minio.StatObjectArgs;
+import io.minio.messages.Item;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.UUID;
+import javax.validation.constraints.NotEmpty;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
+import org.springframework.util.FileCopyUtils;
 
 /**
  * The minio multipart file implementation test.
@@ -51,19 +65,96 @@ class MinioMultipartFileImplTest {
 
   private static final MinioOperations minioOperations = mock(MinioOperations.class);
 
+  private static final ObjectStat emptyObjectStat = mock(ObjectStat.class);
+
   private static final ObjectStat objectStat = mock(ObjectStat.class);
+
+  private static final byte[] content = "Hello".getBytes(StandardCharsets.UTF_8);
+
+  private static final MinioObjectInfo objectInfo = new MinioObjectInfo() {
+    @Override
+    public String getBucket() {
+      return bucket;
+    }
+
+    @Override
+    public String getRegion() {
+      return null;
+    }
+
+    @Override
+    public String getEtag() {
+      return etag;
+    }
+
+    @Override
+    public OffsetDateTime getCreatedTime() {
+      return OffsetDateTime.ofInstant(time.toInstant(), ZoneOffset.UTC);
+    }
+
+    @Override
+    public @NotEmpty String getName() {
+      return name;
+    }
+
+    @Override
+    public String getVersionId() {
+      return versionId;
+    }
+  };
 
   /**
    * Sets up.
    */
   @BeforeAll
   static void setUp() {
+    when(emptyObjectStat.name()).thenReturn(name);
+    when(emptyObjectStat.bucketName()).thenReturn(bucket);
+    when(emptyObjectStat.contentType()).thenReturn(MediaType.TEXT_PLAIN_VALUE);
+    when(emptyObjectStat.createdTime()).thenReturn(time);
+    when(emptyObjectStat.etag()).thenReturn(etag);
+    when(emptyObjectStat.length()).thenReturn(0L);
+
     when(objectStat.name()).thenReturn(name);
     when(objectStat.bucketName()).thenReturn(bucket);
     when(objectStat.contentType()).thenReturn(MediaType.TEXT_PLAIN_VALUE);
     when(objectStat.createdTime()).thenReturn(time);
     when(objectStat.etag()).thenReturn(etag);
-    when(objectStat.length()).thenReturn(0L);
+    when(objectStat.length()).thenReturn((long) content.length);
+
+    when(minioOperations.statObject(any(StatObjectArgs.class))).thenReturn(objectStat);
+    when(minioOperations.getObject(any(GetObjectArgs.class)))
+        .then(invocationOnMock -> new ByteArrayInputStream(content));
+  }
+
+  /**
+   * Illegal constructors.
+   */
+  @Test
+  void illegalConstructors() {
+    assertThrows(IllegalArgumentException.class,
+        () -> new MinioMultipartFileImpl(null, objectInfo));
+    assertThrows(IllegalArgumentException.class,
+        () -> new MinioMultipartFileImpl(minioOperations, null));
+    assertThrows(IllegalArgumentException.class,
+        () -> new MinioMultipartFileImpl(null, null, emptyObjectStat, versionId));
+    assertThrows(IllegalArgumentException.class,
+        () -> new MinioMultipartFileImpl(minioOperations, null, null, versionId));
+    assertThrows(IllegalArgumentException.class,
+        () -> new MinioMultipartFileImpl(null, null, bucket, mock(Item.class)));
+    assertThrows(IllegalArgumentException.class,
+        () -> new MinioMultipartFileImpl(minioOperations, null, bucket, null));
+  }
+
+  /**
+   * Gets object status.
+   */
+  @Test
+  void getObjectStatus() {
+    MinioMultipartFileImpl file = new MinioMultipartFileImpl(
+        minioOperations,
+        objectInfo);
+    assertNotNull(file.getObjectStatus());
   }
 
   /**
@@ -101,9 +192,14 @@ class MinioMultipartFileImplTest {
     MinioMultipartFileImpl file = new MinioMultipartFileImpl(
         minioOperations,
         null,
-        objectStat,
+        emptyObjectStat,
         versionId);
     assertTrue(file.isEmpty());
+
+    file = new MinioMultipartFileImpl(
+        minioOperations,
+        objectInfo);
+    assertFalse(file.isEmpty());
   }
 
   /**
@@ -114,9 +210,14 @@ class MinioMultipartFileImplTest {
     MinioMultipartFileImpl file = new MinioMultipartFileImpl(
         minioOperations,
         null,
-        objectStat,
+        emptyObjectStat,
         versionId);
     assertEquals(0L, file.getSize());
+
+    file = new MinioMultipartFileImpl(
+        minioOperations,
+        objectInfo);
+    assertEquals(content.length, (int) file.getSize());
   }
 
   /**
@@ -129,22 +230,37 @@ class MinioMultipartFileImplTest {
     MinioMultipartFileImpl file = new MinioMultipartFileImpl(
         minioOperations,
         null,
-        objectStat,
+        emptyObjectStat,
         versionId);
     assertArrayEquals(new byte[0], file.getBytes());
+
+    file = new MinioMultipartFileImpl(
+        minioOperations,
+        objectInfo);
+    byte[] bytes = file.getBytes();
+    assertArrayEquals(content, bytes);
   }
 
   /**
    * Gets input stream.
+   *
+   * @throws Exception the exception
    */
   @Test
-  void getInputStream() {
+  void getInputStream() throws Exception {
     MinioMultipartFileImpl file = new MinioMultipartFileImpl(
         minioOperations,
         null,
-        objectStat,
+        emptyObjectStat,
         versionId);
     assertNotNull(file.getInputStream());
+
+    file = new MinioMultipartFileImpl(
+        minioOperations,
+        objectInfo);
+    try (InputStream in = file.getInputStream()) {
+      assertArrayEquals(content, FileCopyUtils.copyToByteArray(in));
+    }
   }
 
   /**
@@ -155,8 +271,13 @@ class MinioMultipartFileImplTest {
     MinioMultipartFileImpl file = new MinioMultipartFileImpl(
         minioOperations,
         null,
-        objectStat,
+        emptyObjectStat,
         versionId);
+    assertEquals(etag, file.getEtag());
+
+    file = new MinioMultipartFileImpl(
+        minioOperations,
+        objectInfo);
     assertEquals(etag, file.getEtag());
   }
 
@@ -168,7 +289,7 @@ class MinioMultipartFileImplTest {
     MinioMultipartFileImpl file = new MinioMultipartFileImpl(
         minioOperations,
         null,
-        objectStat,
+        emptyObjectStat,
         versionId);
     assertEquals(time.toInstant(), file.getCreatedTime().toInstant());
   }
@@ -181,7 +302,7 @@ class MinioMultipartFileImplTest {
     MinioMultipartFileImpl file = new MinioMultipartFileImpl(
         minioOperations,
         null,
-        objectStat,
+        emptyObjectStat,
         versionId);
     assertNull(file.getRegion());
   }
@@ -194,7 +315,7 @@ class MinioMultipartFileImplTest {
     MinioMultipartFileImpl file = new MinioMultipartFileImpl(
         minioOperations,
         null,
-        objectStat,
+        emptyObjectStat,
         versionId);
     assertEquals(bucket, file.getBucket());
   }
@@ -207,9 +328,33 @@ class MinioMultipartFileImplTest {
     MinioMultipartFileImpl file = new MinioMultipartFileImpl(
         minioOperations,
         null,
-        objectStat,
+        emptyObjectStat,
         versionId);
     assertEquals(versionId, file.getVersionId());
+  }
+
+  /**
+   * Transfer to.
+   *
+   * @throws Exception the exception
+   */
+  @Test
+  void transferTo() throws Exception {
+    File destFile = null;
+    try {
+      destFile = File
+          .createTempFile("junit", ".txt", new File(System.getProperty("java.io.tmpdir")));
+      MinioMultipartFileImpl file = new MinioMultipartFileImpl(
+          minioOperations,
+          objectInfo);
+      file.transferTo(destFile);
+      assertArrayEquals(content, FileCopyUtils.copyToByteArray(destFile));
+
+    } finally {
+      if (destFile != null) {
+        Files.delete(destFile.toPath());
+      }
+    }
   }
 
   /**
@@ -221,14 +366,14 @@ class MinioMultipartFileImplTest {
     MinioMultipartFileImpl file0 = new MinioMultipartFileImpl(
         minioOperations,
         null,
-        objectStat,
+        emptyObjectStat,
         versionId);
-    MinioMultipartFileImpl file1 = new MinioMultipartFileImpl(
-        minioOperations,
-        file0);
     assertFalse(file0.equals(null));
     assertFalse(file0.equals(new Object()));
     assertTrue(file0.equals(file0));
+    MinioMultipartFileImpl file1 = new MinioMultipartFileImpl(
+        minioOperations,
+        file0);
     assertTrue(file0.equals(file1));
     assertEquals(file0.hashCode(), file1.hashCode());
     assertEquals(file0.toString(), file1.toString());

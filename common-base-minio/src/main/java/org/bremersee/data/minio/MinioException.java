@@ -28,47 +28,8 @@ import org.bremersee.exception.ServiceException;
  */
 @EqualsAndHashCode(callSuper = true)
 public class MinioException extends ServiceException implements HttpStatusAware, ErrorCodeAware {
-  
+
   private static final long serialVersionUID = 1L;
-
-  /**
-   * Instantiates a new minio exception.
-   */
-  protected MinioException() {
-    super();
-  }
-
-  /**
-   * Instantiates a new minio exception.
-   *
-   * @param httpStatus the http status
-   * @param errorCode the error code
-   */
-  protected MinioException(final int httpStatus, final String errorCode) {
-    super(httpStatus, errorCode);
-  }
-
-  /**
-   * Instantiates a new minio exception.
-   *
-   * @param httpStatus the http status
-   * @param errorCode the error code
-   * @param reason the reason
-   */
-  protected MinioException(final int httpStatus, final String errorCode, final String reason) {
-    super(httpStatus, errorCode, reason);
-  }
-
-  /**
-   * Instantiates a new minio exception.
-   *
-   * @param httpStatus the http status
-   * @param errorCode the error code
-   * @param cause the cause
-   */
-  protected MinioException(final int httpStatus, final String errorCode, final Throwable cause) {
-    super(httpStatus, errorCode, cause);
-  }
 
   /**
    * Instantiates a new minio exception.

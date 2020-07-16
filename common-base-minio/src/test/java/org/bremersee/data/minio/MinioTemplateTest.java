@@ -150,7 +150,7 @@ import org.springframework.util.FileCopyUtils;
 @Slf4j
 public class MinioTemplateTest {
 
-  private final static SimpleDateFormat SDF = new SimpleDateFormat(
+  private static final SimpleDateFormat SDF = new SimpleDateFormat(
       "yyyy-MM-dd-HH-mm-ss", Locale.GERMANY);
 
   private static final String DEFAULT_BUCKET = "bremersee-"
@@ -1051,7 +1051,6 @@ public class MinioTemplateTest {
       minio = mockMinio;
       when(mockClient.putObject(any(PutObjectArgs.class)))
           .thenReturn(new ObjectWriteResponse(
-              // Headers headers, String bucket, String region, String object, String etag, String versionId
               Headers.of(Collections.emptyMap()),
               bucket,
               null,
@@ -1190,7 +1189,8 @@ public class MinioTemplateTest {
   @Test
   void selectObjectContent() throws Exception {
     when(mockClient.selectObjectContent(any(SelectObjectContentArgs.class)))
-        .thenReturn(new SelectResponseStream(new ByteArrayInputStream(new byte[0])));
+        .thenAnswer(invocationOnMock -> new SelectResponseStream(
+            new ByteArrayInputStream(new byte[0])));
     try (SelectResponseStream stream = mockMinio.selectObjectContent(
         SelectObjectContentArgs.builder()
             .bucket(DEFAULT_BUCKET)
