@@ -73,9 +73,4 @@ public class MinioProperties {
   @NotNull
   private Duration readTimeout = Duration.ofSeconds(10);
 
-  /**
-   * Metric configuration prefix which are registered on Actuator.
-   */
-  private String metricName = "minio.storage";
-
 }
