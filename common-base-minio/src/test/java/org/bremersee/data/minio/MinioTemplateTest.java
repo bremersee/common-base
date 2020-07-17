@@ -16,6 +16,7 @@
 
 package org.bremersee.data.minio;
 
+import static org.awaitility.Awaitility.await;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -1164,7 +1165,7 @@ public class MinioTemplateTest {
       assertEquals(until.toEpochSecond(), retention.retainUntilDate().toEpochSecond());
 
       if (playMinioEnabled) {
-        Thread.sleep(1000L * 10L);
+        await().until(() -> ZonedDateTime.now().isAfter(until));
       }
 
     } finally {

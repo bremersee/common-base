@@ -17,6 +17,7 @@
 
   <properties>
     <playtika-testcontainers.version>1.62</playtika-testcontainers.version>
+    <awaitility.version>4.0.3</awaitility.version>
   </properties>
 
   <dependencies>
@@ -125,7 +126,7 @@
     <dependency>
       <groupId>org.awaitility</groupId>
       <artifactId>awaitility</artifactId>
-      <version>4.0.3</version>
+      <version>${awaitility.version}</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
