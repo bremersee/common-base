@@ -56,9 +56,7 @@ public class RedisAccessTokenCache implements AccessTokenCache {
     Assert.notNull(jwtCacheProperties, "Jwt cache properties must be present.");
     Assert.notNull(connectionFactory, "Redis connection factory must be present.");
     this.jwtCacheProperties = jwtCacheProperties;
-    this.redis = new StringRedisTemplate();
-    this.redis.setConnectionFactory(connectionFactory);
-    this.redis.afterPropertiesSet();
+    this.redis = new StringRedisTemplate(connectionFactory);
   }
 
   @Override
