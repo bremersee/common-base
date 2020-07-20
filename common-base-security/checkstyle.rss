@@ -25,9 +25,9 @@ under the License.
     <language>en-us</language>
     <copyright>&#169;2020 bremersee.org</copyright>
     <item>
-      <title>File: 29,
+      <title>File: 33,
              Errors: 0,
-             Warnings: 1,
+             Warnings: 2,
              Infos: 0
       </title>
             <link>https://github.com/bremersee/common-base/common-base-security/checkstyle.html</link>
@@ -47,6 +47,20 @@ under the License.
                           <tr>
                 <td>
                   <a href="https://github.com/bremersee/common-base/common-base-security/checkstyle.html#org.bremersee.security.authentication.AccessTokenCacheImplWthExternalCacheTest.java">org/bremersee/security/authentication/AccessTokenCacheImplWthExternalCacheTest.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/bremersee/common-base/common-base-security/checkstyle.html#org.bremersee.security.authentication.JsonPathJwtAuthenticationDetails.java">org/bremersee/security/authentication/JsonPathJwtAuthenticationDetails.java</a>
                 </td>
                 <td>
                   0
@@ -284,6 +298,20 @@ under the License.
               </tr>
                           <tr>
                 <td>
+                  <a href="https://github.com/bremersee/common-base/common-base-security/checkstyle.html#org.bremersee.security.authentication.AuthenticationDetails.java">org/bremersee/security/authentication/AuthenticationDetails.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
                   <a href="https://github.com/bremersee/common-base/common-base-security/checkstyle.html#org.bremersee.security.authentication.PasswordFlowPropertiesTest.java">org/bremersee/security/authentication/PasswordFlowPropertiesTest.java</a>
                 </td>
                 <td>
@@ -424,7 +452,35 @@ under the License.
               </tr>
                           <tr>
                 <td>
+                  <a href="https://github.com/bremersee/common-base/common-base-security/checkstyle.html#org.bremersee.security.authentication.JsonPathJwtAuthenticationDetailsTest.java">org/bremersee/security/authentication/JsonPathJwtAuthenticationDetailsTest.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  1
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
                   <a href="https://github.com/bremersee/common-base/common-base-security/checkstyle.html#org.bremersee.security.authentication.BasicAuthProperties.java">org/bremersee/security/authentication/BasicAuthProperties.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/bremersee/common-base/common-base-security/checkstyle.html#org.bremersee.security.authentication.AuthenticationDetailsTest.java">org/bremersee/security/authentication/AuthenticationDetailsTest.java</a>
                 </td>
                 <td>
                   0

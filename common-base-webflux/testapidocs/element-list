@@ -11,3 +11,4 @@ org.bremersee.security.core
 org.bremersee.web.reactive.function.client
 org.bremersee.web.reactive.function.client.proxy
 org.bremersee.web.reactive.function.client.proxy.app
+org.bremersee.web.reactive.multipart

@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>JsonPathJwtAuthenticationDetails.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">common-base-security</a> &gt; <a href="index.source.html" class="el_package">org.bremersee.security.authentication</a> &gt; <span class="el_source">JsonPathJwtAuthenticationDetails.java</span></div><h1>JsonPathJwtAuthenticationDetails.java</h1><pre class="source lang-java linenums">/*
+ * Copyright 2020 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package org.bremersee.security.authentication;
+
+import java.util.Locale;
+import java.util.Optional;
+import java.util.TimeZone;
+import org.bremersee.common.model.JavaLocale;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
+import org.springframework.util.StringUtils;
+
+/**
+ * The json path jwt authentication details.
+ *
+ * @author Christian Bremer
+ */
+public class JsonPathJwtAuthenticationDetails implements AuthenticationDetails {
+
+  private final Locale defaultLocale;
+
+  private final TimeZone defaultTimeZone;
+
+  private final String preferredLanguageJsonPath;
+
+  private final String preferredTimeZoneJsonPath;
+
+  /**
+   * Instantiates a new json path jwt authentication details.
+   *
+   * @param defaultLocale the default locale
+   * @param defaultTimeZone the default time zone
+   * @param preferredLanguageJsonPath the preferred language json path
+   * @param preferredTimeZoneJsonPath the preferred time zone json path
+   */
+  public JsonPathJwtAuthenticationDetails(
+      Locale defaultLocale,
+      TimeZone defaultTimeZone,
+      String preferredLanguageJsonPath,
+<span class="fc" id="L54">      String preferredTimeZoneJsonPath) {</span>
+<span class="pc bpc" id="L55" title="1 of 2 branches missed.">    this.defaultLocale = defaultLocale != null ? defaultLocale : Locale.getDefault();</span>
+<span class="pc bpc" id="L56" title="1 of 2 branches missed.">    this.defaultTimeZone = defaultTimeZone != null ? defaultTimeZone : TimeZone.getDefault();</span>
+<span class="fc" id="L57">    this.preferredLanguageJsonPath = preferredLanguageJsonPath;</span>
+<span class="fc" id="L58">    this.preferredTimeZoneJsonPath = preferredTimeZoneJsonPath;</span>
+<span class="fc" id="L59">  }</span>
+
+  @Override
+  public Locale getDefaultLocale() {
+<span class="fc" id="L63">    return defaultLocale;</span>
+  }
+
+  @Override
+  public TimeZone getDefaultTimeZone() {
+<span class="fc" id="L68">    return defaultTimeZone;</span>
+  }
+
+  @Override
+  public Optional&lt;Locale&gt; getPreferredLanguage(Authentication authentication) {
+<span class="fc" id="L73">    return Optional.ofNullable(authentication)</span>
+<span class="pc bpc" id="L74" title="2 of 4 branches missed.">        .filter(auth -&gt; StringUtils.hasText(preferredLanguageJsonPath)</span>
+            &amp;&amp; auth instanceof JwtAuthenticationToken)
+<span class="fc" id="L76">        .map(auth -&gt; ((JwtAuthenticationToken) auth).getToken())</span>
+<span class="fc" id="L77">        .map(JsonPathJwtParser::new)</span>
+<span class="fc" id="L78">        .map(parser -&gt; parser.read(preferredLanguageJsonPath, String.class))</span>
+<span class="fc" id="L79">        .map(language -&gt; JavaLocale.fromValue(language).toLocale());</span>
+  }
+
+  @Override
+  public Optional&lt;TimeZone&gt; getPreferredTimeZone(Authentication authentication) {
+<span class="pc bpc" id="L84" title="1 of 2 branches missed.">    if (!StringUtils.hasText(preferredTimeZoneJsonPath)) {</span>
+<span class="nc" id="L85">      return Optional.empty();</span>
+    }
+<span class="fc" id="L87">    return Optional.ofNullable(authentication)</span>
+<span class="pc bpc" id="L88" title="2 of 4 branches missed.">        .filter(auth -&gt; StringUtils.hasText(preferredTimeZoneJsonPath)</span>
+            &amp;&amp; auth instanceof JwtAuthenticationToken)
+<span class="fc" id="L90">        .map(auth -&gt; ((JwtAuthenticationToken) auth).getToken())</span>
+<span class="fc" id="L91">        .map(JsonPathJwtParser::new)</span>
+<span class="fc" id="L92">        .map(parser -&gt; parser.read(preferredTimeZoneJsonPath, String.class))</span>
+<span class="fc" id="L93">        .map(TimeZone::getTimeZone);</span>
+  }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

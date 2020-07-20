@@ -22,6 +22,8 @@ common-base-webflux,org.bremersee.web.reactive.function.client.proxy,RequestBody
 common-base-webflux,org.bremersee.http.codec.xml,ReactiveJaxbDecoder,165,131,15,5,40,28,13,12,5,10
 common-base-webflux,org.bremersee.http.codec.xml,ReactiveJaxbEncoder,36,87,5,5,8,21,5,6,1,5
 common-base-webflux,org.bremersee.http.codec.xml,ReactiveJaxbDecoder.SplitHandler,91,0,16,0,22,0,10,0,2,0
+common-base-webflux,org.bremersee.web.reactive.multipart,MultipartFileBuilder,6,68,11,15,0,16,11,6,0,4
+common-base-webflux,org.bremersee.web.reactive.multipart,MultipartFileBuilderImpl,43,309,11,17,11,73,15,30,4,27
 common-base-webflux,org.bremersee.web.reactive.function.client,AccessTokenAppender,6,62,0,2,2,16,1,8,1,7
 common-base-webflux,org.bremersee.web.reactive.function.client,DefaultWebClientErrorDecoder,16,45,7,3,2,12,4,5,0,4
 common-base-webflux,org.bremersee.web.reactive.function.client,MessageAwareWebClientErrorDecoder,0,75,1,3,0,20,1,9,0,8

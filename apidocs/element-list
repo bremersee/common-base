@@ -4,6 +4,7 @@ org.bremersee.converter
 org.bremersee.core
 org.bremersee.data.convert
 org.bremersee.data.ldaptive
+org.bremersee.data.minio
 org.bremersee.data.redis
 org.bremersee.exception
 org.bremersee.exception.annotation
@@ -19,7 +20,9 @@ org.bremersee.test.security.authentication
 org.bremersee.test.web
 org.bremersee.thymeleaf
 org.bremersee.web
+org.bremersee.web.multipart
 org.bremersee.web.reactive
 org.bremersee.web.reactive.function.client
 org.bremersee.web.reactive.function.client.proxy
+org.bremersee.web.reactive.multipart
 org.bremersee.web.servlet

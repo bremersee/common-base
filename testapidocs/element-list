@@ -11,6 +11,8 @@ org.bremersee.core
 org.bremersee.data.convert
 org.bremersee.data.ldaptive
 org.bremersee.data.ldaptive.app
+org.bremersee.data.minio
+org.bremersee.data.minio.app
 org.bremersee.exception
 org.bremersee.exception.feign
 org.bremersee.exception.integration.reactive
@@ -42,8 +44,10 @@ org.bremersee.test.security.authentication
 org.bremersee.test.web
 org.bremersee.thymeleaf
 org.bremersee.web
+org.bremersee.web.multipart
 org.bremersee.web.reactive
 org.bremersee.web.reactive.function.client
 org.bremersee.web.reactive.function.client.proxy
 org.bremersee.web.reactive.function.client.proxy.app
+org.bremersee.web.reactive.multipart
 org.bremersee.web.servlet

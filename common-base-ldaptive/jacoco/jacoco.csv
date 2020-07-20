@@ -4,5 +4,5 @@ common-base-ldaptive,org.bremersee.data.ldaptive,DefaultLdaptiveErrorHandler,0,2
 common-base-ldaptive,org.bremersee.data.ldaptive,LdaptiveException.new AbstractServiceExceptionBuilder() {...},0,31,0,0,0,5,0,5,0,5
 common-base-ldaptive,org.bremersee.data.ldaptive,LdaptiveException,35,51,8,4,1,14,7,10,3,8
 common-base-ldaptive,org.bremersee.data.ldaptive,LdaptiveEntryMapper,18,404,14,56,5,84,14,38,0,17
-common-base-ldaptive,org.bremersee.data.ldaptive,LdaptiveTemplate,52,415,19,21,16,104,18,36,0,34
+common-base-ldaptive,org.bremersee.data.ldaptive,LdaptiveTemplate,50,411,17,21,16,104,16,37,0,34
 common-base-ldaptive,org.bremersee.data.ldaptive,LdaptiveConnectionCallbackWithoutResult,0,5,0,0,0,2,0,1,0,1

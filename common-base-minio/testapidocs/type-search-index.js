@@ -1,0 +1,1 @@
+typeSearchIndex = [{"l":"All Classes","url":"allclasses-index.html"},{"p":"org.bremersee.data.minio","l":"MinioTemplateTest"},{"p":"org.bremersee.data.minio.app","l":"TestConfiguration"}]

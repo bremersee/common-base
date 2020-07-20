@@ -4,6 +4,8 @@ org.bremersee.converter.integration.servlet
 org.bremersee.converter.integration.servlet.app
 org.bremersee.data.ldaptive
 org.bremersee.data.ldaptive.app
+org.bremersee.data.minio
+org.bremersee.data.minio.app
 org.bremersee.exception
 org.bremersee.exception.integration.reactive
 org.bremersee.exception.integration.reactive.app

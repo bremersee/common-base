@@ -1,0 +1,1 @@
+memberSearchIndex = [{"p":"org.bremersee.data.minio","c":"MinioTemplateTest","l":"MinioTemplateTest()","url":"%3Cinit%3E()"},{"p":"org.bremersee.data.minio.app","c":"TestConfiguration","l":"TestConfiguration()","url":"%3Cinit%3E()"}]

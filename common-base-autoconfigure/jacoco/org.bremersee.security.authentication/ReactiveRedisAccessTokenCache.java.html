@@ -24,8 +24,7 @@ import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.bremersee.security.authentication.AuthProperties.JwtCache;
 import org.springframework.data.redis.connection.ReactiveRedisConnectionFactory;
-import org.springframework.data.redis.core.ReactiveRedisTemplate;
-import org.springframework.data.redis.serializer.RedisSerializationContext;
+import org.springframework.data.redis.core.ReactiveStringRedisTemplate;
 import org.springframework.util.Assert;
 import reactor.core.publisher.Mono;
 
@@ -34,14 +33,14 @@ import reactor.core.publisher.Mono;
  *
  * @author Christian Bremer
  */
-<span class="fc" id="L37">@Slf4j</span>
+<span class="fc" id="L36">@Slf4j</span>
 public class ReactiveRedisAccessTokenCache implements ReactiveAccessTokenCache {
 
   private final JwtCache jwtCacheProperties;
 
-  private final ReactiveRedisTemplate&lt;String, String&gt; redis;
+  private final ReactiveStringRedisTemplate redis;
 
-<span class="fc" id="L44">  @Setter</span>
+<span class="fc" id="L43">  @Setter</span>
   @NotNull
   private Function&lt;String, Date&gt; findExpirationTimeFn = AccessTokenCache::getExpirationTime;
 
@@ -53,46 +52,44 @@ public class ReactiveRedisAccessTokenCache implements ReactiveAccessTokenCache {
    */
   public ReactiveRedisAccessTokenCache(
       JwtCache jwtCacheProperties,
-<span class="fc" id="L56">      ReactiveRedisConnectionFactory connectionFactory) {</span>
+<span class="fc" id="L55">      ReactiveRedisConnectionFactory connectionFactory) {</span>
 
-<span class="fc" id="L58">    Assert.notNull(jwtCacheProperties, &quot;Jwt cache properties must be present.&quot;);</span>
-<span class="fc" id="L59">    Assert.notNull(connectionFactory, &quot;Redis connection factory must be present.&quot;);</span>
-<span class="fc" id="L60">    this.jwtCacheProperties = jwtCacheProperties;</span>
-<span class="fc" id="L61">    this.redis = new ReactiveRedisTemplate&lt;&gt;(</span>
-        connectionFactory,
-<span class="fc" id="L63">        RedisSerializationContext.string());</span>
-<span class="fc" id="L64">  }</span>
+<span class="fc" id="L57">    Assert.notNull(jwtCacheProperties, &quot;Jwt cache properties must be present.&quot;);</span>
+<span class="fc" id="L58">    Assert.notNull(connectionFactory, &quot;Redis connection factory must be present.&quot;);</span>
+<span class="fc" id="L59">    this.jwtCacheProperties = jwtCacheProperties;</span>
+<span class="fc" id="L60">    this.redis = new ReactiveStringRedisTemplate(connectionFactory);</span>
+<span class="fc" id="L61">  }</span>
 
   @Override
   public Mono&lt;String&gt; findAccessToken(String key) {
-<span class="fc" id="L68">    return redis.opsForValue().get(key)</span>
-<span class="fc" id="L69">        .onErrorResume(</span>
-<span class="fc" id="L70">            throwable -&gt; throwable instanceof RuntimeException,</span>
+<span class="fc" id="L65">    return redis.opsForValue().get(key)</span>
+<span class="fc" id="L66">        .onErrorResume(</span>
+<span class="fc" id="L67">            throwable -&gt; throwable instanceof RuntimeException,</span>
             throwable -&gt; {
-<span class="fc" id="L72">              log.error(&quot;Getting access token from redis cache failed.&quot;, throwable);</span>
-<span class="fc" id="L73">              return Mono.empty();</span>
+<span class="fc" id="L69">              log.error(&quot;Getting access token from redis cache failed.&quot;, throwable);</span>
+<span class="fc" id="L70">              return Mono.empty();</span>
             });
   }
 
   @Override
   public Mono&lt;String&gt; putAccessToken(String key, String accessToken) {
-<span class="fc" id="L79">    Duration duration = jwtCacheProperties.getExpirationTimeThreshold();</span>
-<span class="fc" id="L80">    long millis = System.currentTimeMillis() + duration.toMillis();</span>
-<span class="fc" id="L81">    String dbKey = jwtCacheProperties.addKeyPrefix(key);</span>
-<span class="fc" id="L82">    return Mono.justOrEmpty(findExpirationTimeFn.apply(accessToken))</span>
-<span class="pc bpc" id="L83" title="1 of 2 branches missed.">        .filter(expirationTime -&gt; expirationTime.getTime() &gt; millis)</span>
-<span class="fc" id="L84">        .flatMap(expirationTime -&gt; redis.opsForValue().set(dbKey, accessToken)</span>
-<span class="pc bnc" id="L85" title="All 2 branches missed.">            .flatMap(success -&gt; success</span>
-<span class="nc" id="L86">                ? redis.expireAt(dbKey, expirationTime.toInstant().minus(duration))</span>
-<span class="nc" id="L87">                : Mono.just(false)))</span>
-<span class="pc" id="L88">        .map(result -&gt; accessToken)</span>
-<span class="fc" id="L89">        .onErrorResume(</span>
-<span class="fc" id="L90">            throwable -&gt; throwable instanceof RuntimeException,</span>
+<span class="fc" id="L76">    Duration duration = jwtCacheProperties.getExpirationTimeThreshold();</span>
+<span class="fc" id="L77">    long millis = System.currentTimeMillis() + duration.toMillis();</span>
+<span class="fc" id="L78">    String dbKey = jwtCacheProperties.addKeyPrefix(key);</span>
+<span class="fc" id="L79">    return Mono.justOrEmpty(findExpirationTimeFn.apply(accessToken))</span>
+<span class="pc bpc" id="L80" title="1 of 2 branches missed.">        .filter(expirationTime -&gt; expirationTime.getTime() &gt; millis)</span>
+<span class="fc" id="L81">        .flatMap(expirationTime -&gt; redis.opsForValue().set(dbKey, accessToken)</span>
+<span class="pc bnc" id="L82" title="All 2 branches missed.">            .flatMap(success -&gt; success</span>
+<span class="nc" id="L83">                ? redis.expireAt(dbKey, expirationTime.toInstant().minus(duration))</span>
+<span class="nc" id="L84">                : Mono.just(false)))</span>
+<span class="pc" id="L85">        .map(result -&gt; accessToken)</span>
+<span class="fc" id="L86">        .onErrorResume(</span>
+<span class="fc" id="L87">            throwable -&gt; throwable instanceof RuntimeException,</span>
             throwable -&gt; {
-<span class="fc" id="L92">              log.error(&quot;Putting access token into redis cache failed.&quot;, throwable);</span>
-<span class="fc" id="L93">              return Mono.just(accessToken);</span>
+<span class="fc" id="L89">              log.error(&quot;Putting access token into redis cache failed.&quot;, throwable);</span>
+<span class="fc" id="L90">              return Mono.just(accessToken);</span>
             })
-<span class="fc" id="L95">        .defaultIfEmpty(accessToken);</span>
+<span class="fc" id="L92">        .defaultIfEmpty(accessToken);</span>
   }
 
 }

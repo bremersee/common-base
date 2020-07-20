@@ -35,6 +35,7 @@ import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.event.EventListener;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 
 /**
@@ -49,8 +50,8 @@ import org.springframework.util.ClassUtils;
 @Conditional(JwtSupportCondition.class)
 @Configuration
 @AutoConfigureAfter(RedisAutoConfiguration.class)
-<span class="fc" id="L52">@Slf4j</span>
-<span class="fc" id="L53">public class AccessTokenCacheAutoConfiguration {</span>
+<span class="fc" id="L53">@Slf4j</span>
+<span class="fc" id="L54">public class AccessTokenCacheAutoConfiguration {</span>
 
   /**
    * The default configuration.
@@ -73,22 +74,22 @@ import org.springframework.util.ClassUtils;
      *
      * @param authProperties the auth properties
      */
-<span class="fc" id="L76">    public Default(AuthProperties authProperties) {</span>
-<span class="fc" id="L77">      this.authProperties = authProperties;</span>
-<span class="fc" id="L78">    }</span>
+<span class="fc" id="L77">    public Default(AuthProperties authProperties) {</span>
+<span class="fc" id="L78">      this.authProperties = authProperties;</span>
+<span class="fc" id="L79">    }</span>
 
     /**
      * Init.
      */
     @EventListener(ApplicationReadyEvent.class)
     public void init() {
-<span class="fc" id="L85">      log.info(&quot;\n&quot;</span>
+<span class="fc" id="L86">      log.info(&quot;\n&quot;</span>
               + &quot;*******************************************************************************\n&quot;
               + &quot;* {}.{}\n&quot;
               + &quot;*******************************************************************************&quot;,
-<span class="fc" id="L89">          ClassUtils.getUserClass(AccessTokenCacheAutoConfiguration.class).getSimpleName(),</span>
-<span class="fc" id="L90">          ClassUtils.getUserClass(getClass()).getSimpleName());</span>
-<span class="fc" id="L91">    }</span>
+<span class="fc" id="L90">          ClassUtils.getUserClass(AccessTokenCacheAutoConfiguration.class).getSimpleName(),</span>
+<span class="fc" id="L91">          ClassUtils.getUserClass(getClass()).getSimpleName());</span>
+<span class="fc" id="L92">    }</span>
 
     /**
      * Creates an access token cache.
@@ -100,25 +101,25 @@ import org.springframework.util.ClassUtils;
     public AccessTokenCache accessTokenCache(
         ObjectProvider&lt;List&lt;CacheManager&gt;&gt; cacheManagers) {
 
-<span class="fc" id="L103">      return findJwtCache(cacheManagers.getIfAvailable())</span>
-<span class="pc" id="L104">          .map(externalCache -&gt; AccessTokenCache.builder().withExternalCache(externalCache))</span>
-<span class="fc" id="L105">          .orElseGet(AccessTokenCache::builder)</span>
-<span class="fc" id="L106">          .withExpirationTimeThreshold(authProperties.getJwtCache().getExpirationTimeThreshold())</span>
-<span class="fc" id="L107">          .withKeyPrefix(authProperties.getJwtCache().getKeyPrefix())</span>
-<span class="fc" id="L108">          .build();</span>
+<span class="fc" id="L104">      return findJwtCache(cacheManagers.getIfAvailable())</span>
+<span class="pc" id="L105">          .map(externalCache -&gt; AccessTokenCache.builder().withExternalCache(externalCache))</span>
+<span class="fc" id="L106">          .orElseGet(AccessTokenCache::builder)</span>
+<span class="fc" id="L107">          .withExpirationTimeThreshold(authProperties.getJwtCache().getExpirationTimeThreshold())</span>
+<span class="fc" id="L108">          .withKeyPrefix(authProperties.getJwtCache().getKeyPrefix())</span>
+<span class="fc" id="L109">          .build();</span>
     }
 
     private Optional&lt;Cache&gt; findJwtCache(List&lt;CacheManager&gt; cacheManagers) {
-<span class="fc" id="L112">      final String cacheName = authProperties.getJwtCache().getExternalCacheName();</span>
-<span class="fc" id="L113">      return Optional.ofNullable(cacheManagers)</span>
-<span class="pc" id="L114">          .flatMap(managers -&gt; managers.stream()</span>
-<span class="nc" id="L115">              .filter(manager -&gt; manager.getCacheNames().contains(cacheName))</span>
-<span class="nc" id="L116">              .findFirst())</span>
-<span class="fc" id="L117">          .map(cacheManager -&gt; {</span>
-<span class="nc" id="L118">            Cache externalCache = cacheManager.getCache(cacheName);</span>
-<span class="nc" id="L119">            log.info(&quot;Creating access token cache with external cache {} from cache manager {}&quot;,</span>
+<span class="fc" id="L113">      final String cacheName = authProperties.getJwtCache().getExternalCacheName();</span>
+<span class="fc" id="L114">      return Optional.ofNullable(cacheManagers)</span>
+<span class="pc" id="L115">          .flatMap(managers -&gt; managers.stream()</span>
+<span class="nc" id="L116">              .filter(manager -&gt; manager.getCacheNames().contains(cacheName))</span>
+<span class="nc" id="L117">              .findFirst())</span>
+<span class="fc" id="L118">          .map(cacheManager -&gt; {</span>
+<span class="nc" id="L119">            Cache externalCache = cacheManager.getCache(cacheName);</span>
+<span class="nc" id="L120">            log.info(&quot;Creating access token cache with external cache {} from cache manager {}&quot;,</span>
                 externalCache, cacheManager);
-<span class="nc" id="L121">            return externalCache;</span>
+<span class="nc" id="L122">            return externalCache;</span>
           });
     }
   }
@@ -141,37 +142,38 @@ import org.springframework.util.ClassUtils;
      *
      * @param authProperties the auth properties
      */
-<span class="fc" id="L144">    public WithRedis(AuthProperties authProperties) {</span>
-<span class="fc" id="L145">      this.authProperties = authProperties;</span>
-<span class="fc" id="L146">    }</span>
+<span class="fc" id="L145">    public WithRedis(AuthProperties authProperties) {</span>
+<span class="fc" id="L146">      this.authProperties = authProperties;</span>
+<span class="fc" id="L147">    }</span>
 
     /**
      * Init.
      */
     @EventListener(ApplicationReadyEvent.class)
     public void init() {
-<span class="fc" id="L153">      log.info(&quot;\n&quot;</span>
+<span class="fc" id="L154">      log.info(&quot;\n&quot;</span>
               + &quot;*******************************************************************************\n&quot;
               + &quot;* {}.{}\n&quot;
               + &quot;*******************************************************************************&quot;,
-<span class="fc" id="L157">          ClassUtils.getUserClass(AccessTokenCacheAutoConfiguration.class).getSimpleName(),</span>
-<span class="fc" id="L158">          ClassUtils.getUserClass(getClass()).getSimpleName());</span>
-<span class="fc" id="L159">    }</span>
+<span class="fc" id="L158">          ClassUtils.getUserClass(AccessTokenCacheAutoConfiguration.class).getSimpleName(),</span>
+<span class="fc" id="L159">          ClassUtils.getUserClass(getClass()).getSimpleName());</span>
+<span class="fc" id="L160">    }</span>
 
     /**
      * Creates an access token cache that uses Redis.
      *
-     * @param connectionFactory the connection factory
+     * @param connectionFactoryProvider the connection factory provider
      * @return the access token cache
      */
     @Bean
     public AccessTokenCache redisAccessTokenCache(
-        ObjectProvider&lt;RedisConnectionFactory&gt; connectionFactory) {
+        ObjectProvider&lt;RedisConnectionFactory&gt; connectionFactoryProvider) {
 
-<span class="fc" id="L171">      log.info(&quot;Creating {} ...&quot;, RedisAccessTokenCache.class.getName());</span>
-<span class="fc" id="L172">      return new RedisAccessTokenCache(</span>
-<span class="fc" id="L173">          authProperties.getJwtCache(),</span>
-<span class="fc" id="L174">          connectionFactory.getIfAvailable());</span>
+<span class="fc" id="L172">      RedisConnectionFactory connectionFactory = connectionFactoryProvider.getIfAvailable();</span>
+<span class="fc" id="L173">      Assert.notNull(connectionFactory, &quot;Redis connection factory must not be null.&quot;);</span>
+<span class="fc" id="L174">      log.info(&quot;Creating {} with {} ...&quot;, RedisAccessTokenCache.class.getSimpleName(),</span>
+<span class="fc" id="L175">          ClassUtils.getUserClass(connectionFactory).getSimpleName());</span>
+<span class="fc" id="L176">      return new RedisAccessTokenCache(authProperties.getJwtCache(), connectionFactory);</span>
     }
   }
 

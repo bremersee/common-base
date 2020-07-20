@@ -1,6 +1,8 @@
 GROUP,PACKAGE,CLASS,INSTRUCTION_MISSED,INSTRUCTION_COVERED,BRANCH_MISSED,BRANCH_COVERED,LINE_MISSED,LINE_COVERED,COMPLEXITY_MISSED,COMPLEXITY_COVERED,METHOD_MISSED,METHOD_COVERED
 common-base-web,org.bremersee.http,MediaTypeHelper,28,84,18,22,7,13,18,11,2,7
 common-base-web,org.bremersee.http,HttpHeadersHelper,1,38,1,7,1,10,1,5,0,2
+common-base-web,org.bremersee.web.multipart,FileAwareMultipartFile.EmptyResource,2,37,1,5,0,4,1,8,0,6
+common-base-web,org.bremersee.web.multipart,FileAwareMultipartFile,50,478,37,51,3,80,33,41,0,30
 common-base-web,org.bremersee.web,ErrorDetectors,0,15,0,4,0,3,0,4,0,2
 common-base-web,org.bremersee.exception,RestApiExceptionUtils,8,18,2,2,3,7,1,3,0,2
 common-base-web,org.bremersee.exception,HttpClientException,60,86,17,9,0,11,14,8,1,8

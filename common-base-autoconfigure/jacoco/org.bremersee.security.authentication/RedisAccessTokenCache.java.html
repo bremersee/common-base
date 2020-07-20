@@ -56,39 +56,37 @@ public class RedisAccessTokenCache implements AccessTokenCache {
 <span class="fc" id="L56">    Assert.notNull(jwtCacheProperties, &quot;Jwt cache properties must be present.&quot;);</span>
 <span class="fc" id="L57">    Assert.notNull(connectionFactory, &quot;Redis connection factory must be present.&quot;);</span>
 <span class="fc" id="L58">    this.jwtCacheProperties = jwtCacheProperties;</span>
-<span class="fc" id="L59">    this.redis = new StringRedisTemplate();</span>
-<span class="fc" id="L60">    this.redis.setConnectionFactory(connectionFactory);</span>
-<span class="fc" id="L61">    this.redis.afterPropertiesSet();</span>
-<span class="fc" id="L62">  }</span>
+<span class="fc" id="L59">    this.redis = new StringRedisTemplate(connectionFactory);</span>
+<span class="fc" id="L60">  }</span>
 
   @Override
   public Optional&lt;String&gt; findAccessToken(String key) {
     try {
-<span class="nc" id="L67">      return Optional.ofNullable(redis.opsForValue().get(jwtCacheProperties.addKeyPrefix(key)));</span>
+<span class="nc" id="L65">      return Optional.ofNullable(redis.opsForValue().get(jwtCacheProperties.addKeyPrefix(key)));</span>
 
-<span class="fc" id="L69">    } catch (RuntimeException e) {</span>
-<span class="fc" id="L70">      log.error(&quot;Getting access token from redis cache failed.&quot;, e);</span>
-<span class="fc" id="L71">      return Optional.empty();</span>
+<span class="fc" id="L67">    } catch (RuntimeException e) {</span>
+<span class="fc" id="L68">      log.error(&quot;Getting access token from redis cache failed.&quot;, e);</span>
+<span class="fc" id="L69">      return Optional.empty();</span>
     }
   }
 
   @Override
   public void putAccessToken(String key, String accessToken) {
     try {
-<span class="fc" id="L78">      Duration duration = jwtCacheProperties.getExpirationTimeThreshold();</span>
-<span class="fc" id="L79">      long millis = System.currentTimeMillis() + duration.toMillis();</span>
-<span class="fc" id="L80">      String dbKey = jwtCacheProperties.addKeyPrefix(key);</span>
-<span class="fc" id="L81">      Optional.ofNullable(findExpirationTimeFn.apply(accessToken))</span>
-<span class="pc bpc" id="L82" title="1 of 2 branches missed.">          .filter(expirationTime -&gt; expirationTime.getTime() &gt; millis)</span>
-<span class="nc" id="L83">          .ifPresent(expirationTime -&gt; {</span>
-<span class="nc" id="L84">            redis.opsForValue().set(dbKey, accessToken);</span>
-<span class="nc" id="L85">            redis.expireAt(dbKey, expirationTime);</span>
-<span class="nc" id="L86">          });</span>
+<span class="fc" id="L76">      Duration duration = jwtCacheProperties.getExpirationTimeThreshold();</span>
+<span class="fc" id="L77">      long millis = System.currentTimeMillis() + duration.toMillis();</span>
+<span class="fc" id="L78">      String dbKey = jwtCacheProperties.addKeyPrefix(key);</span>
+<span class="fc" id="L79">      Optional.ofNullable(findExpirationTimeFn.apply(accessToken))</span>
+<span class="pc bpc" id="L80" title="1 of 2 branches missed.">          .filter(expirationTime -&gt; expirationTime.getTime() &gt; millis)</span>
+<span class="nc" id="L81">          .ifPresent(expirationTime -&gt; {</span>
+<span class="nc" id="L82">            redis.opsForValue().set(dbKey, accessToken);</span>
+<span class="nc" id="L83">            redis.expireAt(dbKey, expirationTime);</span>
+<span class="nc" id="L84">          });</span>
 
-<span class="fc" id="L88">    } catch (RuntimeException e) {</span>
-<span class="fc" id="L89">      log.error(&quot;Putting access token into the redis cache failed.&quot;, e);</span>
-<span class="nc" id="L90">    }</span>
-<span class="fc" id="L91">  }</span>
+<span class="fc" id="L86">    } catch (RuntimeException e) {</span>
+<span class="fc" id="L87">      log.error(&quot;Putting access token into the redis cache failed.&quot;, e);</span>
+<span class="nc" id="L88">    }</span>
+<span class="fc" id="L89">  }</span>
 
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

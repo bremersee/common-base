@@ -70,7 +70,7 @@ public class LdaptiveTemplate implements LdaptiveOperations, Cloneable {
    * @param errorHandler the error handler
    */
   public void setErrorHandler(final ErrorHandler errorHandler) {
-<span class="pc bpc" id="L73" title="1 of 2 branches missed.">    if (errorHandler != null) {</span>
+<span class="fc bfc" id="L73" title="All 2 branches covered.">    if (errorHandler != null) {</span>
 <span class="fc" id="L74">      this.errorHandler = errorHandler;</span>
     }
 <span class="fc" id="L76">  }</span>
@@ -84,7 +84,7 @@ public class LdaptiveTemplate implements LdaptiveOperations, Cloneable {
   @SuppressWarnings(&quot;MethodDoesntCallSuperMethod&quot;)
   @Override
   public LdaptiveTemplate clone() {
-<span class="fc" id="L87">    return clone(errorHandler);</span>
+<span class="fc" id="L87">    return clone(null);</span>
   }
 
   /**
@@ -96,7 +96,7 @@ public class LdaptiveTemplate implements LdaptiveOperations, Cloneable {
    */
   public LdaptiveTemplate clone(final ErrorHandler errorHandler) {
 <span class="fc" id="L98">    final LdaptiveTemplate template = new LdaptiveTemplate(connectionFactory);</span>
-<span class="pc bpc" id="L99" title="1 of 2 branches missed.">    template.setErrorHandler(errorHandler != null ? errorHandler : this.errorHandler);</span>
+<span class="fc" id="L99">    template.setErrorHandler(errorHandler);</span>
 <span class="fc" id="L100">    return template;</span>
   }
 

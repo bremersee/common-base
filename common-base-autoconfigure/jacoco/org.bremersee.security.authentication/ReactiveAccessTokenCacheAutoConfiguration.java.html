@@ -34,6 +34,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.context.event.EventListener;
 import org.springframework.data.redis.connection.ReactiveRedisConnectionFactory;
+import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 
 /**
@@ -49,8 +50,8 @@ import org.springframework.util.ClassUtils;
 @Configuration
 @Conditional(JwtSupportCondition.class)
 @AutoConfigureAfter(RedisReactiveAutoConfiguration.class)
-<span class="fc" id="L52">@Slf4j</span>
-<span class="fc" id="L53">public class ReactiveAccessTokenCacheAutoConfiguration {</span>
+<span class="fc" id="L53">@Slf4j</span>
+<span class="fc" id="L54">public class ReactiveAccessTokenCacheAutoConfiguration {</span>
 
   /**
    * The default configuration.
@@ -73,22 +74,22 @@ import org.springframework.util.ClassUtils;
      *
      * @param authProperties the auth properties
      */
-<span class="fc" id="L76">    public Default(AuthProperties authProperties) {</span>
-<span class="fc" id="L77">      this.authProperties = authProperties;</span>
-<span class="fc" id="L78">    }</span>
+<span class="fc" id="L77">    public Default(AuthProperties authProperties) {</span>
+<span class="fc" id="L78">      this.authProperties = authProperties;</span>
+<span class="fc" id="L79">    }</span>
 
     /**
      * Init.
      */
     @EventListener(ApplicationReadyEvent.class)
     public void init() {
-<span class="fc" id="L85">      log.info(&quot;\n&quot;</span>
+<span class="fc" id="L86">      log.info(&quot;\n&quot;</span>
               + &quot;*******************************************************************************\n&quot;
               + &quot;* {}.{}\n&quot;
               + &quot;*******************************************************************************&quot;,
-<span class="fc" id="L89">          ClassUtils.getUserClass(ReactiveAccessTokenCacheAutoConfiguration.class).getSimpleName(),</span>
-<span class="fc" id="L90">          ClassUtils.getUserClass(getClass()).getSimpleName());</span>
-<span class="fc" id="L91">    }</span>
+<span class="fc" id="L90">          ClassUtils.getUserClass(ReactiveAccessTokenCacheAutoConfiguration.class).getSimpleName(),</span>
+<span class="fc" id="L91">          ClassUtils.getUserClass(getClass()).getSimpleName());</span>
+<span class="fc" id="L92">    }</span>
 
     /**
      * Creates an access token cache that will be wrapped into a reactive one.
@@ -100,9 +101,9 @@ import org.springframework.util.ClassUtils;
     @Lazy
     @Bean
     public AccessTokenCache accessTokenCache(ObjectProvider&lt;List&lt;CacheManager&gt;&gt; cacheManagers) {
-<span class="fc" id="L103">      log.info(&quot;Creating {} for reactive application.&quot;, AccessTokenCache.class.getSimpleName());</span>
-<span class="fc" id="L104">      return new AccessTokenCacheAutoConfiguration.Default(authProperties)</span>
-<span class="fc" id="L105">          .accessTokenCache(cacheManagers);</span>
+<span class="fc" id="L104">      log.info(&quot;Creating {} for reactive application.&quot;, AccessTokenCache.class.getSimpleName());</span>
+<span class="fc" id="L105">      return new AccessTokenCacheAutoConfiguration.Default(authProperties)</span>
+<span class="fc" id="L106">          .accessTokenCache(cacheManagers);</span>
     }
 
     /**
@@ -115,8 +116,8 @@ import org.springframework.util.ClassUtils;
     public ReactiveAccessTokenCache reactiveAccessTokenCache(
         ObjectProvider&lt;AccessTokenCache&gt; accessTokenCache) {
 
-<span class="fc" id="L118">      log.info(&quot;Creating {} ...&quot;, ReactiveAccessTokenCache.class.getSimpleName());</span>
-<span class="fc" id="L119">      return ReactiveAccessTokenCache.from(accessTokenCache.getIfAvailable());</span>
+<span class="fc" id="L119">      log.info(&quot;Creating {} ...&quot;, ReactiveAccessTokenCache.class.getSimpleName());</span>
+<span class="fc" id="L120">      return ReactiveAccessTokenCache.from(accessTokenCache.getIfAvailable());</span>
     }
 
   }
@@ -139,22 +140,22 @@ import org.springframework.util.ClassUtils;
      *
      * @param authProperties the auth properties
      */
-<span class="fc" id="L142">    public WithRedis(AuthProperties authProperties) {</span>
-<span class="fc" id="L143">      this.authProperties = authProperties;</span>
-<span class="fc" id="L144">    }</span>
+<span class="fc" id="L143">    public WithRedis(AuthProperties authProperties) {</span>
+<span class="fc" id="L144">      this.authProperties = authProperties;</span>
+<span class="fc" id="L145">    }</span>
 
     /**
      * Init.
      */
     @EventListener(ApplicationReadyEvent.class)
     public void init() {
-<span class="fc" id="L151">      log.info(&quot;\n&quot;</span>
+<span class="fc" id="L152">      log.info(&quot;\n&quot;</span>
               + &quot;*******************************************************************************\n&quot;
               + &quot;* {}.{}\n&quot;
               + &quot;*******************************************************************************&quot;,
-<span class="fc" id="L155">          ClassUtils.getUserClass(ReactiveAccessTokenCacheAutoConfiguration.class).getSimpleName(),</span>
-<span class="fc" id="L156">          ClassUtils.getUserClass(getClass()).getSimpleName());</span>
-<span class="fc" id="L157">    }</span>
+<span class="fc" id="L156">          ClassUtils.getUserClass(ReactiveAccessTokenCacheAutoConfiguration.class).getSimpleName(),</span>
+<span class="fc" id="L157">          ClassUtils.getUserClass(getClass()).getSimpleName());</span>
+<span class="fc" id="L158">    }</span>
 
     /**
      * Creates a reactive access token cache that uses Redis.
@@ -166,9 +167,11 @@ import org.springframework.util.ClassUtils;
     public ReactiveAccessTokenCache reactiveRedisAccessTokenCache(
         ObjectProvider&lt;ReactiveRedisConnectionFactory&gt; connectionFactoryProvider) {
 
-<span class="fc" id="L169">      ReactiveRedisConnectionFactory connectionFactory = connectionFactoryProvider.getIfAvailable();</span>
-<span class="fc" id="L170">      log.info(&quot;Creating {} ...&quot;, ReactiveRedisAccessTokenCache.class.getName());</span>
-<span class="fc" id="L171">      return new ReactiveRedisAccessTokenCache(authProperties.getJwtCache(), connectionFactory);</span>
+<span class="fc" id="L170">      ReactiveRedisConnectionFactory connectionFactory = connectionFactoryProvider.getIfAvailable();</span>
+<span class="fc" id="L171">      Assert.notNull(connectionFactory, &quot;Redis connection factory must not be null.&quot;);</span>
+<span class="fc" id="L172">      log.info(&quot;Creating {} with {} ...&quot;, RedisAccessTokenCache.class.getSimpleName(),</span>
+<span class="fc" id="L173">          ClassUtils.getUserClass(connectionFactory).getSimpleName());</span>
+<span class="fc" id="L174">      return new ReactiveRedisAccessTokenCache(authProperties.getJwtCache(), connectionFactory);</span>
     }
 
   }

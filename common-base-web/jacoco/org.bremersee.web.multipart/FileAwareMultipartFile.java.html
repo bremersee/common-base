@@ -1,0 +1,344 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>FileAwareMultipartFile.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">common-base-web</a> &gt; <a href="index.source.html" class="el_package">org.bremersee.web.multipart</a> &gt; <span class="el_source">FileAwareMultipartFile.java</span></div><h1>FileAwareMultipartFile.java</h1><pre class="source lang-java linenums">/*
+ * Copyright 2020 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package org.bremersee.web.multipart;
+
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
+import java.util.Optional;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
+import org.springframework.core.io.AbstractResource;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.Resource;
+import org.springframework.lang.NonNull;
+import org.springframework.util.FileCopyUtils;
+import org.springframework.util.StringUtils;
+import org.springframework.web.multipart.MultipartFile;
+
+/**
+ * The file aware multipart file.
+ *
+ * @author Christian Bremer
+ */
+<span class="pc bpc" id="L43" title="21 of 38 branches missed.">@EqualsAndHashCode(doNotUseGetters = true)</span>
+<span class="fc" id="L44">@ToString(doNotUseGetters = true)</span>
+public class FileAwareMultipartFile implements MultipartFile {
+
+  private final File file;
+
+  private final String parameterName;
+
+  private final String originalFilename;
+
+  private final String contentType;
+
+<span class="fc" id="L55">  private FileAwareMultipartFile() {</span>
+<span class="fc" id="L56">    this.file = null;</span>
+<span class="fc" id="L57">    this.parameterName = null;</span>
+<span class="fc" id="L58">    this.originalFilename = null;</span>
+<span class="fc" id="L59">    this.contentType = null;</span>
+<span class="fc" id="L60">  }</span>
+
+  /**
+   * Instantiates a new file aware multipart file.
+   *
+   * @param multipartFile the multipart file
+   * @throws IOException the io exception
+   */
+  public FileAwareMultipartFile(MultipartFile multipartFile) throws IOException {
+<span class="fc" id="L69">    this(multipartFile, (File) null);</span>
+<span class="fc" id="L70">  }</span>
+
+  /**
+   * Instantiates a new file aware multipart file.
+   *
+   * @param multipartFile the multipart file
+   * @param tmpDir the tmp dir
+   * @throws IOException the io exception
+   */
+  public FileAwareMultipartFile(MultipartFile multipartFile, String tmpDir) throws IOException {
+<span class="fc" id="L80">    this(multipartFile, getTmpDir(tmpDir));</span>
+<span class="fc" id="L81">  }</span>
+
+  /**
+   * Instantiates a new file aware multipart file.
+   *
+   * @param multipartFile the multipart file
+   * @param tmpDir the tmp dir
+   * @throws IOException the io exception
+   */
+<span class="fc" id="L90">  public FileAwareMultipartFile(MultipartFile multipartFile, File tmpDir) throws IOException {</span>
+<span class="fc bfc" id="L91" title="All 2 branches covered.">    if (multipartFile == null) {</span>
+<span class="fc" id="L92">      this.file = null;</span>
+<span class="fc" id="L93">      this.parameterName = null;</span>
+<span class="fc" id="L94">      this.originalFilename = null;</span>
+<span class="fc" id="L95">      this.contentType = null;</span>
+    } else {
+<span class="fc bfc" id="L97" title="All 2 branches covered.">      if (multipartFile.isEmpty()) {</span>
+<span class="fc" id="L98">        this.file = null;</span>
+      } else {
+<span class="fc bfc" id="L100" title="All 2 branches covered.">        if (multipartFile instanceof FileAwareMultipartFile) {</span>
+<span class="fc" id="L101">          this.file = ((FileAwareMultipartFile) multipartFile).file;</span>
+        } else {
+<span class="fc" id="L103">          this.file = getTmpFile(getTmpDir(tmpDir));</span>
+<span class="fc" id="L104">          FileCopyUtils.copy(</span>
+<span class="fc" id="L105">              multipartFile.getInputStream(),</span>
+<span class="fc" id="L106">              Files.newOutputStream(</span>
+<span class="fc" id="L107">                  this.file.toPath(),</span>
+                  StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING));
+        }
+      }
+<span class="fc" id="L111">      this.parameterName = multipartFile.getName();</span>
+<span class="fc" id="L112">      this.originalFilename = multipartFile.getOriginalFilename();</span>
+<span class="fc" id="L113">      this.contentType = multipartFile.getContentType();</span>
+    }
+<span class="fc" id="L115">  }</span>
+
+  /**
+   * Instantiates a new File aware multipart file.
+   *
+   * @param inputStream the input stream
+   * @param parameterName the parameter name
+   * @param originalFilename the original filename
+   * @param contentType the content type
+   * @throws IOException the io exception
+   */
+  public FileAwareMultipartFile(
+      InputStream inputStream,
+      String parameterName,
+      String originalFilename,
+      String contentType) throws IOException {
+<span class="fc" id="L131">    this(inputStream, (File) null, parameterName, originalFilename, contentType);</span>
+<span class="fc" id="L132">  }</span>
+
+  /**
+   * Instantiates a new File aware multipart file.
+   *
+   * @param inputStream the input stream
+   * @param tmpDir the tmp dir
+   * @param parameterName the parameter name
+   * @param originalFilename the original filename
+   * @param contentType the content type
+   * @throws IOException the io exception
+   */
+  public FileAwareMultipartFile(
+      InputStream inputStream,
+      String tmpDir,
+      String parameterName,
+      String originalFilename,
+      String contentType) throws IOException {
+<span class="fc" id="L150">    this(inputStream, getTmpDir(tmpDir), parameterName, originalFilename, contentType);</span>
+<span class="fc" id="L151">  }</span>
+
+  /**
+   * Instantiates a new File aware multipart file.
+   *
+   * @param inputStream the input stream
+   * @param tmpDir the tmp dir
+   * @param parameterName the parameter name
+   * @param originalFilename the original filename
+   * @param contentType the content type
+   * @throws IOException the io exception
+   */
+  public FileAwareMultipartFile(
+      InputStream inputStream,
+      File tmpDir,
+      String parameterName,
+      String originalFilename,
+<span class="fc" id="L168">      String contentType) throws IOException {</span>
+<span class="pc bpc" id="L169" title="1 of 2 branches missed.">    if (inputStream != null) {</span>
+<span class="fc" id="L170">      this.file = getTmpFile(tmpDir);</span>
+<span class="fc" id="L171">      FileCopyUtils.copy(</span>
+          inputStream,
+<span class="fc" id="L173">          Files.newOutputStream(</span>
+<span class="fc" id="L174">              this.file.toPath(),</span>
+              StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING));
+    } else {
+<span class="nc" id="L177">      this.file = null;</span>
+    }
+<span class="fc" id="L179">    this.parameterName = parameterName;</span>
+<span class="fc" id="L180">    this.originalFilename = originalFilename;</span>
+<span class="fc" id="L181">    this.contentType = contentType;</span>
+<span class="fc" id="L182">  }</span>
+
+  /**
+   * Instantiates a new File aware multipart file.
+   *
+   * @param file the file
+   * @param parameterName the parameter name
+   * @param originalFilename the original filename
+   * @param contentType the content type
+   */
+  public FileAwareMultipartFile(
+      Path file,
+      String parameterName,
+      String originalFilename,
+<span class="fc" id="L196">      String contentType) {</span>
+<span class="pc bpc" id="L197" title="1 of 2 branches missed.">    this.file = file != null ? file.toFile() : null;</span>
+<span class="fc" id="L198">    this.parameterName = parameterName;</span>
+<span class="fc" id="L199">    this.originalFilename = originalFilename;</span>
+<span class="fc" id="L200">    this.contentType = contentType;</span>
+<span class="fc" id="L201">  }</span>
+
+  /**
+   * Instantiates a new File aware multipart file.
+   *
+   * @param file the file
+   * @param parameterName the parameter name
+   * @param originalFilename the original filename
+   * @param contentType the content type
+   */
+  public FileAwareMultipartFile(
+      File file,
+      String parameterName,
+      String originalFilename,
+<span class="fc" id="L215">      String contentType) {</span>
+<span class="fc" id="L216">    this.file = file;</span>
+<span class="fc" id="L217">    this.parameterName = parameterName;</span>
+<span class="fc" id="L218">    this.originalFilename = originalFilename;</span>
+<span class="fc" id="L219">    this.contentType = contentType;</span>
+<span class="fc" id="L220">  }</span>
+
+  /**
+   * Empty file aware multipart file.
+   *
+   * @return the file aware multipart file
+   */
+  public static FileAwareMultipartFile empty() {
+<span class="fc" id="L228">    return new FileAwareMultipartFile();</span>
+  }
+
+  /**
+   * Delete.
+   *
+   * @param multipartFile the multipart file
+   */
+  public static void delete(MultipartFile multipartFile) {
+<span class="pc bpc" id="L237" title="2 of 4 branches missed.">    if (multipartFile != null &amp;&amp; multipartFile.getResource().isFile()) {</span>
+      try {
+<span class="fc" id="L239">        Files.delete(multipartFile.getResource().getFile().toPath());</span>
+<span class="nc" id="L240">      } catch (Exception ignored) {</span>
+        // ignored
+<span class="fc" id="L242">      }</span>
+    }
+<span class="fc" id="L244">  }</span>
+
+  private static File getTmpDir(String tmpDir) {
+<span class="pc bpc" id="L247" title="1 of 2 branches missed.">    return getTmpDir(StringUtils.hasText(tmpDir) ? new File(tmpDir) : null);</span>
+  }
+
+  private static File getTmpDir(File tmpDir) {
+<span class="fc" id="L251">    return Optional.ofNullable(tmpDir)</span>
+<span class="pc bpc" id="L252" title="4 of 8 branches missed.">        .filter(dir -&gt; dir.exists() &amp;&amp; dir.isDirectory() &amp;&amp; dir.canRead() &amp;&amp; dir.canWrite())</span>
+<span class="fc" id="L253">        .orElseGet(() -&gt; new File(System.getProperty(&quot;java.io.tmpdir&quot;)));</span>
+  }
+
+  private static File getTmpFile(File tmpDir) throws IOException {
+<span class="fc" id="L257">    return File.createTempFile(&quot;uploaded-&quot;, &quot;.tmp&quot;, tmpDir);</span>
+  }
+
+  @NonNull
+  @Override
+  public String getName() {
+<span class="fc bfc" id="L263" title="All 2 branches covered.">    return parameterName == null ? &quot;&quot; : parameterName;</span>
+  }
+
+  @Override
+  public String getOriginalFilename() {
+<span class="pc bpc" id="L268" title="1 of 4 branches missed.">    return !StringUtils.hasText(originalFilename) &amp;&amp; file != null</span>
+<span class="nc" id="L269">        ? file.getName()</span>
+<span class="fc" id="L270">        : originalFilename;</span>
+  }
+
+  @Override
+  public String getContentType() {
+<span class="fc" id="L275">    return contentType;</span>
+  }
+
+  @Override
+  public boolean isEmpty() {
+<span class="fc bfc" id="L280" title="All 2 branches covered.">    return getSize() == 0;</span>
+  }
+
+  @Override
+  public long getSize() {
+<span class="fc bfc" id="L285" title="All 2 branches covered.">    return isFileValid() ? file.length() : 0;</span>
+  }
+
+  @NonNull
+  @Override
+  public byte[] getBytes() throws IOException {
+<span class="pc bpc" id="L291" title="1 of 2 branches missed.">    return isEmpty() ? new byte[0] : FileCopyUtils.copyToByteArray(new FileInputStream(file));</span>
+  }
+
+  @NonNull
+  @Override
+  public InputStream getInputStream() throws IOException {
+<span class="pc bpc" id="L297" title="1 of 2 branches missed.">    return isEmpty() ? new ByteArrayInputStream(new byte[0]) : new FileInputStream(file);</span>
+  }
+
+  @NonNull
+  @Override
+  public Resource getResource() {
+<span class="fc bfc" id="L303" title="All 2 branches covered.">    return isEmpty() ? new EmptyResource() : new FileSystemResource(file);</span>
+  }
+
+  @Override
+  public void transferTo(@NonNull File dest) throws IOException, IllegalStateException {
+<span class="pc bpc" id="L308" title="1 of 2 branches missed.">    if (isFileValid()) {</span>
+<span class="fc" id="L309">      FileCopyUtils.copy(file, dest);</span>
+    }
+<span class="fc" id="L311">  }</span>
+
+  private boolean isFileValid() {
+<span class="pc bpc" id="L314" title="3 of 8 branches missed.">    return file != null &amp;&amp; file.exists() &amp;&amp; file.isFile() &amp;&amp; file.canRead();</span>
+  }
+
+  @SuppressWarnings(&quot;Lombok&quot;)
+<span class="pc bpc" id="L318" title="1 of 6 branches missed.">  @EqualsAndHashCode</span>
+  private static class EmptyResource extends AbstractResource {
+
+    private EmptyResource() {
+    }
+
+    @NonNull
+    @Override
+    public String getDescription() {
+<span class="fc" id="L327">      return &quot;Empty resource.&quot;;</span>
+    }
+
+    @NonNull
+    @Override
+    public InputStream getInputStream() {
+<span class="fc" id="L333">      return new ByteArrayInputStream(new byte[0]);</span>
+    }
+
+    @NonNull
+    @Override
+    public String toString() {
+<span class="fc" id="L339">      return getDescription();</span>
+    }
+  }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

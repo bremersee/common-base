@@ -20,12 +20,18 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
+import java.util.TimeZone;
+import javax.validation.constraints.NotNull;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+import org.bremersee.common.model.JavaLocale;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.util.StringUtils;
+import org.springframework.validation.annotation.Validated;
 
 /**
  * The message source properties.
@@ -34,10 +40,11 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
  */
 @ConfigurationProperties(&quot;bremersee.messages&quot;)
 @Getter
-<span class="fc" id="L37">@Setter</span>
-<span class="fc" id="L38">@ToString</span>
-<span class="pc bpc" id="L39" title="40 of 60 branches missed.">@EqualsAndHashCode</span>
-<span class="fc" id="L40">public class MessageSourceProperties {</span>
+<span class="fc" id="L43">@Setter</span>
+<span class="fc" id="L44">@ToString</span>
+<span class="pc bpc" id="L45" title="48 of 68 branches missed.">@EqualsAndHashCode</span>
+@Validated
+<span class="fc" id="L47">public class MessageSourceProperties {</span>
 
   /**
    * Set whether to always apply the {@code MessageFormat} rules, parsing even messages without
@@ -55,13 +62,13 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
    *
    * @see java.text.MessageFormat
    */
-<span class="fc" id="L58">  private boolean alwaysUseMessageFormat = false; // from MessageSourceSupport</span>
+<span class="fc" id="L65">  private boolean alwaysUseMessageFormat = false; // from MessageSourceSupport</span>
 
   /**
    * Set whether to use the message code as default message instead of throwing a
    * NoSuchMessageException. Useful for development and debugging. Default is &quot;false&quot;.
    */
-<span class="fc" id="L64">  private boolean useCodeAsDefaultMessage = false; // from AbstractMessageSource</span>
+<span class="fc" id="L71">  private boolean useCodeAsDefaultMessage = false; // from AbstractMessageSource</span>
 
   /**
    * Set an list of basenames, each following the basic ResourceBundle convention of not specifying
@@ -76,7 +83,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
    * a message code. Note that message definitions in a &lt;i&gt;previous&lt;/i&gt; resource bundle will
    * override ones in a later bundle, due to the sequential lookup.
    */
-<span class="fc" id="L79">  private List&lt;String&gt; baseNames = new ArrayList&lt;&gt;(); // from AbstractResourceBasedMessageSource</span>
+<span class="fc" id="L86">  private List&lt;String&gt; baseNames = new ArrayList&lt;&gt;(); // from AbstractResourceBasedMessageSource</span>
 
   /**
    * Set the number of seconds to cache loaded properties files.
@@ -92,7 +99,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
    * every message access. &lt;b&gt;Do not use this in a production environment!&lt;/b&gt;
    * &lt;/ul&gt;
    */
-<span class="fc" id="L95">  private int cacheSeconds = -1; // from AbstractResourceBasedMessageSource</span>
+<span class="fc" id="L102">  private int cacheSeconds = -1; // from AbstractResourceBasedMessageSource</span>
 
   /**
    * Set the default charset to use for parsing properties files. Used if no file-specific charset
@@ -103,7 +110,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
    *
    * &lt;p&gt;Only applies to classic properties files, not to XML files.
    */
-<span class="fc" id="L106">  private String defaultEncoding = StandardCharsets.UTF_8.name(); // from AbstractResourceBasedM.</span>
+<span class="fc" id="L113">  private String defaultEncoding = StandardCharsets.UTF_8.name(); // from AbstractResourceBasedM.</span>
 
   /**
    * Set whether to fall back to the system Locale if no files for a specific Locale have been
@@ -115,7 +122,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
    * environment, where the system Locale is not relevant to the application at all: set this flag
    * to &quot;false&quot; in such a scenario.
    */
-<span class="fc" id="L118">  private boolean fallbackToSystemLocale = true;</span>
+<span class="fc" id="L125">  private boolean fallbackToSystemLocale = true;</span>
 
   /**
    * Specify a default Locale to fall back to, as an alternative to falling back to the system
@@ -125,12 +132,17 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
    * a locally specified default Locale here, or enforce no fallback locale at all through
    * disabling.
    */
-<span class="fc" id="L128">  private String defaultLocale;</span>
+<span class="fc" id="L135">  private String defaultLocale = &quot;de-DE&quot;;</span>
+
+  /**
+   * Specify a default time zone to fall back to.
+   */
+<span class="fc" id="L140">  private String defaultTimeZone = &quot;Europe/Berlin&quot;;</span>
 
   /**
    * Specifies whether the resource bundles are reloadable or not.
    */
-<span class="fc" id="L133">  private boolean useReloadableMessageSource = false;</span>
+<span class="fc" id="L145">  private boolean useReloadableMessageSource = false;</span>
 
   /**
    * Specify whether to allow for concurrent refresh behavior, i.e. one thread locked in a refresh
@@ -141,14 +153,37 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
    * minimizing contention between threads. If you prefer the old behavior, i.e. to fully block on
    * refresh, switch this flag to &quot;false&quot;.
    */
-<span class="fc" id="L144">  private boolean concurrentRefresh = true; // ReloadableResourceBundleMessageSource</span>
+<span class="fc" id="L156">  private boolean concurrentRefresh = true; // ReloadableResourceBundleMessageSource</span>
 
   /**
    * Set per-file charsets to use for parsing properties files.
    *
    * &lt;p&gt;Only applies to classic properties files, not to XML files.
    */
-<span class="fc" id="L151">  private Map&lt;String, String&gt; fileEncodings = new HashMap&lt;&gt;(); // ReloadableResourceBundleMessageS.</span>
+<span class="fc" id="L163">  private Map&lt;String, String&gt; fileEncodings = new HashMap&lt;&gt;(); // ReloadableResourceBundleMessageS.</span>
 
+  /**
+   * Default locale.
+   *
+   * @return the locale
+   */
+  @NotNull
+  public Locale defaultLocale() {
+<span class="pc bpc" id="L172" title="1 of 2 branches missed.">    return StringUtils.hasText(getDefaultLocale())</span>
+<span class="fc" id="L173">        ? JavaLocale.fromValue(getDefaultLocale()).toLocale(Locale.getDefault())</span>
+<span class="nc" id="L174">        : Locale.getDefault();</span>
+  }
+
+  /**
+   * Default time zone.
+   *
+   * @return the time zone
+   */
+  @NotNull
+  public TimeZone defaultTimeZone() {
+<span class="pc bpc" id="L184" title="1 of 2 branches missed.">    return StringUtils.hasText(getDefaultTimeZone())</span>
+<span class="fc" id="L185">        ? TimeZone.getTimeZone(getDefaultTimeZone())</span>
+<span class="nc" id="L186">        : TimeZone.getDefault();</span>
+  }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

@@ -1,5 +1,6 @@
 GROUP,PACKAGE,CLASS,INSTRUCTION_MISSED,INSTRUCTION_COVERED,BRANCH_MISSED,BRANCH_COVERED,LINE_MISSED,LINE_COVERED,COMPLEXITY_MISSED,COMPLEXITY_COVERED,METHOD_MISSED,METHOD_COVERED
 common-base-security,org.bremersee.security.authentication,ClientCredentialsFlowProperties.Builder,61,141,18,20,0,21,15,15,1,10
+common-base-security,org.bremersee.security.authentication,AuthenticationDetails,0,20,0,0,0,6,0,4,0,4
 common-base-security,org.bremersee.security.authentication,AccessTokenCacheImpl,25,141,4,8,7,35,6,14,3,11
 common-base-security,org.bremersee.security.authentication,PasswordFlowProperties.Builder,80,191,24,26,0,33,20,18,1,12
 common-base-security,org.bremersee.security.authentication,AccessTokenCache.Builder.Impl,0,28,0,0,0,8,0,5,0,5
@@ -13,6 +14,7 @@ common-base-security,org.bremersee.security.authentication,JsonPathJwtParser,0,3
 common-base-security,org.bremersee.security.authentication,AccessTokenCache,10,62,2,4,4,17,2,7,0,6
 common-base-security,org.bremersee.security.authentication,BasicAuthProperties,0,4,0,0,0,1,0,1,0,1
 common-base-security,org.bremersee.security.authentication,RestTemplateAccessTokenRetriever,16,91,1,3,3,25,3,5,2,4
+common-base-security,org.bremersee.security.authentication,JsonPathJwtAuthenticationDetails,6,109,7,7,1,21,7,12,0,12
 common-base-security,org.bremersee.security.authentication,AccessTokenRetrieverProperties,7,24,0,0,3,7,1,2,1,2
 common-base-security,org.bremersee.security.authentication,BasicAuthProperties.Builder.Impl,65,15,14,0,2,3,11,3,4,3
 common-base-security,org.bremersee.security.authentication,ClientCredentialsFlowProperties,12,31,1,1,2,10,3,3,2,3

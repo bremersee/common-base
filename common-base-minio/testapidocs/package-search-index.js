@@ -1,0 +1,1 @@
+packageSearchIndex = [{"l":"All Packages","url":"allpackages-index.html"},{"l":"org.bremersee.data.minio"},{"l":"org.bremersee.data.minio.app"}]

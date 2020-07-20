@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>MultipartFileBuilder.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">common-base-webflux</a> &gt; <a href="index.source.html" class="el_package">org.bremersee.web.reactive.multipart</a> &gt; <span class="el_source">MultipartFileBuilder.java</span></div><h1>MultipartFileBuilder.java</h1><pre class="source lang-java linenums">/*
+ * Copyright 2020 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package org.bremersee.web.reactive.multipart;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import javax.validation.constraints.NotNull;
+import org.bremersee.web.multipart.FileAwareMultipartFile;
+import org.springframework.http.codec.multipart.Part;
+import org.springframework.util.MultiValueMap;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.multipart.MultipartFile;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+
+/**
+ * The multipart file builder interface.
+ *
+ * @author Christian Bremer
+ */
+@Validated
+public interface MultipartFileBuilder {
+
+  /**
+   * Build multipart file from the given part.
+   *
+   * &lt;p&gt;If hhe given part is {@code null}, an empty multipart file will be returned.
+   *
+   * @param part the part (can be {@code null})
+   * @return the multipart file
+   */
+  Mono&lt;MultipartFile&gt; build(Part part);
+
+  /**
+   * Build multipart file from the last part of the given parts.
+   *
+   * @param parts the parts
+   * @return the multipart file
+   */
+  Mono&lt;MultipartFile&gt; build(@NotNull Flux&lt;? extends Part&gt; parts);
+
+  /**
+   * Build multipart files from the given parts.
+   *
+   * @param parts the parts
+   * @return the multipart files
+   */
+  Mono&lt;List&lt;MultipartFile&gt;&gt; buildList(@NotNull Flux&lt;? extends Part&gt; parts);
+
+  /**
+   * Build list of multipart files from the given multi part data.
+   *
+   * @param multiPartData the multi part data
+   * @param requestParameters the request parameters
+   * @return the list of multipart files
+   */
+  Mono&lt;List&lt;MultipartFile&gt;&gt; buildList(
+      @NotNull MultiValueMap&lt;String, Part&gt; multiPartData,
+      String... requestParameters);
+
+  /**
+   * Build list (flux) of lists of multipart files from the given multi part data.
+   *
+   * @param multiPartData the multi part data
+   * @param requestParameters the request parameters
+   * @return the list (flux) of lists of multipart files
+   */
+  Flux&lt;List&lt;MultipartFile&gt;&gt; buildLists(
+      @NotNull MultiValueMap&lt;String, Part&gt; multiPartData,
+      String... requestParameters);
+
+  /**
+   * Build map mono.
+   *
+   * @param parts the parts
+   * @return the mono
+   */
+  @SuppressWarnings(&quot;unchecked&quot;)
+  Mono&lt;Map&lt;String, MultipartFile&gt;&gt; buildMap(@NotNull Flux&lt;? extends Part&gt;... parts);
+
+  /**
+   * Build map of multipart files from the given multi part data.
+   *
+   * @param multiPartData the multi part data
+   * @param requestParameters the request parameters
+   * @return the map of multipart files
+   */
+  Mono&lt;Map&lt;String, MultipartFile&gt;&gt; buildMap(
+      @NotNull MultiValueMap&lt;String, Part&gt; multiPartData,
+      String... requestParameters);
+
+  /**
+   * Build multi value map mono.
+   *
+   * @param parts the parts
+   * @return the mono
+   */
+  @SuppressWarnings(&quot;unchecked&quot;)
+  Mono&lt;MultiValueMap&lt;String, MultipartFile&gt;&gt; buildMultiValueMap(
+      @NotNull Flux&lt;? extends Part&gt;... parts);
+
+  /**
+   * Build multi value map of multipart files from the given multi part data.
+   *
+   * @param multiPartData the multi part data
+   * @param requestParameters the request parameters
+   * @return the multi value map of multipart files
+   */
+  Mono&lt;MultiValueMap&lt;String, MultipartFile&gt;&gt; buildMultiValueMap(
+      @NotNull MultiValueMap&lt;String, Part&gt; multiPartData,
+      String... requestParameters);
+
+  /**
+   * Get multipart file with the specified index. If the list is smaller than the index, an empty
+   * multipart file will be returned.
+   *
+   * @param list the list
+   * @param index the index
+   * @return the multipart file
+   */
+  @NotNull
+  static MultipartFile getMultipartFile(List&lt;MultipartFile&gt; list, int index) {
+<span class="pc bpc" id="L138" title="2 of 6 branches missed.">    MultipartFile multipartFile = list != null &amp;&amp; index &gt;= 0 &amp;&amp; list.size() &gt; index</span>
+<span class="fc" id="L139">        ? list.get(index)</span>
+<span class="fc" id="L140">        : FileAwareMultipartFile.empty();</span>
+<span class="pc bpc" id="L141" title="1 of 2 branches missed.">    return multipartFile != null ? multipartFile : FileAwareMultipartFile.empty();</span>
+  }
+
+  /**
+   * Get multipart file with the specified request parameter name. If no such multipart file
+   * exists, an empty one will be returned.
+   *
+   * @param map the map
+   * @param name the request parameter name
+   * @return the multipart file
+   */
+  @NotNull
+  static MultipartFile getMultipartFile(Map&lt;String, MultipartFile&gt; map, String name) {
+<span class="pc bpc" id="L154" title="2 of 4 branches missed.">    MultipartFile multipartFile = map != null &amp;&amp; name != null</span>
+<span class="fc" id="L155">        ? map.getOrDefault(name, FileAwareMultipartFile.empty())</span>
+<span class="pc" id="L156">        : FileAwareMultipartFile.empty();</span>
+<span class="pc bpc" id="L157" title="1 of 2 branches missed.">    return multipartFile != null ? multipartFile : FileAwareMultipartFile.empty();</span>
+  }
+
+  /**
+   * Get multipart files with the specified request parameter. If no such list of multipart files
+   * exists, an empty list will be returned.
+   *
+   * @param map the map
+   * @param name the name
+   * @return the multipart files
+   */
+  @NotNull
+  static List&lt;MultipartFile&gt; getMultipartFiles(
+      MultiValueMap&lt;String, MultipartFile&gt; map,
+      String name) {
+
+<span class="pc bpc" id="L173" title="2 of 4 branches missed.">    List&lt;MultipartFile&gt; list = map != null &amp;&amp; name != null</span>
+<span class="fc" id="L174">        ? map.getOrDefault(name, Collections.emptyList())</span>
+<span class="pc" id="L175">        : Collections.emptyList();</span>
+<span class="pc bpc" id="L176" title="1 of 2 branches missed.">    return list != null ? list : Collections.emptyList();</span>
+  }
+
+  /**
+   * Get first multipart file. If no such multipart file exists, an empty one will be returned.
+   *
+   * @param map the map
+   * @param name the name
+   * @return the first multipart file
+   */
+  @NotNull
+  static MultipartFile getFirstMultipartFile(
+      MultiValueMap&lt;String, MultipartFile&gt; map,
+      String name) {
+
+<span class="pc bpc" id="L191" title="2 of 4 branches missed.">    MultipartFile multipartFile = map != null &amp;&amp; name != null</span>
+<span class="fc" id="L192">        ? map.getFirst(name)</span>
+<span class="pc" id="L193">        : FileAwareMultipartFile.empty();</span>
+<span class="fc bfc" id="L194" title="All 2 branches covered.">    return multipartFile != null ? multipartFile : FileAwareMultipartFile.empty();</span>
+  }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

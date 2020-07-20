@@ -25,7 +25,7 @@ under the License.
     <language>en-us</language>
     <copyright>&#169;2020 bremersee.org</copyright>
     <item>
-      <title>File: 115,
+      <title>File: 122,
              Errors: 0,
              Warnings: 7,
              Infos: 0
@@ -396,6 +396,20 @@ under the License.
               </tr>
                           <tr>
                 <td>
+                  <a href="https://github.com/bremersee/common-base/common-base-autoconfigure/checkstyle.html#org.bremersee.web.UploadPropertiesTest.java">org/bremersee/web/UploadPropertiesTest.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
                   <a href="https://github.com/bremersee/common-base/common-base-autoconfigure/checkstyle.html#org.bremersee.thymeleaf.AdditionalThymeleafAutoConfiguration.java">org/bremersee/thymeleaf/AdditionalThymeleafAutoConfiguration.java</a>
                 </td>
                 <td>
@@ -466,6 +480,20 @@ under the License.
               </tr>
                           <tr>
                 <td>
+                  <a href="https://github.com/bremersee/common-base/common-base-autoconfigure/checkstyle.html#org.bremersee.data.minio.MinioAutoConfiguration.java">org/bremersee/data/minio/MinioAutoConfiguration.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
                   <a href="https://github.com/bremersee/common-base/common-base-autoconfigure/checkstyle.html#org.bremersee.data.ldaptive.UnboundIdProviderAutoConfiguration.java">org/bremersee/data/ldaptive/UnboundIdProviderAutoConfiguration.java</a>
                 </td>
                 <td>
@@ -495,6 +523,20 @@ under the License.
                           <tr>
                 <td>
                   <a href="https://github.com/bremersee/common-base/common-base-autoconfigure/checkstyle.html#org.bremersee.thymeleaf.AdditionalThymeleafPropertiesTest.java">org/bremersee/thymeleaf/AdditionalThymeleafPropertiesTest.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/bremersee/common-base/common-base-autoconfigure/checkstyle.html#org.bremersee.data.minio.MinioAutoConfigurationTest.java">org/bremersee/data/minio/MinioAutoConfigurationTest.java</a>
                 </td>
                 <td>
                   0
@@ -858,6 +900,34 @@ under the License.
               </tr>
                           <tr>
                 <td>
+                  <a href="https://github.com/bremersee/common-base/common-base-autoconfigure/checkstyle.html#org.bremersee.data.minio.app.TestConfiguration.java">org/bremersee/data/minio/app/TestConfiguration.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/bremersee/common-base/common-base-autoconfigure/checkstyle.html#org.bremersee.web.reactive.MultipartFileBuilderAutoConfiguration.java">org/bremersee/web/reactive/MultipartFileBuilderAutoConfiguration.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
                   <a href="https://github.com/bremersee/common-base/common-base-autoconfigure/checkstyle.html#org.bremersee.converter.ModelMapperAutoConfiguration.java">org/bremersee/converter/ModelMapperAutoConfiguration.java</a>
                 </td>
                 <td>
@@ -901,6 +971,20 @@ under the License.
                           <tr>
                 <td>
                   <a href="https://github.com/bremersee/common-base/common-base-autoconfigure/checkstyle.html#org.bremersee.security.authentication.resourceserver.reactive.ReactiveJwtWithRedisTest.java">org/bremersee/security/authentication/resourceserver/reactive/ReactiveJwtWithRedisTest.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/bremersee/common-base/common-base-autoconfigure/checkstyle.html#org.bremersee.web.UploadProperties.java">org/bremersee/web/UploadProperties.java</a>
                 </td>
                 <td>
                   0
@@ -1335,6 +1419,20 @@ under the License.
                           <tr>
                 <td>
                   <a href="https://github.com/bremersee/common-base/common-base-autoconfigure/checkstyle.html#org.bremersee.security.authentication.resourceserver.servlet.InMemoryTest.java">org/bremersee/security/authentication/resourceserver/servlet/InMemoryTest.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/bremersee/common-base/common-base-autoconfigure/checkstyle.html#org.bremersee.data.minio.MinioProperties.java">org/bremersee/data/minio/MinioProperties.java</a>
                 </td>
                 <td>
                   0

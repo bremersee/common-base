@@ -92,7 +92,7 @@
 <a class="jxr_linenumber" name="L84" href="#L84">84</a>    @SuppressWarnings(<span class="jxr_string">"MethodDoesntCallSuperMethod"</span>)
 <a class="jxr_linenumber" name="L85" href="#L85">85</a>    @Override
 <a class="jxr_linenumber" name="L86" href="#L86">86</a>    <strong class="jxr_keyword">public</strong> <a name="LdaptiveTemplate" href="../../../../org/bremersee/data/ldaptive/LdaptiveTemplate.html#LdaptiveTemplate">LdaptiveTemplate</a> clone() {
-<a class="jxr_linenumber" name="L87" href="#L87">87</a>      <strong class="jxr_keyword">return</strong> clone(errorHandler);
+<a class="jxr_linenumber" name="L87" href="#L87">87</a>      <strong class="jxr_keyword">return</strong> clone(<strong class="jxr_keyword">null</strong>);
 <a class="jxr_linenumber" name="L88" href="#L88">88</a>    }
 <a class="jxr_linenumber" name="L89" href="#L89">89</a>  
 <a class="jxr_linenumber" name="L90" href="#L90">90</a>    <em class="jxr_javadoccomment">/**</em>
@@ -104,7 +104,7 @@
 <a class="jxr_linenumber" name="L96" href="#L96">96</a>  <em class="jxr_javadoccomment">   */</em>
 <a class="jxr_linenumber" name="L97" href="#L97">97</a>    <strong class="jxr_keyword">public</strong> <a name="LdaptiveTemplate" href="../../../../org/bremersee/data/ldaptive/LdaptiveTemplate.html#LdaptiveTemplate">LdaptiveTemplate</a> clone(<strong class="jxr_keyword">final</strong> ErrorHandler errorHandler) {
 <a class="jxr_linenumber" name="L98" href="#L98">98</a>      <strong class="jxr_keyword">final</strong> <a name="LdaptiveTemplate" href="../../../../org/bremersee/data/ldapt<a name="LdaptiveTemplate" href="../../../../org/bremersee/data/ldaptive/LdaptiveTemplate.html#LdaptiveTemplate">LdaptiveTemplate</a>late.html#LdaptiveTemplate">LdaptiveTemplate</a> template = <strong class="jxr_keyword">new</strong> <a name="LdaptiveTemplate" href="../../../../org/bremersee/data/ldaptive/LdaptiveTemplate.html#LdaptiveTemplate">LdaptiveTemplate</a>(connectionFactory);
-<a class="jxr_linenumber" name="L99" href="#L99">99</a>      template.setErrorHandler(errorHandler != <strong class="jxr_keyword">null</strong> ? errorHandler : <strong class="jxr_keyword">this</strong>.errorHandler);
+<a class="jxr_linenumber" name="L99" href="#L99">99</a>      template.setErrorHandler(errorHandler);
 <a class="jxr_linenumber" name="L100" href="#L100">100</a>     <strong class="jxr_keyword">return</strong> template;
 <a class="jxr_linenumber" name="L101" href="#L101">101</a>   }
 <a class="jxr_linenumber" name="L102" href="#L102">102</a> 

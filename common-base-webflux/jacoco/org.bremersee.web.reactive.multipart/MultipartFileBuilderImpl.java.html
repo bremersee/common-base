@@ -1,0 +1,241 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>MultipartFileBuilderImpl.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">common-base-webflux</a> &gt; <a href="index.source.html" class="el_package">org.bremersee.web.reactive.multipart</a> &gt; <span class="el_source">MultipartFileBuilderImpl.java</span></div><h1>MultipartFileBuilderImpl.java</h1><pre class="source lang-java linenums">/*
+ * Copyright 2020 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package org.bremersee.web.reactive.multipart;
+
+import eu.maxschuster.dataurl.DataUrl;
+import eu.maxschuster.dataurl.DataUrlSerializer;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import lombok.extern.slf4j.Slf4j;
+import org.bremersee.exception.ServiceException;
+import org.bremersee.web.multipart.FileAwareMultipartFile;
+import org.springframework.http.MediaType;
+import org.springframework.http.codec.multipart.FilePart;
+import org.springframework.http.codec.multipart.FormFieldPart;
+import org.springframework.http.codec.multipart.Part;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MimeType;
+import org.springframework.util.MultiValueMap;
+import org.springframework.util.StringUtils;
+import org.springframework.web.multipart.MultipartFile;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+import reactor.util.function.Tuple2;
+
+/**
+ * The multipart file builder implementation.
+ *
+ * @author Christian Bremer
+ */
+<span class="fc" id="L51">@Slf4j</span>
+public class MultipartFileBuilderImpl implements MultipartFileBuilder {
+
+  private final File tmpDir;
+
+  /**
+   * Instantiates a new multipart file builder.
+   */
+  public MultipartFileBuilderImpl() {
+<span class="fc" id="L60">    this((File) null);</span>
+<span class="fc" id="L61">  }</span>
+
+  /**
+   * Instantiates a new multipart file builder.
+   *
+   * @param tmpDir the tmp dir
+   */
+  public MultipartFileBuilderImpl(String tmpDir) {
+<span class="pc bpc" id="L69" title="1 of 2 branches missed.">    this(StringUtils.hasText(tmpDir) ? new File(tmpDir) : null);</span>
+<span class="fc" id="L70">  }</span>
+
+  /**
+   * Instantiates a new multipart file builder.
+   *
+   * @param tmpDir the tmp dir
+   */
+<span class="fc" id="L77">  public MultipartFileBuilderImpl(File tmpDir) {</span>
+<span class="pc bpc" id="L78" title="1 of 4 branches missed.">    this.tmpDir = tmpDir != null &amp;&amp; tmpDir.isDirectory()</span>
+<span class="fc" id="L79">        ? tmpDir</span>
+<span class="fc" id="L80">        : new File(System.getProperty(&quot;java.io.tmpdir&quot;));</span>
+<span class="fc" id="L81">  }</span>
+
+  private Mono&lt;MultipartFile&gt; build(FilePart filePart) {
+<span class="pc bpc" id="L84" title="1 of 2 branches missed.">    if (filePart == null) {</span>
+<span class="nc" id="L85">      return Mono.just(FileAwareMultipartFile.empty());</span>
+    }
+<span class="fc" id="L87">    File file = newTmpFile();</span>
+<span class="fc" id="L88">    return filePart.transferTo(file)</span>
+<span class="fc" id="L89">        .then(Mono.just(new FileAwareMultipartFile(</span>
+            file,
+<span class="fc" id="L91">            filePart.name(),</span>
+<span class="fc" id="L92">            filePart.filename(),</span>
+<span class="fc" id="L93">            Optional.of(filePart)</span>
+<span class="fc" id="L94">                .map(part -&gt; part.headers().getContentType())</span>
+<span class="fc" id="L95">                .map(MimeType::toString)</span>
+<span class="fc" id="L96">                .orElse(MediaType.APPLICATION_OCTET_STREAM_VALUE))));</span>
+  }
+
+  private Mono&lt;MultipartFile&gt; build(FormFieldPart formFieldPart) {
+<span class="pc bpc" id="L100" title="2 of 4 branches missed.">    if (formFieldPart == null || !StringUtils.hasText(formFieldPart.value())) {</span>
+<span class="nc" id="L101">      return Mono.just(FileAwareMultipartFile.empty());</span>
+    }
+<span class="fc" id="L103">    return Mono.just(formFieldPart)</span>
+<span class="fc" id="L104">        .map(part -&gt; {</span>
+<span class="fc" id="L105">          String value = part.value();</span>
+<span class="fc" id="L106">          byte[] data = null;</span>
+<span class="fc" id="L107">          String contentType = null;</span>
+<span class="pc bpc" id="L108" title="2 of 4 branches missed.">          if (value.toLowerCase().startsWith(&quot;data:&quot;) &amp;&amp; value.indexOf(',') &gt; -1) {</span>
+<span class="fc" id="L109">            DataUrl dataUrl = null;</span>
+            try {
+<span class="fc" id="L111">              dataUrl = new DataUrlSerializer().unserialize(value);</span>
+<span class="nc" id="L112">            } catch (Exception e) {</span>
+<span class="nc" id="L113">              log.debug(&quot;Parsing form field as data url failed, &quot;</span>
+                  + &quot;treating value as plain/text (value = {}).&quot;, value);
+<span class="fc" id="L115">            }</span>
+<span class="pc bpc" id="L116" title="1 of 2 branches missed.">            if (dataUrl != null) {</span>
+<span class="fc" id="L117">              data = dataUrl.getData();</span>
+<span class="fc" id="L118">              contentType = dataUrl.getMimeType();</span>
+            }
+          }
+<span class="pc bpc" id="L121" title="1 of 2 branches missed.">          if (data == null) {</span>
+<span class="nc" id="L122">            data = value.getBytes(StandardCharsets.UTF_8);</span>
+<span class="nc" id="L123">            contentType = MediaType.TEXT_PLAIN_VALUE;</span>
+          }
+          try {
+<span class="fc" id="L126">            return new FileAwareMultipartFile(</span>
+                new ByteArrayInputStream(data),
+                tmpDir,
+<span class="fc" id="L129">                part.name(),</span>
+                null,
+                contentType);
+
+<span class="nc" id="L133">          } catch (IOException e) {</span>
+<span class="nc" id="L134">            throw ServiceException.internalServerError(</span>
+                &quot;Creating multipart file from form field part failed.&quot;, e);
+          }
+        });
+  }
+
+  @Override
+  public Mono&lt;MultipartFile&gt; build(Part part) {
+<span class="fc bfc" id="L142" title="All 2 branches covered.">    if (part instanceof FilePart) {</span>
+<span class="fc" id="L143">      return build((FilePart) part);</span>
+    }
+<span class="fc bfc" id="L145" title="All 2 branches covered.">    if (part instanceof FormFieldPart) {</span>
+<span class="fc" id="L146">      return build((FormFieldPart) part);</span>
+    }
+<span class="fc" id="L148">    return Mono.just(FileAwareMultipartFile.empty());</span>
+  }
+
+  @Override
+  public Mono&lt;MultipartFile&gt; build(Flux&lt;? extends Part&gt; parts) {
+<span class="fc" id="L153">    return parts</span>
+<span class="fc" id="L154">        .last()</span>
+<span class="fc" id="L155">        .flatMap(this::build);</span>
+  }
+
+  @Override
+  public Mono&lt;List&lt;MultipartFile&gt;&gt; buildList(Flux&lt;? extends Part&gt; parts) {
+<span class="fc" id="L160">    return parts.flatMap(this::build)</span>
+<span class="fc" id="L161">        .collectList();</span>
+  }
+
+  @Override
+  public Mono&lt;List&lt;MultipartFile&gt;&gt; buildList(
+      MultiValueMap&lt;String, Part&gt; multiPartData, String... requestParameters) {
+
+<span class="pc" id="L168">    return Flux.fromArray(Optional.ofNullable(requestParameters).orElseGet(() -&gt; new String[0]))</span>
+<span class="fc" id="L169">        .flatMap(requestParameter -&gt; build(multiPartData.getFirst(requestParameter)))</span>
+<span class="fc" id="L170">        .collectList();</span>
+  }
+
+  @Override
+  public Flux&lt;List&lt;MultipartFile&gt;&gt; buildLists(
+      MultiValueMap&lt;String, Part&gt; multiPartData, String... requestParameters) {
+
+<span class="pc" id="L177">    return Flux.fromArray(Optional.ofNullable(requestParameters).orElseGet(() -&gt; new String[0]))</span>
+<span class="fc" id="L178">        .flatMap(reqParam -&gt; createList(multiPartData, reqParam));</span>
+  }
+
+  @SuppressWarnings(&quot;unchecked&quot;)
+  @Override
+  public Mono&lt;Map&lt;String, MultipartFile&gt;&gt; buildMap(Flux&lt;? extends Part&gt;... parts) {
+<span class="fc" id="L184">    return Flux.fromArray(parts)</span>
+<span class="fc" id="L185">        .flatMap(this::build)</span>
+<span class="fc" id="L186">        .collectMap(MultipartFile::getName, multipartFile -&gt; multipartFile, LinkedHashMap::new);</span>
+  }
+
+  @Override
+  public Mono&lt;Map&lt;String, MultipartFile&gt;&gt; buildMap(
+      MultiValueMap&lt;String, Part&gt; multiPartData, String... requestParameters) {
+
+<span class="pc" id="L193">    return Flux.fromArray(Optional.ofNullable(requestParameters).orElseGet(() -&gt; new String[0]))</span>
+<span class="fc" id="L194">        .flatMap(reqParam -&gt; build(multiPartData.getFirst(reqParam))</span>
+<span class="fc" id="L195">            .zipWith(Mono.just(reqParam)))</span>
+<span class="fc" id="L196">        .collectMap(Tuple2::getT2, Tuple2::getT1, LinkedHashMap::new);</span>
+  }
+
+  @SuppressWarnings(&quot;unchecked&quot;)
+  @Override
+  public Mono&lt;MultiValueMap&lt;String, MultipartFile&gt;&gt; buildMultiValueMap(
+      Flux&lt;? extends Part&gt;... parts) {
+<span class="fc" id="L203">    return Flux.fromArray(parts)</span>
+<span class="fc" id="L204">        .flatMap(this::buildList)</span>
+<span class="pc bpc" id="L205" title="1 of 2 branches missed.">        .filter(list -&gt; !list.isEmpty())</span>
+<span class="fc" id="L206">        .collectMap(list -&gt; list.get(0).getName(), list -&gt; list, LinkedHashMap::new)</span>
+<span class="fc" id="L207">        .map(LinkedMultiValueMap::new);</span>
+  }
+
+  @Override
+  public Mono&lt;MultiValueMap&lt;String, MultipartFile&gt;&gt; buildMultiValueMap(
+      MultiValueMap&lt;String, Part&gt; multiPartData, String... requestParameters) {
+
+<span class="pc" id="L214">    return Flux.fromArray(Optional.ofNullable(requestParameters).orElseGet(() -&gt; new String[0]))</span>
+<span class="fc" id="L215">        .flatMap(reqParam -&gt; createList(multiPartData, reqParam)</span>
+<span class="fc" id="L216">            .zipWith(Mono.just(reqParam)))</span>
+<span class="fc" id="L217">        .collectMap(Tuple2::getT2, Tuple2::getT1, LinkedHashMap::new)</span>
+<span class="fc" id="L218">        .map(LinkedMultiValueMap::new);</span>
+  }
+
+  private File newTmpFile() {
+    try {
+<span class="fc" id="L223">      return File.createTempFile(&quot;uploaded-&quot;, &quot;.tmp&quot;, tmpDir);</span>
+<span class="nc" id="L224">    } catch (Exception e) {</span>
+<span class="nc" id="L225">      throw ServiceException.internalServerError(&quot;Creating tmp file failed.&quot;, e);</span>
+    }
+  }
+
+  private Mono&lt;List&lt;MultipartFile&gt;&gt; createList(
+      MultiValueMap&lt;String, Part&gt; multiPartData,
+      String requestParameter) {
+
+<span class="fc" id="L233">    List&lt;Part&gt; contentParts = multiPartData</span>
+<span class="fc" id="L234">        .getOrDefault(requestParameter, Collections.emptyList());</span>
+<span class="pc bpc" id="L235" title="1 of 2 branches missed.">    return contentParts.isEmpty()</span>
+<span class="nc" id="L236">        ? Mono.empty()</span>
+<span class="fc" id="L237">        : Flux.fromIterable(contentParts).flatMap(this::build).collectList();</span>
+  }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>
