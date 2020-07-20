@@ -20,12 +20,18 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
+import java.util.TimeZone;
+import javax.validation.constraints.NotNull;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+import org.bremersee.common.model.JavaLocale;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.util.StringUtils;
+import org.springframework.validation.annotation.Validated;
 
 /**
  * The message source properties.
@@ -37,6 +43,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @Setter
 @ToString
 @EqualsAndHashCode
+@Validated
 public class MessageSourceProperties {
 
   /**
@@ -125,7 +132,12 @@ public class MessageSourceProperties {
    * a locally specified default Locale here, or enforce no fallback locale at all through
    * disabling.
    */
-  private String defaultLocale;
+  private String defaultLocale = "de-DE";
+
+  /**
+   * Specify a default time zone to fall back to.
+   */
+  private String defaultTimeZone = "Europe/Berlin";
 
   /**
    * Specifies whether the resource bundles are reloadable or not.
@@ -150,4 +162,27 @@ public class MessageSourceProperties {
    */
   private Map<String, String> fileEncodings = new HashMap<>(); // ReloadableResourceBundleMessageS.
 
+  /**
+   * Default locale.
+   *
+   * @return the locale
+   */
+  @NotNull
+  public Locale defaultLocale() {
+    return StringUtils.hasText(getDefaultLocale())
+        ? JavaLocale.fromValue(getDefaultLocale()).toLocale(Locale.getDefault())
+        : Locale.getDefault();
+  }
+
+  /**
+   * Default time zone.
+   *
+   * @return the time zone
+   */
+  @NotNull
+  public TimeZone defaultTimeZone() {
+    return StringUtils.hasText(getDefaultTimeZone())
+        ? TimeZone.getTimeZone(getDefaultTimeZone())
+        : TimeZone.getDefault();
+  }
 }

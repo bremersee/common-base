@@ -34,6 +34,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.context.event.EventListener;
 import org.springframework.data.redis.connection.ReactiveRedisConnectionFactory;
+import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 
 /**
@@ -167,7 +168,9 @@ public class ReactiveAccessTokenCacheAutoConfiguration {
         ObjectProvider<ReactiveRedisConnectionFactory> connectionFactoryProvider) {
 
       ReactiveRedisConnectionFactory connectionFactory = connectionFactoryProvider.getIfAvailable();
-      log.info("Creating {} ...", ReactiveRedisAccessTokenCache.class.getName());
+      Assert.notNull(connectionFactory, "Redis connection factory must not be null.");
+      log.info("Creating {} with {} ...", RedisAccessTokenCache.class.getSimpleName(),
+          ClassUtils.getUserClass(connectionFactory).getSimpleName());
       return new ReactiveRedisAccessTokenCache(authProperties.getJwtCache(), connectionFactory);
     }
 

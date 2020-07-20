@@ -17,6 +17,7 @@
 package org.bremersee.security.authentication;
 
 import lombok.extern.slf4j.Slf4j;
+import org.bremersee.context.MessageSourceProperties;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
@@ -49,7 +50,7 @@ import org.springframework.util.ClassUtils;
 })
 @Configuration
 @AutoConfigureAfter(OAuth2ResourceServerAutoConfiguration.class)
-@EnableConfigurationProperties(AuthProperties.class)
+@EnableConfigurationProperties({AuthProperties.class, MessageSourceProperties.class})
 @Slf4j
 public class JwtSupportAutoConfiguration {
 
@@ -86,6 +87,23 @@ public class JwtSupportAutoConfiguration {
         properties.getRolesValueSeparator(),
         properties.getRolePrefix(),
         properties.getNameJsonPath());
+  }
+
+  /**
+   * Creates authentication details bean.
+   *
+   * @param messageSourceProperties the message source properties
+   * @return the authentication details
+   */
+  @ConditionalOnMissingBean
+  @Bean
+  public AuthenticationDetails authenticationDetails(
+      MessageSourceProperties messageSourceProperties) {
+    return new JsonPathJwtAuthenticationDetails(
+        messageSourceProperties.defaultLocale(),
+        messageSourceProperties.defaultTimeZone(),
+        properties.getPreferredLanguageJsonPath(),
+        properties.getPreferredTimeZoneJsonPath());
   }
 
   /**

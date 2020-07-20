@@ -7,7 +7,7 @@
   <parent>
     <artifactId>common-base-parent</artifactId>
     <groupId>org.bremersee</groupId>
-    <version>2.1.4</version>
+    <version>2.2.0</version>
   </parent>
 
   <artifactId>common-base-starter</artifactId>
@@ -19,6 +19,10 @@
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-validation</artifactId>
     </dependency>
     <dependency>
       <groupId>org.bremersee</groupId>

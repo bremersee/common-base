@@ -19,6 +19,7 @@ package org.bremersee.converter;
 import lombok.ToString;
 import org.bremersee.common.model.JavaLocale;
 import org.springframework.core.convert.converter.Converter;
+import org.springframework.lang.NonNull;
 
 /**
  * The string to java locale converter.
@@ -29,7 +30,7 @@ import org.springframework.core.convert.converter.Converter;
 public class StringToJavaLocaleConverter implements Converter<String, JavaLocale> {
 
   @Override
-  public JavaLocale convert(String source) {
+  public JavaLocale convert(@NonNull String source) {
     return JavaLocale.fromValue(source);
   }
 }

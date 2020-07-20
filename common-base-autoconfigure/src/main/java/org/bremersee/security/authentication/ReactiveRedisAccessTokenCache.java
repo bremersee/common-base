@@ -24,8 +24,7 @@ import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.bremersee.security.authentication.AuthProperties.JwtCache;
 import org.springframework.data.redis.connection.ReactiveRedisConnectionFactory;
-import org.springframework.data.redis.core.ReactiveRedisTemplate;
-import org.springframework.data.redis.serializer.RedisSerializationContext;
+import org.springframework.data.redis.core.ReactiveStringRedisTemplate;
 import org.springframework.util.Assert;
 import reactor.core.publisher.Mono;
 
@@ -39,7 +38,7 @@ public class ReactiveRedisAccessTokenCache implements ReactiveAccessTokenCache {
 
   private final JwtCache jwtCacheProperties;
 
-  private final ReactiveRedisTemplate<String, String> redis;
+  private final ReactiveStringRedisTemplate redis;
 
   @Setter
   @NotNull
@@ -58,9 +57,7 @@ public class ReactiveRedisAccessTokenCache implements ReactiveAccessTokenCache {
     Assert.notNull(jwtCacheProperties, "Jwt cache properties must be present.");
     Assert.notNull(connectionFactory, "Redis connection factory must be present.");
     this.jwtCacheProperties = jwtCacheProperties;
-    this.redis = new ReactiveRedisTemplate<>(
-        connectionFactory,
-        RedisSerializationContext.string());
+    this.redis = new ReactiveStringRedisTemplate(connectionFactory);
   }
 
   @Override

@@ -25,6 +25,7 @@ import java.util.stream.Collectors;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import org.springframework.core.convert.converter.Converter;
+import org.springframework.lang.NonNull;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.jwt.Jwt;
@@ -104,7 +105,7 @@ public class JsonPathJwtConverter implements Converter<Jwt, JwtAuthenticationTok
   }
 
   @Override
-  public JwtAuthenticationToken convert(final Jwt source) {
+  public JwtAuthenticationToken convert(@NonNull final Jwt source) {
     final JsonPathJwtParser parser = new JsonPathJwtParser(source);
     final List<String> roleValues;
     if (rolesValueList) {

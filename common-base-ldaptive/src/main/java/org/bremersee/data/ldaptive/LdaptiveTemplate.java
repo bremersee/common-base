@@ -84,7 +84,7 @@ public class LdaptiveTemplate implements LdaptiveOperations, Cloneable {
   @SuppressWarnings("MethodDoesntCallSuperMethod")
   @Override
   public LdaptiveTemplate clone() {
-    return clone(errorHandler);
+    return clone(null);
   }
 
   /**
@@ -96,7 +96,7 @@ public class LdaptiveTemplate implements LdaptiveOperations, Cloneable {
    */
   public LdaptiveTemplate clone(final ErrorHandler errorHandler) {
     final LdaptiveTemplate template = new LdaptiveTemplate(connectionFactory);
-    template.setErrorHandler(errorHandler != null ? errorHandler : this.errorHandler);
+    template.setErrorHandler(errorHandler);
     return template;
   }
 

@@ -35,6 +35,7 @@ import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.event.EventListener;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 
 /**
@@ -161,17 +162,18 @@ public class AccessTokenCacheAutoConfiguration {
     /**
      * Creates an access token cache that uses Redis.
      *
-     * @param connectionFactory the connection factory
+     * @param connectionFactoryProvider the connection factory provider
      * @return the access token cache
      */
     @Bean
     public AccessTokenCache redisAccessTokenCache(
-        ObjectProvider<RedisConnectionFactory> connectionFactory) {
+        ObjectProvider<RedisConnectionFactory> connectionFactoryProvider) {
 
-      log.info("Creating {} ...", RedisAccessTokenCache.class.getName());
-      return new RedisAccessTokenCache(
-          authProperties.getJwtCache(),
-          connectionFactory.getIfAvailable());
+      RedisConnectionFactory connectionFactory = connectionFactoryProvider.getIfAvailable();
+      Assert.notNull(connectionFactory, "Redis connection factory must not be null.");
+      log.info("Creating {} with {} ...", RedisAccessTokenCache.class.getSimpleName(),
+          ClassUtils.getUserClass(connectionFactory).getSimpleName());
+      return new RedisAccessTokenCache(authProperties.getJwtCache(), connectionFactory);
     }
   }
 
