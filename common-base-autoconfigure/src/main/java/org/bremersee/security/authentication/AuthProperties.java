@@ -24,7 +24,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -37,6 +36,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import org.bremersee.security.FrameOptionsMode;
 import org.bremersee.security.core.AuthorityConstants;
 import org.bremersee.web.CorsProperties;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -67,6 +67,12 @@ public class AuthProperties {
    */
   @NotNull
   private AutoSecurityMode resourceServer = AutoSecurityMode.OTHER;
+
+  /**
+   * Specifies the {@code X-Frame-Options} value.
+   */
+  @NotNull
+  private FrameOptionsMode frameOptionsMode = FrameOptionsMode.DENY;
 
   /**
    * The order of the resource server security auto configuration.

@@ -128,8 +128,7 @@ public abstract class AbstractResourceServerAutoConfiguration extends WebSecurit
   protected void configure(HttpSecurity httpSecurity) throws Exception {
 
     HttpSecurity http = httpSecurity;
-    ExpressionUrlAuthorizationConfigurer<HttpSecurity>.ExpressionInterceptUrlRegistry reg = init(
-        http);
+    ExpressionUrlAuthorizationConfigurer<HttpSecurity>.ExpressionInterceptUrlRegistry reg = init(http);
     if (authProperties.getResourceServer() == AutoSecurityMode.NONE) {
       http = reg
           .anyRequest().permitAll()
@@ -139,7 +138,22 @@ public abstract class AbstractResourceServerAutoConfiguration extends WebSecurit
       reg = configurePathMatchers(reg);
       http = configureAuthenticationProvider(reg.and());
     }
-    http = http.csrf().disable();
+    http = http
+        .headers().frameOptions(customizer -> {
+          switch (authProperties.getFrameOptionsMode()) {
+            case DISABLE: {
+              customizer.disable();
+              break;
+            }
+            case SAMEORIGIN: {
+              customizer.sameOrigin();
+            }
+            default:
+              customizer.deny();
+          }
+        })
+        .and()
+        .csrf().disable();
     if (!corsProperties.isEnable()) {
       http.cors().disable();
     }
