@@ -19,6 +19,7 @@ package org.bremersee.security.authentication;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.bremersee.core.OrderedProxy;
+import org.bremersee.security.FrameOptionsMode;
 import org.bremersee.security.authentication.AuthProperties.PathMatcherProperties;
 import org.bremersee.web.CorsProperties;
 import org.springframework.beans.factory.ObjectProvider;
@@ -31,6 +32,7 @@ import org.springframework.security.core.userdetails.MapReactiveUserDetailsServi
 import org.springframework.security.core.userdetails.ReactiveUserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.server.SecurityWebFilterChain;
+import org.springframework.security.web.server.header.XFrameOptionsServerHttpHeadersWriter.Mode;
 import org.springframework.security.web.server.util.matcher.ServerWebExchangeMatcher;
 import org.springframework.security.web.server.util.matcher.ServerWebExchangeMatchers;
 import org.springframework.util.Assert;
@@ -122,6 +124,7 @@ public abstract class AbstractReactiveResourceServerAutoConfiguration {
       ServerHttpSecurity serverHttpSecurity) {
 
     ServerHttpSecurity http = serverHttpSecurity;
+    http.headers().frameOptions(conf -> conf.mode(Mode.SAMEORIGIN));
     Assert.notNull(http, "Server http security must be present.");
     AuthorizeExchangeSpec spec = init(http);
     if (authProperties.getResourceServer() == AutoSecurityMode.NONE) {
@@ -133,7 +136,16 @@ public abstract class AbstractReactiveResourceServerAutoConfiguration {
       spec = configurePathMatchers(spec);
       http = configureAuthenticationManager(spec.and());
     }
-    http = http.csrf().disable();
+    http = http
+        .headers().frameOptions(customizer -> {
+          if (authProperties.getFrameOptionsMode() == FrameOptionsMode.DISABLE) {
+            customizer.disable();
+          } else {
+            customizer.mode(authProperties.getFrameOptionsMode().getMode());
+          }
+        })
+        .and()
+        .csrf().disable();
     if (!corsProperties.isEnable()) {
       http = http.cors().disable();
     }

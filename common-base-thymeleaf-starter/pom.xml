@@ -7,7 +7,7 @@
   <parent>
     <artifactId>common-base-parent</artifactId>
     <groupId>org.bremersee</groupId>
-    <version>2.2.0</version>
+    <version>2.2.1</version>
   </parent>
 
   <artifactId>common-base-thymeleaf-starter</artifactId>

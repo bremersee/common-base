@@ -30,10 +30,13 @@ import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.bremersee.exception.ServiceException;
 import org.bremersee.web.multipart.FileAwareMultipartFile;
+import org.springframework.core.io.buffer.DataBuffer;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.http.codec.multipart.FormFieldPart;
 import org.springframework.http.codec.multipart.Part;
+import org.springframework.lang.NonNull;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MimeType;
 import org.springframework.util.MultiValueMap;
@@ -150,8 +153,9 @@ public class MultipartFileBuilderImpl implements MultipartFileBuilder {
 
   @Override
   public Mono<MultipartFile> build(Flux<? extends Part> parts) {
-    return parts
-        .last()
+    //noinspection unchecked
+    return ((Flux<Part>) parts)
+        .last(new EmptyPart())
         .flatMap(this::build);
   }
 
@@ -235,6 +239,30 @@ public class MultipartFileBuilderImpl implements MultipartFileBuilder {
     return contentParts.isEmpty()
         ? Mono.empty()
         : Flux.fromIterable(contentParts).flatMap(this::build).collectList();
+  }
+
+  private static class EmptyPart implements Part {
+
+    private EmptyPart() {
+    }
+
+    @NonNull
+    @Override
+    public String name() {
+      return "";
+    }
+
+    @NonNull
+    @Override
+    public HttpHeaders headers() {
+      return new HttpHeaders();
+    }
+
+    @NonNull
+    @Override
+    public Flux<DataBuffer> content() {
+      return Flux.empty();
+    }
   }
 
 }

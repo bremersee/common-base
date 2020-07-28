@@ -166,6 +166,10 @@ class MultipartFileBuilderImplTest {
           }
         })
         .verifyComplete();
+
+    StepVerifier.create(builder.build(Flux.empty()))
+        .assertNext(multipartFile -> assertTrue(multipartFile.isEmpty()))
+        .verifyComplete();
   }
 
   /**
