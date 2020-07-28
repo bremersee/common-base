@@ -5,6 +5,7 @@ org.bremersee.data.minio
 org.bremersee.data.redis
 org.bremersee.exception
 org.bremersee.http.converter
+org.bremersee.security
 org.bremersee.security.access
 org.bremersee.security.authentication
 org.bremersee.thymeleaf

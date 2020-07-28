@@ -12,7 +12,7 @@ common-base-autoconfigure,org.bremersee.security.authentication,AccessTokenCache
 common-base-autoconfigure,org.bremersee.security.authentication,ReactiveInMemoryUserDetailsAutoConfiguration,0,47,0,2,0,10,0,6,0,5
 common-base-autoconfigure,org.bremersee.security.authentication,ResourceServerAutoConfiguration,0,30,0,0,0,10,0,5,0,5
 common-base-autoconfigure,org.bremersee.security.authentication,AccessExpressionUtils,0,290,1,31,0,64,1,33,0,18
-common-base-autoconfigure,org.bremersee.security.authentication,AuthProperties,133,758,88,62,0,59,75,46,3,43
+common-base-autoconfigure,org.bremersee.security.authentication,AuthProperties,144,790,93,65,0,61,80,47,4,44
 common-base-autoconfigure,org.bremersee.security.authentication,ResourceServerAutoSecurityCondition,1,22,1,1,0,3,1,2,0,2
 common-base-autoconfigure,org.bremersee.security.authentication,JwtSupportAutoConfiguration,0,148,0,0,0,39,0,7,0,7
 common-base-autoconfigure,org.bremersee.security.authentication,ReactiveInMemoryUserDetailsAutoConfiguration.ReactiveUserDetailsServiceCondition.RSocketSecurityEnabledCondition,3,0,0,0,1,0,1,0,1,0
@@ -28,7 +28,7 @@ common-base-autoconfigure,org.bremersee.security.authentication,ReactiveJwtSuppo
 common-base-autoconfigure,org.bremersee.security.authentication,AuthProperties.PasswordFlow,17,152,10,20,0,9,10,20,0,15
 common-base-autoconfigure,org.bremersee.security.authentication,ReactiveAccessTokenCacheAutoConfiguration.WithRedis,0,40,0,0,0,12,0,3,0,3
 common-base-autoconfigure,org.bremersee.security.authentication,RedisCondition,0,4,0,0,0,2,0,1,0,1
-common-base-autoconfigure,org.bremersee.security.authentication,AbstractResourceServerAutoConfiguration,13,241,1,9,4,60,4,16,3,12
+common-base-autoconfigure,org.bremersee.security.authentication,AbstractResourceServerAutoConfiguration,20,258,3,10,7,66,6,17,3,13
 common-base-autoconfigure,org.bremersee.security.authentication,AuthProperties.JwtCache,41,140,20,14,2,11,20,9,3,9
 common-base-autoconfigure,org.bremersee.security.authentication,ReactiveInMemoryUserDetailsAutoConfiguration.ReactiveUserDetailsServiceCondition.ReactiveWebApplicationCondition,3,0,0,0,1,0,1,0,1,0
 common-base-autoconfigure,org.bremersee.security.authentication,AccessTokenCacheAutoConfiguration.Default,27,53,0,0,5,17,4,4,4,4
@@ -41,7 +41,7 @@ common-base-autoconfigure,org.bremersee.security.authentication,RedisAccessToken
 common-base-autoconfigure,org.bremersee.security.authentication,RedisCondition.LettuceConnectionFactoryCondition,3,0,0,0,1,0,1,0,1,0
 common-base-autoconfigure,org.bremersee.security.authentication,ReactiveAccessTokenCacheAutoConfiguration.Default,0,40,0,0,0,12,0,4,0,4
 common-base-autoconfigure,org.bremersee.security.authentication,AccessMode,0,48,0,0,0,8,0,3,0,3
-common-base-autoconfigure,org.bremersee.security.authentication,AbstractReactiveResourceServerAutoConfiguration,18,275,1,8,2,62,2,17,1,13
+common-base-autoconfigure,org.bremersee.security.authentication,AbstractReactiveResourceServerAutoConfiguration,22,303,2,9,3,69,3,19,1,15
 common-base-autoconfigure,org.bremersee.web.reactive,BaseCommonConvertersAutoConfiguration,0,18,0,0,0,7,0,4,0,4
 common-base-autoconfigure,org.bremersee.web.reactive,ApiExceptionHandler,8,214,6,10,0,51,6,11,0,9
 common-base-autoconfigure,org.bremersee.web.reactive,CorsAutoConfiguration,1,77,1,3,1,18,1,5,0,4
@@ -72,3 +72,4 @@ common-base-autoconfigure,org.bremersee.security.access,AccessControlProperties,
 common-base-autoconfigure,org.bremersee.web,CorsProperties,60,113,16,14,1,15,13,15,1,12
 common-base-autoconfigure,org.bremersee.web,UploadProperties,13,69,8,6,0,6,7,7,0,7
 common-base-autoconfigure,org.bremersee.web,CorsProperties.CorsConfiguration,148,243,36,28,3,30,28,24,2,18
+common-base-autoconfigure,org.bremersee.security,FrameOptionsMode,0,48,0,0,0,8,0,3,0,3

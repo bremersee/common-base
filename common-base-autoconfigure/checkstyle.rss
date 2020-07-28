@@ -25,9 +25,9 @@ under the License.
     <language>en-us</language>
     <copyright>&#169;2020 bremersee.org</copyright>
     <item>
-      <title>File: 122,
+      <title>File: 123,
              Errors: 0,
-             Warnings: 7,
+             Warnings: 9,
              Infos: 0
       </title>
             <link>https://github.com/bremersee/common-base/common-base-autoconfigure/checkstyle.html</link>
@@ -229,6 +229,20 @@ under the License.
                           <tr>
                 <td>
                   <a href="https://github.com/bremersee/common-base/common-base-autoconfigure/checkstyle.html#org.bremersee.security.access.AccessControlAutoConfigurationTest.java">org/bremersee/security/access/AccessControlAutoConfigurationTest.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/bremersee/common-base/common-base-autoconfigure/checkstyle.html#org.bremersee.security.FrameOptionsMode.java">org/bremersee/security/FrameOptionsMode.java</a>
                 </td>
                 <td>
                   0
@@ -1382,7 +1396,7 @@ under the License.
                   0
                 </td>
                 <td>
-                  3
+                  5
                 </td>
                 <td>
                   0
