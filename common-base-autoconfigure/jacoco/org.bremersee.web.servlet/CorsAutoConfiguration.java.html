@@ -25,6 +25,7 @@ import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.event.EventListener;
+import org.springframework.lang.NonNull;
 import org.springframework.util.ClassUtils;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
@@ -37,7 +38,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @ConditionalOnWebApplication(type = Type.SERVLET)
 @EnableConfigurationProperties(CorsProperties.class)
 @Configuration
-<span class="fc" id="L40">@Slf4j</span>
+<span class="fc" id="L41">@Slf4j</span>
 public class CorsAutoConfiguration implements WebMvcConfigurer {
 
   private final CorsProperties properties;
@@ -47,40 +48,40 @@ public class CorsAutoConfiguration implements WebMvcConfigurer {
    *
    * @param properties the cors properties
    */
-<span class="fc" id="L50">  public CorsAutoConfiguration(CorsProperties properties) {</span>
-<span class="fc" id="L51">    this.properties = properties;</span>
-<span class="fc" id="L52">  }</span>
+<span class="fc" id="L51">  public CorsAutoConfiguration(CorsProperties properties) {</span>
+<span class="fc" id="L52">    this.properties = properties;</span>
+<span class="fc" id="L53">  }</span>
 
   /**
    * Init.
    */
   @EventListener(ApplicationReadyEvent.class)
   public void init() {
-<span class="fc" id="L59">    log.info(&quot;\n&quot;</span>
+<span class="fc" id="L60">    log.info(&quot;\n&quot;</span>
             + &quot;*********************************************************************************\n&quot;
             + &quot;* {}\n&quot;
             + &quot;*********************************************************************************\n&quot;
             + &quot;* properties = {}\n&quot;
             + &quot;*********************************************************************************&quot;,
-<span class="fc" id="L65">        ClassUtils.getUserClass(getClass()).getSimpleName(), properties);</span>
-<span class="fc" id="L66">  }</span>
+<span class="fc" id="L66">        ClassUtils.getUserClass(getClass()).getSimpleName(), properties);</span>
+<span class="fc" id="L67">  }</span>
 
   @SuppressWarnings(&quot;DuplicatedCode&quot;)
   @Override
-  public void addCorsMappings(CorsRegistry corsRegistry) {
-<span class="pc bpc" id="L71" title="1 of 2 branches missed.">    if (!properties.isEnable()) {</span>
-<span class="nc" id="L72">      return;</span>
+  public void addCorsMappings(@NonNull CorsRegistry corsRegistry) {
+<span class="pc bpc" id="L72" title="1 of 2 branches missed.">    if (!properties.isEnable()) {</span>
+<span class="nc" id="L73">      return;</span>
     }
-<span class="fc bfc" id="L74" title="All 2 branches covered.">    for (CorsConfiguration config : properties.getConfigs()) {</span>
-<span class="fc" id="L75">      corsRegistry.addMapping(config.getPathPattern())</span>
-<span class="fc" id="L76">          .allowedOrigins(config.getAllowedOrigins().toArray(new String[0]))</span>
-<span class="fc" id="L77">          .allowedMethods(config.getAllowedMethods().toArray(new String[0]))</span>
-<span class="fc" id="L78">          .allowedHeaders(config.getAllowedHeaders().toArray(new String[0]))</span>
-<span class="fc" id="L79">          .exposedHeaders(config.getExposedHeaders().toArray(new String[0]))</span>
-<span class="fc" id="L80">          .maxAge(config.getMaxAge())</span>
-<span class="fc" id="L81">          .allowCredentials(config.isAllowCredentials());</span>
-<span class="fc" id="L82">    }</span>
-<span class="fc" id="L83">  }</span>
+<span class="fc bfc" id="L75" title="All 2 branches covered.">    for (CorsConfiguration config : properties.getConfigs()) {</span>
+<span class="fc" id="L76">      corsRegistry.addMapping(config.getPathPattern())</span>
+<span class="fc" id="L77">          .allowedOrigins(config.getAllowedOrigins().toArray(new String[0]))</span>
+<span class="fc" id="L78">          .allowedMethods(config.getAllowedMethods().toArray(new String[0]))</span>
+<span class="fc" id="L79">          .allowedHeaders(config.getAllowedHeaders().toArray(new String[0]))</span>
+<span class="fc" id="L80">          .exposedHeaders(config.getExposedHeaders().toArray(new String[0]))</span>
+<span class="fc" id="L81">          .maxAge(config.getMaxAge())</span>
+<span class="fc" id="L82">          .allowCredentials(config.isAllowCredentials());</span>
+<span class="fc" id="L83">    }</span>
+<span class="fc" id="L84">  }</span>
 
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

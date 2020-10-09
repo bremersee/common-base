@@ -154,49 +154,51 @@ public abstract class AbstractResourceServerAutoConfiguration extends WebSecurit
 <span class="fc" id="L154">        })</span>
 <span class="fc" id="L155">        .and()</span>
 <span class="fc" id="L156">        .csrf().disable();</span>
-<span class="pc bpc" id="L157" title="1 of 2 branches missed.">    if (!corsProperties.isEnable()) {</span>
-<span class="nc" id="L158">      http.cors().disable();</span>
+<span class="pc bpc" id="L157" title="1 of 2 branches missed.">    if (corsProperties.isEnable()) {</span>
+<span class="fc" id="L158">      http.cors();</span>
+    } else {
+<span class="nc" id="L160">      http.cors().disable();</span>
     }
-<span class="fc" id="L160">  }</span>
+<span class="fc" id="L162">  }</span>
 
   private ExpressionUrlAuthorizationConfigurer&lt;HttpSecurity&gt;.ExpressionInterceptUrlRegistry
   configurePathMatchers(
       ExpressionUrlAuthorizationConfigurer&lt;HttpSecurity&gt;.ExpressionInterceptUrlRegistry reg) {
 
-<span class="fc bfc" id="L166" title="All 2 branches covered.">    for (PathMatcherProperties props : authProperties.preparePathMatchers(corsProperties)) {</span>
-<span class="fc" id="L167">      log.info(&quot;Securing requests to {}&quot;, props);</span>
-<span class="fc" id="L168">      HttpMethod httpMethod = props.httpMethod();</span>
-<span class="fc bfc" id="L169" title="All 2 branches covered.">      if (httpMethod == null) {</span>
-<span class="fc" id="L170">        reg = reg.antMatchers(props.getAntPattern())</span>
-<span class="fc" id="L171">            .access(props.accessExpression(</span>
-<span class="fc" id="L172">                authProperties::ensureRolePrefix));</span>
+<span class="fc bfc" id="L168" title="All 2 branches covered.">    for (PathMatcherProperties props : authProperties.preparePathMatchers(corsProperties)) {</span>
+<span class="fc" id="L169">      log.info(&quot;Securing requests to {}&quot;, props);</span>
+<span class="fc" id="L170">      HttpMethod httpMethod = props.httpMethod();</span>
+<span class="fc bfc" id="L171" title="All 2 branches covered.">      if (httpMethod == null) {</span>
+<span class="fc" id="L172">        reg = reg.antMatchers(props.getAntPattern())</span>
+<span class="fc" id="L173">            .access(props.accessExpression(</span>
+<span class="fc" id="L174">                authProperties::ensureRolePrefix));</span>
       } else {
-<span class="fc" id="L174">        reg = reg.antMatchers(httpMethod, props.getAntPattern())</span>
-<span class="fc" id="L175">            .access(props.accessExpression(</span>
-<span class="fc" id="L176">                authProperties::ensureRolePrefix));</span>
+<span class="fc" id="L176">        reg = reg.antMatchers(httpMethod, props.getAntPattern())</span>
+<span class="fc" id="L177">            .access(props.accessExpression(</span>
+<span class="fc" id="L178">                authProperties::ensureRolePrefix));</span>
       }
-<span class="fc" id="L178">    }</span>
-<span class="fc" id="L179">    return reg;</span>
+<span class="fc" id="L180">    }</span>
+<span class="fc" id="L181">    return reg;</span>
   }
 
   private HttpSecurity configureAuthenticationProvider(HttpSecurity http) throws Exception {
 
-<span class="fc bfc" id="L184" title="All 2 branches covered.">    if (jwtConverterProvider.getIfAvailable() != null) {</span>
-<span class="fc" id="L185">      log.info(&quot;Configure authentication provider with JWT.&quot;);</span>
-<span class="fc" id="L186">      return http</span>
-<span class="fc" id="L187">          .oauth2ResourceServer((rs) -&gt; rs</span>
-<span class="fc" id="L188">              .jwt()</span>
-<span class="fc" id="L189">              .jwtAuthenticationConverter(jwtConverterProvider.getIfAvailable())</span>
-<span class="fc" id="L190">              .and());</span>
+<span class="fc bfc" id="L186" title="All 2 branches covered.">    if (jwtConverterProvider.getIfAvailable() != null) {</span>
+<span class="fc" id="L187">      log.info(&quot;Configure authentication provider with JWT.&quot;);</span>
+<span class="fc" id="L188">      return http</span>
+<span class="fc" id="L189">          .oauth2ResourceServer((rs) -&gt; rs</span>
+<span class="fc" id="L190">              .jwt()</span>
+<span class="fc" id="L191">              .jwtAuthenticationConverter(jwtConverterProvider.getIfAvailable())</span>
+<span class="fc" id="L192">              .and());</span>
     }
-<span class="fc" id="L192">    log.info(&quot;Configure authentication provider with basic auth and in-memory users.&quot;);</span>
-<span class="fc" id="L193">    String realm = environment.getProperty(&quot;spring.application.name&quot;, &quot;Restricted area&quot;);</span>
-<span class="fc" id="L194">    return http</span>
+<span class="fc" id="L194">    log.info(&quot;Configure authentication provider with basic auth and in-memory users.&quot;);</span>
+<span class="fc" id="L195">    String realm = environment.getProperty(&quot;spring.application.name&quot;, &quot;Restricted area&quot;);</span>
+<span class="fc" id="L196">    return http</span>
         // .userDetailsService(userDetailsService())
-<span class="fc" id="L196">        .formLogin().disable()</span>
-<span class="fc" id="L197">        .httpBasic().realmName(realm)</span>
-<span class="fc" id="L198">        .and()</span>
-<span class="fc" id="L199">        .sessionManagement((sm) -&gt; sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS));</span>
+<span class="fc" id="L198">        .formLogin().disable()</span>
+<span class="fc" id="L199">        .httpBasic().realmName(realm)</span>
+<span class="fc" id="L200">        .and()</span>
+<span class="fc" id="L201">        .sessionManagement((sm) -&gt; sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS));</span>
   }
 
 }

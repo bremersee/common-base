@@ -28,7 +28,7 @@ common-base-autoconfigure,org.bremersee.security.authentication,ReactiveJwtSuppo
 common-base-autoconfigure,org.bremersee.security.authentication,AuthProperties.PasswordFlow,17,152,10,20,0,9,10,20,0,15
 common-base-autoconfigure,org.bremersee.security.authentication,ReactiveAccessTokenCacheAutoConfiguration.WithRedis,0,40,0,0,0,12,0,3,0,3
 common-base-autoconfigure,org.bremersee.security.authentication,RedisCondition,0,4,0,0,0,2,0,1,0,1
-common-base-autoconfigure,org.bremersee.security.authentication,AbstractResourceServerAutoConfiguration,20,258,3,10,7,66,6,17,3,13
+common-base-autoconfigure,org.bremersee.security.authentication,AbstractResourceServerAutoConfiguration,20,262,3,10,7,67,6,17,3,13
 common-base-autoconfigure,org.bremersee.security.authentication,AuthProperties.JwtCache,41,140,20,14,2,11,20,9,3,9
 common-base-autoconfigure,org.bremersee.security.authentication,ReactiveInMemoryUserDetailsAutoConfiguration.ReactiveUserDetailsServiceCondition.ReactiveWebApplicationCondition,3,0,0,0,1,0,1,0,1,0
 common-base-autoconfigure,org.bremersee.security.authentication,AccessTokenCacheAutoConfiguration.Default,27,53,0,0,5,17,4,4,4,4
@@ -41,7 +41,7 @@ common-base-autoconfigure,org.bremersee.security.authentication,RedisAccessToken
 common-base-autoconfigure,org.bremersee.security.authentication,RedisCondition.LettuceConnectionFactoryCondition,3,0,0,0,1,0,1,0,1,0
 common-base-autoconfigure,org.bremersee.security.authentication,ReactiveAccessTokenCacheAutoConfiguration.Default,0,40,0,0,0,12,0,4,0,4
 common-base-autoconfigure,org.bremersee.security.authentication,AccessMode,0,48,0,0,0,8,0,3,0,3
-common-base-autoconfigure,org.bremersee.security.authentication,AbstractReactiveResourceServerAutoConfiguration,22,303,2,9,3,69,3,19,1,15
+common-base-autoconfigure,org.bremersee.security.authentication,AbstractReactiveResourceServerAutoConfiguration,22,308,2,9,3,70,3,19,1,15
 common-base-autoconfigure,org.bremersee.web.reactive,BaseCommonConvertersAutoConfiguration,0,18,0,0,0,7,0,4,0,4
 common-base-autoconfigure,org.bremersee.web.reactive,ApiExceptionHandler,8,214,6,10,0,51,6,11,0,9
 common-base-autoconfigure,org.bremersee.web.reactive,CorsAutoConfiguration,1,77,1,3,1,18,1,5,0,4

@@ -146,62 +146,64 @@ public abstract class AbstractReactiveResourceServerAutoConfiguration {
 <span class="fc" id="L146">        })</span>
 <span class="fc" id="L147">        .and()</span>
 <span class="fc" id="L148">        .csrf().disable();</span>
-<span class="pc bpc" id="L149" title="1 of 2 branches missed.">    if (!corsProperties.isEnable()) {</span>
-<span class="nc" id="L150">      http = http.cors().disable();</span>
+<span class="pc bpc" id="L149" title="1 of 2 branches missed.">    if (corsProperties.isEnable()) {</span>
+<span class="fc" id="L150">      http = http.cors().and();</span>
+    } else {
+<span class="nc" id="L152">      http = http.cors().disable();</span>
     }
-<span class="fc" id="L152">    return OrderedProxy.create(</span>
-<span class="fc" id="L153">        http.build(),</span>
-<span class="fc" id="L154">        authProperties.getResourceServerOrder());</span>
+<span class="fc" id="L154">    return OrderedProxy.create(</span>
+<span class="fc" id="L155">        http.build(),</span>
+<span class="fc" id="L156">        authProperties.getResourceServerOrder());</span>
   }
 
   private AuthorizeExchangeSpec configurePathMatchers(AuthorizeExchangeSpec spec) {
 
-<span class="fc bfc" id="L159" title="All 2 branches covered.">    for (PathMatcherProperties props : authProperties.preparePathMatchers(corsProperties)) {</span>
-<span class="fc" id="L160">      log.info(&quot;Securing requests to {}&quot;, props);</span>
-<span class="fc bfc" id="L161" title="All 3 branches covered.">      switch (props.getAccessMode()) {</span>
+<span class="fc bfc" id="L161" title="All 2 branches covered.">    for (PathMatcherProperties props : authProperties.preparePathMatchers(corsProperties)) {</span>
+<span class="fc" id="L162">      log.info(&quot;Securing requests to {}&quot;, props);</span>
+<span class="fc bfc" id="L163" title="All 3 branches covered.">      switch (props.getAccessMode()) {</span>
         case DENY_ALL:
-<span class="fc" id="L163">          spec = spec.matchers(matcher(props)).denyAll();</span>
-<span class="fc" id="L164">          break;</span>
+<span class="fc" id="L165">          spec = spec.matchers(matcher(props)).denyAll();</span>
+<span class="fc" id="L166">          break;</span>
         case PERMIT_ALL:
-<span class="fc" id="L166">          spec = spec.matchers(matcher(props)).permitAll();</span>
-<span class="fc" id="L167">          break;</span>
+<span class="fc" id="L168">          spec = spec.matchers(matcher(props)).permitAll();</span>
+<span class="fc" id="L169">          break;</span>
         default:
-<span class="fc" id="L169">          spec = spec.matchers(matcher(props)).access(new RoleOrIpBasedAuthorizationManager(</span>
-<span class="fc" id="L170">              props.roles(authProperties::ensureRolePrefix),</span>
-<span class="fc" id="L171">              props.getIpAddresses()));</span>
+<span class="fc" id="L171">          spec = spec.matchers(matcher(props)).access(new RoleOrIpBasedAuthorizationManager(</span>
+<span class="fc" id="L172">              props.roles(authProperties::ensureRolePrefix),</span>
+<span class="fc" id="L173">              props.getIpAddresses()));</span>
       }
-<span class="fc" id="L173">    }</span>
-<span class="fc" id="L174">    return spec;</span>
+<span class="fc" id="L175">    }</span>
+<span class="fc" id="L176">    return spec;</span>
   }
 
   private ServerWebExchangeMatcher matcher(PathMatcherProperties props) {
-<span class="fc" id="L178">    return Optional.ofNullable(props.httpMethod())</span>
-<span class="fc" id="L179">        .map(method -&gt; ServerWebExchangeMatchers.pathMatchers(method, props.getAntPattern()))</span>
-<span class="fc" id="L180">        .orElseGet(() -&gt; ServerWebExchangeMatchers.pathMatchers(props.getAntPattern()));</span>
+<span class="fc" id="L180">    return Optional.ofNullable(props.httpMethod())</span>
+<span class="fc" id="L181">        .map(method -&gt; ServerWebExchangeMatchers.pathMatchers(method, props.getAntPattern()))</span>
+<span class="fc" id="L182">        .orElseGet(() -&gt; ServerWebExchangeMatchers.pathMatchers(props.getAntPattern()));</span>
   }
 
   private ServerHttpSecurity configureAuthenticationManager(ServerHttpSecurity http) {
 
-<span class="fc" id="L185">    return Optional.ofNullable(jwtConverterProvider.getIfAvailable())</span>
-<span class="fc" id="L186">        .map(jwtConverter -&gt; http</span>
-<span class="fc" id="L187">            .oauth2ResourceServer((rs) -&gt; rs</span>
-<span class="fc" id="L188">                .jwt()</span>
-<span class="fc" id="L189">                .jwtAuthenticationConverter(jwtConverter)</span>
-<span class="fc" id="L190">                .and()))</span>
-<span class="fc" id="L191">        .orElseGet(() -&gt; http</span>
-<span class="fc" id="L192">            .authenticationManager(userDetailsAuthenticationManager())</span>
-<span class="fc" id="L193">            .httpBasic()</span>
-<span class="fc" id="L194">            .and()</span>
-<span class="fc" id="L195">            .formLogin().disable());</span>
+<span class="fc" id="L187">    return Optional.ofNullable(jwtConverterProvider.getIfAvailable())</span>
+<span class="fc" id="L188">        .map(jwtConverter -&gt; http</span>
+<span class="fc" id="L189">            .oauth2ResourceServer((rs) -&gt; rs</span>
+<span class="fc" id="L190">                .jwt()</span>
+<span class="fc" id="L191">                .jwtAuthenticationConverter(jwtConverter)</span>
+<span class="fc" id="L192">                .and()))</span>
+<span class="fc" id="L193">        .orElseGet(() -&gt; http</span>
+<span class="fc" id="L194">            .authenticationManager(userDetailsAuthenticationManager())</span>
+<span class="fc" id="L195">            .httpBasic()</span>
+<span class="fc" id="L196">            .and()</span>
+<span class="fc" id="L197">            .formLogin().disable());</span>
   }
 
   private ReactiveAuthenticationManager userDetailsAuthenticationManager() {
 
-<span class="fc" id="L200">    return Optional.ofNullable(userDetailsServiceProvider.getIfAvailable())</span>
-<span class="fc" id="L201">        .map(UserDetailsRepositoryReactiveAuthenticationManager::new)</span>
-<span class="pc" id="L202">        .orElseGet(() -&gt; new UserDetailsRepositoryReactiveAuthenticationManager(</span>
+<span class="fc" id="L202">    return Optional.ofNullable(userDetailsServiceProvider.getIfAvailable())</span>
+<span class="fc" id="L203">        .map(UserDetailsRepositoryReactiveAuthenticationManager::new)</span>
+<span class="pc" id="L204">        .orElseGet(() -&gt; new UserDetailsRepositoryReactiveAuthenticationManager(</span>
             new MapReactiveUserDetailsService(authProperties
-<span class="nc" id="L204">                .buildBasicAuthUserDetails(passwordEncoderProvider.getIfAvailable()))));</span>
+<span class="nc" id="L206">                .buildBasicAuthUserDetails(passwordEncoderProvider.getIfAvailable()))));</span>
   }
 
 }
