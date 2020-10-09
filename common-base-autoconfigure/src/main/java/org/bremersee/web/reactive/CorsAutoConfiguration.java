@@ -25,6 +25,7 @@ import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.event.EventListener;
+import org.springframework.lang.NonNull;
 import org.springframework.util.ClassUtils;
 import org.springframework.web.reactive.config.CorsRegistry;
 import org.springframework.web.reactive.config.WebFluxConfigurer;
@@ -67,7 +68,7 @@ public class CorsAutoConfiguration implements WebFluxConfigurer {
 
   @SuppressWarnings("DuplicatedCode")
   @Override
-  public void addCorsMappings(CorsRegistry corsRegistry) {
+  public void addCorsMappings(@NonNull CorsRegistry corsRegistry) {
     if (!properties.isEnable()) {
       return;
     }

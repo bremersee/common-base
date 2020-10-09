@@ -146,7 +146,9 @@ public abstract class AbstractReactiveResourceServerAutoConfiguration {
         })
         .and()
         .csrf().disable();
-    if (!corsProperties.isEnable()) {
+    if (corsProperties.isEnable()) {
+      http = http.cors().and();
+    } else {
       http = http.cors().disable();
     }
     return OrderedProxy.create(
