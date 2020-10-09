@@ -154,7 +154,9 @@ public abstract class AbstractResourceServerAutoConfiguration extends WebSecurit
         })
         .and()
         .csrf().disable();
-    if (!corsProperties.isEnable()) {
+    if (corsProperties.isEnable()) {
+      http.cors();
+    } else {
       http.cors().disable();
     }
   }
