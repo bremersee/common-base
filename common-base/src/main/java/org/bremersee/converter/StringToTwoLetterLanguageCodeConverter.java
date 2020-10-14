@@ -19,6 +19,7 @@ package org.bremersee.converter;
 import lombok.ToString;
 import org.bremersee.common.model.TwoLetterLanguageCode;
 import org.springframework.core.convert.converter.Converter;
+import org.springframework.lang.NonNull;
 
 /**
  * The string to two letter language code converter.
@@ -30,7 +31,7 @@ public class StringToTwoLetterLanguageCodeConverter
     implements Converter<String, TwoLetterLanguageCode> {
 
   @Override
-  public TwoLetterLanguageCode convert(String source) {
+  public TwoLetterLanguageCode convert(@NonNull String source) {
     return TwoLetterLanguageCode.fromValue(source.toLowerCase());
   }
 }

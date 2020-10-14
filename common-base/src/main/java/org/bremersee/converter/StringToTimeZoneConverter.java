@@ -19,6 +19,7 @@ package org.bremersee.converter;
 import java.util.TimeZone;
 import lombok.ToString;
 import org.springframework.core.convert.converter.Converter;
+import org.springframework.lang.NonNull;
 
 /**
  * The string to time zone converter.
@@ -29,7 +30,7 @@ import org.springframework.core.convert.converter.Converter;
 public class StringToTimeZoneConverter implements Converter<String, TimeZone> {
 
   @Override
-  public TimeZone convert(String source) {
+  public TimeZone convert(@NonNull String source) {
     return TimeZone.getTimeZone(source);
   }
 

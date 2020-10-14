@@ -19,6 +19,7 @@ package org.bremersee.converter;
 import lombok.ToString;
 import org.bremersee.common.model.TwoLetterCountryCode;
 import org.springframework.core.convert.converter.Converter;
+import org.springframework.lang.NonNull;
 
 /**
  * The string to two letter country code converter.
@@ -30,7 +31,7 @@ public class StringToTwoLetterCountryCodeConverter
     implements Converter<String, TwoLetterCountryCode> {
 
   @Override
-  public TwoLetterCountryCode convert(String source) {
+  public TwoLetterCountryCode convert(@NonNull String source) {
     return TwoLetterCountryCode.fromValue(source);
   }
 }

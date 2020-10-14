@@ -22,6 +22,7 @@ import java.time.ZoneOffset;
 import lombok.ToString;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.data.convert.ReadingConverter;
+import org.springframework.lang.NonNull;
 
 /**
  * The instant to offset date time read converter.
@@ -33,7 +34,7 @@ import org.springframework.data.convert.ReadingConverter;
 public class InstantToOffsetDateTimeReadConverter implements Converter<Instant, OffsetDateTime> {
 
   @Override
-  public OffsetDateTime convert(Instant source) {
+  public OffsetDateTime convert(@NonNull Instant source) {
     return OffsetDateTime.ofInstant(source, ZoneOffset.UTC);
   }
 }

@@ -20,6 +20,7 @@ import java.util.Locale;
 import lombok.ToString;
 import org.bremersee.common.model.JavaLocale;
 import org.springframework.core.convert.converter.Converter;
+import org.springframework.lang.NonNull;
 
 /**
  * The string to locale converter.
@@ -30,8 +31,8 @@ import org.springframework.core.convert.converter.Converter;
 public class StringToLocaleConverter implements Converter<String, Locale> {
 
   @Override
-  public Locale convert(String source) {
-    final JavaLocale javaLocale = JavaLocale.fromValue(source);
-    return javaLocale != null ? javaLocale.toLocale() : null;
+  public Locale convert(@NonNull String source) {
+    return JavaLocale.fromValue(source).toLocale();
   }
+
 }
