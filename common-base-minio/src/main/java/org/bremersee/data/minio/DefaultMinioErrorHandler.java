@@ -16,21 +16,17 @@
 
 package org.bremersee.data.minio;
 
-import io.minio.ErrorCode;
 import io.minio.errors.BucketPolicyTooLargeException;
 import io.minio.errors.ErrorResponseException;
 import io.minio.errors.InsufficientDataException;
 import io.minio.errors.InternalException;
-import io.minio.errors.InvalidBucketNameException;
-import io.minio.errors.InvalidEndpointException;
-import io.minio.errors.InvalidExpiresRangeException;
-import io.minio.errors.InvalidPortException;
 import io.minio.errors.InvalidResponseException;
-import io.minio.errors.RegionConflictException;
+import io.minio.errors.ServerException;
 import io.minio.errors.XmlParserException;
 import io.minio.messages.ErrorResponse;
 import java.io.IOException;
 import java.util.Optional;
+import okhttp3.Response;
 import org.springframework.util.StringUtils;
 
 /**
@@ -79,31 +75,26 @@ public class DefaultMinioErrorHandler extends AbstractMinioErrorHandler {
       status = 400;
       errorCode = ERROR_CODE_PREFIX + "BUCKET_POLICY_TOO_LARGE";
       message = e.toString();
+
     } else if (e instanceof ErrorResponseException) {
       ErrorResponseException ere = (ErrorResponseException) e;
       status = getStatus(ere);
       errorCode = getErrorCode(ere);
       message = getMessage(ere);
+
     } else if (e instanceof InsufficientDataException) {
       status = 400;
       errorCode = ERROR_CODE_PREFIX + "INSUFFICIENT_DATA";
+
     } else if (e instanceof InternalException) {
       errorCode = ERROR_CODE_PREFIX + "INTERNAL_ERROR";
-    } else if (e instanceof InvalidBucketNameException) {
-      status = 400;
-      errorCode = ERROR_CODE_PREFIX + "INVALID_BUCKET_NAME";
-    } else if (e instanceof InvalidEndpointException) {
-      errorCode = ERROR_CODE_PREFIX + "INVALID_ENDPOINT";
-    } else if (e instanceof InvalidExpiresRangeException) {
-      status = 400;
-      errorCode = ERROR_CODE_PREFIX + "INVALID_EXPIRES_RANGE";
-    } else if (e instanceof InvalidPortException) {
-      errorCode = ERROR_CODE_PREFIX + "INVALID_PORT";
+
     } else if (e instanceof InvalidResponseException) {
       errorCode = ERROR_CODE_PREFIX + "INVALID_RESPONSE";
-    } else if (e instanceof RegionConflictException) {
-      status = 400;
-      errorCode = ERROR_CODE_PREFIX + "REGION_CONFLICT";
+
+    } else if (e instanceof ServerException) {
+      errorCode = ERROR_CODE_PREFIX + "SERVER_EXCEPTION";
+
     } else if (e instanceof XmlParserException) {
       errorCode = ERROR_CODE_PREFIX + "XML_PARSER_ERROR";
     }
@@ -113,53 +104,134 @@ public class DefaultMinioErrorHandler extends AbstractMinioErrorHandler {
   private int getStatus(ErrorResponseException e) {
     return Optional.of(e)
         .map(ErrorResponseException::errorResponse)
-        .map(ErrorResponse::errorCode)
-        .map(this::getStatus)
+        .map(ErrorResponse::code)
+        .map(code -> getStatus(code, e.response()))
         .orElse(500);
   }
 
-  private int getStatus(ErrorCode errorCode) {
+  private int getStatus(String errorCode, Response response) {
+    // see https://docs.aws.amazon.com/AmazonS3/latest/API/ErrorResponses.html#ErrorCodeList
     switch (errorCode) {
-      case NO_SUCH_OBJECT:
-      case RESOURCE_NOT_FOUND:
-      case NO_SUCH_BUCKET:
-      case NO_SUCH_KEY:
-      case NO_SUCH_UPLOAD:
-      case NO_SUCH_VERSION:
-      case NO_SUCH_LIFECYCLE_CONFIGURATION:
-      case NO_SUCH_BUCKET_POLICY:
-      case NO_SUCH_OBJECT_LOCK_CONFIGURATION:
-        return 404;
-      case RESOURCE_CONFLICT:
-      case BUCKET_ALREADY_EXISTS:
-      case BUCKET_ALREADY_OWNED_BY_YOU:
-      case BUCKET_NOT_EMPTY:
-        return 409;
-      case INTERNAL_ERROR:
-      case NOT_IMPLEMENTED:
-      case OPERATION_ABORTED:
-      case RESTORE_ALREADY_IN_PROGRESS:
-      case SERVICE_UNAVAILABLE:
-      case SLOW_DOWN:
-        return 500;
-      default:
+      case "AmbiguousGrantByEmailAddress":
+      case "AuthorizationHeaderMalformed":
+      case "BadDigest":
+      case "CredentialsNotSupported":
+      case "EntityTooSmall":
+      case "EntityTooLarge":
+      case "ExpiredToken":
+      case "IllegalLocationConstraintException":
+      case "IllegalVersioningConfigurationException":
+      case "IncompleteBody":
+      case "IncorrectNumberOfFilesInPostRequest":
+      case "InlineDataTooLarge":
+      case "InvalidAccessPoint":
+      case "InvalidArgument":
+      case "InvalidBucketName":
+      case "InvalidDigest":
+      case "InvalidEncryptionAlgorithmError":
+      case "InvalidLocationConstraint":
+      case "InvalidPart":
+      case "InvalidPartOrder":
+      case "InvalidPolicyDocument":
+      case "InvalidRequest":
+      case "InvalidSOAPRequest":
+      case "InvalidStorageClass":
+      case "InvalidTargetBucketForLogging":
+      case "InvalidToken":
+      case "InvalidURI":
+      case "KeyTooLongError":
+      case "MalformedACLError":
+      case "MalformedPOSTRequest":
+      case "MalformedXML":
+      case "MaxMessageLengthExceeded":
+      case "MaxPostPreDataLengthExceededError":
+      case "MetadataTooLarge":
+      case "MissingRequestBodyError":
+      case "MissingSecurityElement":
+      case "MissingSecurityHeader":
+      case "NoLoggingStatusForKey":
+      case "RequestIsNotMultiPartContent":
+      case "RequestTimeout":
+      case "RequestTorrentOfBucketError":
+      case "ServerSideEncryptionConfigurationNotFoundError":
+      case "TokenRefreshRequired":
+      case "TooManyAccessPoints":
+      case "TooManyBuckets":
+      case "UnexpectedContent":
+      case "UnresolvableGrantByEmailAddress":
+      case "UserKeyMustBeSpecified":
+      case "InvalidTag":
+      case "MalformedPolicy":
         return 400;
+      case "UnauthorizedAccess":
+        return 401;
+      case "AccessDenied":
+      case "AccountProblem":
+      case "AllAccessDisabled":
+      case "CrossLocationLoggingProhibited":
+      case "InvalidAccessKeyId":
+      case "InvalidObjectState":
+      case "InvalidPayer":
+      case "InvalidSecurity":
+      case "NotSignedUp":
+      case "RequestTimeTooSkewed":
+      case "SignatureDoesNotMatch":
+        return 403;
+      case "ResourceNotFound": // not in list
+      case "NoSuchAccessPoint":
+      case "NoSuchBucket":
+      case "NoSuchKey":
+      case "NoSuchObject": // not in list
+      case "NoSuchUpload":
+      case "NoSuchVersion":
+      case "NoSuchLifecycleConfiguration":
+      case "NoSuchBucketPolicy":
+      case "NoSuchObjectLockConfiguration": // not in list
+      case "NoSuchOutpost":
+      case "NoSuchTagSet":
+      case "UnsupportedOperation":
+        return 404;
+      case "MethodNotAllowed":
+        return 405;
+      case "BucketAlreadyExists":
+      case "BucketAlreadyOwnedByYou":
+      case "BucketNotEmpty":
+      case "InvalidBucketState":
+      case "OperationAborted":
+      case "InvalidOutpostState":
+        return 409;
+      case "MissingContentLength":
+        return 411;
+      case "PreconditionFailed":
+        return 412;
+      case "InvalidRange":
+        return 416;
+      case "InternalError":
+        return 500;
+      case "NotImplemented":
+        return 501;
+      case "ServiceUnavailable":
+      case "SlowDown":
+        return 503;
+      default:
+        return Optional.ofNullable(response)
+            .filter(r -> r.code() != 200)
+            .map(Response::code)
+            .orElse(400);
     }
   }
 
   private String getErrorCode(ErrorResponseException e) {
     return Optional.of(e)
         .map(ErrorResponseException::errorResponse)
-        .map(ErrorResponse::errorCode)
-        .map(ErrorCode::name)
+        .map(ErrorResponse::code)
         .orElse(ERROR_CODE_PREFIX + "UNSPECIFIED_ERROR_RESPONSE");
   }
 
   private String getMessage(ErrorResponseException e) {
     return Optional.of(e)
         .map(ErrorResponseException::errorResponse)
-        .map(ErrorResponse::errorCode)
-        .map(ErrorCode::message)
+        .map(ErrorResponse::message)
         .orElseGet(() -> StringUtils.hasText(e.getMessage())
             ? e.getMessage()
             : "Unspecified error response.");

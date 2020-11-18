@@ -19,10 +19,10 @@ package org.bremersee.data.minio;
 import static org.bremersee.data.minio.DefaultMinioErrorHandler.ERROR_CODE_PREFIX;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import io.minio.ErrorCode;
 import io.minio.errors.ErrorResponseException;
 import io.minio.messages.ErrorResponse;
 import java.io.IOException;
+import java.util.UUID;
 import okhttp3.Protocol;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -84,29 +84,17 @@ class DefaultMinioErrorHandlerTest {
     me = handler.map(new io.minio.errors.InternalException("A message."));
     assertEquals(500, me.status());
 
-    me = handler.map(new io.minio.errors.InvalidBucketNameException("bucket-name", "A message."));
-    assertEquals(400, me.status());
-
-    me = handler.map(new io.minio.errors.InvalidEndpointException("http://invalid", "A message."));
+    me = handler.map(new io.minio.errors.InvalidResponseException(503, "application/json", "{}"));
     assertEquals(500, me.status());
 
-    me = handler.map(new io.minio.errors.InvalidExpiresRangeException(6060, "A message."));
-    assertEquals(400, me.status());
-
-    me = handler.map(new io.minio.errors.InvalidPortException(80, "A message."));
+    me = handler.map(new io.minio.errors.ServerException("A message."));
     assertEquals(500, me.status());
-
-    me = handler.map(new io.minio.errors.InvalidResponseException());
-    assertEquals(500, me.status());
-
-    me = handler.map(new io.minio.errors.RegionConflictException("A message."));
-    assertEquals(400, me.status());
 
     me = handler.map(new io.minio.errors.XmlParserException(new Exception("A message.")));
     assertEquals(500, me.status());
 
     me = handler.map(new ErrorResponseException(
-        new ErrorResponse(ErrorCode.BAD_DIGEST, "bucket", "obj", "123", "456", "789"),
+        new ErrorResponse("InvalidRequest", "message", "bucket", "object", "123", "456", "789"),
         new Response.Builder()
             .protocol(Protocol.HTTP_1_1)
             .code(500)
@@ -118,7 +106,7 @@ class DefaultMinioErrorHandlerTest {
     assertEquals(400, me.status());
 
     me = handler.map(new ErrorResponseException(
-        new ErrorResponse(ErrorCode.NO_SUCH_OBJECT, "bucket", "obj", "123", "456", "789"),
+        new ErrorResponse("NoSuchBucket", "message", "bucket", "object", "123", "456", "789"),
         new Response.Builder()
             .protocol(Protocol.HTTP_1_1)
             .code(500)
@@ -130,7 +118,7 @@ class DefaultMinioErrorHandlerTest {
     assertEquals(404, me.status());
 
     me = handler.map(new ErrorResponseException(
-        new ErrorResponse(ErrorCode.RESOURCE_CONFLICT, "bucket", "obj", "123", "456", "789"),
+        new ErrorResponse("BucketAlreadyExists", "message", "bucket", "object", "123", "456", "789"),
         new Response.Builder()
             .protocol(Protocol.HTTP_1_1)
             .code(500)
@@ -142,7 +130,7 @@ class DefaultMinioErrorHandlerTest {
     assertEquals(409, me.status());
 
     me = handler.map(new ErrorResponseException(
-        new ErrorResponse(ErrorCode.INTERNAL_ERROR, "bucket", "obj", "123", "456", "789"),
+        new ErrorResponse(UUID.randomUUID().toString(), "message", "bucket", "object", "123", "456", "789"),
         new Response.Builder()
             .protocol(Protocol.HTTP_1_1)
             .code(500)

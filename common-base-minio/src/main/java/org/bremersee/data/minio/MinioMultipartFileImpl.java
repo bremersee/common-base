@@ -17,8 +17,8 @@
 package org.bremersee.data.minio;
 
 import io.minio.GetObjectArgs;
-import io.minio.ObjectStat;
 import io.minio.StatObjectArgs;
+import io.minio.StatObjectResponse;
 import io.minio.messages.Item;
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -65,7 +65,7 @@ public class MinioMultipartFileImpl implements MinioMultipartFile {
 
   private Long size;
 
-  private ObjectStat objectStatus;
+  private StatObjectResponse objectStatus;
 
   /**
    * Instantiates a new minio multipart file.
@@ -93,23 +93,21 @@ public class MinioMultipartFileImpl implements MinioMultipartFile {
    * @param minioOperations the minio operations
    * @param region the region
    * @param objectStatus the object status
-   * @param versionId the version id
    */
   public MinioMultipartFileImpl(
       MinioOperations minioOperations,
       String region,
-      ObjectStat objectStatus,
-      String versionId) {
+      StatObjectResponse objectStatus) {
 
     Assert.notNull(minioOperations, "Minio operations must not be null.");
     Assert.notNull(objectStatus, "Object status must not be null.");
     this.minioOperations = minioOperations;
     this.region = region;
-    this.bucket = objectStatus.bucketName();
-    this.name = objectStatus.name();
-    this.versionId = versionId;
+    this.bucket = objectStatus.bucket();
+    this.name = objectStatus.object();
+    this.versionId = objectStatus.versionId();
     this.etag = objectStatus.etag();
-    this.size = objectStatus.length();
+    this.size = objectStatus.size();
     this.objectStatus = objectStatus;
   }
 
@@ -144,7 +142,7 @@ public class MinioMultipartFileImpl implements MinioMultipartFile {
    *
    * @return the object status
    */
-  protected ObjectStat getObjectStatus() {
+  protected StatObjectResponse getObjectStatus() {
     if (objectStatus == null) {
       objectStatus = minioOperations.statObject(StatObjectArgs.builder()
           .region(region)
@@ -180,7 +178,7 @@ public class MinioMultipartFileImpl implements MinioMultipartFile {
   @Override
   public long getSize() {
     if (size == null) {
-      size = getObjectStatus().length();
+      size = getObjectStatus().size();
     }
     return size;
   }
@@ -222,8 +220,8 @@ public class MinioMultipartFileImpl implements MinioMultipartFile {
   }
 
   @Override
-  public OffsetDateTime getCreatedTime() {
-    return Optional.ofNullable(getObjectStatus().createdTime())
+  public OffsetDateTime getLastModified() {
+    return Optional.ofNullable(getObjectStatus().lastModified())
         .map(time -> OffsetDateTime.ofInstant(time.toInstant(), ZoneOffset.UTC))
         .orElse(null);
 
