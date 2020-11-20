@@ -16,7 +16,7 @@
   <description>Common Base Minio</description>
 
   <properties>
-    <playtika-testcontainers.version>1.62</playtika-testcontainers.version>
+    <playtika-testcontainers.version>1.85</playtika-testcontainers.version>
     <awaitility.version>4.0.3</awaitility.version>
   </properties>
 
@@ -117,12 +117,14 @@
       <artifactId>spring-cloud-starter</artifactId>
       <scope>test</scope>
     </dependency>
+    <!--
     <dependency>
       <groupId>com.playtika.testcontainers</groupId>
       <artifactId>embedded-minio</artifactId>
       <version>${playtika-testcontainers.version}</version>
       <scope>test</scope>
     </dependency>
+    -->
     <dependency>
       <groupId>org.awaitility</groupId>
       <artifactId>awaitility</artifactId>

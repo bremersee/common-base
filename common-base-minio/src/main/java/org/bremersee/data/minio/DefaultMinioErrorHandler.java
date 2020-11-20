@@ -215,8 +215,8 @@ public class DefaultMinioErrorHandler extends AbstractMinioErrorHandler {
         return 503;
       default:
         return Optional.ofNullable(response)
-            .filter(r -> r.code() != 200)
             .map(Response::code)
+            .filter(code -> code >= 400)
             .orElse(400);
     }
   }

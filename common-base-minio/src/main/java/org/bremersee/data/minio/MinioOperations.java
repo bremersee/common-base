@@ -723,118 +723,95 @@ public interface MinioOperations {
   // Object operations
 
   /**
-   * Creates an object by combining data from different source objects using server-side copy.
+   * Uploads data from a stream to an object.
    *
    * <pre>Example:{@code
-   * List<ComposeSource> sourceObjectList = new ArrayList<ComposeSource>();
+   * // Upload known sized input stream.
+   * minioClient.putObject(
+   *     PutObjectArgs.builder().bucket("my-bucketname").object("my-objectname").stream(
+   *             inputStream, size, -1)
+   *         .contentType("video/mp4")
+   *         .build());
    *
-   * sourceObjectList.add(
-   *    ComposeSource.builder().bucket("my-job-bucket").object("my-objectname-part-one").build());
-   * sourceObjectList.add(
-   *    ComposeSource.builder().bucket("my-job-bucket").object("my-objectname-part-two").build());
-   * sourceObjectList.add(
-   *    ComposeSource.builder().bucket("my-job-bucket").object("my-objectname-part-three").build());
+   * // Upload unknown sized input stream.
+   * minioClient.putObject(
+   *     PutObjectArgs.builder().bucket("my-bucketname").object("my-objectname").stream(
+   *             inputStream, -1, 10485760)
+   *         .contentType("video/mp4")
+   *         .build());
    *
-   * // Create my-bucketname/my-objectname by combining source object list.
-   * minioClient.composeObject(
-   *    ComposeObjectArgs.builder()
-   *        .bucket("my-bucketname")
-   *        .object("my-objectname")
-   *        .sources(sourceObjectList)
-   *        .build());
+   * // Create object ends with '/' (also called as folder or directory).
+   * minioClient.putObject(
+   *     PutObjectArgs.builder().bucket("my-bucketname").object("path/to/").stream(
+   *             new ByteArrayInputStream(new byte[] {}), 0, -1)
+   *         .build());
+   *
+   * // Upload input stream with headers and user metadata.
+   * Map<String, String> headers = new HashMap<>();
+   * headers.put("X-Amz-Storage-Class", "REDUCED_REDUNDANCY");
+   * Map<String, String> userMetadata = new HashMap<>();
+   * userMetadata.put("My-Project", "Project One");
+   * minioClient.putObject(
+   *     PutObjectArgs.builder().bucket("my-bucketname").object("my-objectname").stream(
+   *             inputStream, size, -1)
+   *         .headers(headers)
+   *         .userMetadata(userMetadata)
+   *         .build());
+   *
+   * // Upload input stream with server-side encryption.
+   * minioClient.putObject(
+   *     PutObjectArgs.builder().bucket("my-bucketname").object("my-objectname").stream(
+   *             inputStream, size, -1)
+   *         .sse(sse)
+   *         .build());
    * }</pre>
    *
-   * @param args {@link ComposeObjectArgs} object.
+   * @param args {@link PutObjectArgs} object.
+   * @return {@link ObjectWriteResponse} object.
    */
-  default ObjectWriteResponse composeObject(ComposeObjectArgs args) {
-    return execute(minioClient -> minioClient.composeObject(args));
+  default ObjectWriteResponse putObject(PutObjectArgs args) {
+    return execute(minioClient -> minioClient.putObject(args));
   }
 
   /**
-   * Creates an object by server-side copying data from another object.
-   *
-   * @param args {@link CopyObjectArgs} object.
-   */
-  default ObjectWriteResponse copyObject(CopyObjectArgs args) {
-    return execute(minioClient -> minioClient.copyObject(args));
-  }
-
-  /**
-   * Deletes tags of an object.
+   * Uploads data from a file to an object.
    *
    * <pre>Example:{@code
-   * minioClient.deleteObjectTags(
-   *     DeleteObjectTags.builder().bucket("my-bucketname").object("my-objectname").build());
+   * // Upload an JSON file.
+   * minioClient.uploadObject(
+   *     UploadObjectArgs.builder()
+   *         .bucket("my-bucketname").object("my-objectname").filename("person.json").build());
+   *
+   * // Upload a video file.
+   * minioClient.uploadObject(
+   *     UploadObjectArgs.builder()
+   *         .bucket("my-bucketname")
+   *         .object("my-objectname")
+   *         .filename("my-video.avi")
+   *         .contentType("video/mp4")
+   *         .build());
    * }</pre>
    *
-   * @param args {@link DeleteObjectTagsArgs} object.
+   * @param args {@link UploadObjectArgs} object.
+   * @param deleteMode the delete mode
+   * @return {@link ObjectWriteResponse} object.
    */
-  default void deleteObjectTags(DeleteObjectTagsArgs args) {
-    execute((MinioClientCallbackWithoutResult) minioClient -> minioClient
-        .deleteObjectTags(args));
-  }
+  default ObjectWriteResponse uploadObject(UploadObjectArgs args, DeleteMode deleteMode) {
+    final Path file = Paths.get(args.filename());
+    try {
+      return execute(minioClient -> {
+        ObjectWriteResponse response = minioClient.uploadObject(args);
+        if (DeleteMode.ON_SUCCESS == deleteMode) {
+          Files.delete(file);
+        }
+        return response;
+      });
 
-  /**
-   * Disables legal hold on an object.
-   *
-   * <pre>Example:{@code
-   * minioClient.disableObjectLegalHold(
-   *    DisableObjectLegalHoldArgs.builder()
-   *        .bucket("my-bucketname")
-   *        .object("my-objectname")
-   *        .versionId("object-versionId")
-   *        .build());
-   * }</pre>
-   *
-   * @param args {@link DisableObjectLegalHoldArgs} object.
-   */
-  default void disableObjectLegalHold(DisableObjectLegalHoldArgs args) {
-    execute((MinioClientCallbackWithoutResult) minioClient -> minioClient
-        .disableObjectLegalHold(args));
-  }
-
-  /**
-   * Enables legal hold on an object.
-   *
-   * <pre>Example:{@code
-   * minioClient.enableObjectLegalHold(
-   *    EnableObjectLegalHoldArgs.builder()
-   *        .bucket("my-bucketname")
-   *        .object("my-objectname")
-   *        .versionId("object-versionId")
-   *        .build());
-   * }</pre>
-   *
-   * @param args {@link EnableObjectLegalHoldArgs} object.
-   */
-  default void enableObjectLegalHold(EnableObjectLegalHoldArgs args) {
-    execute((MinioClientCallbackWithoutResult) minioClient -> minioClient
-        .enableObjectLegalHold(args));
-  }
-
-  /**
-   * Gets data from offset to length of a SSE-C encrypted object. Returned {@link InputStream} must be closed after use
-   * to release network resources.
-   *
-   * <pre>Example:{@code
-   * try (InputStream stream =
-   *     minioClient.getObject(
-   *   GetObjectArgs.builder()
-   *     .bucket("my-bucketname")
-   *     .object("my-objectname")
-   *     .offset(offset)
-   *     .length(len)
-   *     .ssec(ssec)
-   *     .build()
-   * ) {
-   *   // Read data from stream
-   * }
-   * }</pre>
-   *
-   * @param args Object of {@link GetObjectArgs}
-   */
-  default InputStream getObject(GetObjectArgs args) {
-    return execute(minioClient -> minioClient.getObject(args));
+    } finally {
+      if (DeleteMode.ALWAYS == deleteMode) {
+        execute((MinioClientCallbackWithoutResult) minioClient -> Files.delete(file));
+      }
+    }
   }
 
   /**
@@ -855,43 +832,6 @@ public interface MinioOperations {
   default void downloadObject(DownloadObjectArgs args) {
     execute((MinioClientCallbackWithoutResult) minioClient -> minioClient
         .downloadObject(args));
-  }
-
-  /**
-   * Gets retention configuration of an object.
-   *
-   * <pre>Example:{@code
-   * Retention retention =
-   *     minioClient.getObjectRetention(GetObjectRetentionArgs.builder()
-   *        .bucket(bucketName)
-   *        .object(objectName)
-   *        .versionId(versionId)
-   *        .build()););
-   * System.out.println(
-   *     "mode: " + retention.mode() + "until: " + retention.retainUntilDate());
-   * }</pre>
-   *
-   * @param args {@link GetObjectRetentionArgs} object.
-   * @return {@link Retention} - Object retention configuration.
-   */
-  default Retention getObjectRetention(GetObjectRetentionArgs args) {
-    return execute(minioClient -> minioClient.getObjectRetention(args));
-  }
-
-  /**
-   * Gets tags of an object.
-   *
-   * <pre>Example:{@code
-   * Tags tags =
-   *     minioClient.getObjectTags(
-   *         GetObjectTagsArgs.builder().bucket("my-bucketname").object("my-objectname").build());
-   * }</pre>
-   *
-   * @param args {@link GetObjectTagsArgs} object.
-   * @return {@link Tags} - Tags.
-   */
-  default Tags getObjectTags(GetObjectTagsArgs args) {
-    return execute(minioClient -> minioClient.getObjectTags(args));
   }
 
   /**
@@ -999,120 +939,129 @@ public interface MinioOperations {
   }
 
   /**
-   * Returns true if legal hold is enabled on an object.
+   * Gets information of an object.
    *
    * <pre>Example:{@code
-   * boolean status =
-   *     s3Client.isObjectLegalHoldEnabled(
-   *        IsObjectLegalHoldEnabledArgs.builder()
+   * // Get information of an object.
+   * ObjectStat objectStat =
+   *     minioClient.statObject(
+   *         StatObjectArgs.builder().bucket("my-bucketname").object("my-objectname").build());
+   *
+   * // Get information of SSE-C encrypted object.
+   * ObjectStat objectStat =
+   *     minioClient.statObject(
+   *         StatObjectArgs.builder()
    *             .bucket("my-bucketname")
    *             .object("my-objectname")
-   *             .versionId("object-versionId")
+   *             .ssec(ssec)
    *             .build());
-   * if (status) {
-   *   System.out.println("Legal hold is on");
-   *  } else {
-   *   System.out.println("Legal hold is off");
-   *  }
+   *
+   * // Get information of a versioned object.
+   * ObjectStat objectStat =
+   *     minioClient.statObject(
+   *         StatObjectArgs.builder()
+   *             .bucket("my-bucketname")
+   *             .object("my-objectname")
+   *             .versionId("version-id")
+   *             .build());
+   *
+   * // Get information of a SSE-C encrypted versioned object.
+   * ObjectStat objectStat =
+   *     minioClient.statObject(
+   *         StatObjectArgs.builder()
+   *             .bucket("my-bucketname")
+   *             .object("my-objectname")
+   *             .versionId("version-id")
+   *             .ssec(ssec)
+   *             .build());
    * }</pre>
    *
-   * @param args {@link IsObjectLegalHoldEnabledArgs} object.
-   * @return boolean - True if legal hold is enabled.
+   * @param args {@link StatObjectArgs} object.
+   * @return {@link StatObjectResponse} - Populated object information and metadata.
    */
-  default boolean isObjectLegalHoldEnabled(IsObjectLegalHoldEnabledArgs args) {
-    return execute(minioClient -> minioClient.isObjectLegalHoldEnabled(args));
+  default StatObjectResponse statObject(StatObjectArgs args) {
+    return execute(minioClient -> minioClient.statObject(args));
   }
 
   /**
-   * Uploads data from a stream to an object.
+   * Check whether an object exists or not.
    *
-   * <pre>Example:{@code
-   * // Upload known sized input stream.
-   * minioClient.putObject(
-   *     PutObjectArgs.builder().bucket("my-bucketname").object("my-objectname").stream(
-   *             inputStream, size, -1)
-   *         .contentType("video/mp4")
-   *         .build());
-   *
-   * // Upload unknown sized input stream.
-   * minioClient.putObject(
-   *     PutObjectArgs.builder().bucket("my-bucketname").object("my-objectname").stream(
-   *             inputStream, -1, 10485760)
-   *         .contentType("video/mp4")
-   *         .build());
-   *
-   * // Create object ends with '/' (also called as folder or directory).
-   * minioClient.putObject(
-   *     PutObjectArgs.builder().bucket("my-bucketname").object("path/to/").stream(
-   *             new ByteArrayInputStream(new byte[] {}), 0, -1)
-   *         .build());
-   *
-   * // Upload input stream with headers and user metadata.
-   * Map<String, String> headers = new HashMap<>();
-   * headers.put("X-Amz-Storage-Class", "REDUCED_REDUNDANCY");
-   * Map<String, String> userMetadata = new HashMap<>();
-   * userMetadata.put("My-Project", "Project One");
-   * minioClient.putObject(
-   *     PutObjectArgs.builder().bucket("my-bucketname").object("my-objectname").stream(
-   *             inputStream, size, -1)
-   *         .headers(headers)
-   *         .userMetadata(userMetadata)
-   *         .build());
-   *
-   * // Upload input stream with server-side encryption.
-   * minioClient.putObject(
-   *     PutObjectArgs.builder().bucket("my-bucketname").object("my-objectname").stream(
-   *             inputStream, size, -1)
-   *         .sse(sse)
-   *         .build());
-   * }</pre>
-   *
-   * @param args {@link PutObjectArgs} object.
-   * @return {@link ObjectWriteResponse} object.
+   * @param args {@link StatObjectArgs} object.
+   * @return {@code true} if the object exists, otherwise {@code false}
    */
-  default ObjectWriteResponse putObject(PutObjectArgs args) {
-    return execute(minioClient -> minioClient.putObject(args));
-  }
-
-  /**
-   * Uploads data from a file to an object.
-   *
-   * <pre>Example:{@code
-   * // Upload an JSON file.
-   * minioClient.uploadObject(
-   *     UploadObjectArgs.builder()
-   *         .bucket("my-bucketname").object("my-objectname").filename("person.json").build());
-   *
-   * // Upload a video file.
-   * minioClient.uploadObject(
-   *     UploadObjectArgs.builder()
-   *         .bucket("my-bucketname")
-   *         .object("my-objectname")
-   *         .filename("my-video.avi")
-   *         .contentType("video/mp4")
-   *         .build());
-   * }</pre>
-   *
-   * @param args {@link UploadObjectArgs} object.
-   * @param deleteMode the delete mode
-   * @return {@link ObjectWriteResponse} object.
-   */
-  default ObjectWriteResponse uploadObject(UploadObjectArgs args, DeleteMode deleteMode) {
-    final Path file = Paths.get(args.filename());
+  default boolean objectExists(StatObjectArgs args) {
     try {
-      return execute(minioClient -> {
-        ObjectWriteResponse response = minioClient.uploadObject(args);
-        if (DeleteMode.ON_SUCCESS == deleteMode) {
-          Files.delete(file);
-        }
-        return response;
-      });
-
-    } finally {
-      if (DeleteMode.ALWAYS == deleteMode) {
-        execute((MinioClientCallbackWithoutResult) minioClient -> Files.delete(file));
+      return statObject(args) != null;
+    } catch (MinioException e) {
+      if (404 == e.status()) {
+        return false;
       }
+      throw e;
     }
+  }
+
+  /**
+   * Gets data from offset to length of a SSE-C encrypted object. Returned {@link InputStream} must be closed after use
+   * to release network resources.
+   *
+   * <pre>Example:{@code
+   * try (InputStream stream =
+   *     minioClient.getObject(
+   *   GetObjectArgs.builder()
+   *     .bucket("my-bucketname")
+   *     .object("my-objectname")
+   *     .offset(offset)
+   *     .length(len)
+   *     .ssec(ssec)
+   *     .build()
+   * ) {
+   *   // Read data from stream
+   * }
+   * }</pre>
+   *
+   * @param args Object of {@link GetObjectArgs}
+   */
+  default InputStream getObject(GetObjectArgs args) {
+    return execute(minioClient -> minioClient.getObject(args));
+  }
+
+  /**
+   * Selects content of an object by SQL expression.
+   *
+   * <pre>Example:{@code
+   * String sqlExpression = "select * from S3Object";
+   * InputSerialization is =
+   *     new InputSerialization(null, false, null, null, FileHeaderInfo.USE, null, null,
+   *         null);
+   * OutputSerialization os =
+   *     new OutputSerialization(null, null, null, QuoteFields.ASNEEDED, null);
+   * SelectResponseStream stream =
+   *     minioClient.selectObjectContent(
+   *       SelectObjectContentArgs.builder()
+   *       .bucket("my-bucketname")
+   *       .object("my-objectname")
+   *       .sqlExpression(sqlExpression)
+   *       .inputSerialization(is)
+   *       .outputSerialization(os)
+   *       .requestProgress(true)
+   *       .build());
+   *
+   * byte[] buf = new byte[512];
+   * int bytesRead = stream.read(buf, 0, buf.length);
+   * System.out.println(new String(buf, 0, bytesRead, StandardCharsets.UTF_8));
+   *
+   * Stats stats = stream.stats();
+   * System.out.println("bytes scanned: " + stats.bytesScanned());
+   * System.out.println("bytes processed: " + stats.bytesProcessed());
+   * System.out.println("bytes returned: " + stats.bytesReturned());
+   *
+   * stream.close();
+   * }</pre>
+   *
+   * @param args instance of {@link SelectObjectContentArgs}
+   */
+  default SelectResponseStream selectObjectContent(SelectObjectContentArgs args) {
+    return execute(minioClient -> minioClient.selectObjectContent(args));
   }
 
   /**
@@ -1174,42 +1123,61 @@ public interface MinioOperations {
   }
 
   /**
-   * Selects content of an object by SQL expression.
+   * Creates an object by combining data from different source objects using server-side copy.
    *
    * <pre>Example:{@code
-   * String sqlExpression = "select * from S3Object";
-   * InputSerialization is =
-   *     new InputSerialization(null, false, null, null, FileHeaderInfo.USE, null, null,
-   *         null);
-   * OutputSerialization os =
-   *     new OutputSerialization(null, null, null, QuoteFields.ASNEEDED, null);
-   * SelectResponseStream stream =
-   *     minioClient.selectObjectContent(
-   *       SelectObjectContentArgs.builder()
-   *       .bucket("my-bucketname")
-   *       .object("my-objectname")
-   *       .sqlExpression(sqlExpression)
-   *       .inputSerialization(is)
-   *       .outputSerialization(os)
-   *       .requestProgress(true)
-   *       .build());
+   * List<ComposeSource> sourceObjectList = new ArrayList<ComposeSource>();
    *
-   * byte[] buf = new byte[512];
-   * int bytesRead = stream.read(buf, 0, buf.length);
-   * System.out.println(new String(buf, 0, bytesRead, StandardCharsets.UTF_8));
+   * sourceObjectList.add(
+   *    ComposeSource.builder().bucket("my-job-bucket").object("my-objectname-part-one").build());
+   * sourceObjectList.add(
+   *    ComposeSource.builder().bucket("my-job-bucket").object("my-objectname-part-two").build());
+   * sourceObjectList.add(
+   *    ComposeSource.builder().bucket("my-job-bucket").object("my-objectname-part-three").build());
    *
-   * Stats stats = stream.stats();
-   * System.out.println("bytes scanned: " + stats.bytesScanned());
-   * System.out.println("bytes processed: " + stats.bytesProcessed());
-   * System.out.println("bytes returned: " + stats.bytesReturned());
-   *
-   * stream.close();
+   * // Create my-bucketname/my-objectname by combining source object list.
+   * minioClient.composeObject(
+   *    ComposeObjectArgs.builder()
+   *        .bucket("my-bucketname")
+   *        .object("my-objectname")
+   *        .sources(sourceObjectList)
+   *        .build());
    * }</pre>
    *
-   * @param args instance of {@link SelectObjectContentArgs}
+   * @param args {@link ComposeObjectArgs} object.
    */
-  default SelectResponseStream selectObjectContent(SelectObjectContentArgs args) {
-    return execute(minioClient -> minioClient.selectObjectContent(args));
+  default ObjectWriteResponse composeObject(ComposeObjectArgs args) {
+    return execute(minioClient -> minioClient.composeObject(args));
+  }
+
+  /**
+   * Creates an object by server-side copying data from another object.
+   *
+   * @param args {@link CopyObjectArgs} object.
+   */
+  default ObjectWriteResponse copyObject(CopyObjectArgs args) {
+    return execute(minioClient -> minioClient.copyObject(args));
+  }
+
+  /**
+   * Gets retention configuration of an object.
+   *
+   * <pre>Example:{@code
+   * Retention retention =
+   *     minioClient.getObjectRetention(GetObjectRetentionArgs.builder()
+   *        .bucket(bucketName)
+   *        .object(objectName)
+   *        .versionId(versionId)
+   *        .build()););
+   * System.out.println(
+   *     "mode: " + retention.mode() + "until: " + retention.retainUntilDate());
+   * }</pre>
+   *
+   * @param args {@link GetObjectRetentionArgs} object.
+   * @return {@link Retention} - Object retention configuration.
+   */
+  default Retention getObjectRetention(GetObjectRetentionArgs args) {
+    return execute(minioClient -> minioClient.getObjectRetention(args));
   }
 
   /**
@@ -1235,6 +1203,22 @@ public interface MinioOperations {
   }
 
   /**
+   * Gets tags of an object.
+   *
+   * <pre>Example:{@code
+   * Tags tags =
+   *     minioClient.getObjectTags(
+   *         GetObjectTagsArgs.builder().bucket("my-bucketname").object("my-objectname").build());
+   * }</pre>
+   *
+   * @param args {@link GetObjectTagsArgs} object.
+   * @return {@link Tags} - Tags.
+   */
+  default Tags getObjectTags(GetObjectTagsArgs args) {
+    return execute(minioClient -> minioClient.getObjectTags(args));
+  }
+
+  /**
    * Sets tags to an object.
    *
    * <pre>Example:{@code
@@ -1257,65 +1241,81 @@ public interface MinioOperations {
   }
 
   /**
-   * Gets information of an object.
+   * Deletes tags of an object.
    *
    * <pre>Example:{@code
-   * // Get information of an object.
-   * ObjectStat objectStat =
-   *     minioClient.statObject(
-   *         StatObjectArgs.builder().bucket("my-bucketname").object("my-objectname").build());
-   *
-   * // Get information of SSE-C encrypted object.
-   * ObjectStat objectStat =
-   *     minioClient.statObject(
-   *         StatObjectArgs.builder()
-   *             .bucket("my-bucketname")
-   *             .object("my-objectname")
-   *             .ssec(ssec)
-   *             .build());
-   *
-   * // Get information of a versioned object.
-   * ObjectStat objectStat =
-   *     minioClient.statObject(
-   *         StatObjectArgs.builder()
-   *             .bucket("my-bucketname")
-   *             .object("my-objectname")
-   *             .versionId("version-id")
-   *             .build());
-   *
-   * // Get information of a SSE-C encrypted versioned object.
-   * ObjectStat objectStat =
-   *     minioClient.statObject(
-   *         StatObjectArgs.builder()
-   *             .bucket("my-bucketname")
-   *             .object("my-objectname")
-   *             .versionId("version-id")
-   *             .ssec(ssec)
-   *             .build());
+   * minioClient.deleteObjectTags(
+   *     DeleteObjectTags.builder().bucket("my-bucketname").object("my-objectname").build());
    * }</pre>
    *
-   * @param args {@link StatObjectArgs} object.
-   * @return {@link StatObjectResponse} - Populated object information and metadata.
+   * @param args {@link DeleteObjectTagsArgs} object.
    */
-  default StatObjectResponse statObject(StatObjectArgs args) {
-    return execute(minioClient -> minioClient.statObject(args));
+  default void deleteObjectTags(DeleteObjectTagsArgs args) {
+    execute((MinioClientCallbackWithoutResult) minioClient -> minioClient
+        .deleteObjectTags(args));
   }
 
   /**
-   * Check whether an object exists or not.
+   * Returns true if legal hold is enabled on an object.
    *
-   * @param args {@link StatObjectArgs} object.
-   * @return {@code true} if the object exists, otherwise {@code false}
+   * <pre>Example:{@code
+   * boolean status =
+   *     s3Client.isObjectLegalHoldEnabled(
+   *        IsObjectLegalHoldEnabledArgs.builder()
+   *             .bucket("my-bucketname")
+   *             .object("my-objectname")
+   *             .versionId("object-versionId")
+   *             .build());
+   * if (status) {
+   *   System.out.println("Legal hold is on");
+   *  } else {
+   *   System.out.println("Legal hold is off");
+   *  }
+   * }</pre>
+   *
+   * @param args {@link IsObjectLegalHoldEnabledArgs} object.
+   * @return boolean - True if legal hold is enabled.
    */
-  default boolean objectExists(StatObjectArgs args) {
-    try {
-      return statObject(args) != null;
-    } catch (MinioException e) {
-      if (404 == e.status()) {
-        return false;
-      }
-      throw e;
-    }
+  default boolean isObjectLegalHoldEnabled(IsObjectLegalHoldEnabledArgs args) {
+    return execute(minioClient -> minioClient.isObjectLegalHoldEnabled(args));
+  }
+
+  /**
+   * Enables legal hold on an object.
+   *
+   * <pre>Example:{@code
+   * minioClient.enableObjectLegalHold(
+   *    EnableObjectLegalHoldArgs.builder()
+   *        .bucket("my-bucketname")
+   *        .object("my-objectname")
+   *        .versionId("object-versionId")
+   *        .build());
+   * }</pre>
+   *
+   * @param args {@link EnableObjectLegalHoldArgs} object.
+   */
+  default void enableObjectLegalHold(EnableObjectLegalHoldArgs args) {
+    execute((MinioClientCallbackWithoutResult) minioClient -> minioClient
+        .enableObjectLegalHold(args));
+  }
+
+  /**
+   * Disables legal hold on an object.
+   *
+   * <pre>Example:{@code
+   * minioClient.disableObjectLegalHold(
+   *    DisableObjectLegalHoldArgs.builder()
+   *        .bucket("my-bucketname")
+   *        .object("my-objectname")
+   *        .versionId("object-versionId")
+   *        .build());
+   * }</pre>
+   *
+   * @param args {@link DisableObjectLegalHoldArgs} object.
+   */
+  default void disableObjectLegalHold(DisableObjectLegalHoldArgs args) {
+    execute((MinioClientCallbackWithoutResult) minioClient -> minioClient
+        .disableObjectLegalHold(args));
   }
 
 }
