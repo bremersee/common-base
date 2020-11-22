@@ -6,7 +6,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import org.junit.jupiter.api.Test;
-import org.ldaptive.provider.Provider;
 import org.springframework.beans.factory.ObjectProvider;
 
 /**
@@ -55,19 +54,9 @@ class LdaptiveAutoConfigurationTest {
         = mock(ObjectProvider.class);
     when(connectionConfigFactory.getIfAvailable(any()))
         .thenReturn(LdaptiveConnectionConfigFactory.defaultFactory());
-    ObjectProvider<LdaptiveConnectionPoolFactory> connectionPoolFactory
-        = mock(ObjectProvider.class);
-    when(connectionPoolFactory.getIfAvailable(any()))
-        .thenReturn(LdaptiveConnectionPoolFactory.defaultFactory());
-    ObjectProvider<Provider<?>> ldaptiveProvider
-        = mock(ObjectProvider.class);
-    when(ldaptiveProvider.getIfAvailable())
-        .thenReturn(null);
 
     return new LdaptiveAutoConfiguration(
         properties,
-        connectionConfigFactory,
-        connectionPoolFactory,
-        ldaptiveProvider);
+        connectionConfigFactory);
   }
 }

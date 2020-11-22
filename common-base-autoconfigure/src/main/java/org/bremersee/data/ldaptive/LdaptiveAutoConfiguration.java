@@ -18,12 +18,12 @@ package org.bremersee.data.ldaptive;
 
 import lombok.extern.slf4j.Slf4j;
 import org.bremersee.exception.ServiceException;
-import org.ldaptive.ConnectionConfig;
 import org.ldaptive.ConnectionFactory;
 import org.ldaptive.DefaultConnectionFactory;
-import org.ldaptive.pool.ConnectionPool;
-import org.ldaptive.pool.PooledConnectionFactory;
-import org.ldaptive.provider.Provider;
+import org.ldaptive.PooledConnectionFactory;
+import org.ldaptive.SearchRequest;
+import org.ldaptive.SearchResponse;
+import org.ldaptive.pool.IdlePruneStrategy;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -53,29 +53,18 @@ public class LdaptiveAutoConfiguration {
 
   private final LdaptiveConnectionConfigFactory connectionConfigFactory;
 
-  private final LdaptiveConnectionPoolFactory connectionPoolFactory;
-
-  private final Provider<?> ldaptiveProvider;
-
   /**
    * Instantiates a new ldaptive configuration.
    *
    * @param ldaptiveProperties the ldaptive properties
    * @param connectionConfigFactory the connection config factory
-   * @param connectionPoolFactory the connection pool factory
-   * @param ldaptiveProvider the ldaptive provider
    */
   public LdaptiveAutoConfiguration(
       LdaptiveProperties ldaptiveProperties,
-      ObjectProvider<LdaptiveConnectionConfigFactory> connectionConfigFactory,
-      ObjectProvider<LdaptiveConnectionPoolFactory> connectionPoolFactory,
-      ObjectProvider<Provider<?>> ldaptiveProvider) {
+      ObjectProvider<LdaptiveConnectionConfigFactory> connectionConfigFactory) {
     this.properties = ldaptiveProperties;
     this.connectionConfigFactory = connectionConfigFactory
         .getIfAvailable(LdaptiveConnectionConfigFactory::defaultFactory);
-    this.connectionPoolFactory = connectionPoolFactory
-        .getIfAvailable(LdaptiveConnectionPoolFactory::defaultFactory);
-    this.ldaptiveProvider = ldaptiveProvider.getIfAvailable();
   }
 
   /**
@@ -88,22 +77,18 @@ public class LdaptiveAutoConfiguration {
             + "* {}\n"
             + "*********************************************************************************\n"
             + "* connectionConfigFactory = {}\n"
-            + "* connectionPoolFactory = {}\n"
-            + "* ldaptiveProvider = {}\n"
+            + "* properties = {}\n"
             + "*********************************************************************************",
         ClassUtils.getUserClass(getClass()).getSimpleName(),
         ClassUtils.getUserClass(connectionConfigFactory).getSimpleName(),
-        ClassUtils.getUserClass(connectionConfigFactory).getSimpleName(),
-        ldaptiveProvider != null
-            ? ClassUtils.getUserClass(ldaptiveProvider).getSimpleName()
-            : "null");
+        properties);
 
     if (properties.isPooled()) {
-      LdaptiveTemplate template = new LdaptiveTemplate(defaultConnectionFactory());
-      boolean exists = template
-          .findOne(properties.getSearchValidator().getSearchRequest())
-          .isPresent();
-      if (!exists) {
+      log.info("Checking validation properties {}", properties.getSearchValidator());
+      LdaptiveTemplate ldaptiveTemplate = new LdaptiveTemplate(defaultConnectionFactory());
+      SearchRequest request = properties.getSearchValidator().getSearchRequest().createSearchRequest();
+      SearchResponse response = ldaptiveTemplate.search(request);
+      if (!response.isSuccess()) {
         ServiceException se = ServiceException.internalServerError(
             "Invalid search validator. There is no result executing search validator.",
             "org.bremersee:common-base-ldaptive-autoconfigure:"
@@ -111,6 +96,7 @@ public class LdaptiveAutoConfiguration {
         log.error("Validation of pool validation failed.", se);
         throw se;
       }
+      log.info("Checking validation properties: successfully done!");
     }
   }
 
@@ -130,36 +116,33 @@ public class LdaptiveAutoConfiguration {
    *
    * @return the connection factory bean
    */
-  @Bean
+  @Bean(destroyMethod = "close")
   public ConnectionFactory connectionFactory() {
     return properties.isPooled() ? pooledConnectionFactory() : defaultConnectionFactory();
   }
 
   private DefaultConnectionFactory defaultConnectionFactory() {
-    DefaultConnectionFactory factory = new DefaultConnectionFactory();
-    factory.setConnectionConfig(connectionConfig());
-    if (ldaptiveProvider != null) {
-      factory.setProvider(ldaptiveProvider);
-    }
-    return factory;
+    return DefaultConnectionFactory.builder()
+        .config(connectionConfigFactory.createConnectionConfig(properties))
+        .build();
   }
 
   private PooledConnectionFactory pooledConnectionFactory() {
-    PooledConnectionFactory factory = new PooledConnectionFactory();
-    factory.setConnectionPool(connectionPool());
+    PooledConnectionFactory factory = PooledConnectionFactory.builder()
+        .config(connectionConfigFactory.createConnectionConfig(properties))
+        .blockWaitTime(properties.getBlockWaitTime())
+        .connectOnCreate(properties.isConnectOnCreate())
+        .failFastInitialize(properties.isFailFastInitialize())
+        .max(properties.getMaxPoolSize())
+        .min(properties.getMinPoolSize())
+        .pruneStrategy(new IdlePruneStrategy(properties.getPrunePeriod(), properties.getIdleTime()))
+        .validateOnCheckIn(properties.isValidateOnCheckIn())
+        .validateOnCheckOut(properties.isValidateOnCheckOut())
+        .validatePeriodically(properties.isValidatePeriodically())
+        .validator(properties.createSearchConnectionValidator())
+        .build();
+    factory.initialize();
     return factory;
-  }
-
-  private ConnectionConfig connectionConfig() {
-    return connectionConfigFactory.createConnectionConfig(properties);
-  }
-
-  private ConnectionPool connectionPool() {
-    ConnectionPool pool = connectionPoolFactory.createConnectionPool(
-        properties,
-        defaultConnectionFactory());
-    pool.initialize();
-    return pool;
   }
 
 }

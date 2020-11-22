@@ -37,10 +37,10 @@ import org.bremersee.exception.ServiceException;
 import org.junit.jupiter.api.Test;
 import org.ldaptive.AddRequest;
 import org.ldaptive.DeleteRequest;
+import org.ldaptive.FilterTemplate;
 import org.ldaptive.LdapAttribute;
 import org.ldaptive.LdapEntry;
 import org.ldaptive.ModifyRequest;
-import org.ldaptive.SearchFilter;
 import org.ldaptive.SearchRequest;
 import org.ldaptive.SearchScope;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -85,10 +85,11 @@ class LdaptiveTemplateTest {
    */
   @Test
   void findExistingPersons() {
-    SearchFilter searchFilter = new SearchFilter("(objectclass=inetOrgPerson)");
-    SearchRequest searchRequest = new SearchRequest(
-        "ou=people," + baseDn, searchFilter);
-    searchRequest.setSearchScope(SearchScope.ONELEVEL);
+    SearchRequest searchRequest = SearchRequest.builder()
+        .dn("ou=people," + baseDn)
+        .filter("(objectclass=inetOrgPerson)")
+        .scope(SearchScope.ONELEVEL)
+        .build();
 
     // without mapper
     Collection<LdapEntry> entries = ldaptiveTemplate.findAll(searchRequest);
@@ -121,13 +122,16 @@ class LdaptiveTemplateTest {
    */
   @Test
   void findExistingGroups() {
-    SearchFilter searchFilter = new SearchFilter("(objectclass=groupOfUniqueNames)");
-    SearchRequest searchRequest = new SearchRequest(
-        "ou=groups," + baseDn, searchFilter);
-    searchRequest.setSearchScope(SearchScope.ONELEVEL);
+    SearchRequest searchRequest = SearchRequest.builder()
+        .dn("ou=groups," + baseDn)
+        .filter("(objectclass=groupOfUniqueNames)")
+        .scope(SearchScope.ONELEVEL)
+        .build();
 
     // without mapper
     Collection<LdapEntry> entries = ldaptiveTemplate.findAll(searchRequest);
+    System.out.println("====> size = " + entries.size());
+    System.out.println("====> entries = " + entries);
     entries.forEach(ldapEntry -> log.info("Ldap entry found with cn = {}",
         ldapEntry.getAttribute("cn").getStringValue()));
     assertTrue(entries.stream()
@@ -151,11 +155,14 @@ class LdaptiveTemplateTest {
    */
   @Test
   void findExistingPerson() {
-    SearchFilter searchFilter = new SearchFilter("(&(objectclass=inetOrgPerson)(uid={0}))");
-    searchFilter.setParameter(0, "anna");
-    SearchRequest searchRequest = new SearchRequest(
-        "ou=people," + baseDn, searchFilter);
-    searchRequest.setSearchScope(SearchScope.ONELEVEL);
+    SearchRequest searchRequest = SearchRequest.builder()
+        .dn("ou=people," + baseDn)
+        .filter(FilterTemplate.builder()
+            .filter("(&(objectclass=inetOrgPerson)(uid={0}))")
+            .parameters("anna")
+            .build())
+        .scope(SearchScope.ONELEVEL)
+        .build();
 
     Optional<LdapEntry> entry = ldaptiveTemplate.findOne(searchRequest);
     assertTrue(entry.isPresent());
@@ -192,7 +199,7 @@ class LdaptiveTemplateTest {
     LdapEntry destination = new LdapEntry();
     personMapper.map(person, destination);
     destination.setDn(dn);
-    destination.addAttribute(new LdapAttribute(
+    destination.addAttributes(new LdapAttribute(
         "objectclass",
         personMapper.getObjectClasses()));
     ldaptiveTemplate.add(new AddRequest(dn, destination.getAttributes()));
@@ -203,7 +210,7 @@ class LdaptiveTemplateTest {
         .mapAndComputeModifyRequest(person, destination);
     ldaptiveTemplate.modify(modifyRequest);
 
-    person = ldaptiveTemplate.findOne(SearchRequest.newObjectScopeSearchRequest(dn), personMapper)
+    person = ldaptiveTemplate.findOne(SearchRequest.objectScopeSearchRequest(dn), personMapper)
         .orElseThrow(() -> ServiceException.notFound("Person", "person"));
     assertEquals("Surname", person.getSn());
 
@@ -212,7 +219,7 @@ class LdaptiveTemplateTest {
         .mapAndComputeModifyRequest(person, destination);
     ldaptiveTemplate.modify(modifyRequest);
 
-    person = ldaptiveTemplate.findOne(SearchRequest.newObjectScopeSearchRequest(dn), personMapper)
+    person = ldaptiveTemplate.findOne(SearchRequest.objectScopeSearchRequest(dn), personMapper)
         .orElseThrow(() -> ServiceException.notFound("Person", "person"));
     assertNull(person.getSn());
 
@@ -236,11 +243,14 @@ class LdaptiveTemplateTest {
     group = ldaptiveTemplate.save(group, groupMapper);
     assertNotNull(group);
 
-    SearchFilter searchFilter = new SearchFilter("(&(objectclass=groupOfUniqueNames)(cn={0}))");
-    searchFilter.setParameter(0, "party");
-    SearchRequest searchRequest = new SearchRequest(
-        "ou=groups," + baseDn, searchFilter);
-    searchRequest.setSearchScope(SearchScope.ONELEVEL);
+    SearchRequest searchRequest = SearchRequest.builder()
+        .dn("ou=groups," + baseDn)
+        .filter(FilterTemplate.builder()
+            .filter("(&(objectclass=groupOfUniqueNames)(cn={0}))")
+            .parameters("party")
+            .build())
+        .scope(SearchScope.ONELEVEL)
+        .build();
 
     group = ldaptiveTemplate.findOne(searchRequest, groupMapper)
         .orElseThrow(() -> ServiceException.notFound("Group", "party"));

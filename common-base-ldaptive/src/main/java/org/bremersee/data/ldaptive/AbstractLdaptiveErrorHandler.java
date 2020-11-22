@@ -18,6 +18,7 @@ package org.bremersee.data.ldaptive;
 
 import lombok.extern.slf4j.Slf4j;
 import org.ldaptive.LdapException;
+import org.springframework.lang.NonNull;
 
 /**
  * The abstract ldaptive error handler.
@@ -28,7 +29,7 @@ import org.ldaptive.LdapException;
 public abstract class AbstractLdaptiveErrorHandler implements LdaptiveErrorHandler {
 
   @Override
-  public void handleError(final Throwable t) {
+  public void handleError(@NonNull final Throwable t) {
     final LdaptiveException ldaptiveException;
     if (t instanceof LdaptiveException) {
       ldaptiveException = (LdaptiveException) t;

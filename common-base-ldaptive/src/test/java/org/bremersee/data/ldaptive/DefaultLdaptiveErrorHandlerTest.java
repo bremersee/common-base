@@ -39,11 +39,11 @@ class DefaultLdaptiveErrorHandlerTest {
     DefaultLdaptiveErrorHandler errorHandler = new DefaultLdaptiveErrorHandler();
     assertNotNull(errorHandler.map(null));
 
-    LdapException ldapException = new LdapException("Not found.", ResultCode.NO_SUCH_OBJECT);
+    LdapException ldapException = new LdapException(ResultCode.NO_SUCH_OBJECT, "Not found.");
     assertEquals(404, errorHandler.map(ldapException).status());
     assertEquals(ldapException, errorHandler.map(ldapException).getCause());
 
-    ldapException = new LdapException("Internal server error.", ResultCode.INVALID_RESPONSE);
+    ldapException = new LdapException(ResultCode.INVALID_RESPONSE, "Internal server error.");
     assertEquals(0, errorHandler.map(ldapException).status());
     assertEquals(ldapException, errorHandler.map(ldapException).getCause());
   }
@@ -60,7 +60,7 @@ class DefaultLdaptiveErrorHandlerTest {
         .build();
     assertThrows(LdaptiveException.class, () -> errorHandler.handleError(ldaptiveException));
 
-    LdapException ldapException = new LdapException("Not found.", ResultCode.NO_SUCH_OBJECT);
+    LdapException ldapException = new LdapException(ResultCode.NO_SUCH_OBJECT, "Not found.");
     assertThrows(LdaptiveException.class, () -> errorHandler.handleError(ldapException));
 
     assertThrows(LdaptiveException.class, () -> errorHandler.handleError(new Exception()));
