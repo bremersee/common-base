@@ -9,10 +9,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.bremersee.data.ldaptive.DefaultLdaptiveErrorHandler;
 import org.bremersee.data.ldaptive.LdaptiveEntryMapper;
 import org.bremersee.data.ldaptive.LdaptiveErrorHandler;
+import org.bremersee.data.ldaptive.LdaptiveTemplate;
 import org.bremersee.exception.ServiceException;
 import org.ldaptive.AddOperation;
 import org.ldaptive.AddRequest;
 import org.ldaptive.AttributeModification;
+import org.ldaptive.BindRequest;
 import org.ldaptive.CompareOperation;
 import org.ldaptive.CompareRequest;
 import org.ldaptive.ConnectionFactory;
@@ -143,7 +145,13 @@ public class ReactiveLdaptiveTemplate implements ReactiveLdaptiveOperations {
         .then(Mono.just(Objects.requireNonNull(entryMapper.map(entry))));
   }
 
-  // Bind requests are synchronous, invoke execute
+  @Override
+  public Mono<Boolean> bind(BindRequest bindRequest) {
+    // Bind requests are synchronous
+    LdaptiveTemplate template = new LdaptiveTemplate(getConnectionFactory());
+    template.setErrorHandler(errorHandler);
+    return Mono.just(template.bind(bindRequest));
+  }
 
   @Override
   public Mono<Boolean> compare(CompareRequest compareRequest) {
@@ -194,8 +202,13 @@ public class ReactiveLdaptiveTemplate implements ReactiveLdaptiveOperations {
           .onExtended((name, value) -> future.complete(ExtendedResponse.builder()
               .responseName(name)
               .responseValue(value)
+              .resultCode(ResultCode.SUCCESS)
               .build()))
-          .onResult(new FutureAwareResultHandler<>(future, NOT_SUCCESS, errorHandler, null))
+          .onResult(new FutureAwareResultHandler<>(
+              future,
+              NOT_SUCCESS,
+              errorHandler,
+              r -> ExtendedResponse.builder().resultCode(r.getResultCode()).build()))
           .onException(ldapException -> future.completeExceptionally(errorHandler.map(ldapException)))
           .build()
           .send(request);

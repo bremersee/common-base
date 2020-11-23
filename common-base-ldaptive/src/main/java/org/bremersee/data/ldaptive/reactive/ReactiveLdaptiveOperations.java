@@ -50,6 +50,14 @@ public interface ReactiveLdaptiveOperations {
   Mono<Result> add(@NotNull AddRequest addRequest);
 
   /**
+   * Executes bind operation.
+   *
+   * @param bindRequest the bind request
+   * @return the mono
+   */
+  Mono<Boolean> bind(@NotNull BindRequest bindRequest);
+
+  /**
    * Executes compare operation.
    *
    * @param compareRequest the compare request

@@ -40,6 +40,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.TestInstance.Lifecycle;
 import org.ldaptive.AddRequest;
+import org.ldaptive.BindRequest;
 import org.ldaptive.CompareRequest;
 import org.ldaptive.ConnectionFactory;
 import org.ldaptive.DeleteRequest;
@@ -50,6 +51,7 @@ import org.ldaptive.ModifyDnRequest;
 import org.ldaptive.ModifyRequest;
 import org.ldaptive.SearchRequest;
 import org.ldaptive.SearchScope;
+import org.ldaptive.SimpleBindRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -217,14 +219,22 @@ class ReactiveLdaptiveTemplateTest {
    * Generate user password and bind.
    */
   @Test
-  void generateUserPassword() {
+  void generateUserPasswordAndBind() {
     String dn = "uid=anna,ou=people," + baseDn;
 
     String newPasswd = "Pass1234$";
     StepVerifier.create(ldaptiveTemplate.generateUserPassword(dn))
         .assertNext(initPasswd -> StepVerifier
             .create(ldaptiveTemplate.modifyUserPassword(dn, initPasswd, newPasswd))
-            .assertNext(r -> System.out.println(r.getResponseName() + " = "))
+            .assertNext(extendedResponse -> {
+              assertTrue(extendedResponse.isSuccess());
+              StepVerifier.create(ldaptiveTemplate.bind(SimpleBindRequest.builder()
+                  .dn(dn)
+                  .password(newPasswd)
+                  .build()))
+                  .expectNext(true)
+                  .verifyComplete();
+            })
             .verifyComplete())
         .verifyComplete();
   }
