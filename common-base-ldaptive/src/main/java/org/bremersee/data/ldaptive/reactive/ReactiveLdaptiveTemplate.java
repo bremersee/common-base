@@ -115,7 +115,6 @@ public class ReactiveLdaptiveTemplate implements ReactiveLdaptiveOperations {
     try {
       AddOperation.builder()
           .factory(connectionFactory)
-          .throwIf(NOT_SUCCESS)
           .onResult(new FutureAwareResultHandler<>(future, NOT_SUCCESS, errorHandler, r -> r))
           .onException(ldapException -> future.completeExceptionally(errorHandler.map(ldapException)))
           .build()
@@ -159,7 +158,6 @@ public class ReactiveLdaptiveTemplate implements ReactiveLdaptiveOperations {
     try {
       CompareOperation.builder()
           .factory(connectionFactory)
-          .throwIf(NOT_COMPARE_RESULT)
           .onCompare(future::complete) // this will be only called, if the result is COMPARE_TRUE or COMPARE_FALSE
           .onResult(new FutureAwareResultHandler<>(future, NOT_COMPARE_RESULT, errorHandler, Result::isSuccess))
           .onException(ldapException -> future.completeExceptionally(errorHandler.map(ldapException)))
@@ -178,7 +176,6 @@ public class ReactiveLdaptiveTemplate implements ReactiveLdaptiveOperations {
     try {
       DeleteOperation.builder()
           .factory(connectionFactory)
-          .throwIf(NOT_DELETE_RESULT)
           .onResult(new FutureAwareResultHandler<>(future, NOT_DELETE_RESULT, errorHandler, r -> r))
           .onException(ldapException -> future.completeExceptionally(errorHandler.map(ldapException)))
           .build()
@@ -198,7 +195,6 @@ public class ReactiveLdaptiveTemplate implements ReactiveLdaptiveOperations {
     try {
       ExtendedOperation.builder()
           .factory(connectionFactory)
-          .throwIf(NOT_SUCCESS)
           .onExtended((name, value) -> future.complete(ExtendedResponse.builder()
               .responseName(name)
               .responseValue(value)
@@ -225,7 +221,6 @@ public class ReactiveLdaptiveTemplate implements ReactiveLdaptiveOperations {
     try {
       ModifyOperation.builder()
           .factory(connectionFactory)
-          .throwIf(NOT_SUCCESS)
           .onResult(new FutureAwareResultHandler<>(future, NOT_SUCCESS, errorHandler, r -> r))
           .onException(ldapException -> future.completeExceptionally(errorHandler.map(ldapException)))
           .build()
@@ -250,7 +245,6 @@ public class ReactiveLdaptiveTemplate implements ReactiveLdaptiveOperations {
     try {
       ModifyDnOperation.builder()
           .factory(connectionFactory)
-          .throwIf(NOT_SUCCESS)
           .onResult(new FutureAwareResultHandler<>(future, NOT_SUCCESS, errorHandler, r -> r))
           .onException(ldapException -> future.completeExceptionally(errorHandler.map(ldapException)))
           .build()
@@ -268,7 +262,6 @@ public class ReactiveLdaptiveTemplate implements ReactiveLdaptiveOperations {
     try {
       SearchOperation.builder()
           .factory(connectionFactory)
-          .throwIf(NOT_FIND_RESULT)
           .onEntry(ldapEntry -> {
             future.complete(ldapEntry);
             return ldapEntry;
@@ -290,7 +283,6 @@ public class ReactiveLdaptiveTemplate implements ReactiveLdaptiveOperations {
       try {
         SearchOperation.builder()
             .factory(connectionFactory)
-            .throwIf(NOT_FIND_RESULT)
             .onEntry(ldapEntry -> {
               fluxSink.next(ldapEntry);
               return ldapEntry;
