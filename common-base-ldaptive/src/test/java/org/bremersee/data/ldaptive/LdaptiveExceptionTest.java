@@ -61,7 +61,7 @@ class LdaptiveExceptionTest {
     ldaptiveException = LdaptiveException.builder()
         .httpStatus(505)
         .errorCode("1234")
-        .cause(new LdapException("Something went wrong", ResultCode.CONNECT_ERROR))
+        .cause(new LdapException(ResultCode.CONNECT_ERROR, "Something went wrong"))
         .build();
     assertEquals(505, ldaptiveException.status());
     assertEquals("1234", ldaptiveException.getErrorCode());
@@ -71,7 +71,7 @@ class LdaptiveExceptionTest {
     ldaptiveException = LdaptiveException.builder()
         .httpStatus(505)
         .errorCode("1234")
-        .cause(new LdapException("Something went wrong", ResultCode.CONNECT_ERROR))
+        .cause(new LdapException(ResultCode.CONNECT_ERROR, "Something went wrong"))
         .reason("Oops")
         .build();
     assertEquals(505, ldaptiveException.status());

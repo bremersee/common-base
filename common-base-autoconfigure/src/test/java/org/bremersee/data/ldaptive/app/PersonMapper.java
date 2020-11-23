@@ -26,7 +26,7 @@ import javax.validation.constraints.NotNull;
 import org.bremersee.data.ldaptive.LdaptiveEntryMapper;
 import org.ldaptive.AttributeModification;
 import org.ldaptive.LdapEntry;
-import org.ldaptive.io.StringValueTranscoder;
+import org.ldaptive.transcode.StringValueTranscoder;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;

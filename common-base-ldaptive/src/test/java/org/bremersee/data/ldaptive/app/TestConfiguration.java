@@ -20,9 +20,7 @@ import org.bremersee.data.ldaptive.LdaptiveTemplate;
 import org.ldaptive.BindConnectionInitializer;
 import org.ldaptive.ConnectionConfig;
 import org.ldaptive.ConnectionFactory;
-import org.ldaptive.Credential;
 import org.ldaptive.DefaultConnectionFactory;
-import org.ldaptive.provider.unboundid.UnboundIDProvider;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -55,16 +53,15 @@ public class TestConfiguration {
    */
   @Bean
   public ConnectionFactory connectionFactory() {
-    BindConnectionInitializer bci = new BindConnectionInitializer();
-    bci.setBindDn(username);
-    bci.setBindCredential(new Credential(password));
-    ConnectionConfig connectionConfig = new ConnectionConfig();
-    connectionConfig.setLdapUrl("ldap://localhost:" + port);
-    connectionConfig.setConnectionInitializer(bci);
-    DefaultConnectionFactory factory = new DefaultConnectionFactory();
-    factory.setConnectionConfig(connectionConfig);
-    factory.setProvider(new UnboundIDProvider());
-    return factory;
+    return DefaultConnectionFactory.builder()
+        .config(ConnectionConfig.builder()
+            .url("ldap://localhost:" + port)
+            .connectionInitializers(BindConnectionInitializer.builder()
+                .dn(username)
+                .credential(password)
+                .build())
+            .build())
+        .build();
   }
 
   /**

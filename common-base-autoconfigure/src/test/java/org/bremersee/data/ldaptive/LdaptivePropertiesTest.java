@@ -5,9 +5,10 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.time.Duration;
 import java.util.UUID;
+import org.bremersee.data.ldaptive.LdaptiveProperties.SearchValidatorProperties;
 import org.junit.jupiter.api.Test;
-import org.ldaptive.pool.SearchValidator;
 
 /**
  * The ldaptive properties test.
@@ -34,22 +35,6 @@ class LdaptivePropertiesTest {
   }
 
   /**
-   * Is use unbound id provider.
-   */
-  @Test
-  void isUseUnboundIdProvider() {
-    LdaptiveProperties expected = new LdaptiveProperties();
-    expected.setUseUnboundIdProvider(true);
-    assertTrue(expected.isUseUnboundIdProvider());
-
-    LdaptiveProperties actual = new LdaptiveProperties();
-    actual.setUseUnboundIdProvider(true);
-
-    assertEquals(expected, actual);
-    assertTrue(expected.toString().contains("true"));
-  }
-
-  /**
    * Gets ldap url.
    */
   @Test
@@ -71,13 +56,12 @@ class LdaptivePropertiesTest {
   @Test
   void getConnectTimeout() {
     LdaptiveProperties expected = new LdaptiveProperties();
-    expected.setConnectTimeout(123456789L);
+    expected.setConnectTimeout(Duration.ofMillis(123456789L));
 
     LdaptiveProperties actual = new LdaptiveProperties();
-    actual.setConnectTimeout(123456789L);
+    actual.setConnectTimeout(Duration.ofMillis(123456789L));
 
     assertEquals(expected, actual);
-    assertTrue(expected.toString().contains("123456789"));
   }
 
   /**
@@ -86,29 +70,12 @@ class LdaptivePropertiesTest {
   @Test
   void getResponseTimeout() {
     LdaptiveProperties expected = new LdaptiveProperties();
-    expected.setResponseTimeout(123456789L);
+    expected.setResponseTimeout(Duration.ofMillis(123456789L));
 
     LdaptiveProperties actual = new LdaptiveProperties();
-    actual.setResponseTimeout(123456789L);
+    actual.setResponseTimeout(Duration.ofMillis(123456789L));
 
     assertEquals(expected, actual);
-    assertTrue(expected.toString().contains("123456789"));
-  }
-
-  /**
-   * Is use ssl.
-   */
-  @Test
-  void isUseSsl() {
-    LdaptiveProperties expected = new LdaptiveProperties();
-    expected.setUseSsl(true);
-    assertTrue(expected.isUseSsl());
-
-    LdaptiveProperties actual = new LdaptiveProperties();
-    actual.setUseSsl(true);
-
-    assertEquals(expected, actual);
-    assertTrue(expected.toString().contains("true"));
   }
 
   /**
@@ -302,13 +269,12 @@ class LdaptivePropertiesTest {
   @Test
   void getValidatePeriod() {
     LdaptiveProperties expected = new LdaptiveProperties();
-    expected.setValidatePeriod(123456789L);
+    expected.setValidatePeriod(Duration.ofMillis(123456789L));
 
     LdaptiveProperties actual = new LdaptiveProperties();
-    actual.setValidatePeriod(123456789L);
+    actual.setValidatePeriod(Duration.ofMillis(123456789L));
 
     assertEquals(expected, actual);
-    assertTrue(expected.toString().contains("123456789"));
   }
 
   /**
@@ -317,13 +283,12 @@ class LdaptivePropertiesTest {
   @Test
   void getPrunePeriod() {
     LdaptiveProperties expected = new LdaptiveProperties();
-    expected.setPrunePeriod(123456789L);
+    expected.setPrunePeriod(Duration.ofMillis(123456789L));
 
     LdaptiveProperties actual = new LdaptiveProperties();
-    actual.setPrunePeriod(123456789L);
+    actual.setPrunePeriod(Duration.ofMillis(123456789L));
 
     assertEquals(expected, actual);
-    assertTrue(expected.toString().contains("123456789"));
   }
 
   /**
@@ -332,13 +297,12 @@ class LdaptivePropertiesTest {
   @Test
   void getIdleTime() {
     LdaptiveProperties expected = new LdaptiveProperties();
-    expected.setIdleTime(123456789L);
+    expected.setIdleTime(Duration.ofMillis(123456789L));
 
     LdaptiveProperties actual = new LdaptiveProperties();
-    actual.setIdleTime(123456789L);
+    actual.setIdleTime(Duration.ofMillis(123456789L));
 
     assertEquals(expected, actual);
-    assertTrue(expected.toString().contains("123456789"));
   }
 
   /**
@@ -347,13 +311,12 @@ class LdaptivePropertiesTest {
   @Test
   void getBlockWaitTime() {
     LdaptiveProperties expected = new LdaptiveProperties();
-    expected.setBlockWaitTime(123456789L);
+    expected.setBlockWaitTime(Duration.ofMillis(123456789L));
 
     LdaptiveProperties actual = new LdaptiveProperties();
-    actual.setBlockWaitTime(123456789L);
+    actual.setBlockWaitTime(Duration.ofMillis(123456789L));
 
     assertEquals(expected, actual);
-    assertTrue(expected.toString().contains("123456789"));
   }
 
   /**
@@ -362,7 +325,7 @@ class LdaptivePropertiesTest {
   @Test
   void getSearchValidator() {
     LdaptiveProperties expected = new LdaptiveProperties();
-    expected.setSearchValidator(new SearchValidator());
+    expected.setSearchValidator(new SearchValidatorProperties());
     assertNotNull(expected.getSearchValidator());
   }
 }

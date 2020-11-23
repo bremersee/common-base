@@ -27,7 +27,6 @@ org.bremersee.web.reactive.MultipartFileBuilderAutoConfiguration,\
 \
 org.bremersee.thymeleaf.AdditionalThymeleafAutoConfiguration,\
 \
-org.bremersee.data.ldaptive.UnboundIdProviderAutoConfiguration,\
 org.bremersee.data.ldaptive.LdaptiveAutoConfiguration,\
 org.bremersee.data.minio.MinioAutoConfiguration,\
 org.bremersee.data.redis.EmbeddedRedisAutoConfiguration
