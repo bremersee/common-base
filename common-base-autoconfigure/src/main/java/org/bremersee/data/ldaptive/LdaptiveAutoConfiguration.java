@@ -17,6 +17,7 @@
 package org.bremersee.data.ldaptive;
 
 import lombok.extern.slf4j.Slf4j;
+import org.bremersee.data.ldaptive.reactive.ReactiveLdaptiveTemplate;
 import org.bremersee.exception.ServiceException;
 import org.ldaptive.ConnectionFactory;
 import org.ldaptive.DefaultConnectionFactory;
@@ -41,7 +42,7 @@ import org.springframework.util.ClassUtils;
  */
 @Configuration
 @ConditionalOnClass({
-    DefaultConnectionFactory.class,
+    ConnectionFactory.class,
     LdaptiveTemplate.class
 })
 @ConditionalOnProperty(prefix = "bremersee.ldaptive", name = "enabled", havingValue = "true")
@@ -109,6 +110,18 @@ public class LdaptiveAutoConfiguration {
   @Bean
   public LdaptiveTemplate ldaptiveTemplate(ConnectionFactory connectionFactory) {
     return new LdaptiveTemplate(connectionFactory);
+  }
+
+  /**
+   * Builds reactive ldaptive template.
+   *
+   * @param connectionFactory the connection factory
+   * @return the reactive ldaptive template
+   */
+  @ConditionalOnClass(name = {"reactor.core.publisher.Mono"})
+  @Bean
+  public ReactiveLdaptiveTemplate reactiveLdaptiveTemplate(ConnectionFactory connectionFactory) {
+    return new ReactiveLdaptiveTemplate(connectionFactory);
   }
 
   /**

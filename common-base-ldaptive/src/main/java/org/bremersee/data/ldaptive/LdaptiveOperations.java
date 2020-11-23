@@ -246,30 +246,30 @@ public interface LdaptiveOperations {
   }
 
   /**
-   * Delete.
+   * Remove.
    *
    * @param <T> the type parameter
    * @param domainObject the domain object
    * @param entryMapper the entry mapper
    */
-  default <T> void delete(
+  default <T> void remove(
       @NotNull T domainObject,
       @NotNull LdaptiveEntryMapper<T> entryMapper) {
     delete(DeleteRequest.builder().dn(entryMapper.mapDn(domainObject)).build());
   }
 
   /**
-   * Delete all.
+   * Remove all.
    *
    * @param <T> the type parameter
    * @param domainObjects the domain objects
    * @param entryMapper the entry mapper
    */
-  default <T> void deleteAll(
+  default <T> void removeAll(
       @Nullable Collection<T> domainObjects,
       @NotNull LdaptiveEntryMapper<T> entryMapper) {
     Optional.ofNullable(domainObjects)
-        .ifPresent(col -> col.forEach(domainObject -> delete(domainObject, entryMapper)));
+        .ifPresent(col -> col.forEach(domainObject -> remove(domainObject, entryMapper)));
   }
 
 }

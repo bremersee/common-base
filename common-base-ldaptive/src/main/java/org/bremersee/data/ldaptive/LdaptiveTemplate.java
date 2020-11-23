@@ -61,6 +61,15 @@ import org.springframework.util.ErrorHandler;
 @SuppressWarnings("WeakerAccess")
 public class LdaptiveTemplate implements LdaptiveOperations, Cloneable {
 
+  private static final ResultPredicate NOT_COMPARE_RESULT = result -> !result.isSuccess()
+      && result.getResultCode() != ResultCode.COMPARE_TRUE
+      && result.getResultCode() != ResultCode.COMPARE_FALSE;
+
+  private static final ResultPredicate NOT_DELETE_RESULT = result -> !result.isSuccess()
+      && result.getResultCode() != ResultCode.NO_SUCH_OBJECT;
+
+  private static final ResultPredicate NOT_FIND_RESULT = NOT_DELETE_RESULT;
+
   private final ConnectionFactory connectionFactory;
 
   private ErrorHandler errorHandler = new DefaultLdaptiveErrorHandler();
@@ -143,7 +152,12 @@ public class LdaptiveTemplate implements LdaptiveOperations, Cloneable {
 
   @Override
   public boolean compare(CompareRequest request) {
-    return Optional.ofNullable(execute(new CompareOperation(getConnectionFactory()), request))
+    return Optional.ofNullable(execute(
+        CompareOperation.builder()
+            .factory(getConnectionFactory())
+            .throwIf(NOT_COMPARE_RESULT)
+            .build(),
+        request))
         .map(CompareResponse::isTrue)
         .orElse(false);
   }
@@ -153,8 +167,7 @@ public class LdaptiveTemplate implements LdaptiveOperations, Cloneable {
     execute(
         DeleteOperation.builder()
             .factory(getConnectionFactory())
-            .throwIf(result -> result.getResultCode() != ResultCode.SUCCESS
-                && result.getResultCode() != ResultCode.NO_SUCH_OBJECT)
+            .throwIf(NOT_DELETE_RESULT)
             .build(),
         request);
   }
@@ -196,7 +209,7 @@ public class LdaptiveTemplate implements LdaptiveOperations, Cloneable {
     return execute(
         SearchOperation.builder()
             .factory(getConnectionFactory())
-            .throwIf(ResultPredicate.NOT_SUCCESS)
+            .throwIf(NOT_FIND_RESULT)
             .build(),
         request);
   }
@@ -206,8 +219,7 @@ public class LdaptiveTemplate implements LdaptiveOperations, Cloneable {
     try {
       SearchResponse response = SearchOperation.builder()
           .factory(getConnectionFactory())
-          .throwIf(result -> result.getResultCode() != ResultCode.NO_SUCH_OBJECT
-              && result.getResultCode() != ResultCode.SUCCESS)
+          .throwIf(NOT_FIND_RESULT)
           .build()
           .execute(SearchRequest.objectScopeSearchRequest(dn));
       return response.isSuccess();

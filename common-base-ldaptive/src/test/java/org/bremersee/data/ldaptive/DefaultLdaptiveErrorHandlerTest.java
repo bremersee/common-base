@@ -44,7 +44,7 @@ class DefaultLdaptiveErrorHandlerTest {
     assertEquals(ldapException, errorHandler.map(ldapException).getCause());
 
     ldapException = new LdapException(ResultCode.INVALID_RESPONSE, "Internal server error.");
-    assertEquals(0, errorHandler.map(ldapException).status());
+    assertEquals(500, errorHandler.map(ldapException).status());
     assertEquals(ldapException, errorHandler.map(ldapException).getCause());
   }
 
