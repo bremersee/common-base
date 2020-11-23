@@ -46,7 +46,7 @@ import reactor.core.publisher.Mono;
  * @author Christian Bremer
  */
 @Slf4j
-public class ReactiveLdaptiveTemplate implements ReactiveLdaptiveOperations {
+public class ReactiveLdaptiveTemplate implements ReactiveLdaptiveOperations, Cloneable {
 
   private static final ResultPredicate NOT_COMPARE_RESULT = result -> !result.isSuccess()
       && result.getResultCode() != ResultCode.COMPARE_TRUE
