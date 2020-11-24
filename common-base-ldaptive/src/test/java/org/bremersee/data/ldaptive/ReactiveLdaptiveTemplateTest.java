@@ -72,7 +72,7 @@ import reactor.test.StepVerifier;
         "spring.ldap.embedded.credential.username=uid=admin",
         "spring.ldap.embedded.credential.password=secret",
         "spring.ldap.embedded.ldif=classpath:schema.ldif",
-        "spring.ldap.embedded.port=12389",
+        "spring.ldap.embedded.port=13389",
         "spring.ldap.embedded.validation.enabled=false"
     })
 @TestInstance(Lifecycle.PER_CLASS) // allows us to use @BeforeAll with a non-static method
