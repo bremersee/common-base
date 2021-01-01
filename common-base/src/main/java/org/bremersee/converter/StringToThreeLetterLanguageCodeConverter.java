@@ -19,6 +19,7 @@ package org.bremersee.converter;
 import lombok.ToString;
 import org.bremersee.common.model.ThreeLetterLanguageCode;
 import org.springframework.core.convert.converter.Converter;
+import org.springframework.lang.NonNull;
 
 /**
  * The string to three letter language code converter.
@@ -30,7 +31,7 @@ public class StringToThreeLetterLanguageCodeConverter
     implements Converter<String, ThreeLetterLanguageCode> {
 
   @Override
-  public ThreeLetterLanguageCode convert(String source) {
+  public ThreeLetterLanguageCode convert(@NonNull String source) {
     return ThreeLetterLanguageCode.fromValue(source);
   }
 }

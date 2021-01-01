@@ -25,7 +25,6 @@ import org.bremersee.data.ldaptive.app.PersonMapper;
 import org.bremersee.data.ldaptive.app.TestConfiguration;
 import org.junit.jupiter.api.Test;
 import org.ldaptive.LdapEntry;
-import org.ldaptive.SearchFilter;
 import org.ldaptive.SearchRequest;
 import org.ldaptive.SearchScope;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,16 +46,18 @@ import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
         "spring.ldap.embedded.credential.username=uid=admin",
         "spring.ldap.embedded.credential.password=secret",
         "spring.ldap.embedded.ldif=classpath:schema.ldif",
-        "spring.ldap.embedded.port=12389",
+        "spring.ldap.embedded.port=11389",
         "spring.ldap.embedded.validation.enabled=false",
         "bremersee.ldaptive.enabled=true",
-        "bremersee.ldaptive.use-unbound-id-provider=true",
-        "bremersee.ldaptive.ldap-url=ldap://localhost:12389",
-        "bremersee.ldaptive.use-ssl=false",
+        "bremersee.ldaptive.ldap-url=ldap://localhost:11389",
         "bremersee.ldaptive.use-start-tls=false",
         "bremersee.ldaptive.bind-dn=uid=admin",
         "bremersee.ldaptive.bind-credentials=secret",
-        "bremersee.ldaptive.pooled=false"
+        "bremersee.ldaptive.pooled=false",
+        "bremersee.ldaptive.search-validator.search-request.base-dn=ou=people,dc=bremersee,dc=org",
+        "bremersee.ldaptive.search-validator.search-request.search-filter.filer=uid=anna",
+        "bremersee.ldaptive.search-validator.search-request.size-limit=1",
+        "bremersee.ldaptive.search-validator.search-request.search-scope=ONELEVEL",
     })
 @Slf4j
 class LdaptiveIntegrationTest {
@@ -79,10 +80,11 @@ class LdaptiveIntegrationTest {
    */
   @Test
   void findExistingPersons() {
-    SearchFilter searchFilter = new SearchFilter("(objectclass=inetOrgPerson)");
-    SearchRequest searchRequest = new SearchRequest(
-        "ou=people," + baseDn, searchFilter);
-    searchRequest.setSearchScope(SearchScope.ONELEVEL);
+    SearchRequest searchRequest = SearchRequest.builder()
+        .dn("ou=people," + baseDn)
+        .filter("(objectclass=inetOrgPerson)")
+        .scope(SearchScope.ONELEVEL)
+        .build();
 
     // without mapper
     Collection<LdapEntry> entries = ldaptiveTemplate.findAll(searchRequest);
@@ -115,10 +117,11 @@ class LdaptiveIntegrationTest {
    */
   @Test
   void findExistingGroups() {
-    SearchFilter searchFilter = new SearchFilter("(objectclass=groupOfUniqueNames)");
-    SearchRequest searchRequest = new SearchRequest(
-        "ou=groups," + baseDn, searchFilter);
-    searchRequest.setSearchScope(SearchScope.ONELEVEL);
+    SearchRequest searchRequest = SearchRequest.builder()
+        .dn("ou=groups," + baseDn)
+        .filter("(objectclass=groupOfUniqueNames)")
+        .scope(SearchScope.ONELEVEL)
+        .build();
 
     // without mapper
     Collection<LdapEntry> entries = ldaptiveTemplate.findAll(searchRequest);

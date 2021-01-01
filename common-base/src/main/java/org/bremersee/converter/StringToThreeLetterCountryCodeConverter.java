@@ -19,6 +19,7 @@ package org.bremersee.converter;
 import lombok.ToString;
 import org.bremersee.common.model.ThreeLetterCountryCode;
 import org.springframework.core.convert.converter.Converter;
+import org.springframework.lang.NonNull;
 
 /**
  * The string to three letter country code converter.
@@ -30,7 +31,7 @@ public class StringToThreeLetterCountryCodeConverter
     implements Converter<String, ThreeLetterCountryCode> {
 
   @Override
-  public ThreeLetterCountryCode convert(String source) {
+  public ThreeLetterCountryCode convert(@NonNull String source) {
     return ThreeLetterCountryCode.fromValue(source);
   }
 }

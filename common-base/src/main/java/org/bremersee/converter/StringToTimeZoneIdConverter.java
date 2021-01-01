@@ -19,6 +19,7 @@ package org.bremersee.converter;
 import lombok.ToString;
 import org.bremersee.common.model.TimeZoneId;
 import org.springframework.core.convert.converter.Converter;
+import org.springframework.lang.NonNull;
 
 /**
  * The string to time zone id converter.
@@ -29,7 +30,7 @@ import org.springframework.core.convert.converter.Converter;
 public class StringToTimeZoneIdConverter implements Converter<String, TimeZoneId> {
 
   @Override
-  public TimeZoneId convert(String source) {
+  public TimeZoneId convert(@NonNull String source) {
     return TimeZoneId.fromValue(source);
   }
 }

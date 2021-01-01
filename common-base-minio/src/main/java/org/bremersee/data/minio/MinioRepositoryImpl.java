@@ -17,23 +17,25 @@
 package org.bremersee.data.minio;
 
 import io.minio.BucketExistsArgs;
-import io.minio.EnableVersioningArgs;
+import io.minio.GetBucketVersioningArgs;
 import io.minio.GetPresignedObjectUrlArgs;
-import io.minio.IsVersioningEnabledArgs;
 import io.minio.ListObjectsArgs;
 import io.minio.MakeBucketArgs;
 import io.minio.MinioClient;
-import io.minio.ObjectStat;
 import io.minio.ObjectWriteResponse;
 import io.minio.PutObjectArgs;
 import io.minio.RemoveObjectArgs;
 import io.minio.RemoveObjectsArgs;
 import io.minio.Result;
+import io.minio.SetBucketVersioningArgs;
 import io.minio.StatObjectArgs;
+import io.minio.StatObjectResponse;
 import io.minio.http.Method;
 import io.minio.messages.DeleteError;
 import io.minio.messages.DeleteObject;
 import io.minio.messages.Item;
+import io.minio.messages.VersioningConfiguration;
+import io.minio.messages.VersioningConfiguration.Status;
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.Duration;
@@ -139,14 +141,31 @@ public class MinioRepositoryImpl implements MinioRepository {
           .bucket(bucket)
           .build());
     }
-    if (enableVersioning && !minio.isVersioningEnabled(IsVersioningEnabledArgs.builder()
+    VersioningConfiguration versioningConfiguration = minio.getBucketVersioning(GetBucketVersioningArgs.builder()
         .region(region)
         .bucket(bucket)
-        .build())) {
-      minio.enableVersioning(EnableVersioningArgs.builder()
-          .region(region)
-          .bucket(bucket)
-          .build());
+        .build());
+    switch (versioningConfiguration.status()) {
+      case ENABLED:
+        if (!enableVersioning) {
+          minio.setBucketVersioning(SetBucketVersioningArgs.builder()
+              .region(region)
+              .bucket(bucket)
+              .config(new VersioningConfiguration(Status.SUSPENDED, false))
+              .build());
+        }
+        break;
+      case SUSPENDED:
+      case OFF:
+        if (enableVersioning) {
+          minio.setBucketVersioning(SetBucketVersioningArgs.builder()
+              .region(region)
+              .bucket(bucket)
+              .config(new VersioningConfiguration(Status.ENABLED, false))
+              .build());
+        }
+        break;
+      default:
     }
   }
 
@@ -208,13 +227,13 @@ public class MinioRepositoryImpl implements MinioRepository {
   @Override
   public Optional<MinioMultipartFile> findOne(MinioObjectId id) {
     try {
-      ObjectStat objectStat = minio.statObject(StatObjectArgs.builder()
+      StatObjectResponse objectStat = minio.statObject(StatObjectArgs.builder()
           .region(region)
           .bucket(bucket)
           .object(id.getName())
           .versionId(id.getVersionId())
           .build());
-      return Optional.of(new MinioMultipartFileImpl(minio, region, objectStat, id.getVersionId()));
+      return Optional.of(new MinioMultipartFileImpl(minio, region, objectStat));
 
     } catch (MinioException e) {
       if (404 == e.status()) {

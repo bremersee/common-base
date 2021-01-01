@@ -16,14 +16,23 @@
 
 package org.bremersee.data.ldaptive;
 
+import java.time.Duration;
+import java.util.ArrayList;
+import java.util.List;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-import org.ldaptive.pool.PoolConfig;
-import org.ldaptive.pool.SearchValidator;
+import org.ldaptive.ReturnAttributes;
+import org.ldaptive.SearchConnectionValidator;
+import org.ldaptive.SearchRequest;
+import org.ldaptive.SearchScope;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.util.StringUtils;
+import org.springframework.validation.annotation.Validated;
 
 /**
  * The ldap properties.
@@ -32,10 +41,11 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
  */
 @SuppressWarnings({"WeakerAccess"})
 @ConfigurationProperties(prefix = "bremersee.ldaptive")
+@Validated
 @Getter
 @Setter
 @ToString(exclude = {"bindCredentials"})
-@EqualsAndHashCode(exclude = {"bindCredentials", "searchValidator"})
+@EqualsAndHashCode(exclude = {"bindCredentials"})
 @NoArgsConstructor
 public class LdaptiveProperties {
 
@@ -45,29 +55,45 @@ public class LdaptiveProperties {
   private boolean enabled = true;
 
   /**
-   * Specifies whether to use the UnboundId provider or not.
-   */
-  private boolean useUnboundIdProvider = true;
-
-  /**
    * URL to the LDAP(s).
    */
   private String ldapUrl = "ldap://localhost:12389";
 
   /**
-   * Amount of time in milliseconds that connects will block.
+   * Duration of time that connects will block.
    */
-  private long connectTimeout = -1;
+  @NotNull
+  private Duration connectTimeout = Duration.ofMinutes(1);
 
   /**
-   * Amount of time in milliseconds to wait for responses.
+   * Duration of time to wait for responses.
    */
-  private long responseTimeout = -1;
+  @NotNull
+  private Duration responseTimeout = Duration.ofMinutes(1);
 
   /**
-   * Connect to LDAP using SSL protocol.
+   * Duration of time that operations will block on reconnects, should generally be longer than connect timeout.
    */
-  private boolean useSsl;
+  @NotNull
+  private Duration reconnectTimeout = Duration.ofMinutes(2);
+
+  /**
+   * Whether to automatically reconnect to the server when a connection is lost. Default is true.
+   */
+  private boolean autoReconnect = true;
+
+  @Min(0)
+  private int reconnectAttempts = 5;
+
+  @NotNull
+  private Duration reconnectBackoffDelay = Duration.ofSeconds(2);
+
+  private double reconnectBackoffMultiplier = 1.;
+
+  /**
+   * Whether pending operations should be replayed after a reconnect. Default is true.
+   */
+  private boolean autoReplay = true;
 
   /**
    * Connect to LDAP using startTLS.
@@ -105,53 +131,170 @@ public class LdaptiveProperties {
   private boolean pooled = false;
 
   /**
+   * Duration to wait for an available connection.
+   */
+  @NotNull
+  private Duration blockWaitTime = Duration.ofMinutes(1);
+
+  /**
    * Minimum pool size.
    */
-  private int minPoolSize = PoolConfig.DEFAULT_MIN_POOL_SIZE;
+  private int minPoolSize = 3;
 
   /**
    * Maximum pool size.
    */
-  private int maxPoolSize = PoolConfig.DEFAULT_MAX_POOL_SIZE;
+  private int maxPoolSize = 10;
+
+  /**
+   * Whether to connect to the ldap on connection creation.
+   */
+  private boolean connectOnCreate = true;
+
+  /**
+   * Whether initialize should throw if pooling configuration requirements are not met.
+   */
+  private boolean failFastInitialize = true;
 
   /**
    * Whether the ldap object should be validated when returned to the pool.
    */
-  private boolean validateOnCheckIn = PoolConfig.DEFAULT_VALIDATE_ON_CHECKIN;
+  private boolean validateOnCheckIn = false;
 
   /**
    * Whether the ldap object should be validated when given from the pool.
    */
-  private boolean validateOnCheckOut = PoolConfig.DEFAULT_VALIDATE_ON_CHECKOUT;
+  private boolean validateOnCheckOut = false;
 
   /**
    * Whether the pool should be validated periodically.
    */
-  private boolean validatePeriodically = PoolConfig.DEFAULT_VALIDATE_PERIODICALLY;
+  private boolean validatePeriodically = false;
 
   /**
-   * Time in seconds that the validate pool should repeat.
+   * Validation period.
    */
-  private long validatePeriod = PoolConfig.DEFAULT_VALIDATE_PERIOD.toMillis();
+  @NotNull
+  private Duration validatePeriod = Duration.ofMinutes(30);
 
   /**
-   * Prune period in seconds.
+   * Maximum length of time a connection validation should block.
    */
-  private long prunePeriod = 300L;
+  @NotNull
+  private Duration validateTimeout = Duration.ofSeconds(5);
+
+  @NotNull
+  private SearchValidatorProperties searchValidator = new SearchValidatorProperties();
 
   /**
-   * Idle time in seconds.
+   * Prune period.
    */
-  private long idleTime = 600L;
+  @NotNull
+  private Duration prunePeriod = Duration.ofMinutes(5);
 
   /**
-   * Time in milliseconds to wait for an available connection.
+   * Idle time.
    */
-  private long blockWaitTime = 10000L;
+  @NotNull
+  private Duration idleTime = Duration.ofMinutes(10);
 
   /**
-   * The search validator of the connection pool.
+   * Create search connection validator search connection validator.
+   *
+   * @return the search connection validator
    */
-  private SearchValidator searchValidator = new SearchValidator();
+  @NotNull
+  public SearchConnectionValidator createSearchConnectionValidator() {
+    return new SearchConnectionValidator(
+        validatePeriod,
+        validateTimeout,
+        searchValidator.getSearchRequest().createSearchRequest());
+  }
+
+  /**
+   * The search validator properties.
+   */
+  @Getter
+  @Setter
+  @ToString
+  @EqualsAndHashCode
+  @NoArgsConstructor
+  public static class SearchValidatorProperties {
+
+    @NotNull
+    private SearchRequestProperties searchRequest = new SearchRequestProperties();
+
+    /**
+     * The search request properties.
+     */
+    @Getter
+    @Setter
+    @ToString
+    @EqualsAndHashCode
+    @NoArgsConstructor
+    public static class SearchRequestProperties {
+
+      private String baseDn;
+
+      @NotNull
+      private SearchFilterProperties searchFilter = new SearchFilterProperties();
+
+      private Integer sizeLimit;
+
+      private SearchScope searchScope; // = SearchScope.ONELEVEL;
+
+      @NotNull
+      private List<String> returnAttributes = new ArrayList<>();
+
+      /**
+       * Gets the return attributes as array.
+       *
+       * @return the return attributes as array
+       */
+      @NotNull
+      public String[] returnAttributesAsArray() {
+        if (returnAttributes.isEmpty()) {
+          return ReturnAttributes.NONE.value();
+        }
+        return returnAttributes.toArray(new String[0]);
+      }
+
+      /**
+       * Create search request.
+       *
+       * @return the search request
+       */
+      @NotNull
+      public SearchRequest createSearchRequest() {
+        SearchRequest searchRequest = new SearchRequest();
+        searchRequest.setBaseDn(StringUtils.hasText(getBaseDn()) ? getBaseDn() : "");
+        if (StringUtils.hasText(getSearchFilter().getFilter())) {
+          searchRequest.setFilter(getSearchFilter().getFilter());
+        }
+        searchRequest.setReturnAttributes(returnAttributesAsArray());
+        if (getSearchScope() != null) {
+          searchRequest.setSearchScope(getSearchScope());
+        }
+        if (getSizeLimit() != null) {
+          searchRequest.setSizeLimit(getSizeLimit());
+        }
+        return searchRequest;
+      }
+
+      /**
+       * The search filter properties.
+       */
+      @Getter
+      @Setter
+      @ToString
+      @EqualsAndHashCode
+      @NoArgsConstructor
+      public static class SearchFilterProperties {
+
+        private String filter;
+
+      }
+    }
+  }
 
 }

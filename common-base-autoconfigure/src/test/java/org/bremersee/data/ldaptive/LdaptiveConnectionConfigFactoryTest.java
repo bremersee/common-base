@@ -2,6 +2,7 @@ package org.bremersee.data.ldaptive;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
+import java.time.Duration;
 import org.junit.jupiter.api.Test;
 import org.ldaptive.ConnectionConfig;
 
@@ -17,10 +18,9 @@ class LdaptiveConnectionConfigFactoryTest {
   void createConnectionConfig() {
     LdaptiveProperties properties = new LdaptiveProperties();
     properties.setPooled(false);
-    properties.setConnectTimeout(1);
-    properties.setResponseTimeout(2);
+    properties.setConnectTimeout(Duration.ofMinutes(1L));
+    properties.setResponseTimeout(Duration.ofMinutes(2L));
     properties.setUseStartTls(true);
-    properties.setUseSsl(true);
     properties.setTrustCertificates("trustcert");
     properties.setAuthenticationCertificate("authcert");
     properties.setAuthenticationKey("authkey");

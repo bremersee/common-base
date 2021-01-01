@@ -19,6 +19,7 @@ package org.bremersee.converter;
 import lombok.ToString;
 import org.bremersee.common.model.MongoSearchLanguage;
 import org.springframework.core.convert.converter.Converter;
+import org.springframework.lang.NonNull;
 
 /**
  * The string to mongo search language converter.
@@ -30,7 +31,7 @@ public class StringToMongoSearchLanguageConverter
     implements Converter<String, MongoSearchLanguage> {
 
   @Override
-  public MongoSearchLanguage convert(String source) {
+  public MongoSearchLanguage convert(@NonNull String source) {
     return MongoSearchLanguage.fromValue(source);
   }
 }

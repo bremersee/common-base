@@ -18,11 +18,13 @@ package org.bremersee.data.ldaptive;
 
 import static org.springframework.util.Assert.notNull;
 
-import java.time.Duration;
+import java.util.function.Predicate;
 import org.ldaptive.BindConnectionInitializer;
+import org.ldaptive.ClosedRetryMetadata;
 import org.ldaptive.ConnectionConfig;
 import org.ldaptive.ConnectionInitializer;
 import org.ldaptive.Credential;
+import org.ldaptive.RetryMetadata;
 import org.ldaptive.ssl.CredentialConfig;
 import org.ldaptive.ssl.SslConfig;
 import org.ldaptive.ssl.X509CredentialConfig;
@@ -64,7 +66,7 @@ public interface LdaptiveConnectionConfigFactory {
       String bindCredential);
 
   /**
-   * Get default factory.
+   * Get default connection config factory.
    *
    * @return the default connection config factory
    */
@@ -73,7 +75,7 @@ public interface LdaptiveConnectionConfigFactory {
   }
 
   /**
-   * The default connection config implementation.
+   * The default connection config factory.
    */
   class Default implements LdaptiveConnectionConfigFactory {
 
@@ -81,52 +83,93 @@ public interface LdaptiveConnectionConfigFactory {
     public ConnectionConfig createConnectionConfig(
         final LdaptiveProperties properties,
         final String bindDn,
-        final String bindCredential) {
+        final String bindCredentials) {
 
       notNull(properties, "Ldaptive properties must not be null.");
-      final String username = bindDn != null ? bindDn : properties.getBindDn();
-      final String password = bindCredential != null
-          ? bindCredential
-          : properties.getBindCredentials();
-      final ConnectionConfig cc = new ConnectionConfig();
-      cc.setLdapUrl(properties.getLdapUrl());
-
-      if (properties.getConnectTimeout() > 0L) {
-        cc.setConnectTimeout(Duration.ofMillis(properties.getConnectTimeout()));
-      }
-      if (properties.getResponseTimeout() > 0L) {
-        cc.setResponseTimeout(Duration.ofMillis(properties.getResponseTimeout()));
-      }
-
-      cc.setUseSSL(properties.isUseSsl());
-      cc.setUseStartTLS(properties.isUseStartTls());
-
-      if ((properties.isUseSsl() || properties.isUseStartTls()) && hasSslConfig(properties)) {
-        cc.setSslConfig(sslConfig(properties));
-      }
-
-      // binds all operations to a dn
-      if (StringUtils.hasText(properties.getBindDn())) {
-        cc.setConnectionInitializer(connectionInitializer(username, password));
-      }
-
-      return cc;
+      return ConnectionConfig.builder()
+          .autoReconnect(properties.isAutoReconnect())
+          .autoReconnectCondition(autoReconnectCondition(properties))
+          .autoReplay(properties.isAutoReplay())
+          .connectionInitializers(connectionInitializers(properties, bindDn, bindCredentials))
+          .connectTimeout(properties.getConnectTimeout())
+          .reconnectTimeout(properties.getReconnectTimeout())
+          .responseTimeout(properties.getResponseTimeout())
+          .sslConfig(sslConfig(properties))
+          .url(properties.getLdapUrl())
+          .useStartTLS(properties.isUseStartTls())
+          .build();
     }
 
-    private boolean hasSslConfig(final LdaptiveProperties properties) {
+    private Predicate<RetryMetadata> autoReconnectCondition(LdaptiveProperties properties) {
+      return metadata -> {
+        if (properties.getReconnectAttempts() > 0 && metadata instanceof ClosedRetryMetadata) {
+          if (metadata.getAttempts() > properties.getReconnectAttempts()) {
+            return false;
+          }
+          if (metadata.getAttempts() > 0) {
+            try {
+              long delay = Math.abs(properties.getReconnectBackoffDelay().toMillis());
+              double multiplier = Math.abs(properties.getReconnectBackoffMultiplier() * metadata.getAttempts());
+              int attempts = metadata.getAttempts();
+              long millis = Math.round(delay * multiplier * attempts);
+              Thread.sleep(millis);
+            } catch (InterruptedException e) {
+              // nothing to do
+            }
+          }
+          return true;
+        }
+        return false;
+      };
+    }
+
+    private ConnectionInitializer[] connectionInitializers(
+        LdaptiveProperties properties,
+        String bindDn,
+        String bindCredentials) {
+
+      String username;
+      String password;
+      if (StringUtils.hasText(bindDn)) {
+        username = bindDn;
+        password = bindCredentials;
+      } else {
+        username = properties.getBindDn();
+        password = properties.getBindCredentials();
+      }
+      if (StringUtils.hasText(username)) {
+        return new ConnectionInitializer[]{
+            connectionInitializer(username, password)
+        };
+      }
+      return new ConnectionInitializer[]{};
+    }
+
+    private ConnectionInitializer connectionInitializer(String bindDn, String bindCredential) {
+      // sasl is not supported at the moment
+      final BindConnectionInitializer bci = new BindConnectionInitializer();
+      bci.setBindDn(bindDn);
+      bci.setBindCredential(new Credential(bindCredential));
+      return bci;
+    }
+
+    private SslConfig sslConfig(LdaptiveProperties properties) {
+      if (hasSslConfig(properties)) {
+        SslConfig sc = new SslConfig();
+        sc.setCredentialConfig(sslCredentialConfig(properties));
+        return sc;
+      }
+      return null;
+    }
+
+    private boolean hasSslConfig(LdaptiveProperties properties) {
       return StringUtils.hasText(properties.getTrustCertificates())
           || StringUtils.hasText(properties.getAuthenticationCertificate())
           || StringUtils.hasText(properties.getAuthenticationKey());
     }
 
-    private SslConfig sslConfig(final LdaptiveProperties properties) {
-      final SslConfig sc = new SslConfig();
-      sc.setCredentialConfig(sslCredentialConfig(properties));
-      return sc;
-    }
-
-    private CredentialConfig sslCredentialConfig(final LdaptiveProperties properties) {
-      final X509CredentialConfig x509 = new X509CredentialConfig();
+    private CredentialConfig sslCredentialConfig(LdaptiveProperties properties) {
+      X509CredentialConfig x509 = new X509CredentialConfig();
       if (StringUtils.hasText(properties.getAuthenticationCertificate())) {
         x509.setAuthenticationCertificate(properties.getAuthenticationCertificate());
       }
@@ -137,14 +180,6 @@ public interface LdaptiveConnectionConfigFactory {
         x509.setTrustCertificates(properties.getTrustCertificates());
       }
       return x509;
-    }
-
-    private ConnectionInitializer connectionInitializer(String bindDn, String bindCredential) {
-      // sasl is not supported at the moment
-      final BindConnectionInitializer bci = new BindConnectionInitializer();
-      bci.setBindDn(bindDn);
-      bci.setBindCredential(new Credential(bindCredential));
-      return bci;
     }
 
   }

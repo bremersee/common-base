@@ -25,12 +25,12 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import javax.validation.constraints.NotNull;
 import org.ldaptive.AttributeModification;
-import org.ldaptive.AttributeModificationType;
+import org.ldaptive.AttributeModification.Type;
 import org.ldaptive.LdapAttribute;
 import org.ldaptive.LdapEntry;
 import org.ldaptive.ModifyRequest;
 import org.ldaptive.beans.LdapEntryMapper;
-import org.ldaptive.io.ValueTranscoder;
+import org.ldaptive.transcode.ValueTranscoder;
 import org.springframework.lang.Nullable;
 import org.springframework.validation.annotation.Validated;
 
@@ -44,8 +44,8 @@ import org.springframework.validation.annotation.Validated;
 public interface LdaptiveEntryMapper<T> extends LdapEntryMapper<T> {
 
   /**
-   * Get object classes of the ldap entry. The object classes are only required, if a new ldap entry
-   * should be persisted.
+   * Get object classes of the ldap entry. The object classes are only required, if a new ldap entry should be
+   * persisted.
    *
    * @return the object classes of the ldap entry
    */
@@ -72,10 +72,9 @@ public interface LdaptiveEntryMapper<T> extends LdapEntryMapper<T> {
   }
 
   /**
-   * Map and compute attribute modifications (see {@link LdapEntry#computeModifications(LdapEntry,
-   * LdapEntry)}**).
+   * Map and compute attribute modifications (see {@link LdapEntry#computeModifications(LdapEntry, LdapEntry)}**).
    *
-   * @param source      the source (domain object)
+   * @param source the source (domain object)
    * @param destination the destination (ldap entry)
    * @return the attribute modifications
    */
@@ -86,7 +85,7 @@ public interface LdaptiveEntryMapper<T> extends LdapEntryMapper<T> {
   /**
    * Map and compute modify request.
    *
-   * @param source      the source (domain object)
+   * @param source the source (domain object)
    * @param destination the destination (ldap entry)
    * @return the modify request
    */
@@ -99,11 +98,11 @@ public interface LdaptiveEntryMapper<T> extends LdapEntryMapper<T> {
   /**
    * Gets attribute value.
    *
-   * @param <T>             the type parameter
-   * @param ldapEntry       the ldap entry
-   * @param name            the name
+   * @param <T> the type parameter
+   * @param ldapEntry the ldap entry
+   * @param name the name
    * @param valueTranscoder the value transcoder
-   * @param defaultValue    the default value
+   * @param defaultValue the default value
    * @return the attribute value
    */
   static <T> T getAttributeValue(
@@ -112,16 +111,16 @@ public interface LdaptiveEntryMapper<T> extends LdapEntryMapper<T> {
       final ValueTranscoder<T> valueTranscoder,
       final T defaultValue) {
     final LdapAttribute attr = ldapEntry == null ? null : ldapEntry.getAttribute(name);
-    final T value = attr != null ? attr.getValue(valueTranscoder) : null;
+    final T value = attr != null ? attr.getValue(valueTranscoder.decoder()) : null;
     return value != null ? value : defaultValue;
   }
 
   /**
    * Gets attribute values.
    *
-   * @param <T>             the type parameter
-   * @param ldapEntry       the ldap entry
-   * @param name            the name
+   * @param <T> the type parameter
+   * @param ldapEntry the ldap entry
+   * @param name the name
    * @param valueTranscoder the value transcoder
    * @return the attribute values
    */
@@ -130,16 +129,16 @@ public interface LdaptiveEntryMapper<T> extends LdapEntryMapper<T> {
       @NotNull final String name,
       final ValueTranscoder<T> valueTranscoder) {
     final LdapAttribute attr = ldapEntry == null ? null : ldapEntry.getAttribute(name);
-    final Collection<T> values = attr != null ? attr.getValues(valueTranscoder) : null;
+    final Collection<T> values = attr != null ? attr.getValues(valueTranscoder.decoder()) : null;
     return values != null ? values : new ArrayList<>();
   }
 
   /**
    * Gets attribute values as set.
    *
-   * @param <T>             the type parameter
-   * @param ldapEntry       the ldap entry
-   * @param name            the name
+   * @param <T> the type parameter
+   * @param ldapEntry the ldap entry
+   * @param name the name
    * @param valueTranscoder the value transcoder
    * @return the attribute values as set
    */
@@ -153,9 +152,9 @@ public interface LdaptiveEntryMapper<T> extends LdapEntryMapper<T> {
   /**
    * Gets attribute values as list.
    *
-   * @param <T>             the type parameter
-   * @param ldapEntry       the ldap entry
-   * @param name            the name
+   * @param <T> the type parameter
+   * @param ldapEntry the ldap entry
+   * @param name the name
    * @param valueTranscoder the value transcoder
    * @return the attribute values as list
    */
@@ -169,13 +168,13 @@ public interface LdaptiveEntryMapper<T> extends LdapEntryMapper<T> {
   /**
    * Replaces the value of the attribute with the specified value.
    *
-   * @param <T>             the type of the domain object
-   * @param ldapEntry       the ldap entry
-   * @param name            the attribute name
-   * @param value           the attribute value
-   * @param isBinary        specifies whether the attribute value is binary or not
+   * @param <T> the type of the domain object
+   * @param ldapEntry the ldap entry
+   * @param name the attribute name
+   * @param value the attribute value
+   * @param isBinary specifies whether the attribute value is binary or not
    * @param valueTranscoder the value transcoder (can be null if value is also null)
-   * @param modifications   the list of modifications
+   * @param modifications the list of modifications
    */
   static <T> void setAttribute(
       @NotNull final LdapEntry ldapEntry,
@@ -197,13 +196,13 @@ public interface LdaptiveEntryMapper<T> extends LdapEntryMapper<T> {
   /**
    * Replaces the values of the attribute with the specified values.
    *
-   * @param <T>             the type of the domain object
-   * @param ldapEntry       the ldap entry
-   * @param name            the attribute name
-   * @param values          the values of the attribute
-   * @param isBinary        specifies whether the attribute value is binary or not
+   * @param <T> the type of the domain object
+   * @param ldapEntry the ldap entry
+   * @param name the attribute name
+   * @param values the values of the attribute
+   * @param isBinary specifies whether the attribute value is binary or not
    * @param valueTranscoder the value transcoder (can be null if values is also null)
-   * @param modifications   the list of modifications
+   * @param modifications the list of modifications
    */
   static <T> void setAttributes(
       @NotNull final LdapEntry ldapEntry,
@@ -229,17 +228,18 @@ public interface LdaptiveEntryMapper<T> extends LdapEntryMapper<T> {
         ldapEntry.removeAttribute(name);
         modifications.add(
             new AttributeModification(
-                AttributeModificationType.REMOVE,
+                Type.DELETE,
                 attr));
       } else if (!new ArrayList<>(realValues)
-          .equals(new ArrayList<>(attr.getValues(valueTranscoder)))) {
-        final LdapAttribute newAttr = new LdapAttribute(attr.isBinary());
+          .equals(new ArrayList<>(attr.getValues(valueTranscoder.decoder())))) {
+        final LdapAttribute newAttr = new LdapAttribute();
+        newAttr.setBinary(isBinary);
         newAttr.setName(name);
-        newAttr.addValues(valueTranscoder, realValues);
-        ldapEntry.addAttribute(newAttr);
+        newAttr.addValues(valueTranscoder.encoder(), realValues);
+        ldapEntry.addAttributes(newAttr);
         modifications.add(
             new AttributeModification(
-                AttributeModificationType.REPLACE,
+                Type.REPLACE,
                 newAttr));
       }
     }
@@ -248,13 +248,13 @@ public interface LdaptiveEntryMapper<T> extends LdapEntryMapper<T> {
   /**
    * Adds the specified value to the attribute with the specified name.
    *
-   * @param <T>             the type of the domain object
-   * @param ldapEntry       the ldap entry
-   * @param name            the attribute name
-   * @param value           the attribute value
-   * @param isBinary        specifies whether the attribute value is binary or not
+   * @param <T> the type of the domain object
+   * @param ldapEntry the ldap entry
+   * @param name the attribute name
+   * @param value the attribute value
+   * @param isBinary specifies whether the attribute value is binary or not
    * @param valueTranscoder the value transcoder
-   * @param modifications   the list of modifications
+   * @param modifications the list of modifications
    */
   static <T> void addAttribute(
       @NotNull final LdapEntry ldapEntry,
@@ -275,13 +275,13 @@ public interface LdaptiveEntryMapper<T> extends LdapEntryMapper<T> {
   /**
    * Adds the specified values to the attribute with the specified name.
    *
-   * @param <T>             the type of the domain object
-   * @param ldapEntry       the ldap entry
-   * @param name            the attribute name
-   * @param values          the attribute values
-   * @param isBinary        specifies whether the attribute value is binary or not
+   * @param <T> the type of the domain object
+   * @param ldapEntry the ldap entry
+   * @param name the attribute name
+   * @param values the attribute values
+   * @param isBinary specifies whether the attribute value is binary or not
    * @param valueTranscoder the value transcoder
-   * @param modifications   the list of modifications
+   * @param modifications the list of modifications
    */
   static <T> void addAttributes(
       @NotNull final LdapEntry ldapEntry,
@@ -303,13 +303,14 @@ public interface LdaptiveEntryMapper<T> extends LdapEntryMapper<T> {
     }
     final LdapAttribute attr = ldapEntry.getAttribute(name);
     if (attr == null) {
-      final LdapAttribute newAttr = new LdapAttribute(isBinary);
+      final LdapAttribute newAttr = new LdapAttribute();
+      newAttr.setBinary(isBinary);
       newAttr.setName(name);
-      newAttr.addValues(valueTranscoder, realValues);
-      ldapEntry.addAttribute(newAttr);
+      newAttr.addValues(valueTranscoder.encoder(), realValues);
+      ldapEntry.addAttributes(newAttr);
       modifications.add(
           new AttributeModification(
-              AttributeModificationType.ADD,
+              Type.ADD,
               newAttr));
     } else {
       final List<T> newValues = new ArrayList<>(
@@ -322,8 +323,8 @@ public interface LdaptiveEntryMapper<T> extends LdapEntryMapper<T> {
   /**
    * Removes an attribute with the specified name.
    *
-   * @param ldapEntry     the ldap entry
-   * @param name          the name
+   * @param ldapEntry the ldap entry
+   * @param name the name
    * @param modifications the modifications
    */
   static void removeAttribute(
@@ -334,23 +335,22 @@ public interface LdaptiveEntryMapper<T> extends LdapEntryMapper<T> {
     if (attr == null) {
       return;
     }
-    ldapEntry.removeAttribute(attr);
+    ldapEntry.removeAttributes(attr);
     modifications.add(
         new AttributeModification(
-            AttributeModificationType.REMOVE,
+            Type.DELETE,
             attr));
   }
 
   /**
-   * Removes an attribute with the specified value. If the value is {@code null}, the whole
-   * attribute will be removed.
+   * Removes an attribute with the specified value. If the value is {@code null}, the whole attribute will be removed.
    *
-   * @param <T>             the type of the domain object
-   * @param ldapEntry       the ldap entry
-   * @param name            the name
-   * @param value           the value
+   * @param <T> the type of the domain object
+   * @param ldapEntry the ldap entry
+   * @param name the name
+   * @param value the value
    * @param valueTranscoder the value transcoder
-   * @param modifications   the modifications
+   * @param modifications the modifications
    */
   static <T> void removeAttribute(
       @NotNull final LdapEntry ldapEntry,
@@ -371,15 +371,14 @@ public interface LdaptiveEntryMapper<T> extends LdapEntryMapper<T> {
   }
 
   /**
-   * Remove attributes with the specified values. If values are empty or {@code null}, no attributes
-   * will be removed.
+   * Remove attributes with the specified values. If values are empty or {@code null}, no attributes will be removed.
    *
-   * @param <T>             the type of the domain object
-   * @param ldapEntry       the ldap entry
-   * @param name            the name
-   * @param values          the values
+   * @param <T> the type of the domain object
+   * @param ldapEntry the ldap entry
+   * @param name the name
+   * @param values the values
    * @param valueTranscoder the value transcoder
-   * @param modifications   the modifications
+   * @param modifications the modifications
    */
   static <T> void removeAttributes(
       @NotNull final LdapEntry ldapEntry,
@@ -400,9 +399,9 @@ public interface LdaptiveEntryMapper<T> extends LdapEntryMapper<T> {
   /**
    * Create dn string.
    *
-   * @param rdn      the rdn
+   * @param rdn the rdn
    * @param rdnValue the rdn value
-   * @param baseDn   the base dn
+   * @param baseDn the base dn
    * @return the string
    */
   static String createDn(

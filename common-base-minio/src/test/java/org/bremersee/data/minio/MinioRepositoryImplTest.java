@@ -27,21 +27,23 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import io.minio.BucketExistsArgs;
+import io.minio.GetBucketVersioningArgs;
 import io.minio.GetPresignedObjectUrlArgs;
-import io.minio.IsVersioningEnabledArgs;
 import io.minio.ListObjectsArgs;
 import io.minio.MinioClient;
-import io.minio.ObjectStat;
 import io.minio.ObjectWriteResponse;
 import io.minio.PutObjectArgs;
 import io.minio.RemoveObjectArgs;
 import io.minio.RemoveObjectsArgs;
 import io.minio.Result;
 import io.minio.StatObjectArgs;
+import io.minio.StatObjectResponse;
 import io.minio.Time;
 import io.minio.http.Method;
 import io.minio.messages.DeleteError;
 import io.minio.messages.Item;
+import io.minio.messages.VersioningConfiguration;
+import io.minio.messages.VersioningConfiguration.Status;
 import java.io.ByteArrayInputStream;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
@@ -100,7 +102,8 @@ class MinioRepositoryImplTest {
 
     when(minioOperations.bucketExists(any(BucketExistsArgs.class))).thenReturn(false);
 
-    when(minioOperations.isVersioningEnabled(any(IsVersioningEnabledArgs.class))).thenReturn(false);
+    when(minioOperations.getBucketVersioning(any(GetBucketVersioningArgs.class)))
+        .thenReturn(new VersioningConfiguration(Status.SUSPENDED, false));
 
     when(minioOperations.putObject(any(PutObjectArgs.class)))
         .thenReturn(new ObjectWriteResponse(
@@ -113,8 +116,8 @@ class MinioRepositoryImplTest {
     headers.put("Last-Modified", time.format(Time.HTTP_HEADER_DATE_FORMAT));
     headers.put("Content-Length", String.valueOf(size));
     headers.put("ETag", etag);
-    when(minioOperations.statObject(any(StatObjectArgs.class))).thenReturn(new ObjectStat(
-        bucket, name, Headers.of(headers)
+    when(minioOperations.statObject(any(StatObjectArgs.class))).thenReturn(new StatObjectResponse(
+        Headers.of(headers), bucket, null, name
     ));
 
     Item item = mock(Item.class);

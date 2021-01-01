@@ -16,6 +16,7 @@
 
 package org.bremersee.data.ldaptive;
 
+import java.util.Optional;
 import org.ldaptive.LdapException;
 import org.ldaptive.ResultCode;
 
@@ -27,14 +28,40 @@ import org.ldaptive.ResultCode;
 public class DefaultLdaptiveErrorHandler extends AbstractLdaptiveErrorHandler {
 
   @Override
-  public LdaptiveException map(final LdapException ldapException) {
-    if (ldapException == null) {
-      return new LdaptiveException();
+  public LdaptiveException map(LdapException ldapException) {
+    return LdaptiveException.builder()
+        .errorCode(errorCode(ldapException))
+        .httpStatus(httpStatus(ldapException))
+        .cause(ldapException)
+        .build();
+  }
+
+  private int httpStatus(LdapException ldapException) {
+    return Optional.ofNullable(ldapException)
+        .map(LdapException::getResultCode)
+        .map(this::httpStatus)
+        .orElse(500);
+  }
+
+  private int httpStatus(ResultCode resultCode) {
+    ResultCode code = Optional.ofNullable(resultCode).orElse(ResultCode.OTHER);
+    switch (code) {
+      case SUCCESS:
+        return 200;
+      case INVALID_CREDENTIALS:
+        return 400;
+      case NO_SUCH_OBJECT:
+        return 404;
+      default:
+        return 500;
     }
-    if (ldapException.getResultCode() == ResultCode.NO_SUCH_OBJECT) {
-      return LdaptiveException.builder().httpStatus(404).cause(ldapException).build();
-    }
-    return LdaptiveException.builder().cause(ldapException).build();
+  }
+
+  private String errorCode(LdapException ldapException) {
+    return Optional.ofNullable(ldapException)
+        .map(LdapException::getResultCode)
+        .map(ResultCode::name)
+        .orElse(null);
   }
 
 }

@@ -24,6 +24,7 @@ import java.util.List;
 import org.bremersee.exception.RestApiExceptionMapper;
 import org.bremersee.exception.RestApiExceptionMapperImpl;
 import org.bremersee.exception.RestApiExceptionMapperProperties;
+import org.bremersee.test.beans.SimpleObjectProvider;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
@@ -41,9 +42,9 @@ class ApiExceptionResolverAutoConfigurationTest {
    */
   @Test
   void extendHandlerExceptionResolvers() {
-    ApiExceptionResolverAutoConfiguration configuration
-        = new ApiExceptionResolverAutoConfiguration(
-        restApiExceptionMapper(), objectMapperBuilder());
+    ApiExceptionResolverAutoConfiguration configuration = new ApiExceptionResolverAutoConfiguration(
+        restApiExceptionMapper(),
+        new SimpleObjectProvider<>(new Jackson2ObjectMapperBuilder()));
     configuration.init();
     List<HandlerExceptionResolver> exceptionResolvers = new ArrayList<>();
     configuration.extendHandlerExceptionResolvers(exceptionResolvers);
@@ -54,14 +55,6 @@ class ApiExceptionResolverAutoConfigurationTest {
         new RestApiExceptionMapperProperties(), "testapp");
     //noinspection unchecked
     ObjectProvider<RestApiExceptionMapper> provider = mock(ObjectProvider.class);
-    when(provider.getIfAvailable()).thenReturn(value);
-    return provider;
-  }
-
-  private static ObjectProvider<Jackson2ObjectMapperBuilder> objectMapperBuilder() {
-    Jackson2ObjectMapperBuilder value = new Jackson2ObjectMapperBuilder();
-    //noinspection unchecked
-    ObjectProvider<Jackson2ObjectMapperBuilder> provider = mock(ObjectProvider.class);
     when(provider.getIfAvailable()).thenReturn(value);
     return provider;
   }

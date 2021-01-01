@@ -47,10 +47,10 @@ public interface MinioObjectInfo extends MinioObjectId {
   String getEtag();
 
   /**
-   * Gets created time.
+   * Gets last modified time.
    *
-   * @return the created time
+   * @return the last modified time
    */
-  OffsetDateTime getCreatedTime();
+  OffsetDateTime getLastModified();
 
 }

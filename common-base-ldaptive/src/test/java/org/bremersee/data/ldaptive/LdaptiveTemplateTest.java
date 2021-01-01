@@ -20,6 +20,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Arrays;
@@ -27,6 +28,7 @@ import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.bremersee.data.ldaptive.app.Group;
 import org.bremersee.data.ldaptive.app.GroupMapper;
@@ -36,13 +38,16 @@ import org.bremersee.data.ldaptive.app.TestConfiguration;
 import org.bremersee.exception.ServiceException;
 import org.junit.jupiter.api.Test;
 import org.ldaptive.AddRequest;
+import org.ldaptive.CompareRequest;
 import org.ldaptive.DeleteRequest;
+import org.ldaptive.FilterTemplate;
 import org.ldaptive.LdapAttribute;
 import org.ldaptive.LdapEntry;
+import org.ldaptive.ModifyDnRequest;
 import org.ldaptive.ModifyRequest;
-import org.ldaptive.SearchFilter;
 import org.ldaptive.SearchRequest;
 import org.ldaptive.SearchScope;
+import org.ldaptive.SimpleBindRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -85,10 +90,11 @@ class LdaptiveTemplateTest {
    */
   @Test
   void findExistingPersons() {
-    SearchFilter searchFilter = new SearchFilter("(objectclass=inetOrgPerson)");
-    SearchRequest searchRequest = new SearchRequest(
-        "ou=people," + baseDn, searchFilter);
-    searchRequest.setSearchScope(SearchScope.ONELEVEL);
+    SearchRequest searchRequest = SearchRequest.builder()
+        .dn("ou=people," + baseDn)
+        .filter("(objectclass=inetOrgPerson)")
+        .scope(SearchScope.ONELEVEL)
+        .build();
 
     // without mapper
     Collection<LdapEntry> entries = ldaptiveTemplate.findAll(searchRequest);
@@ -121,13 +127,16 @@ class LdaptiveTemplateTest {
    */
   @Test
   void findExistingGroups() {
-    SearchFilter searchFilter = new SearchFilter("(objectclass=groupOfUniqueNames)");
-    SearchRequest searchRequest = new SearchRequest(
-        "ou=groups," + baseDn, searchFilter);
-    searchRequest.setSearchScope(SearchScope.ONELEVEL);
+    SearchRequest searchRequest = SearchRequest.builder()
+        .dn("ou=groups," + baseDn)
+        .filter("(objectclass=groupOfUniqueNames)")
+        .scope(SearchScope.ONELEVEL)
+        .build();
 
     // without mapper
     Collection<LdapEntry> entries = ldaptiveTemplate.findAll(searchRequest);
+    System.out.println("====> size = " + entries.size());
+    System.out.println("====> entries = " + entries);
     entries.forEach(ldapEntry -> log.info("Ldap entry found with cn = {}",
         ldapEntry.getAttribute("cn").getStringValue()));
     assertTrue(entries.stream()
@@ -151,11 +160,14 @@ class LdaptiveTemplateTest {
    */
   @Test
   void findExistingPerson() {
-    SearchFilter searchFilter = new SearchFilter("(&(objectclass=inetOrgPerson)(uid={0}))");
-    searchFilter.setParameter(0, "anna");
-    SearchRequest searchRequest = new SearchRequest(
-        "ou=people," + baseDn, searchFilter);
-    searchRequest.setSearchScope(SearchScope.ONELEVEL);
+    SearchRequest searchRequest = SearchRequest.builder()
+        .dn("ou=people," + baseDn)
+        .filter(FilterTemplate.builder()
+            .filter("(&(objectclass=inetOrgPerson)(uid={0}))")
+            .parameters("anna")
+            .build())
+        .scope(SearchScope.ONELEVEL)
+        .build();
 
     Optional<LdapEntry> entry = ldaptiveTemplate.findOne(searchRequest);
     assertTrue(entry.isPresent());
@@ -164,6 +176,87 @@ class LdaptiveTemplateTest {
     Optional<Person> person = ldaptiveTemplate.findOne(searchRequest, personMapper);
     assertTrue(person.isPresent());
     assertEquals("anna", person.get().getUid());
+  }
+
+  /**
+   * Find existing person by dn.
+   */
+  @Test
+  void findExistingPersonByDn() {
+    String dn = "uid=anna,ou=people," + baseDn;
+    Optional<LdapEntry> entry = ldaptiveTemplate
+        .findOne(SearchRequest.objectScopeSearchRequest(dn));
+    assertTrue(entry.isPresent());
+  }
+
+  /**
+   * Find non existing person.
+   */
+  @Test
+  void findNonExistingPerson() {
+    SearchRequest searchRequest = SearchRequest.builder()
+        .dn("ou=people," + baseDn)
+        .filter(FilterTemplate.builder()
+            .filter("(&(objectclass=inetOrgPerson)(uid={0}))")
+            .parameters(UUID.randomUUID().toString().replace("-", ""))
+            .build())
+        .scope(SearchScope.ONELEVEL)
+        .build();
+
+    Optional<LdapEntry> entry = ldaptiveTemplate.findOne(searchRequest);
+    assertFalse(entry.isPresent());
+  }
+
+  /**
+   * Find non existing person by dn.
+   */
+  @Test
+  void findNonExistingPersonByDn() {
+    String uid = UUID.randomUUID().toString().replace("-", "");
+    String dn = "uid=" + uid + ",ou=people," + baseDn;
+    Optional<LdapEntry> entry = ldaptiveTemplate
+        .findOne(SearchRequest.objectScopeSearchRequest(dn));
+    assertFalse(entry.isPresent());
+  }
+
+  /**
+   * Generate user password and bind.
+   */
+  @Test
+  void generateUserPasswordAndBind() {
+    String dn = "uid=anna,ou=people," + baseDn;
+
+    String initPasswd = ldaptiveTemplate.generateUserPassword(dn);
+    assertNotNull(initPasswd);
+
+    String newPasswd = initPasswd + "Pass1234";
+    ldaptiveTemplate.modifyUserPassword(dn, initPasswd, newPasswd);
+
+    boolean success = ldaptiveTemplate.bind(SimpleBindRequest.builder()
+        .dn(dn)
+        .password(newPasswd)
+        .build());
+    assertTrue(success);
+
+    success = ldaptiveTemplate.bind(SimpleBindRequest.builder()
+        .dn(dn)
+        .password(initPasswd + "f")
+        .build());
+    assertFalse(success);
+  }
+
+  /**
+   * Set user password fails.
+   */
+  @Test
+  void setUserPasswordFails() {
+    String dn = "uid=hans,ou=people," + baseDn;
+
+    String initPasswd = ldaptiveTemplate.generateUserPassword(dn);
+    assertNotNull(initPasswd);
+
+    String newPasswd = initPasswd + "Pass1234";
+    assertThrows(ServiceException.class, () -> ldaptiveTemplate.modifyUserPassword(dn, "wrong", newPasswd));
   }
 
   /**
@@ -176,6 +269,40 @@ class LdaptiveTemplateTest {
     assertTrue(ldaptiveTemplate.exists(group, groupMapper));
     group.setCn("na");
     assertFalse(ldaptiveTemplate.exists(group, groupMapper));
+  }
+
+  /**
+   * Compare group.
+   */
+  @Test
+  void compareGroup() {
+    Group group = new Group();
+    group.setCn("developers");
+
+    assertTrue(ldaptiveTemplate.compare(CompareRequest.builder()
+        .dn(groupMapper.mapDn(group))
+        .name("ou")
+        .value("developer")
+        .build()));
+
+    assertFalse(ldaptiveTemplate.compare(CompareRequest.builder()
+        .dn(groupMapper.mapDn(group))
+        .name("ou")
+        .value("manager")
+        .build()));
+
+    assertFalse(ldaptiveTemplate.compare(CompareRequest.builder()
+        .dn(groupMapper.mapDn(group))
+        .name("notexists")
+        .value("manager")
+        .build()));
+
+    group.setCn("notexists");
+    assertThrows(ServiceException.class, () -> ldaptiveTemplate.compare(CompareRequest.builder()
+        .dn(groupMapper.mapDn(group))
+        .name("ou")
+        .value("developer")
+        .build()));
   }
 
   /**
@@ -192,7 +319,7 @@ class LdaptiveTemplateTest {
     LdapEntry destination = new LdapEntry();
     personMapper.map(person, destination);
     destination.setDn(dn);
-    destination.addAttribute(new LdapAttribute(
+    destination.addAttributes(new LdapAttribute(
         "objectclass",
         personMapper.getObjectClasses()));
     ldaptiveTemplate.add(new AddRequest(dn, destination.getAttributes()));
@@ -203,7 +330,7 @@ class LdaptiveTemplateTest {
         .mapAndComputeModifyRequest(person, destination);
     ldaptiveTemplate.modify(modifyRequest);
 
-    person = ldaptiveTemplate.findOne(SearchRequest.newObjectScopeSearchRequest(dn), personMapper)
+    person = ldaptiveTemplate.findOne(SearchRequest.objectScopeSearchRequest(dn), personMapper)
         .orElseThrow(() -> ServiceException.notFound("Person", "person"));
     assertEquals("Surname", person.getSn());
 
@@ -212,7 +339,7 @@ class LdaptiveTemplateTest {
         .mapAndComputeModifyRequest(person, destination);
     ldaptiveTemplate.modify(modifyRequest);
 
-    person = ldaptiveTemplate.findOne(SearchRequest.newObjectScopeSearchRequest(dn), personMapper)
+    person = ldaptiveTemplate.findOne(SearchRequest.objectScopeSearchRequest(dn), personMapper)
         .orElseThrow(() -> ServiceException.notFound("Person", "person"));
     assertNull(person.getSn());
 
@@ -221,10 +348,10 @@ class LdaptiveTemplateTest {
   }
 
   /**
-   * Save and delete group.
+   * Save and remove group.
    */
   @Test
-  void saveAndDeleteGroup() {
+  void saveAndRemoveGroup() {
     Group group = new Group();
     group.setCn("party");
     group.setOu("Party Guests");
@@ -236,11 +363,14 @@ class LdaptiveTemplateTest {
     group = ldaptiveTemplate.save(group, groupMapper);
     assertNotNull(group);
 
-    SearchFilter searchFilter = new SearchFilter("(&(objectclass=groupOfUniqueNames)(cn={0}))");
-    searchFilter.setParameter(0, "party");
-    SearchRequest searchRequest = new SearchRequest(
-        "ou=groups," + baseDn, searchFilter);
-    searchRequest.setSearchScope(SearchScope.ONELEVEL);
+    SearchRequest searchRequest = SearchRequest.builder()
+        .dn("ou=groups," + baseDn)
+        .filter(FilterTemplate.builder()
+            .filter("(&(objectclass=groupOfUniqueNames)(cn={0}))")
+            .parameters("party")
+            .build())
+        .scope(SearchScope.ONELEVEL)
+        .build();
 
     group = ldaptiveTemplate.findOne(searchRequest, groupMapper)
         .orElseThrow(() -> ServiceException.notFound("Group", "party"));
@@ -273,7 +403,7 @@ class LdaptiveTemplateTest {
     assertTrue(group.getMembers().contains("uid=gustav,ou=people," + baseDn));
     assertFalse(group.getMembers().contains("uid=hans,ou=people," + baseDn));
 
-    ldaptiveTemplate.delete(group, groupMapper);
+    ldaptiveTemplate.remove(group, groupMapper);
     assertFalse(ldaptiveTemplate.exists(group, groupMapper));
   }
 
@@ -281,7 +411,7 @@ class LdaptiveTemplateTest {
    * Save and delete persons.
    */
   @Test
-  void saveAndDeletePersons() {
+  void saveAndRemovePersons() {
     Person p0 = new Person();
     p0.setCn("Person Number 0");
     p0.setSn("Person 0");
@@ -301,10 +431,42 @@ class LdaptiveTemplateTest {
     assertTrue(ldaptiveTemplate.exists(p1, personMapper));
     assertTrue(ldaptiveTemplate.exists(p2, personMapper));
 
-    ldaptiveTemplate.deleteAll(Arrays.asList(p0, p1, p2), personMapper);
+    ldaptiveTemplate.removeAll(Arrays.asList(p0, p1, p2), personMapper);
     assertFalse(ldaptiveTemplate.exists(p0, personMapper));
     assertFalse(ldaptiveTemplate.exists(p1, personMapper));
     assertFalse(ldaptiveTemplate.exists(p2, personMapper));
+  }
+
+  /**
+   * Modify dn.
+   */
+  @Test
+  void modifyDn() {
+    Person p0 = new Person();
+    p0.setCn("Gottfried");
+    p0.setSn("Benn");
+    p0.setUid("benn");
+
+    p0 = ldaptiveTemplate.save(p0, personMapper);
+    assertNotNull(p0);
+
+    ldaptiveTemplate.modifyDn(ModifyDnRequest.builder()
+        .oldDN(personMapper.mapDn(p0))
+        .newRDN("uid=gbn")
+        .delete(true)
+        .build());
+
+    Optional<Person> pr = ldaptiveTemplate.findAll(
+        SearchRequest.builder()
+            .dn("ou=people," + baseDn)
+            .filter("(sn=Benn)")
+            .build(),
+        personMapper)
+        .filter(p -> "gbn".equals(p.getUid()))
+        .findAny();
+    assertTrue(pr.isPresent());
+
+    ldaptiveTemplate.delete(DeleteRequest.builder().dn(personMapper.mapDn(pr.get())).build());
   }
 
   /**
