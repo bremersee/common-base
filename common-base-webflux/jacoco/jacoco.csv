@@ -20,7 +20,7 @@ common-base-webflux,org.bremersee.web.reactive.function.client.proxy,RequestCook
 common-base-webflux,org.bremersee.web.reactive.function.client.proxy,InvocationParameters,0,21,0,0,0,4,0,4,0,4
 common-base-webflux,org.bremersee.web.reactive.function.client.proxy,RequestBodyInserter,0,4,0,0,0,1,0,1,0,1
 common-base-webflux,org.bremersee.http.codec.xml,ReactiveJaxbDecoder,165,131,15,5,40,28,13,12,5,10
-common-base-webflux,org.bremersee.http.codec.xml,ReactiveJaxbEncoder,36,87,5,5,8,21,5,6,1,5
+common-base-webflux,org.bremersee.http.codec.xml,ReactiveJaxbEncoder,89,34,7,3,20,9,8,3,4,2
 common-base-webflux,org.bremersee.http.codec.xml,ReactiveJaxbDecoder.SplitHandler,91,0,16,0,22,0,10,0,2,0
 common-base-webflux,org.bremersee.web.reactive.multipart,MultipartFileBuilder,6,68,11,15,0,16,11,6,0,4
 common-base-webflux,org.bremersee.web.reactive.multipart,MultipartFileBuilderImpl.EmptyPart,8,0,0,0,3,0,3,0,3,0

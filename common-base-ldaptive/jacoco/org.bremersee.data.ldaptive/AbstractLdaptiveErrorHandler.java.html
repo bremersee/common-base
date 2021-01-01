@@ -18,27 +18,30 @@ package org.bremersee.data.ldaptive;
 
 import lombok.extern.slf4j.Slf4j;
 import org.ldaptive.LdapException;
+import org.springframework.lang.NonNull;
 
 /**
  * The abstract ldaptive error handler.
  *
  * @author Christian Bremer
  */
-<span class="fc" id="L27">@Slf4j</span>
-<span class="fc" id="L28">public abstract class AbstractLdaptiveErrorHandler implements LdaptiveErrorHandler {</span>
+<span class="fc" id="L28">@Slf4j</span>
+<span class="fc" id="L29">public abstract class AbstractLdaptiveErrorHandler implements LdaptiveErrorHandler {</span>
 
   @Override
-  public void handleError(final Throwable t) {
+  public void handleError(@NonNull final Throwable t) {
     final LdaptiveException ldaptiveException;
-<span class="fc bfc" id="L33" title="All 2 branches covered.">    if (t instanceof LdaptiveException) {</span>
-<span class="fc" id="L34">      ldaptiveException = (LdaptiveException) t;</span>
-<span class="fc bfc" id="L35" title="All 2 branches covered.">    } else if (t instanceof LdapException) {</span>
-<span class="fc" id="L36">      ldaptiveException = map((LdapException) t);</span>
+<span class="fc bfc" id="L34" title="All 2 branches covered.">    if (t instanceof LdaptiveException) {</span>
+<span class="fc" id="L35">      ldaptiveException = (LdaptiveException) t;</span>
+<span class="fc bfc" id="L36" title="All 2 branches covered.">    } else if (t instanceof LdapException) {</span>
+<span class="fc" id="L37">      ldaptiveException = map((LdapException) t);</span>
     } else {
-<span class="fc" id="L38">      ldaptiveException = LdaptiveException.builder().cause(t).build();</span>
+<span class="fc" id="L39">      ldaptiveException = LdaptiveException.builder()</span>
+<span class="fc" id="L40">          .cause(t)</span>
+<span class="fc" id="L41">          .build();</span>
     }
-<span class="fc" id="L40">    log.error(&quot;LDAP operation failed.&quot;, ldaptiveException);</span>
-<span class="fc" id="L41">    throw ldaptiveException;</span>
+<span class="fc" id="L43">    log.error(&quot;LDAP operation failed.&quot;, ldaptiveException);</span>
+<span class="fc" id="L44">    throw ldaptiveException;</span>
   }
 
 }

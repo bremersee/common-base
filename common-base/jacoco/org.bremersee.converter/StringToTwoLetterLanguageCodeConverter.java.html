@@ -19,19 +19,20 @@ package org.bremersee.converter;
 import lombok.ToString;
 import org.bremersee.common.model.TwoLetterLanguageCode;
 import org.springframework.core.convert.converter.Converter;
+import org.springframework.lang.NonNull;
 
 /**
  * The string to two letter language code converter.
  *
  * @author Christian Bremer
  */
-<span class="fc" id="L28">@ToString</span>
-<span class="fc" id="L29">public class StringToTwoLetterLanguageCodeConverter</span>
+<span class="fc" id="L29">@ToString</span>
+<span class="fc" id="L30">public class StringToTwoLetterLanguageCodeConverter</span>
     implements Converter&lt;String, TwoLetterLanguageCode&gt; {
 
   @Override
-  public TwoLetterLanguageCode convert(String source) {
-<span class="fc" id="L34">    return TwoLetterLanguageCode.fromValue(source.toLowerCase());</span>
+  public TwoLetterLanguageCode convert(@NonNull String source) {
+<span class="fc" id="L35">    return TwoLetterLanguageCode.fromValue(source.toLowerCase());</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

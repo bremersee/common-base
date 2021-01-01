@@ -1,0 +1,384 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ReactiveLdaptiveTemplate.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">common-base-ldaptive</a> &gt; <a href="index.source.html" class="el_package">org.bremersee.data.ldaptive.reactive</a> &gt; <span class="el_source">ReactiveLdaptiveTemplate.java</span></div><h1>ReactiveLdaptiveTemplate.java</h1><pre class="source lang-java linenums">package org.bremersee.data.ldaptive.reactive;
+
+import static org.ldaptive.handler.ResultPredicate.NOT_SUCCESS;
+
+import java.util.Objects;
+import java.util.concurrent.CompletableFuture;
+import java.util.function.Function;
+import lombok.extern.slf4j.Slf4j;
+import org.bremersee.data.ldaptive.DefaultLdaptiveErrorHandler;
+import org.bremersee.data.ldaptive.LdaptiveEntryMapper;
+import org.bremersee.data.ldaptive.LdaptiveErrorHandler;
+import org.bremersee.data.ldaptive.LdaptiveTemplate;
+import org.bremersee.exception.ServiceException;
+import org.ldaptive.AddOperation;
+import org.ldaptive.AddRequest;
+import org.ldaptive.AttributeModification;
+import org.ldaptive.BindRequest;
+import org.ldaptive.CompareOperation;
+import org.ldaptive.CompareRequest;
+import org.ldaptive.ConnectionFactory;
+import org.ldaptive.DeleteOperation;
+import org.ldaptive.DeleteRequest;
+import org.ldaptive.LdapAttribute;
+import org.ldaptive.LdapEntry;
+import org.ldaptive.LdapException;
+import org.ldaptive.ModifyDnOperation;
+import org.ldaptive.ModifyDnRequest;
+import org.ldaptive.ModifyOperation;
+import org.ldaptive.ModifyRequest;
+import org.ldaptive.Result;
+import org.ldaptive.ResultCode;
+import org.ldaptive.SearchOperation;
+import org.ldaptive.SearchRequest;
+import org.ldaptive.extended.ExtendedOperation;
+import org.ldaptive.extended.ExtendedRequest;
+import org.ldaptive.extended.ExtendedResponse;
+import org.ldaptive.handler.ResultHandler;
+import org.ldaptive.handler.ResultPredicate;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.FluxSink;
+import reactor.core.publisher.Mono;
+
+/**
+ * The reactive ldaptive template.
+ *
+ * @author Christian Bremer
+ */
+<span class="fc" id="L48">@Slf4j</span>
+public class ReactiveLdaptiveTemplate implements ReactiveLdaptiveOperations, Cloneable {
+
+<span class="pc bpc" id="L51" title="1 of 2 branches missed.">  private static final ResultPredicate NOT_COMPARE_RESULT = result -&gt; !result.isSuccess()</span>
+<span class="pc bpc" id="L52" title="1 of 2 branches missed.">      &amp;&amp; result.getResultCode() != ResultCode.COMPARE_TRUE</span>
+<span class="pc bpc" id="L53" title="1 of 2 branches missed.">      &amp;&amp; result.getResultCode() != ResultCode.COMPARE_FALSE;</span>
+
+<span class="fc bfc" id="L55" title="All 2 branches covered.">  private static final ResultPredicate NOT_DELETE_RESULT = result -&gt; !result.isSuccess()</span>
+<span class="pc bpc" id="L56" title="1 of 2 branches missed.">      &amp;&amp; result.getResultCode() != ResultCode.NO_SUCH_OBJECT;</span>
+
+<span class="fc" id="L58">  private static final ResultPredicate NOT_FIND_RESULT = NOT_DELETE_RESULT;</span>
+
+  private final ConnectionFactory connectionFactory;
+
+<span class="fc" id="L62">  private LdaptiveErrorHandler errorHandler = new DefaultLdaptiveErrorHandler();</span>
+
+  /**
+   * Instantiates a new Reactive ldaptive template.
+   *
+   * @param connectionFactory the connection factory
+   */
+<span class="fc" id="L69">  public ReactiveLdaptiveTemplate(ConnectionFactory connectionFactory) {</span>
+<span class="fc" id="L70">    this.connectionFactory = connectionFactory;</span>
+<span class="fc" id="L71">  }</span>
+
+  @Override
+  public ConnectionFactory getConnectionFactory() {
+<span class="fc" id="L75">    return connectionFactory;</span>
+  }
+
+  /**
+   * Sets error handler.
+   *
+   * @param errorHandler the error handler
+   */
+  public void setErrorHandler(LdaptiveErrorHandler errorHandler) {
+<span class="fc bfc" id="L84" title="All 2 branches covered.">    if (errorHandler != null) {</span>
+<span class="fc" id="L85">      this.errorHandler = errorHandler;</span>
+    }
+<span class="fc" id="L87">  }</span>
+
+  /**
+   * Returns a new instance of this ldaptive template with the same connection factory and error handler.
+   *
+   * @return a new instance of this ldaptive template
+   */
+  @SuppressWarnings(&quot;MethodDoesntCallSuperMethod&quot;)
+  @Override
+  public ReactiveLdaptiveTemplate clone() {
+<span class="fc" id="L97">    return clone(null);</span>
+  }
+
+  /**
+   * Returns a new instance of this ldaptive template with the same connection factory and the given error handler.
+   *
+   * @param errorHandler the new error handler
+   * @return the new instance of the ldaptive template
+   */
+  public ReactiveLdaptiveTemplate clone(final LdaptiveErrorHandler errorHandler) {
+<span class="fc" id="L107">    final ReactiveLdaptiveTemplate template = new ReactiveLdaptiveTemplate(connectionFactory);</span>
+<span class="fc" id="L108">    template.setErrorHandler(errorHandler);</span>
+<span class="fc" id="L109">    return template;</span>
+  }
+
+  @Override
+  public Mono&lt;Result&gt; add(AddRequest addRequest) {
+<span class="fc" id="L114">    CompletableFuture&lt;Result&gt; future = new CompletableFuture&lt;&gt;();</span>
+    try {
+<span class="fc" id="L116">      AddOperation.builder()</span>
+<span class="fc" id="L117">          .factory(connectionFactory)</span>
+<span class="fc" id="L118">          .onResult(new FutureAwareResultHandler&lt;&gt;(future, NOT_SUCCESS, errorHandler, r -&gt; r))</span>
+<span class="pc" id="L119">          .onException(ldapException -&gt; future.completeExceptionally(errorHandler.map(ldapException)))</span>
+<span class="fc" id="L120">          .build()</span>
+<span class="fc" id="L121">          .send(addRequest);</span>
+
+<span class="nc" id="L123">    } catch (LdapException e) {</span>
+<span class="nc" id="L124">      future.completeExceptionally(errorHandler.map(e));</span>
+<span class="fc" id="L125">    }</span>
+<span class="fc" id="L126">    return Mono.fromFuture(future);</span>
+  }
+
+  private &lt;T&gt; Mono&lt;T&gt; add(T domainObject, LdaptiveEntryMapper&lt;T&gt; entryMapper) {
+<span class="fc" id="L130">    String[] objectClasses = entryMapper.getObjectClasses();</span>
+<span class="pc bpc" id="L131" title="2 of 4 branches missed.">    if (objectClasses == null || objectClasses.length == 0) {</span>
+<span class="nc" id="L132">      final ServiceException se = ServiceException.internalServerError(</span>
+          &quot;Object classes must be specified to save a new ldap entry.&quot;,
+          &quot;org.bremersee:common-base-ldaptive:d7aa5699-fd2e-45df-a863-97960e8095b8&quot;);
+<span class="nc" id="L135">      log.error(&quot;Saving domain object failed.&quot;, se);</span>
+<span class="nc" id="L136">      throw se;</span>
+    }
+<span class="fc" id="L138">    String dn = entryMapper.mapDn(domainObject);</span>
+<span class="fc" id="L139">    LdapEntry entry = new LdapEntry();</span>
+<span class="fc" id="L140">    entryMapper.map(domainObject, entry);</span>
+<span class="fc" id="L141">    entry.setDn(dn);</span>
+<span class="fc" id="L142">    entry.addAttributes(new LdapAttribute(&quot;objectclass&quot;, objectClasses));</span>
+<span class="fc" id="L143">    return add(new AddRequest(dn, entry.getAttributes()))</span>
+<span class="fc" id="L144">        .then(Mono.just(Objects.requireNonNull(entryMapper.map(entry))));</span>
+  }
+
+  @Override
+  public Mono&lt;Boolean&gt; bind(BindRequest bindRequest) {
+    // Bind requests are synchronous
+<span class="fc" id="L150">    LdaptiveTemplate template = new LdaptiveTemplate(getConnectionFactory());</span>
+<span class="fc" id="L151">    template.setErrorHandler(errorHandler);</span>
+<span class="fc" id="L152">    return Mono.just(template.bind(bindRequest));</span>
+  }
+
+  @Override
+  public Mono&lt;Boolean&gt; compare(CompareRequest compareRequest) {
+<span class="fc" id="L157">    CompletableFuture&lt;Boolean&gt; future = new CompletableFuture&lt;&gt;();</span>
+    try {
+<span class="fc" id="L159">      CompareOperation.builder()</span>
+<span class="fc" id="L160">          .factory(connectionFactory)</span>
+<span class="fc" id="L161">          .onCompare(future::complete) // this will be only called, if the result is COMPARE_TRUE or COMPARE_FALSE</span>
+<span class="fc" id="L162">          .onResult(new FutureAwareResultHandler&lt;&gt;(future, NOT_COMPARE_RESULT, errorHandler, Result::isSuccess))</span>
+<span class="pc" id="L163">          .onException(ldapException -&gt; future.completeExceptionally(errorHandler.map(ldapException)))</span>
+<span class="fc" id="L164">          .build()</span>
+<span class="fc" id="L165">          .send(compareRequest);</span>
+
+<span class="nc" id="L167">    } catch (LdapException e) {</span>
+<span class="nc" id="L168">      future.completeExceptionally(errorHandler.map(e));</span>
+<span class="fc" id="L169">    }</span>
+<span class="fc" id="L170">    return Mono.fromFuture(future);</span>
+  }
+
+  @Override
+  public Mono&lt;Result&gt; delete(DeleteRequest deleteRequest) {
+<span class="fc" id="L175">    CompletableFuture&lt;Result&gt; future = new CompletableFuture&lt;&gt;();</span>
+    try {
+<span class="fc" id="L177">      DeleteOperation.builder()</span>
+<span class="fc" id="L178">          .factory(connectionFactory)</span>
+<span class="fc" id="L179">          .onResult(new FutureAwareResultHandler&lt;&gt;(future, NOT_DELETE_RESULT, errorHandler, r -&gt; r))</span>
+<span class="pc" id="L180">          .onException(ldapException -&gt; future.completeExceptionally(errorHandler.map(ldapException)))</span>
+<span class="fc" id="L181">          .build()</span>
+<span class="fc" id="L182">          .send(deleteRequest)</span>
+<span class="fc" id="L183">          .await();</span>
+
+<span class="nc" id="L185">    } catch (LdapException e) {</span>
+<span class="nc" id="L186">      future.completeExceptionally(errorHandler.map(e));</span>
+<span class="fc" id="L187">    }</span>
+<span class="fc" id="L188">    return Mono.fromFuture(future);</span>
+  }
+
+  @Override
+  public Mono&lt;ExtendedResponse&gt; executeExtension(ExtendedRequest request) {
+
+<span class="fc" id="L194">    CompletableFuture&lt;ExtendedResponse&gt; future = new CompletableFuture&lt;&gt;();</span>
+    try {
+<span class="fc" id="L196">      ExtendedOperation.builder()</span>
+<span class="fc" id="L197">          .factory(connectionFactory)</span>
+<span class="fc" id="L198">          .onExtended((name, value) -&gt; future.complete(ExtendedResponse.builder()</span>
+<span class="fc" id="L199">              .responseName(name)</span>
+<span class="fc" id="L200">              .responseValue(value)</span>
+<span class="fc" id="L201">              .resultCode(ResultCode.SUCCESS)</span>
+<span class="fc" id="L202">              .build()))</span>
+<span class="fc" id="L203">          .onResult(new FutureAwareResultHandler&lt;&gt;(</span>
+              future,
+              NOT_SUCCESS,
+              errorHandler,
+<span class="nc" id="L207">              r -&gt; ExtendedResponse.builder().resultCode(r.getResultCode()).build()))</span>
+<span class="pc" id="L208">          .onException(ldapException -&gt; future.completeExceptionally(errorHandler.map(ldapException)))</span>
+<span class="fc" id="L209">          .build()</span>
+<span class="fc" id="L210">          .send(request);</span>
+
+<span class="nc" id="L212">    } catch (LdapException e) {</span>
+<span class="nc" id="L213">      future.completeExceptionally(errorHandler.map(e));</span>
+<span class="fc" id="L214">    }</span>
+<span class="fc" id="L215">    return Mono.fromFuture(future);</span>
+  }
+
+  @Override
+  public Mono&lt;Result&gt; modify(ModifyRequest modifyRequest) {
+<span class="fc" id="L220">    CompletableFuture&lt;Result&gt; future = new CompletableFuture&lt;&gt;();</span>
+    try {
+<span class="fc" id="L222">      ModifyOperation.builder()</span>
+<span class="fc" id="L223">          .factory(connectionFactory)</span>
+<span class="fc" id="L224">          .onResult(new FutureAwareResultHandler&lt;&gt;(future, NOT_SUCCESS, errorHandler, r -&gt; r))</span>
+<span class="pc" id="L225">          .onException(ldapException -&gt; future.completeExceptionally(errorHandler.map(ldapException)))</span>
+<span class="fc" id="L226">          .build()</span>
+<span class="fc" id="L227">          .send(modifyRequest);</span>
+
+<span class="nc" id="L229">    } catch (LdapException e) {</span>
+<span class="nc" id="L230">      future.completeExceptionally(errorHandler.map(e));</span>
+<span class="fc" id="L231">    }</span>
+<span class="fc" id="L232">    return Mono.fromFuture(future);</span>
+  }
+
+  private &lt;T&gt; Mono&lt;T&gt; modify(T domainObject, LdapEntry entry, LdaptiveEntryMapper&lt;T&gt; entryMapper) {
+<span class="fc" id="L236">    String dn = entryMapper.mapDn(domainObject);</span>
+<span class="fc" id="L237">    AttributeModification[] modifications = entryMapper.mapAndComputeModifications(domainObject, entry);</span>
+<span class="fc" id="L238">    return modify(new ModifyRequest(dn, modifications))</span>
+<span class="fc" id="L239">        .then(Mono.just(Objects.requireNonNull(entryMapper.map(entry))));</span>
+  }
+
+  @Override
+  public Mono&lt;Result&gt; modifyDn(ModifyDnRequest modifyDnRequest) {
+<span class="fc" id="L244">    CompletableFuture&lt;Result&gt; future = new CompletableFuture&lt;&gt;();</span>
+    try {
+<span class="fc" id="L246">      ModifyDnOperation.builder()</span>
+<span class="fc" id="L247">          .factory(connectionFactory)</span>
+<span class="fc" id="L248">          .onResult(new FutureAwareResultHandler&lt;&gt;(future, NOT_SUCCESS, errorHandler, r -&gt; r))</span>
+<span class="pc" id="L249">          .onException(ldapException -&gt; future.completeExceptionally(errorHandler.map(ldapException)))</span>
+<span class="fc" id="L250">          .build()</span>
+<span class="fc" id="L251">          .send(modifyDnRequest);</span>
+
+<span class="nc" id="L253">    } catch (LdapException e) {</span>
+<span class="nc" id="L254">      future.completeExceptionally(errorHandler.map(e));</span>
+<span class="fc" id="L255">    }</span>
+<span class="fc" id="L256">    return Mono.fromFuture(future);</span>
+  }
+
+  @Override
+  public Mono&lt;LdapEntry&gt; findOne(SearchRequest searchRequest) {
+<span class="fc" id="L261">    CompletableFuture&lt;LdapEntry&gt; future = new CompletableFuture&lt;&gt;();</span>
+    try {
+<span class="fc" id="L263">      SearchOperation.builder()</span>
+<span class="fc" id="L264">          .factory(connectionFactory)</span>
+<span class="fc" id="L265">          .onEntry(ldapEntry -&gt; {</span>
+<span class="fc" id="L266">            future.complete(ldapEntry);</span>
+<span class="fc" id="L267">            return ldapEntry;</span>
+          })
+<span class="fc" id="L269">          .onResult(new FutureAwareResultHandler&lt;&gt;(future, NOT_FIND_RESULT, errorHandler, null))</span>
+<span class="pc" id="L270">          .onException(ldapException -&gt; future.obtrudeException(errorHandler.map(ldapException)))</span>
+<span class="fc" id="L271">          .build()</span>
+<span class="fc" id="L272">          .send(searchRequest);</span>
+
+<span class="nc" id="L274">    } catch (LdapException e) {</span>
+<span class="nc" id="L275">      future.completeExceptionally(errorHandler.map(e));</span>
+<span class="fc" id="L276">    }</span>
+<span class="fc" id="L277">    return Mono.fromFuture(future);</span>
+  }
+
+  @Override
+  public Flux&lt;LdapEntry&gt; findAll(SearchRequest searchRequest) {
+<span class="fc" id="L282">    return Flux.create((FluxSink&lt;LdapEntry&gt; fluxSink) -&gt; {</span>
+      try {
+<span class="fc" id="L284">        SearchOperation.builder()</span>
+<span class="fc" id="L285">            .factory(connectionFactory)</span>
+<span class="fc" id="L286">            .onEntry(ldapEntry -&gt; {</span>
+<span class="fc" id="L287">              fluxSink.next(ldapEntry);</span>
+<span class="fc" id="L288">              return ldapEntry;</span>
+            })
+<span class="fc" id="L290">            .onResult(new FluxSinkAwareResultHandler&lt;&gt;(fluxSink, NOT_FIND_RESULT, errorHandler))</span>
+<span class="pc" id="L291">            .onException(ldapException -&gt; fluxSink.error(errorHandler.map(ldapException)))</span>
+<span class="fc" id="L292">            .build()</span>
+<span class="fc" id="L293">            .send(searchRequest);</span>
+
+<span class="nc" id="L295">      } catch (LdapException e) {</span>
+<span class="nc" id="L296">        fluxSink.error(errorHandler.map(e));</span>
+<span class="fc" id="L297">      }</span>
+<span class="fc" id="L298">    });</span>
+  }
+
+  @Override
+  public &lt;T&gt; Mono&lt;T&gt; save(T domainObject, LdaptiveEntryMapper&lt;T&gt; entryMapper) {
+<span class="fc" id="L303">    return findOne(SearchRequest.objectScopeSearchRequest(entryMapper.mapDn(domainObject)))</span>
+<span class="fc" id="L304">        .flatMap(entry -&gt; modify(domainObject, entry, entryMapper))</span>
+<span class="fc" id="L305">        .switchIfEmpty(add(domainObject, entryMapper));</span>
+  }
+
+  private static class FutureAwareResultHandler&lt;T&gt; implements ResultHandler {
+
+    private final CompletableFuture&lt;T&gt; future;
+
+    private final ResultPredicate throwErrorPredicate;
+
+    private final LdaptiveErrorHandler errorHandler;
+
+    private final Function&lt;Result, T&gt; resultValueFn;
+
+    /**
+     * Instantiates a new Future aware result handler.
+     *
+     * @param future the future
+     * @param throwErrorPredicate the throw error predicate
+     * @param errorHandler the error handler
+     * @param resultValueFn the result value fn
+     */
+    public FutureAwareResultHandler(
+        CompletableFuture&lt;T&gt; future,
+        ResultPredicate throwErrorPredicate,
+        LdaptiveErrorHandler errorHandler,
+<span class="fc" id="L330">        Function&lt;Result, T&gt; resultValueFn) {</span>
+<span class="fc" id="L331">      this.throwErrorPredicate = throwErrorPredicate;</span>
+<span class="fc" id="L332">      this.errorHandler = errorHandler;</span>
+<span class="fc" id="L333">      this.future = future;</span>
+<span class="fc" id="L334">      this.resultValueFn = resultValueFn;</span>
+<span class="fc" id="L335">    }</span>
+
+    @Override
+    public void accept(Result result) {
+<span class="fc bfc" id="L339" title="All 2 branches covered.">      if (!future.isDone()) {</span>
+<span class="pc bpc" id="L340" title="1 of 4 branches missed.">        if (throwErrorPredicate != null &amp;&amp; throwErrorPredicate.test(result)) {</span>
+<span class="fc" id="L341">          future.completeExceptionally(errorHandler.map(new LdapException(result)));</span>
+        } else {
+<span class="fc bfc" id="L343" title="All 2 branches covered.">          future.complete(resultValueFn != null ? resultValueFn.apply(result) : null);</span>
+        }
+      }
+<span class="fc" id="L346">    }</span>
+  }
+
+  private static class FluxSinkAwareResultHandler&lt;T&gt; implements ResultHandler {
+
+    private final FluxSink&lt;T&gt; fluxSink;
+
+    private final ResultPredicate throwErrorPredicate;
+
+    private final LdaptiveErrorHandler errorHandler;
+
+    /**
+     * Instantiates a new Flux sink aware result handler.
+     *
+     * @param fluxSink the flux sink
+     * @param throwErrorPredicate the throw error predicate
+     * @param errorHandler the error handler
+     */
+    public FluxSinkAwareResultHandler(
+        FluxSink&lt;T&gt; fluxSink,
+        ResultPredicate throwErrorPredicate,
+<span class="fc" id="L367">        LdaptiveErrorHandler errorHandler) {</span>
+<span class="fc" id="L368">      this.throwErrorPredicate = throwErrorPredicate;</span>
+<span class="fc" id="L369">      this.errorHandler = errorHandler;</span>
+<span class="fc" id="L370">      this.fluxSink = fluxSink;</span>
+<span class="fc" id="L371">    }</span>
+
+    @Override
+    public void accept(Result result) {
+<span class="pc bpc" id="L375" title="2 of 4 branches missed.">      if (throwErrorPredicate != null &amp;&amp; throwErrorPredicate.test(result)) {</span>
+<span class="nc" id="L376">        fluxSink.error(errorHandler.map(new LdapException(result)));</span>
+      } else {
+<span class="fc" id="L378">        fluxSink.complete();</span>
+      }
+<span class="fc" id="L380">    }</span>
+  }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

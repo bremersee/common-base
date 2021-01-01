@@ -18,11 +18,13 @@ package org.bremersee.data.ldaptive;
 
 import static org.springframework.util.Assert.notNull;
 
-import java.time.Duration;
+import java.util.function.Predicate;
 import org.ldaptive.BindConnectionInitializer;
+import org.ldaptive.ClosedRetryMetadata;
 import org.ldaptive.ConnectionConfig;
 import org.ldaptive.ConnectionInitializer;
 import org.ldaptive.Credential;
+import org.ldaptive.RetryMetadata;
 import org.ldaptive.ssl.CredentialConfig;
 import org.ldaptive.ssl.SslConfig;
 import org.ldaptive.ssl.X509CredentialConfig;
@@ -43,11 +45,11 @@ public interface LdaptiveConnectionConfigFactory {
    * @return the connection config
    */
   default ConnectionConfig createConnectionConfig(LdaptiveProperties properties) {
-<span class="fc" id="L46">    notNull(properties, &quot;Ldaptive properties must not be null.&quot;);</span>
-<span class="fc" id="L47">    return createConnectionConfig(</span>
+<span class="fc" id="L48">    notNull(properties, &quot;Ldaptive properties must not be null.&quot;);</span>
+<span class="fc" id="L49">    return createConnectionConfig(</span>
         properties,
-<span class="fc" id="L49">        properties.getBindDn(),</span>
-<span class="fc" id="L50">        properties.getBindCredentials());</span>
+<span class="fc" id="L51">        properties.getBindDn(),</span>
+<span class="fc" id="L52">        properties.getBindCredentials());</span>
   }
 
   /**
@@ -64,87 +66,120 @@ public interface LdaptiveConnectionConfigFactory {
       String bindCredential);
 
   /**
-   * Get default factory.
+   * Get default connection config factory.
    *
    * @return the default connection config factory
    */
   static LdaptiveConnectionConfigFactory defaultFactory() {
-<span class="fc" id="L72">    return new Default();</span>
+<span class="fc" id="L74">    return new Default();</span>
   }
 
   /**
-   * The default connection config implementation.
+   * The default connection config factory.
    */
-<span class="fc" id="L78">  class Default implements LdaptiveConnectionConfigFactory {</span>
+<span class="fc" id="L80">  class Default implements LdaptiveConnectionConfigFactory {</span>
 
     @Override
     public ConnectionConfig createConnectionConfig(
         final LdaptiveProperties properties,
         final String bindDn,
-        final String bindCredential) {
+        final String bindCredentials) {
 
-<span class="fc" id="L86">      notNull(properties, &quot;Ldaptive properties must not be null.&quot;);</span>
-<span class="fc bfc" id="L87" title="All 2 branches covered.">      final String username = bindDn != null ? bindDn : properties.getBindDn();</span>
-<span class="fc bfc" id="L88" title="All 2 branches covered.">      final String password = bindCredential != null</span>
-<span class="fc" id="L89">          ? bindCredential</span>
-<span class="fc" id="L90">          : properties.getBindCredentials();</span>
-<span class="fc" id="L91">      final ConnectionConfig cc = new ConnectionConfig();</span>
-<span class="fc" id="L92">      cc.setLdapUrl(properties.getLdapUrl());</span>
-
-<span class="fc bfc" id="L94" title="All 2 branches covered.">      if (properties.getConnectTimeout() &gt; 0L) {</span>
-<span class="fc" id="L95">        cc.setConnectTimeout(Duration.ofMillis(properties.getConnectTimeout()));</span>
-      }
-<span class="fc bfc" id="L97" title="All 2 branches covered.">      if (properties.getResponseTimeout() &gt; 0L) {</span>
-<span class="fc" id="L98">        cc.setResponseTimeout(Duration.ofMillis(properties.getResponseTimeout()));</span>
-      }
-
-<span class="fc" id="L101">      cc.setUseSSL(properties.isUseSsl());</span>
-<span class="fc" id="L102">      cc.setUseStartTLS(properties.isUseStartTls());</span>
-
-<span class="pc bpc" id="L104" title="2 of 6 branches missed.">      if ((properties.isUseSsl() || properties.isUseStartTls()) &amp;&amp; hasSslConfig(properties)) {</span>
-<span class="fc" id="L105">        cc.setSslConfig(sslConfig(properties));</span>
-      }
-
-      // binds all operations to a dn
-<span class="fc bfc" id="L109" title="All 2 branches covered.">      if (StringUtils.hasText(properties.getBindDn())) {</span>
-<span class="fc" id="L110">        cc.setConnectionInitializer(connectionInitializer(username, password));</span>
-      }
-
-<span class="fc" id="L113">      return cc;</span>
+<span class="fc" id="L88">      notNull(properties, &quot;Ldaptive properties must not be null.&quot;);</span>
+<span class="fc" id="L89">      return ConnectionConfig.builder()</span>
+<span class="fc" id="L90">          .autoReconnect(properties.isAutoReconnect())</span>
+<span class="fc" id="L91">          .autoReconnectCondition(autoReconnectCondition(properties))</span>
+<span class="fc" id="L92">          .autoReplay(properties.isAutoReplay())</span>
+<span class="fc" id="L93">          .connectionInitializers(connectionInitializers(properties, bindDn, bindCredentials))</span>
+<span class="fc" id="L94">          .connectTimeout(properties.getConnectTimeout())</span>
+<span class="fc" id="L95">          .reconnectTimeout(properties.getReconnectTimeout())</span>
+<span class="fc" id="L96">          .responseTimeout(properties.getResponseTimeout())</span>
+<span class="fc" id="L97">          .sslConfig(sslConfig(properties))</span>
+<span class="fc" id="L98">          .url(properties.getLdapUrl())</span>
+<span class="fc" id="L99">          .useStartTLS(properties.isUseStartTls())</span>
+<span class="fc" id="L100">          .build();</span>
     }
 
-    private boolean hasSslConfig(final LdaptiveProperties properties) {
-<span class="pc bpc" id="L117" title="1 of 2 branches missed.">      return StringUtils.hasText(properties.getTrustCertificates())</span>
-<span class="nc bnc" id="L118" title="All 2 branches missed.">          || StringUtils.hasText(properties.getAuthenticationCertificate())</span>
-<span class="pc bnc" id="L119" title="All 2 branches missed.">          || StringUtils.hasText(properties.getAuthenticationKey());</span>
+    private Predicate&lt;RetryMetadata&gt; autoReconnectCondition(LdaptiveProperties properties) {
+<span class="fc" id="L104">      return metadata -&gt; {</span>
+<span class="nc bnc" id="L105" title="All 4 branches missed.">        if (properties.getReconnectAttempts() &gt; 0 &amp;&amp; metadata instanceof ClosedRetryMetadata) {</span>
+<span class="nc bnc" id="L106" title="All 2 branches missed.">          if (metadata.getAttempts() &gt; properties.getReconnectAttempts()) {</span>
+<span class="nc" id="L107">            return false;</span>
+          }
+<span class="nc bnc" id="L109" title="All 2 branches missed.">          if (metadata.getAttempts() &gt; 0) {</span>
+            try {
+<span class="nc" id="L111">              long delay = Math.abs(properties.getReconnectBackoffDelay().toMillis());</span>
+<span class="nc" id="L112">              double multiplier = Math.abs(properties.getReconnectBackoffMultiplier() * metadata.getAttempts());</span>
+<span class="nc" id="L113">              int attempts = metadata.getAttempts();</span>
+<span class="nc" id="L114">              long millis = Math.round(delay * multiplier * attempts);</span>
+<span class="nc" id="L115">              Thread.sleep(millis);</span>
+<span class="nc" id="L116">            } catch (InterruptedException e) {</span>
+              // nothing to do
+<span class="nc" id="L118">            }</span>
+          }
+<span class="nc" id="L120">          return true;</span>
+        }
+<span class="nc" id="L122">        return false;</span>
+      };
     }
 
-    private SslConfig sslConfig(final LdaptiveProperties properties) {
-<span class="fc" id="L123">      final SslConfig sc = new SslConfig();</span>
-<span class="fc" id="L124">      sc.setCredentialConfig(sslCredentialConfig(properties));</span>
-<span class="fc" id="L125">      return sc;</span>
-    }
+    private ConnectionInitializer[] connectionInitializers(
+        LdaptiveProperties properties,
+        String bindDn,
+        String bindCredentials) {
 
-    private CredentialConfig sslCredentialConfig(final LdaptiveProperties properties) {
-<span class="fc" id="L129">      final X509CredentialConfig x509 = new X509CredentialConfig();</span>
-<span class="pc bpc" id="L130" title="1 of 2 branches missed.">      if (StringUtils.hasText(properties.getAuthenticationCertificate())) {</span>
-<span class="fc" id="L131">        x509.setAuthenticationCertificate(properties.getAuthenticationCertificate());</span>
+      String username;
+      String password;
+<span class="fc bfc" id="L133" title="All 2 branches covered.">      if (StringUtils.hasText(bindDn)) {</span>
+<span class="fc" id="L134">        username = bindDn;</span>
+<span class="fc" id="L135">        password = bindCredentials;</span>
+      } else {
+<span class="fc" id="L137">        username = properties.getBindDn();</span>
+<span class="fc" id="L138">        password = properties.getBindCredentials();</span>
       }
-<span class="pc bpc" id="L133" title="1 of 2 branches missed.">      if (StringUtils.hasText(properties.getAuthenticationKey())) {</span>
-<span class="fc" id="L134">        x509.setAuthenticationKey(properties.getAuthenticationKey());</span>
+<span class="fc bfc" id="L140" title="All 2 branches covered.">      if (StringUtils.hasText(username)) {</span>
+<span class="fc" id="L141">        return new ConnectionInitializer[]{</span>
+<span class="fc" id="L142">            connectionInitializer(username, password)</span>
+        };
       }
-<span class="pc bpc" id="L136" title="1 of 2 branches missed.">      if (StringUtils.hasText(properties.getTrustCertificates())) {</span>
-<span class="fc" id="L137">        x509.setTrustCertificates(properties.getTrustCertificates());</span>
-      }
-<span class="fc" id="L139">      return x509;</span>
+<span class="fc" id="L145">      return new ConnectionInitializer[]{};</span>
     }
 
     private ConnectionInitializer connectionInitializer(String bindDn, String bindCredential) {
       // sasl is not supported at the moment
-<span class="fc" id="L144">      final BindConnectionInitializer bci = new BindConnectionInitializer();</span>
-<span class="fc" id="L145">      bci.setBindDn(bindDn);</span>
-<span class="fc" id="L146">      bci.setBindCredential(new Credential(bindCredential));</span>
-<span class="fc" id="L147">      return bci;</span>
+<span class="fc" id="L150">      final BindConnectionInitializer bci = new BindConnectionInitializer();</span>
+<span class="fc" id="L151">      bci.setBindDn(bindDn);</span>
+<span class="fc" id="L152">      bci.setBindCredential(new Credential(bindCredential));</span>
+<span class="fc" id="L153">      return bci;</span>
+    }
+
+    private SslConfig sslConfig(LdaptiveProperties properties) {
+<span class="fc bfc" id="L157" title="All 2 branches covered.">      if (hasSslConfig(properties)) {</span>
+<span class="fc" id="L158">        SslConfig sc = new SslConfig();</span>
+<span class="fc" id="L159">        sc.setCredentialConfig(sslCredentialConfig(properties));</span>
+<span class="fc" id="L160">        return sc;</span>
+      }
+<span class="fc" id="L162">      return null;</span>
+    }
+
+    private boolean hasSslConfig(LdaptiveProperties properties) {
+<span class="fc bfc" id="L166" title="All 2 branches covered.">      return StringUtils.hasText(properties.getTrustCertificates())</span>
+<span class="pc bpc" id="L167" title="1 of 2 branches missed.">          || StringUtils.hasText(properties.getAuthenticationCertificate())</span>
+<span class="pc bpc" id="L168" title="1 of 2 branches missed.">          || StringUtils.hasText(properties.getAuthenticationKey());</span>
+    }
+
+    private CredentialConfig sslCredentialConfig(LdaptiveProperties properties) {
+<span class="fc" id="L172">      X509CredentialConfig x509 = new X509CredentialConfig();</span>
+<span class="pc bpc" id="L173" title="1 of 2 branches missed.">      if (StringUtils.hasText(properties.getAuthenticationCertificate())) {</span>
+<span class="fc" id="L174">        x509.setAuthenticationCertificate(properties.getAuthenticationCertificate());</span>
+      }
+<span class="pc bpc" id="L176" title="1 of 2 branches missed.">      if (StringUtils.hasText(properties.getAuthenticationKey())) {</span>
+<span class="fc" id="L177">        x509.setAuthenticationKey(properties.getAuthenticationKey());</span>
+      }
+<span class="pc bpc" id="L179" title="1 of 2 branches missed.">      if (StringUtils.hasText(properties.getTrustCertificates())) {</span>
+<span class="fc" id="L180">        x509.setTrustCertificates(properties.getTrustCertificates());</span>
+      }
+<span class="fc" id="L182">      return x509;</span>
     }
 
   }

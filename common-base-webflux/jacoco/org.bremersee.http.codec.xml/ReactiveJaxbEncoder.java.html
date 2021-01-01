@@ -84,35 +84,35 @@ public class ReactiveJaxbEncoder extends AbstractSingleValueEncoder&lt;Object&gt
       ResolvableType valueType, @Nullable MimeType mimeType, @Nullable Map&lt;String, Object&gt; hints) {
 
     // we're relying on doOnDiscard in base class
-<span class="fc" id="L87">    return Mono.fromCallable(() -&gt; encodeValue(value, bufferFactory, valueType, mimeType, hints))</span>
-<span class="fc" id="L88">        .flux();</span>
+<span class="nc" id="L87">    return Mono.fromCallable(() -&gt; encodeValue(value, bufferFactory, valueType, mimeType, hints))</span>
+<span class="nc" id="L88">        .flux();</span>
   }
 
   @Override
   public DataBuffer encodeValue(Object value, DataBufferFactory bufferFactory,
       ResolvableType valueType, @Nullable MimeType mimeType, @Nullable Map&lt;String, Object&gt; hints) {
 
-<span class="pc bpc" id="L95" title="1 of 2 branches missed.">    if (!Hints.isLoggingSuppressed(hints)) {</span>
-<span class="fc" id="L96">      LogFormatUtils.traceDebug(logger, traceOn -&gt; {</span>
+<span class="nc bnc" id="L95" title="All 2 branches missed.">    if (!Hints.isLoggingSuppressed(hints)) {</span>
+<span class="nc" id="L96">      LogFormatUtils.traceDebug(logger, traceOn -&gt; {</span>
 <span class="nc bnc" id="L97" title="All 2 branches missed.">        String formatted = LogFormatUtils.formatValue(value, !traceOn);</span>
 <span class="nc" id="L98">        return Hints.getLogPrefix(hints) + &quot;Encoding [&quot; + formatted + &quot;]&quot;;</span>
       });
     }
 
-<span class="fc" id="L102">    boolean release = true;</span>
-<span class="fc" id="L103">    DataBuffer buffer = bufferFactory.allocateBuffer(1024);</span>
+<span class="nc" id="L102">    boolean release = true;</span>
+<span class="nc" id="L103">    DataBuffer buffer = bufferFactory.allocateBuffer(1024);</span>
     try {
-<span class="fc" id="L105">      OutputStream outputStream = buffer.asOutputStream();</span>
-<span class="fc" id="L106">      Marshaller marshaller = jaxbContextBuilder.buildMarshaller(value);</span>
-<span class="fc" id="L107">      marshaller.marshal(value, outputStream);</span>
-<span class="fc" id="L108">      release = false;</span>
-<span class="fc" id="L109">      return buffer;</span>
+<span class="nc" id="L105">      OutputStream outputStream = buffer.asOutputStream();</span>
+<span class="nc" id="L106">      Marshaller marshaller = jaxbContextBuilder.buildMarshaller(value);</span>
+<span class="nc" id="L107">      marshaller.marshal(value, outputStream);</span>
+<span class="nc" id="L108">      release = false;</span>
+<span class="nc" id="L109">      return buffer;</span>
 <span class="nc" id="L110">    } catch (MarshalException ex) {</span>
 <span class="nc" id="L111">      throw new EncodingException(&quot;Could not marshal &quot; + value.getClass() + &quot; to XML&quot;, ex);</span>
 <span class="nc" id="L112">    } catch (JAXBException ex) {</span>
 <span class="nc" id="L113">      throw new CodecException(&quot;Invalid JAXB configuration&quot;, ex);</span>
     } finally {
-<span class="pc bpc" id="L115" title="1 of 2 branches missed.">      if (release) {</span>
+<span class="nc bnc" id="L115" title="All 2 branches missed.">      if (release) {</span>
 <span class="nc" id="L116">        DataBufferUtils.release(buffer);</span>
       }
     }

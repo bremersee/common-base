@@ -183,13 +183,13 @@ public abstract class AbstractResourceServerAutoConfiguration extends WebSecurit
 
   private HttpSecurity configureAuthenticationProvider(HttpSecurity http) throws Exception {
 
-<span class="fc bfc" id="L186" title="All 2 branches covered.">    if (jwtConverterProvider.getIfAvailable() != null) {</span>
-<span class="fc" id="L187">      log.info(&quot;Configure authentication provider with JWT.&quot;);</span>
-<span class="fc" id="L188">      return http</span>
-<span class="fc" id="L189">          .oauth2ResourceServer((rs) -&gt; rs</span>
-<span class="fc" id="L190">              .jwt()</span>
-<span class="fc" id="L191">              .jwtAuthenticationConverter(jwtConverterProvider.getIfAvailable())</span>
-<span class="fc" id="L192">              .and());</span>
+<span class="pc bpc" id="L186" title="1 of 2 branches missed.">    if (jwtConverterProvider.getIfAvailable() != null) {</span>
+<span class="nc" id="L187">      log.info(&quot;Configure authentication provider with JWT.&quot;);</span>
+<span class="nc" id="L188">      return http</span>
+<span class="nc" id="L189">          .oauth2ResourceServer((rs) -&gt; rs</span>
+<span class="nc" id="L190">              .jwt()</span>
+<span class="nc" id="L191">              .jwtAuthenticationConverter(jwtConverterProvider.getIfAvailable())</span>
+<span class="nc" id="L192">              .and());</span>
     }
 <span class="fc" id="L194">    log.info(&quot;Configure authentication provider with basic auth and in-memory users.&quot;);</span>
 <span class="fc" id="L195">    String realm = environment.getProperty(&quot;spring.application.name&quot;, &quot;Restricted area&quot;);</span>

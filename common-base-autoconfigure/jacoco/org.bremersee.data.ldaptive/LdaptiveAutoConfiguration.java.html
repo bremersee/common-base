@@ -17,13 +17,14 @@
 package org.bremersee.data.ldaptive;
 
 import lombok.extern.slf4j.Slf4j;
+import org.bremersee.data.ldaptive.reactive.ReactiveLdaptiveTemplate;
 import org.bremersee.exception.ServiceException;
-import org.ldaptive.ConnectionConfig;
 import org.ldaptive.ConnectionFactory;
 import org.ldaptive.DefaultConnectionFactory;
-import org.ldaptive.pool.ConnectionPool;
-import org.ldaptive.pool.PooledConnectionFactory;
-import org.ldaptive.provider.Provider;
+import org.ldaptive.PooledConnectionFactory;
+import org.ldaptive.SearchRequest;
+import org.ldaptive.SearchResponse;
+import org.ldaptive.pool.IdlePruneStrategy;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -41,78 +42,64 @@ import org.springframework.util.ClassUtils;
  */
 @Configuration
 @ConditionalOnClass({
-    DefaultConnectionFactory.class,
+    ConnectionFactory.class,
     LdaptiveTemplate.class
 })
 @ConditionalOnProperty(prefix = &quot;bremersee.ldaptive&quot;, name = &quot;enabled&quot;, havingValue = &quot;true&quot;)
 @EnableConfigurationProperties(LdaptiveProperties.class)
-<span class="fc" id="L49">@Slf4j</span>
+<span class="fc" id="L50">@Slf4j</span>
 public class LdaptiveAutoConfiguration {
 
   private final LdaptiveProperties properties;
 
   private final LdaptiveConnectionConfigFactory connectionConfigFactory;
 
-  private final LdaptiveConnectionPoolFactory connectionPoolFactory;
-
-  private final Provider&lt;?&gt; ldaptiveProvider;
-
   /**
    * Instantiates a new ldaptive configuration.
    *
    * @param ldaptiveProperties the ldaptive properties
    * @param connectionConfigFactory the connection config factory
-   * @param connectionPoolFactory the connection pool factory
-   * @param ldaptiveProvider the ldaptive provider
    */
   public LdaptiveAutoConfiguration(
       LdaptiveProperties ldaptiveProperties,
-      ObjectProvider&lt;LdaptiveConnectionConfigFactory&gt; connectionConfigFactory,
-      ObjectProvider&lt;LdaptiveConnectionPoolFactory&gt; connectionPoolFactory,
-<span class="fc" id="L72">      ObjectProvider&lt;Provider&lt;?&gt;&gt; ldaptiveProvider) {</span>
-<span class="fc" id="L73">    this.properties = ldaptiveProperties;</span>
-<span class="fc" id="L74">    this.connectionConfigFactory = connectionConfigFactory</span>
-<span class="fc" id="L75">        .getIfAvailable(LdaptiveConnectionConfigFactory::defaultFactory);</span>
-<span class="fc" id="L76">    this.connectionPoolFactory = connectionPoolFactory</span>
-<span class="fc" id="L77">        .getIfAvailable(LdaptiveConnectionPoolFactory::defaultFactory);</span>
-<span class="fc" id="L78">    this.ldaptiveProvider = ldaptiveProvider.getIfAvailable();</span>
-<span class="fc" id="L79">  }</span>
+<span class="fc" id="L65">      ObjectProvider&lt;LdaptiveConnectionConfigFactory&gt; connectionConfigFactory) {</span>
+<span class="fc" id="L66">    this.properties = ldaptiveProperties;</span>
+<span class="fc" id="L67">    this.connectionConfigFactory = connectionConfigFactory</span>
+<span class="fc" id="L68">        .getIfAvailable(LdaptiveConnectionConfigFactory::defaultFactory);</span>
+<span class="fc" id="L69">  }</span>
 
   /**
    * Init.
    */
   @EventListener(ApplicationReadyEvent.class)
   public void init() {
-<span class="fc" id="L86">    log.info(&quot;\n&quot;</span>
+<span class="fc" id="L76">    log.info(&quot;\n&quot;</span>
             + &quot;*********************************************************************************\n&quot;
             + &quot;* {}\n&quot;
             + &quot;*********************************************************************************\n&quot;
             + &quot;* connectionConfigFactory = {}\n&quot;
-            + &quot;* connectionPoolFactory = {}\n&quot;
-            + &quot;* ldaptiveProvider = {}\n&quot;
+            + &quot;* properties = {}\n&quot;
             + &quot;*********************************************************************************&quot;,
-<span class="fc" id="L94">        ClassUtils.getUserClass(getClass()).getSimpleName(),</span>
-<span class="fc" id="L95">        ClassUtils.getUserClass(connectionConfigFactory).getSimpleName(),</span>
-<span class="fc" id="L96">        ClassUtils.getUserClass(connectionConfigFactory).getSimpleName(),</span>
-<span class="fc bfc" id="L97" title="All 2 branches covered.">        ldaptiveProvider != null</span>
-<span class="fc" id="L98">            ? ClassUtils.getUserClass(ldaptiveProvider).getSimpleName()</span>
-<span class="fc" id="L99">            : &quot;null&quot;);</span>
+<span class="fc" id="L83">        ClassUtils.getUserClass(getClass()).getSimpleName(),</span>
+<span class="fc" id="L84">        ClassUtils.getUserClass(connectionConfigFactory).getSimpleName(),</span>
+        properties);
 
-<span class="pc bpc" id="L101" title="1 of 2 branches missed.">    if (properties.isPooled()) {</span>
-<span class="nc" id="L102">      LdaptiveTemplate template = new LdaptiveTemplate(defaultConnectionFactory());</span>
-<span class="nc" id="L103">      boolean exists = template</span>
-<span class="nc" id="L104">          .findOne(properties.getSearchValidator().getSearchRequest())</span>
-<span class="nc" id="L105">          .isPresent();</span>
-<span class="nc bnc" id="L106" title="All 2 branches missed.">      if (!exists) {</span>
-<span class="nc" id="L107">        ServiceException se = ServiceException.internalServerError(</span>
+<span class="pc bpc" id="L87" title="1 of 2 branches missed.">    if (properties.isPooled()) {</span>
+<span class="nc" id="L88">      log.info(&quot;Checking validation properties {}&quot;, properties.getSearchValidator());</span>
+<span class="nc" id="L89">      LdaptiveTemplate ldaptiveTemplate = new LdaptiveTemplate(defaultConnectionFactory());</span>
+<span class="nc" id="L90">      SearchRequest request = properties.getSearchValidator().getSearchRequest().createSearchRequest();</span>
+<span class="nc" id="L91">      SearchResponse response = ldaptiveTemplate.search(request);</span>
+<span class="nc bnc" id="L92" title="All 2 branches missed.">      if (!response.isSuccess()) {</span>
+<span class="nc" id="L93">        ServiceException se = ServiceException.internalServerError(</span>
             &quot;Invalid search validator. There is no result executing search validator.&quot;,
             &quot;org.bremersee:common-base-ldaptive-autoconfigure:&quot;
                 + &quot;bf2c08f6-65bf-417c-8ab9-1c069f46bde2&quot;);
-<span class="nc" id="L111">        log.error(&quot;Validation of pool validation failed.&quot;, se);</span>
-<span class="nc" id="L112">        throw se;</span>
+<span class="nc" id="L97">        log.error(&quot;Validation of pool validation failed.&quot;, se);</span>
+<span class="nc" id="L98">        throw se;</span>
       }
+<span class="nc" id="L100">      log.info(&quot;Checking validation properties: successfully done!&quot;);</span>
     }
-<span class="fc" id="L115">  }</span>
+<span class="fc" id="L102">  }</span>
 
   /**
    * Builds ldaptive template.
@@ -122,7 +109,19 @@ public class LdaptiveAutoConfiguration {
    */
   @Bean
   public LdaptiveTemplate ldaptiveTemplate(ConnectionFactory connectionFactory) {
-<span class="fc" id="L125">    return new LdaptiveTemplate(connectionFactory);</span>
+<span class="fc" id="L112">    return new LdaptiveTemplate(connectionFactory);</span>
+  }
+
+  /**
+   * Builds reactive ldaptive template.
+   *
+   * @param connectionFactory the connection factory
+   * @return the reactive ldaptive template
+   */
+  @ConditionalOnClass(name = {&quot;reactor.core.publisher.Mono&quot;})
+  @Bean
+  public ReactiveLdaptiveTemplate reactiveLdaptiveTemplate(ConnectionFactory connectionFactory) {
+<span class="fc" id="L124">    return new ReactiveLdaptiveTemplate(connectionFactory);</span>
   }
 
   /**
@@ -130,36 +129,33 @@ public class LdaptiveAutoConfiguration {
    *
    * @return the connection factory bean
    */
-  @Bean
+  @Bean(destroyMethod = &quot;close&quot;)
   public ConnectionFactory connectionFactory() {
-<span class="pc bpc" id="L135" title="1 of 2 branches missed.">    return properties.isPooled() ? pooledConnectionFactory() : defaultConnectionFactory();</span>
+<span class="pc bpc" id="L134" title="1 of 2 branches missed.">    return properties.isPooled() ? pooledConnectionFactory() : defaultConnectionFactory();</span>
   }
 
   private DefaultConnectionFactory defaultConnectionFactory() {
-<span class="fc" id="L139">    DefaultConnectionFactory factory = new DefaultConnectionFactory();</span>
-<span class="fc" id="L140">    factory.setConnectionConfig(connectionConfig());</span>
-<span class="fc bfc" id="L141" title="All 2 branches covered.">    if (ldaptiveProvider != null) {</span>
-<span class="fc" id="L142">      factory.setProvider(ldaptiveProvider);</span>
-    }
-<span class="fc" id="L144">    return factory;</span>
+<span class="fc" id="L138">    return DefaultConnectionFactory.builder()</span>
+<span class="fc" id="L139">        .config(connectionConfigFactory.createConnectionConfig(properties))</span>
+<span class="fc" id="L140">        .build();</span>
   }
 
   private PooledConnectionFactory pooledConnectionFactory() {
-<span class="nc" id="L148">    PooledConnectionFactory factory = new PooledConnectionFactory();</span>
-<span class="nc" id="L149">    factory.setConnectionPool(connectionPool());</span>
-<span class="nc" id="L150">    return factory;</span>
-  }
-
-  private ConnectionConfig connectionConfig() {
-<span class="fc" id="L154">    return connectionConfigFactory.createConnectionConfig(properties);</span>
-  }
-
-  private ConnectionPool connectionPool() {
-<span class="nc" id="L158">    ConnectionPool pool = connectionPoolFactory.createConnectionPool(</span>
-        properties,
-<span class="nc" id="L160">        defaultConnectionFactory());</span>
-<span class="nc" id="L161">    pool.initialize();</span>
-<span class="nc" id="L162">    return pool;</span>
+<span class="nc" id="L144">    PooledConnectionFactory factory = PooledConnectionFactory.builder()</span>
+<span class="nc" id="L145">        .config(connectionConfigFactory.createConnectionConfig(properties))</span>
+<span class="nc" id="L146">        .blockWaitTime(properties.getBlockWaitTime())</span>
+<span class="nc" id="L147">        .connectOnCreate(properties.isConnectOnCreate())</span>
+<span class="nc" id="L148">        .failFastInitialize(properties.isFailFastInitialize())</span>
+<span class="nc" id="L149">        .max(properties.getMaxPoolSize())</span>
+<span class="nc" id="L150">        .min(properties.getMinPoolSize())</span>
+<span class="nc" id="L151">        .pruneStrategy(new IdlePruneStrategy(properties.getPrunePeriod(), properties.getIdleTime()))</span>
+<span class="nc" id="L152">        .validateOnCheckIn(properties.isValidateOnCheckIn())</span>
+<span class="nc" id="L153">        .validateOnCheckOut(properties.isValidateOnCheckOut())</span>
+<span class="nc" id="L154">        .validatePeriodically(properties.isValidatePeriodically())</span>
+<span class="nc" id="L155">        .validator(properties.createSearchConnectionValidator())</span>
+<span class="nc" id="L156">        .build();</span>
+<span class="nc" id="L157">    factory.initialize();</span>
+<span class="nc" id="L158">    return factory;</span>
   }
 
 }

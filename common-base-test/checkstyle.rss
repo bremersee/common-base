@@ -23,11 +23,11 @@ under the License.
     <link>https://github.com/bremersee/common-base/common-base-test</link>
     <description>common-base-test - Checkstyle report</description>
     <language>en-us</language>
-    <copyright>&#169;2020 bremersee.org</copyright>
+    <copyright>&#169;2021 bremersee.org</copyright>
     <item>
-      <title>File: 12,
+      <title>File: 14,
              Errors: 0,
-             Warnings: 5,
+             Warnings: 7,
              Infos: 0
       </title>
             <link>https://github.com/bremersee/common-base/common-base-test/checkstyle.html</link>
@@ -74,20 +74,6 @@ under the License.
               </tr>
                           <tr>
                 <td>
-                  <a href="https://github.com/bremersee/common-base/common-base-test/checkstyle.html#org.bremersee.test.web.RestApiTester.java">org/bremersee/test/web/RestApiTester.java</a>
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-              </tr>
-                          <tr>
-                <td>
                   <a href="https://github.com/bremersee/common-base/common-base-test/checkstyle.html#org.bremersee.test.web.RestApiTesterTest.java">org/bremersee/test/web/RestApiTesterTest.java</a>
                 </td>
                 <td>
@@ -102,7 +88,7 @@ under the License.
               </tr>
                           <tr>
                 <td>
-                  <a href="https://github.com/bremersee/common-base/common-base-test/checkstyle.html#org.bremersee.test.web.RestApiTesterExclusion.java">org/bremersee/test/web/RestApiTesterExclusion.java</a>
+                  <a href="https://github.com/bremersee/common-base/common-base-test/checkstyle.html#org.bremersee.test.web.RestApiAssertionType.java">org/bremersee/test/web/RestApiAssertionType.java</a>
                 </td>
                 <td>
                   0
@@ -116,7 +102,77 @@ under the License.
               </tr>
                           <tr>
                 <td>
-                  <a href="https://github.com/bremersee/common-base/common-base-test/checkstyle.html#org.bremersee.test.web.RestApiAssertionType.java">org/bremersee/test/web/RestApiAssertionType.java</a>
+                  <a href="https://github.com/bremersee/common-base/common-base-test/checkstyle.html#org.bremersee.test.beans.SimpleObjectProvider.java">org/bremersee/test/beans/SimpleObjectProvider.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  2
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/bremersee/common-base/common-base-test/checkstyle.html#org.bremersee.test.web.GoodRestApiOne.java">org/bremersee/test/web/GoodRestApiOne.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/bremersee/common-base/common-base-test/checkstyle.html#org.bremersee.test.web.RestApiTesterPath.java">org/bremersee/test/web/RestApiTesterPath.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/bremersee/common-base/common-base-test/checkstyle.html#org.bremersee.test.security.authentication.JsonPathJwtConverterProperties.java">org/bremersee/test/security/authentication/JsonPathJwtConverterProperties.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/bremersee/common-base/common-base-test/checkstyle.html#org.bremersee.test.web.RestApiTester.java">org/bremersee/test/web/RestApiTester.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/bremersee/common-base/common-base-test/checkstyle.html#org.bremersee.test.web.RestApiTesterExclusion.java">org/bremersee/test/web/RestApiTesterExclusion.java</a>
                 </td>
                 <td>
                   0
@@ -172,35 +228,7 @@ under the License.
               </tr>
                           <tr>
                 <td>
-                  <a href="https://github.com/bremersee/common-base/common-base-test/checkstyle.html#org.bremersee.test.web.GoodRestApiOne.java">org/bremersee/test/web/GoodRestApiOne.java</a>
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-              </tr>
-                          <tr>
-                <td>
-                  <a href="https://github.com/bremersee/common-base/common-base-test/checkstyle.html#org.bremersee.test.web.RestApiTesterPath.java">org/bremersee/test/web/RestApiTesterPath.java</a>
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-              </tr>
-                          <tr>
-                <td>
-                  <a href="https://github.com/bremersee/common-base/common-base-test/checkstyle.html#org.bremersee.test.security.authentication.JsonPathJwtConverterProperties.java">org/bremersee/test/security/authentication/JsonPathJwtConverterProperties.java</a>
+                  <a href="https://github.com/bremersee/common-base/common-base-test/checkstyle.html#org.bremersee.test.beans.SimpleObjectProviderTest.java">org/bremersee/test/beans/SimpleObjectProviderTest.java</a>
                 </td>
                 <td>
                   0

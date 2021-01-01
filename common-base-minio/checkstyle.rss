@@ -23,11 +23,11 @@ under the License.
     <link>https://github.com/bremersee/common-base/common-base-minio</link>
     <description>common-base-minio - Checkstyle report</description>
     <language>en-us</language>
-    <copyright>&#169;2020 bremersee.org</copyright>
+    <copyright>&#169;2021 bremersee.org</copyright>
     <item>
       <title>File: 22,
              Errors: 0,
-             Warnings: 0,
+             Warnings: 21,
              Infos: 0
       </title>
             <link>https://github.com/bremersee/common-base/common-base-minio/checkstyle.html</link>
@@ -66,7 +66,7 @@ under the License.
                   0
                 </td>
                 <td>
-                  0
+                  2
                 </td>
                 <td>
                   0
@@ -248,7 +248,7 @@ under the License.
                   0
                 </td>
                 <td>
-                  0
+                  1
                 </td>
                 <td>
                   0
@@ -276,7 +276,7 @@ under the License.
                   0
                 </td>
                 <td>
-                  0
+                  12
                 </td>
                 <td>
                   0
@@ -332,7 +332,7 @@ under the License.
                   0
                 </td>
                 <td>
-                  0
+                  6
                 </td>
                 <td>
                   0

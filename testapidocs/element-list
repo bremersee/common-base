@@ -40,6 +40,7 @@ org.bremersee.security.authentication.resourceserver.servlet.components
 org.bremersee.security.authentication.resourceserver.servlet.withoutredis
 org.bremersee.security.authentication.resourceserver.servlet.withredis
 org.bremersee.security.core
+org.bremersee.test.beans
 org.bremersee.test.security.authentication
 org.bremersee.test.web
 org.bremersee.thymeleaf

@@ -40,7 +40,7 @@ public class RedisAccessTokenCache implements AccessTokenCache {
 
   private final StringRedisTemplate redis;
 
-<span class="fc" id="L43">  @Setter</span>
+<span class="pc" id="L43">  @Setter</span>
   @NotNull
   private Function&lt;String, Date&gt; findExpirationTimeFn = AccessTokenCache::getExpirationTime;
 
@@ -64,29 +64,29 @@ public class RedisAccessTokenCache implements AccessTokenCache {
     try {
 <span class="nc" id="L65">      return Optional.ofNullable(redis.opsForValue().get(jwtCacheProperties.addKeyPrefix(key)));</span>
 
-<span class="fc" id="L67">    } catch (RuntimeException e) {</span>
-<span class="fc" id="L68">      log.error(&quot;Getting access token from redis cache failed.&quot;, e);</span>
-<span class="fc" id="L69">      return Optional.empty();</span>
+<span class="nc" id="L67">    } catch (RuntimeException e) {</span>
+<span class="nc" id="L68">      log.error(&quot;Getting access token from redis cache failed.&quot;, e);</span>
+<span class="nc" id="L69">      return Optional.empty();</span>
     }
   }
 
   @Override
   public void putAccessToken(String key, String accessToken) {
     try {
-<span class="fc" id="L76">      Duration duration = jwtCacheProperties.getExpirationTimeThreshold();</span>
-<span class="fc" id="L77">      long millis = System.currentTimeMillis() + duration.toMillis();</span>
-<span class="fc" id="L78">      String dbKey = jwtCacheProperties.addKeyPrefix(key);</span>
-<span class="fc" id="L79">      Optional.ofNullable(findExpirationTimeFn.apply(accessToken))</span>
-<span class="pc bpc" id="L80" title="1 of 2 branches missed.">          .filter(expirationTime -&gt; expirationTime.getTime() &gt; millis)</span>
+<span class="nc" id="L76">      Duration duration = jwtCacheProperties.getExpirationTimeThreshold();</span>
+<span class="nc" id="L77">      long millis = System.currentTimeMillis() + duration.toMillis();</span>
+<span class="nc" id="L78">      String dbKey = jwtCacheProperties.addKeyPrefix(key);</span>
+<span class="nc" id="L79">      Optional.ofNullable(findExpirationTimeFn.apply(accessToken))</span>
+<span class="nc bnc" id="L80" title="All 2 branches missed.">          .filter(expirationTime -&gt; expirationTime.getTime() &gt; millis)</span>
 <span class="nc" id="L81">          .ifPresent(expirationTime -&gt; {</span>
 <span class="nc" id="L82">            redis.opsForValue().set(dbKey, accessToken);</span>
 <span class="nc" id="L83">            redis.expireAt(dbKey, expirationTime);</span>
 <span class="nc" id="L84">          });</span>
 
-<span class="fc" id="L86">    } catch (RuntimeException e) {</span>
-<span class="fc" id="L87">      log.error(&quot;Putting access token into the redis cache failed.&quot;, e);</span>
+<span class="nc" id="L86">    } catch (RuntimeException e) {</span>
+<span class="nc" id="L87">      log.error(&quot;Putting access token into the redis cache failed.&quot;, e);</span>
 <span class="nc" id="L88">    }</span>
-<span class="fc" id="L89">  }</span>
+<span class="nc" id="L89">  }</span>
 
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

@@ -17,8 +17,8 @@
 package org.bremersee.data.minio;
 
 import io.minio.GetObjectArgs;
-import io.minio.ObjectStat;
 import io.minio.StatObjectArgs;
+import io.minio.StatObjectResponse;
 import io.minio.messages.Item;
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -65,7 +65,7 @@ public class MinioMultipartFileImpl implements MinioMultipartFile {
 
   private Long size;
 
-  private ObjectStat objectStatus;
+  private StatObjectResponse objectStatus;
 
   /**
    * Instantiates a new minio multipart file.
@@ -93,25 +93,23 @@ public class MinioMultipartFileImpl implements MinioMultipartFile {
    * @param minioOperations the minio operations
    * @param region the region
    * @param objectStatus the object status
-   * @param versionId the version id
    */
   public MinioMultipartFileImpl(
       MinioOperations minioOperations,
       String region,
-      ObjectStat objectStatus,
-<span class="fc" id="L102">      String versionId) {</span>
+<span class="fc" id="L100">      StatObjectResponse objectStatus) {</span>
 
-<span class="fc" id="L104">    Assert.notNull(minioOperations, &quot;Minio operations must not be null.&quot;);</span>
-<span class="fc" id="L105">    Assert.notNull(objectStatus, &quot;Object status must not be null.&quot;);</span>
-<span class="fc" id="L106">    this.minioOperations = minioOperations;</span>
-<span class="fc" id="L107">    this.region = region;</span>
-<span class="fc" id="L108">    this.bucket = objectStatus.bucketName();</span>
-<span class="fc" id="L109">    this.name = objectStatus.name();</span>
-<span class="fc" id="L110">    this.versionId = versionId;</span>
-<span class="fc" id="L111">    this.etag = objectStatus.etag();</span>
-<span class="fc" id="L112">    this.size = objectStatus.length();</span>
-<span class="fc" id="L113">    this.objectStatus = objectStatus;</span>
-<span class="fc" id="L114">  }</span>
+<span class="fc" id="L102">    Assert.notNull(minioOperations, &quot;Minio operations must not be null.&quot;);</span>
+<span class="fc" id="L103">    Assert.notNull(objectStatus, &quot;Object status must not be null.&quot;);</span>
+<span class="fc" id="L104">    this.minioOperations = minioOperations;</span>
+<span class="fc" id="L105">    this.region = region;</span>
+<span class="fc" id="L106">    this.bucket = objectStatus.bucket();</span>
+<span class="fc" id="L107">    this.name = objectStatus.object();</span>
+<span class="fc" id="L108">    this.versionId = objectStatus.versionId();</span>
+<span class="fc" id="L109">    this.etag = objectStatus.etag();</span>
+<span class="fc" id="L110">    this.size = objectStatus.size();</span>
+<span class="fc" id="L111">    this.objectStatus = objectStatus;</span>
+<span class="fc" id="L112">  }</span>
 
   /**
    * Instantiates a new minio multipart file.
@@ -125,107 +123,107 @@ public class MinioMultipartFileImpl implements MinioMultipartFile {
       MinioOperations minioOperations,
       String region,
       String bucket,
-<span class="fc" id="L128">      Item item) {</span>
+<span class="fc" id="L126">      Item item) {</span>
 
-<span class="fc" id="L130">    Assert.notNull(minioOperations, &quot;Minio operations must not be null.&quot;);</span>
-<span class="fc" id="L131">    Assert.hasText(bucket, &quot;Bucket must be present.&quot;);</span>
-<span class="fc" id="L132">    Assert.notNull(item, &quot;Item must not be null.&quot;);</span>
-<span class="fc" id="L133">    this.minioOperations = minioOperations;</span>
-<span class="fc" id="L134">    this.region = region;</span>
-<span class="fc" id="L135">    this.bucket = bucket;</span>
-<span class="fc" id="L136">    this.name = item.objectName();</span>
-<span class="fc" id="L137">    this.versionId = item.versionId();</span>
-<span class="fc" id="L138">    this.etag = item.etag();</span>
-<span class="fc" id="L139">    this.size = item.size();</span>
-<span class="fc" id="L140">  }</span>
+<span class="fc" id="L128">    Assert.notNull(minioOperations, &quot;Minio operations must not be null.&quot;);</span>
+<span class="fc" id="L129">    Assert.hasText(bucket, &quot;Bucket must be present.&quot;);</span>
+<span class="fc" id="L130">    Assert.notNull(item, &quot;Item must not be null.&quot;);</span>
+<span class="fc" id="L131">    this.minioOperations = minioOperations;</span>
+<span class="fc" id="L132">    this.region = region;</span>
+<span class="fc" id="L133">    this.bucket = bucket;</span>
+<span class="fc" id="L134">    this.name = item.objectName();</span>
+<span class="fc" id="L135">    this.versionId = item.versionId();</span>
+<span class="fc" id="L136">    this.etag = item.etag();</span>
+<span class="fc" id="L137">    this.size = item.size();</span>
+<span class="fc" id="L138">  }</span>
 
   /**
    * Gets object status.
    *
    * @return the object status
    */
-  protected ObjectStat getObjectStatus() {
-<span class="fc bfc" id="L148" title="All 2 branches covered.">    if (objectStatus == null) {</span>
-<span class="fc" id="L149">      objectStatus = minioOperations.statObject(StatObjectArgs.builder()</span>
-<span class="fc" id="L150">          .region(region)</span>
-<span class="fc" id="L151">          .bucket(bucket)</span>
-<span class="fc" id="L152">          .object(name)</span>
-<span class="fc" id="L153">          .versionId(versionId)</span>
-<span class="fc" id="L154">          .build());</span>
+  protected StatObjectResponse getObjectStatus() {
+<span class="fc bfc" id="L146" title="All 2 branches covered.">    if (objectStatus == null) {</span>
+<span class="fc" id="L147">      objectStatus = minioOperations.statObject(StatObjectArgs.builder()</span>
+<span class="fc" id="L148">          .region(region)</span>
+<span class="fc" id="L149">          .bucket(bucket)</span>
+<span class="fc" id="L150">          .object(name)</span>
+<span class="fc" id="L151">          .versionId(versionId)</span>
+<span class="fc" id="L152">          .build());</span>
     }
-<span class="fc" id="L156">    return objectStatus;</span>
+<span class="fc" id="L154">    return objectStatus;</span>
   }
 
   @NonNull
   @Override
   public String getName() {
-<span class="fc" id="L162">    return name;</span>
+<span class="fc" id="L160">    return name;</span>
   }
 
   @Override
   public String getOriginalFilename() {
-<span class="fc" id="L167">    return name;</span>
+<span class="fc" id="L165">    return name;</span>
   }
 
   @Override
   public String getContentType() {
-<span class="fc" id="L172">    return getObjectStatus().contentType();</span>
+<span class="fc" id="L170">    return getObjectStatus().contentType();</span>
   }
 
   @Override
   public boolean isEmpty() {
-<span class="fc bfc" id="L177" title="All 2 branches covered.">    return getSize() &lt;= 0;</span>
+<span class="fc bfc" id="L175" title="All 2 branches covered.">    return getSize() &lt;= 0;</span>
   }
 
   @Override
   public long getSize() {
-<span class="fc bfc" id="L182" title="All 2 branches covered.">    if (size == null) {</span>
-<span class="fc" id="L183">      size = getObjectStatus().length();</span>
+<span class="fc bfc" id="L180" title="All 2 branches covered.">    if (size == null) {</span>
+<span class="fc" id="L181">      size = getObjectStatus().size();</span>
     }
-<span class="fc" id="L185">    return size;</span>
+<span class="fc" id="L183">    return size;</span>
   }
 
   @NonNull
   @Override
   public byte[] getBytes() throws IOException {
-<span class="fc bfc" id="L191" title="All 2 branches covered.">    if (isEmpty()) {</span>
-<span class="fc" id="L192">      return new byte[0];</span>
+<span class="fc bfc" id="L189" title="All 2 branches covered.">    if (isEmpty()) {</span>
+<span class="fc" id="L190">      return new byte[0];</span>
     }
-<span class="fc" id="L194">    return FileCopyUtils.copyToByteArray(getInputStream());</span>
+<span class="fc" id="L192">    return FileCopyUtils.copyToByteArray(getInputStream());</span>
   }
 
   @NonNull
   @Override
   public InputStream getInputStream() {
-<span class="fc bfc" id="L200" title="All 2 branches covered.">    if (isEmpty()) {</span>
-<span class="fc" id="L201">      return new ByteArrayInputStream(new byte[0]);</span>
+<span class="fc bfc" id="L198" title="All 2 branches covered.">    if (isEmpty()) {</span>
+<span class="fc" id="L199">      return new ByteArrayInputStream(new byte[0]);</span>
     }
-<span class="fc" id="L203">    return minioOperations.getObject(GetObjectArgs.builder()</span>
-<span class="fc" id="L204">        .region(region)</span>
-<span class="fc" id="L205">        .bucket(bucket)</span>
-<span class="fc" id="L206">        .object(name)</span>
-<span class="fc" id="L207">        .versionId(versionId)</span>
-<span class="fc" id="L208">        .build());</span>
+<span class="fc" id="L201">    return minioOperations.getObject(GetObjectArgs.builder()</span>
+<span class="fc" id="L202">        .region(region)</span>
+<span class="fc" id="L203">        .bucket(bucket)</span>
+<span class="fc" id="L204">        .object(name)</span>
+<span class="fc" id="L205">        .versionId(versionId)</span>
+<span class="fc" id="L206">        .build());</span>
   }
 
   @Override
   public void transferTo(@NonNull File dest) throws IOException, IllegalStateException {
-<span class="fc" id="L213">    FileCopyUtils.copy(getInputStream(), Files.newOutputStream(dest.toPath()));</span>
-<span class="fc" id="L214">  }</span>
+<span class="fc" id="L211">    FileCopyUtils.copy(getInputStream(), Files.newOutputStream(dest.toPath()));</span>
+<span class="fc" id="L212">  }</span>
 
   @Override
   public String getEtag() {
-<span class="fc bfc" id="L218" title="All 2 branches covered.">    if (etag == null) {</span>
-<span class="fc" id="L219">      etag = getObjectStatus().etag();</span>
+<span class="fc bfc" id="L216" title="All 2 branches covered.">    if (etag == null) {</span>
+<span class="fc" id="L217">      etag = getObjectStatus().etag();</span>
     }
-<span class="fc" id="L221">    return etag;</span>
+<span class="fc" id="L219">    return etag;</span>
   }
 
   @Override
-  public OffsetDateTime getCreatedTime() {
-<span class="fc" id="L226">    return Optional.ofNullable(getObjectStatus().createdTime())</span>
-<span class="fc" id="L227">        .map(time -&gt; OffsetDateTime.ofInstant(time.toInstant(), ZoneOffset.UTC))</span>
-<span class="fc" id="L228">        .orElse(null);</span>
+  public OffsetDateTime getLastModified() {
+<span class="fc" id="L224">    return Optional.ofNullable(getObjectStatus().lastModified())</span>
+<span class="fc" id="L225">        .map(time -&gt; OffsetDateTime.ofInstant(time.toInstant(), ZoneOffset.UTC))</span>
+<span class="fc" id="L226">        .orElse(null);</span>
 
   }
 

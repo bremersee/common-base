@@ -16,6 +16,7 @@
 
 package org.bremersee.data.ldaptive;
 
+import java.util.Optional;
 import org.ldaptive.LdapException;
 import org.ldaptive.ResultCode;
 
@@ -24,17 +25,43 @@ import org.ldaptive.ResultCode;
  *
  * @author Christian Bremer
  */
-<span class="fc" id="L27">public class DefaultLdaptiveErrorHandler extends AbstractLdaptiveErrorHandler {</span>
+<span class="fc" id="L28">public class DefaultLdaptiveErrorHandler extends AbstractLdaptiveErrorHandler {</span>
 
   @Override
-  public LdaptiveException map(final LdapException ldapException) {
-<span class="fc bfc" id="L31" title="All 2 branches covered.">    if (ldapException == null) {</span>
-<span class="fc" id="L32">      return new LdaptiveException();</span>
+  public LdaptiveException map(LdapException ldapException) {
+<span class="fc" id="L32">    return LdaptiveException.builder()</span>
+<span class="fc" id="L33">        .errorCode(errorCode(ldapException))</span>
+<span class="fc" id="L34">        .httpStatus(httpStatus(ldapException))</span>
+<span class="fc" id="L35">        .cause(ldapException)</span>
+<span class="fc" id="L36">        .build();</span>
+  }
+
+  private int httpStatus(LdapException ldapException) {
+<span class="fc" id="L40">    return Optional.ofNullable(ldapException)</span>
+<span class="fc" id="L41">        .map(LdapException::getResultCode)</span>
+<span class="fc" id="L42">        .map(this::httpStatus)</span>
+<span class="fc" id="L43">        .orElse(500);</span>
+  }
+
+  private int httpStatus(ResultCode resultCode) {
+<span class="fc" id="L47">    ResultCode code = Optional.ofNullable(resultCode).orElse(ResultCode.OTHER);</span>
+<span class="pc bpc" id="L48" title="1 of 4 branches missed.">    switch (code) {</span>
+      case SUCCESS:
+<span class="nc" id="L50">        return 200;</span>
+      case INVALID_CREDENTIALS:
+<span class="fc" id="L52">        return 400;</span>
+      case NO_SUCH_OBJECT:
+<span class="fc" id="L54">        return 404;</span>
+      default:
+<span class="fc" id="L56">        return 500;</span>
     }
-<span class="fc bfc" id="L34" title="All 2 branches covered.">    if (ldapException.getResultCode() == ResultCode.NO_SUCH_OBJECT) {</span>
-<span class="fc" id="L35">      return LdaptiveException.builder().httpStatus(404).cause(ldapException).build();</span>
-    }
-<span class="fc" id="L37">    return LdaptiveException.builder().cause(ldapException).build();</span>
+  }
+
+  private String errorCode(LdapException ldapException) {
+<span class="fc" id="L61">    return Optional.ofNullable(ldapException)</span>
+<span class="fc" id="L62">        .map(LdapException::getResultCode)</span>
+<span class="fc" id="L63">        .map(ResultCode::name)</span>
+<span class="fc" id="L64">        .orElse(null);</span>
   }
 
 }

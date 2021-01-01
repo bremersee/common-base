@@ -19,18 +19,19 @@ package org.bremersee.converter;
 import java.util.TimeZone;
 import lombok.ToString;
 import org.springframework.core.convert.converter.Converter;
+import org.springframework.lang.NonNull;
 
 /**
  * The time zone to string converter.
  *
  * @author Christian Bremer
  */
-<span class="fc" id="L28">@ToString</span>
-<span class="fc" id="L29">public class TimeZoneToStringConverter implements Converter&lt;TimeZone, String&gt; {</span>
+<span class="fc" id="L29">@ToString</span>
+<span class="fc" id="L30">public class TimeZoneToStringConverter implements Converter&lt;TimeZone, String&gt; {</span>
 
   @Override
-  public String convert(TimeZone source) {
-<span class="fc" id="L33">    return source.getID();</span>
+  public String convert(@NonNull TimeZone source) {
+<span class="fc" id="L34">    return source.getID();</span>
   }
 
 }

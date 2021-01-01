@@ -83,13 +83,13 @@ import org.springframework.util.ClassUtils;
      */
     @EventListener(ApplicationReadyEvent.class)
     public void init() {
-<span class="fc" id="L86">      log.info(&quot;\n&quot;</span>
+<span class="nc" id="L86">      log.info(&quot;\n&quot;</span>
               + &quot;*******************************************************************************\n&quot;
               + &quot;* {}.{}\n&quot;
               + &quot;*******************************************************************************&quot;,
-<span class="fc" id="L90">          ClassUtils.getUserClass(AccessTokenCacheAutoConfiguration.class).getSimpleName(),</span>
-<span class="fc" id="L91">          ClassUtils.getUserClass(getClass()).getSimpleName());</span>
-<span class="fc" id="L92">    }</span>
+<span class="nc" id="L90">          ClassUtils.getUserClass(AccessTokenCacheAutoConfiguration.class).getSimpleName(),</span>
+<span class="nc" id="L91">          ClassUtils.getUserClass(getClass()).getSimpleName());</span>
+<span class="nc" id="L92">    }</span>
 
     /**
      * Creates an access token cache.
@@ -151,13 +151,13 @@ import org.springframework.util.ClassUtils;
      */
     @EventListener(ApplicationReadyEvent.class)
     public void init() {
-<span class="fc" id="L154">      log.info(&quot;\n&quot;</span>
+<span class="nc" id="L154">      log.info(&quot;\n&quot;</span>
               + &quot;*******************************************************************************\n&quot;
               + &quot;* {}.{}\n&quot;
               + &quot;*******************************************************************************&quot;,
-<span class="fc" id="L158">          ClassUtils.getUserClass(AccessTokenCacheAutoConfiguration.class).getSimpleName(),</span>
-<span class="fc" id="L159">          ClassUtils.getUserClass(getClass()).getSimpleName());</span>
-<span class="fc" id="L160">    }</span>
+<span class="nc" id="L158">          ClassUtils.getUserClass(AccessTokenCacheAutoConfiguration.class).getSimpleName(),</span>
+<span class="nc" id="L159">          ClassUtils.getUserClass(getClass()).getSimpleName());</span>
+<span class="nc" id="L160">    }</span>
 
     /**
      * Creates an access token cache that uses Redis.

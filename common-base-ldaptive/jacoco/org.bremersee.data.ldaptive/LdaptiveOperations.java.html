@@ -1,0 +1,276 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>LdaptiveOperations.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">common-base-ldaptive</a> &gt; <a href="index.source.html" class="el_package">org.bremersee.data.ldaptive</a> &gt; <span class="el_source">LdaptiveOperations.java</span></div><h1>LdaptiveOperations.java</h1><pre class="source lang-java linenums">/*
+ * Copyright 2019 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package org.bremersee.data.ldaptive;
+
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.stream.Stream;
+import javax.validation.constraints.NotNull;
+import org.ldaptive.AddRequest;
+import org.ldaptive.BindRequest;
+import org.ldaptive.CompareRequest;
+import org.ldaptive.ConnectionFactory;
+import org.ldaptive.DeleteRequest;
+import org.ldaptive.LdapEntry;
+import org.ldaptive.ModifyDnRequest;
+import org.ldaptive.ModifyRequest;
+import org.ldaptive.SearchRequest;
+import org.ldaptive.SearchResponse;
+import org.ldaptive.extended.ExtendedRequest;
+import org.ldaptive.extended.ExtendedResponse;
+import org.ldaptive.extended.PasswordModifyRequest;
+import org.ldaptive.extended.PasswordModifyResponseParser;
+import org.springframework.lang.Nullable;
+import org.springframework.validation.annotation.Validated;
+
+/**
+ * The interface for ldap operations.
+ *
+ * @author Christian Bremer
+ */
+@Validated
+public interface LdaptiveOperations {
+
+  /**
+   * Gets connection factory.
+   *
+   * @return the connection factory
+   */
+  @NotNull
+  ConnectionFactory getConnectionFactory();
+
+  /**
+   * Executes add operation.
+   *
+   * @param addRequest the add request
+   */
+  void add(@NotNull AddRequest addRequest);
+
+  /**
+   * Executes bind operation.
+   *
+   * @param request the request
+   * @return the boolean
+   */
+  boolean bind(@NotNull BindRequest request);
+
+  /**
+   * Executes compare operation.
+   *
+   * @param request the request
+   * @return the boolean
+   */
+  boolean compare(@NotNull CompareRequest request);
+
+  /**
+   * Executes delete operation.
+   *
+   * @param request the request
+   */
+  void delete(@NotNull DeleteRequest request);
+
+  /**
+   * Executes an extended request.
+   *
+   * @param request the request
+   * @return the extended response
+   */
+  @NotNull
+  ExtendedResponse executeExtension(@NotNull ExtendedRequest request);
+
+  /**
+   * Generate user password.
+   *
+   * @param dn the dn
+   * @return the generated user password
+   */
+  default String generateUserPassword(@NotNull String dn) {
+<span class="fc" id="L104">    ExtendedResponse response = executeExtension(new PasswordModifyRequest(dn));</span>
+<span class="fc" id="L105">    return PasswordModifyResponseParser.parse(response);</span>
+  }
+
+  /**
+   * Executes modify operation.
+   *
+   * @param request the request
+   */
+  void modify(@NotNull ModifyRequest request);
+
+  /**
+   * Executes modify dn operation.
+   *
+   * @param request the request
+   */
+  void modifyDn(@NotNull ModifyDnRequest request);
+
+  /**
+   * Modifies user password.
+   *
+   * @param dn the dn
+   * @param oldPass the old pass
+   * @param newPass the new pass
+   */
+  default void modifyUserPassword(@NotNull String dn, @Nullable String oldPass, @Nullable String newPass) {
+<span class="fc" id="L130">    executeExtension(new PasswordModifyRequest(dn, oldPass, newPass));</span>
+<span class="fc" id="L131">  }</span>
+
+  /**
+   * Executes search operation.
+   *
+   * @param request the request
+   * @return the search response
+   */
+  @NotNull
+  SearchResponse search(@NotNull SearchRequest request);
+
+  /**
+   * Find one.
+   *
+   * @param request the request
+   * @return the optional ldap entry
+   */
+  default Optional&lt;LdapEntry&gt; findOne(@NotNull SearchRequest request) {
+<span class="fc" id="L149">    return Optional.ofNullable(search(request))</span>
+<span class="fc" id="L150">        .map(SearchResponse::getEntry);</span>
+  }
+
+  /**
+   * Find one.
+   *
+   * @param &lt;T&gt; the type parameter
+   * @param request the request
+   * @param entryMapper the entry mapper
+   * @return the optional domain object
+   */
+  default &lt;T&gt; Optional&lt;T&gt; findOne(
+      @NotNull SearchRequest request,
+      @NotNull LdaptiveEntryMapper&lt;T&gt; entryMapper) {
+<span class="fc" id="L164">    return Optional.ofNullable(search(request))</span>
+<span class="fc" id="L165">        .map(SearchResponse::getEntry)</span>
+<span class="fc" id="L166">        .map(entryMapper::map);</span>
+  }
+
+  /**
+   * Find all.
+   *
+   * @param request the request
+   * @return the collection
+   */
+  default Collection&lt;LdapEntry&gt; findAll(@NotNull SearchRequest request) {
+<span class="fc" id="L176">    return Optional.ofNullable(search(request))</span>
+<span class="fc" id="L177">        .map(SearchResponse::getEntries)</span>
+<span class="fc" id="L178">        .orElseGet(Collections::emptyList);</span>
+  }
+
+  /**
+   * Find all.
+   *
+   * @param &lt;T&gt; the type parameter
+   * @param request the request
+   * @param entryMapper the entry mapper
+   * @return the stream
+   */
+  default &lt;T&gt; Stream&lt;T&gt; findAll(
+      @NotNull SearchRequest request,
+      @NotNull LdaptiveEntryMapper&lt;T&gt; entryMapper) {
+<span class="fc" id="L192">    return Optional.ofNullable(search(request))</span>
+<span class="fc" id="L193">        .map(SearchResponse::getEntries)</span>
+<span class="fc" id="L194">        .orElseGet(Collections::emptyList)</span>
+<span class="fc" id="L195">        .stream()</span>
+<span class="fc" id="L196">        .map(entryMapper::map);</span>
+  }
+
+  /**
+   * Exists.
+   *
+   * @param dn the dn
+   * @return the boolean
+   */
+  boolean exists(@NotNull String dn);
+
+  /**
+   * Exists.
+   *
+   * @param &lt;T&gt; the type parameter
+   * @param domainObject the domain object
+   * @param entryMapper the entry mapper
+   * @return the boolean
+   */
+  default &lt;T&gt; boolean exists(@NotNull T domainObject, @NotNull LdaptiveEntryMapper&lt;T&gt; entryMapper) {
+<span class="fc" id="L216">    return exists(entryMapper.mapDn(domainObject));</span>
+  }
+
+  /**
+   * Save t.
+   *
+   * @param &lt;T&gt; the type parameter
+   * @param domainObject the domain object
+   * @param entryMapper the entry mapper
+   * @return the t
+   */
+  &lt;T&gt; T save(T domainObject, LdaptiveEntryMapper&lt;T&gt; entryMapper);
+
+  /**
+   * Save all stream.
+   *
+   * @param &lt;T&gt; the type parameter
+   * @param domainObjects the domain objects
+   * @param entryMapper the entry mapper
+   * @return the stream
+   */
+  default &lt;T&gt; Stream&lt;T&gt; saveAll(
+      @Nullable Collection&lt;T&gt; domainObjects,
+      @NotNull LdaptiveEntryMapper&lt;T&gt; entryMapper) {
+
+<span class="fc" id="L241">    return Optional.ofNullable(domainObjects)</span>
+<span class="fc" id="L242">        .map(col -&gt; col.stream()</span>
+<span class="fc" id="L243">            .filter(Objects::nonNull)</span>
+<span class="fc" id="L244">            .map(domainObject -&gt; save(domainObject, entryMapper)))</span>
+<span class="fc" id="L245">        .orElseGet(Stream::empty);</span>
+  }
+
+  /**
+   * Remove.
+   *
+   * @param &lt;T&gt; the type parameter
+   * @param domainObject the domain object
+   * @param entryMapper the entry mapper
+   */
+  default &lt;T&gt; void remove(
+      @NotNull T domainObject,
+      @NotNull LdaptiveEntryMapper&lt;T&gt; entryMapper) {
+<span class="fc" id="L258">    delete(DeleteRequest.builder().dn(entryMapper.mapDn(domainObject)).build());</span>
+<span class="fc" id="L259">  }</span>
+
+  /**
+   * Remove all.
+   *
+   * @param &lt;T&gt; the type parameter
+   * @param domainObjects the domain objects
+   * @param entryMapper the entry mapper
+   */
+  default &lt;T&gt; void removeAll(
+      @Nullable Collection&lt;T&gt; domainObjects,
+      @NotNull LdaptiveEntryMapper&lt;T&gt; entryMapper) {
+<span class="fc" id="L271">    Optional.ofNullable(domainObjects)</span>
+<span class="fc" id="L272">        .ifPresent(col -&gt; col.forEach(domainObject -&gt; remove(domainObject, entryMapper)));</span>
+<span class="fc" id="L273">  }</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

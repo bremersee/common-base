@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>SimpleObjectProvider.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">common-base-test</a> &gt; <a href="index.source.html" class="el_package">org.bremersee.test.beans</a> &gt; <span class="el_source">SimpleObjectProvider.java</span></div><h1>SimpleObjectProvider.java</h1><pre class="source lang-java linenums">/*
+ * Copyright 2020 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package org.bremersee.test.beans;
+
+import java.util.function.Consumer;
+import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.NoSuchBeanDefinitionException;
+import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.lang.NonNull;
+import org.springframework.lang.Nullable;
+
+/**
+ * The simple object provider.
+ *
+ * @param &lt;T&gt; the type parameter
+ */
+public class SimpleObjectProvider&lt;T&gt; implements ObjectProvider&lt;T&gt; {
+
+  private final T provides;
+
+  private final Consumer&lt;T&gt; dependencyConsumer;
+
+  /**
+   * Instantiates a new simple object provider.
+   *
+   * @param provides the provides
+   */
+  public SimpleObjectProvider(@Nullable T provides) {
+<span class="fc" id="L43">    this(provides, null);</span>
+<span class="fc" id="L44">  }</span>
+
+  /**
+   * Instantiates a new simple object provider.
+   *
+   * &lt;p&gt;If a dependency consumer is set, the given consumer will be invoked when
+   * {@link ObjectProvider#ifAvailable(Consumer)} or {@link ObjectProvider#ifUnique(Consumer)} is called.
+   *
+   * @param provides the provides
+   * @param dependencyConsumer the dependency consumer
+   */
+<span class="fc" id="L55">  public SimpleObjectProvider(@Nullable T provides, @Nullable Consumer&lt;T&gt; dependencyConsumer) {</span>
+<span class="fc" id="L56">    this.provides = provides;</span>
+<span class="fc" id="L57">    this.dependencyConsumer = dependencyConsumer;</span>
+<span class="fc" id="L58">  }</span>
+
+  private void callConsumer(Consumer&lt;T&gt; originalConsumer) {
+<span class="fc bfc" id="L61" title="All 2 branches covered.">    if (provides == null) {</span>
+<span class="fc" id="L62">      return;</span>
+    }
+<span class="pc bpc" id="L64" title="1 of 2 branches missed.">    if (dependencyConsumer != null) {</span>
+<span class="fc" id="L65">      dependencyConsumer.accept(provides);</span>
+    } else {
+<span class="nc" id="L67">      originalConsumer.accept(provides);</span>
+    }
+<span class="fc" id="L69">  }</span>
+
+  @NonNull
+  @Override
+  public T getObject(@NonNull Object... objects) throws BeansException {
+<span class="fc bfc" id="L74" title="All 2 branches covered.">    if (provides == null) {</span>
+<span class="fc" id="L75">      throw new NoSuchBeanDefinitionException(&quot;Mocked object provider has no bean.&quot;);</span>
+    }
+<span class="fc" id="L77">    return provides;</span>
+  }
+
+  @Override
+  public void ifAvailable(@NonNull Consumer&lt;T&gt; dependencyConsumer) throws BeansException {
+<span class="fc" id="L82">    callConsumer(dependencyConsumer);</span>
+<span class="fc" id="L83">  }</span>
+
+  @Override
+  public void ifUnique(@NonNull Consumer&lt;T&gt; dependencyConsumer) throws BeansException {
+<span class="fc" id="L87">    callConsumer(dependencyConsumer);</span>
+<span class="fc" id="L88">  }</span>
+
+  @Override
+  public T getIfAvailable() throws BeansException {
+<span class="fc" id="L92">    return provides;</span>
+  }
+
+  @Override
+  public T getIfUnique() throws BeansException {
+<span class="fc" id="L97">    return provides;</span>
+  }
+
+  @NonNull
+  @Override
+  public T getObject() throws BeansException {
+<span class="fc bfc" id="L103" title="All 2 branches covered.">    if (provides == null) {</span>
+<span class="fc" id="L104">      throw new NoSuchBeanDefinitionException(&quot;Mocked object provider has no bean.&quot;);</span>
+    }
+<span class="fc" id="L106">    return provides;</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

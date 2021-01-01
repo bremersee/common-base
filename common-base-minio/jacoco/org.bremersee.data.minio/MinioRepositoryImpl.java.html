@@ -17,23 +17,25 @@
 package org.bremersee.data.minio;
 
 import io.minio.BucketExistsArgs;
-import io.minio.EnableVersioningArgs;
+import io.minio.GetBucketVersioningArgs;
 import io.minio.GetPresignedObjectUrlArgs;
-import io.minio.IsVersioningEnabledArgs;
 import io.minio.ListObjectsArgs;
 import io.minio.MakeBucketArgs;
 import io.minio.MinioClient;
-import io.minio.ObjectStat;
 import io.minio.ObjectWriteResponse;
 import io.minio.PutObjectArgs;
 import io.minio.RemoveObjectArgs;
 import io.minio.RemoveObjectsArgs;
 import io.minio.Result;
+import io.minio.SetBucketVersioningArgs;
 import io.minio.StatObjectArgs;
+import io.minio.StatObjectResponse;
 import io.minio.http.Method;
 import io.minio.messages.DeleteError;
 import io.minio.messages.DeleteObject;
 import io.minio.messages.Item;
+import io.minio.messages.VersioningConfiguration;
+import io.minio.messages.VersioningConfiguration.Status;
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.Duration;
@@ -60,10 +62,10 @@ public class MinioRepositoryImpl implements MinioRepository {
 
   private final MinioOperations minio;
 
-<span class="fc" id="L63">  @Getter</span>
+<span class="fc" id="L65">  @Getter</span>
   private final String region;
 
-<span class="fc" id="L66">  @Getter</span>
+<span class="fc" id="L68">  @Getter</span>
   private final String bucket;
 
   private final boolean enableVersioning;
@@ -86,17 +88,17 @@ public class MinioRepositoryImpl implements MinioRepository {
       String bucket,
       boolean enableVersioning,
       boolean create,
-<span class="fc" id="L89">      Duration presignedObjectUrlDuration) {</span>
+<span class="fc" id="L91">      Duration presignedObjectUrlDuration) {</span>
 
-<span class="fc" id="L91">    this.minio = minioOperations;</span>
-<span class="fc" id="L92">    this.region = region;</span>
-<span class="fc" id="L93">    this.bucket = bucket;</span>
-<span class="fc" id="L94">    this.enableVersioning = enableVersioning;</span>
-<span class="fc" id="L95">    this.presignedObjectUrlDuration = validateDuration(presignedObjectUrlDuration);</span>
-<span class="fc bfc" id="L96" title="All 2 branches covered.">    if (create) {</span>
-<span class="fc" id="L97">      createBucket();</span>
+<span class="fc" id="L93">    this.minio = minioOperations;</span>
+<span class="fc" id="L94">    this.region = region;</span>
+<span class="fc" id="L95">    this.bucket = bucket;</span>
+<span class="fc" id="L96">    this.enableVersioning = enableVersioning;</span>
+<span class="fc" id="L97">    this.presignedObjectUrlDuration = validateDuration(presignedObjectUrlDuration);</span>
+<span class="fc bfc" id="L98" title="All 2 branches covered.">    if (create) {</span>
+<span class="fc" id="L99">      createBucket();</span>
     }
-<span class="fc" id="L99">  }</span>
+<span class="fc" id="L101">  }</span>
 
   /**
    * Instantiates a new minio repository.
@@ -116,48 +118,65 @@ public class MinioRepositoryImpl implements MinioRepository {
       boolean create,
       Duration presignedObjectUrlDuration) {
 
-<span class="fc" id="L119">    this(</span>
+<span class="fc" id="L121">    this(</span>
         new MinioTemplate(minioClient),
         region,
         bucket,
         enableVersioning,
         create,
         presignedObjectUrlDuration);
-<span class="fc" id="L126">  }</span>
+<span class="fc" id="L128">  }</span>
 
   private static Duration validateDuration(Duration presignedObjectUrlDuration) {
-<span class="fc" id="L129">    return Optional.ofNullable(presignedObjectUrlDuration)</span>
-<span class="pc bpc" id="L130" title="1 of 2 branches missed.">        .filter(duration -&gt; duration.toMillis() &gt; 1000L * 30L</span>
-<span class="pc bpc" id="L131" title="1 of 2 branches missed.">            &amp;&amp; duration.toMillis() &lt; 1000L * 60L * 60L * 24L * 7L)</span>
-<span class="pc" id="L132">        .orElseGet(() -&gt; Duration.of(1L, ChronoUnit.DAYS));</span>
+<span class="fc" id="L131">    return Optional.ofNullable(presignedObjectUrlDuration)</span>
+<span class="pc bpc" id="L132" title="1 of 2 branches missed.">        .filter(duration -&gt; duration.toMillis() &gt; 1000L * 30L</span>
+<span class="pc bpc" id="L133" title="1 of 2 branches missed.">            &amp;&amp; duration.toMillis() &lt; 1000L * 60L * 60L * 24L * 7L)</span>
+<span class="pc" id="L134">        .orElseGet(() -&gt; Duration.of(1L, ChronoUnit.DAYS));</span>
   }
 
   private void createBucket() {
-<span class="pc bpc" id="L136" title="1 of 2 branches missed.">    if (!minio.bucketExists(BucketExistsArgs.builder().bucket(bucket).build())) {</span>
-<span class="fc" id="L137">      minio.makeBucket(MakeBucketArgs.builder()</span>
-<span class="fc" id="L138">          .region(region)</span>
-<span class="fc" id="L139">          .bucket(bucket)</span>
-<span class="fc" id="L140">          .build());</span>
+<span class="pc bpc" id="L138" title="1 of 2 branches missed.">    if (!minio.bucketExists(BucketExistsArgs.builder().bucket(bucket).build())) {</span>
+<span class="fc" id="L139">      minio.makeBucket(MakeBucketArgs.builder()</span>
+<span class="fc" id="L140">          .region(region)</span>
+<span class="fc" id="L141">          .bucket(bucket)</span>
+<span class="fc" id="L142">          .build());</span>
     }
-<span class="pc bpc" id="L142" title="2 of 4 branches missed.">    if (enableVersioning &amp;&amp; !minio.isVersioningEnabled(IsVersioningEnabledArgs.builder()</span>
-<span class="fc" id="L143">        .region(region)</span>
-<span class="fc" id="L144">        .bucket(bucket)</span>
-<span class="fc" id="L145">        .build())) {</span>
-<span class="fc" id="L146">      minio.enableVersioning(EnableVersioningArgs.builder()</span>
-<span class="fc" id="L147">          .region(region)</span>
-<span class="fc" id="L148">          .bucket(bucket)</span>
-<span class="fc" id="L149">          .build());</span>
+<span class="fc" id="L144">    VersioningConfiguration versioningConfiguration = minio.getBucketVersioning(GetBucketVersioningArgs.builder()</span>
+<span class="fc" id="L145">        .region(region)</span>
+<span class="fc" id="L146">        .bucket(bucket)</span>
+<span class="fc" id="L147">        .build());</span>
+<span class="pc bpc" id="L148" title="2 of 3 branches missed.">    switch (versioningConfiguration.status()) {</span>
+      case ENABLED:
+<span class="nc bnc" id="L150" title="All 2 branches missed.">        if (!enableVersioning) {</span>
+<span class="nc" id="L151">          minio.setBucketVersioning(SetBucketVersioningArgs.builder()</span>
+<span class="nc" id="L152">              .region(region)</span>
+<span class="nc" id="L153">              .bucket(bucket)</span>
+<span class="nc" id="L154">              .config(new VersioningConfiguration(Status.SUSPENDED, false))</span>
+<span class="nc" id="L155">              .build());</span>
+        }
+        break;
+      case SUSPENDED:
+      case OFF:
+<span class="pc bpc" id="L160" title="1 of 2 branches missed.">        if (enableVersioning) {</span>
+<span class="fc" id="L161">          minio.setBucketVersioning(SetBucketVersioningArgs.builder()</span>
+<span class="fc" id="L162">              .region(region)</span>
+<span class="fc" id="L163">              .bucket(bucket)</span>
+<span class="fc" id="L164">              .config(new VersioningConfiguration(Status.ENABLED, false))</span>
+<span class="fc" id="L165">              .build());</span>
+        }
+        break;
+      default:
     }
-<span class="fc" id="L151">  }</span>
+<span class="fc" id="L170">  }</span>
 
   @Override
   public MinioOperations getMinioOperations() {
-<span class="fc" id="L155">    return minio;</span>
+<span class="fc" id="L174">    return minio;</span>
   }
 
   @Override
   public boolean isVersioningEnabled() {
-<span class="fc" id="L160">    return enableVersioning;</span>
+<span class="fc" id="L179">    return enableVersioning;</span>
   }
 
   @Override
@@ -166,30 +185,30 @@ public class MinioRepositoryImpl implements MinioRepository {
       MultipartFile multipartFile,
       DeleteMode deleteMode) {
 
-<span class="fc" id="L169">    return Optional.ofNullable(multipartFile)</span>
-<span class="fc bfc" id="L170" title="All 2 branches covered.">        .filter(file -&gt; !file.isEmpty())</span>
-<span class="fc" id="L171">        .map(file -&gt; {</span>
-<span class="fc" id="L172">          try (InputStream in = file.getInputStream()) {</span>
-<span class="fc" id="L173">            ObjectWriteResponse response = minio.putObject(PutObjectArgs.builder()</span>
-<span class="pc bpc" id="L174" title="1 of 2 branches missed.">                .contentType(StringUtils.hasText(file.getContentType())</span>
-<span class="fc" id="L175">                    ? file.getContentType()</span>
-<span class="nc" id="L176">                    : MediaType.APPLICATION_OCTET_STREAM_VALUE)</span>
-<span class="fc" id="L177">                .stream(in, file.getSize(), -1)</span>
-<span class="fc" id="L178">                .region(region)</span>
-<span class="fc" id="L179">                .bucket(bucket)</span>
-<span class="fc" id="L180">                .object(id.getName())</span>
-<span class="fc" id="L181">                .build());</span>
-<span class="pc bpc" id="L182" title="1 of 2 branches missed.">            if (DeleteMode.ON_SUCCESS == deleteMode) {</span>
-<span class="nc" id="L183">              FileAwareMultipartFile.delete(file);</span>
+<span class="fc" id="L188">    return Optional.ofNullable(multipartFile)</span>
+<span class="fc bfc" id="L189" title="All 2 branches covered.">        .filter(file -&gt; !file.isEmpty())</span>
+<span class="fc" id="L190">        .map(file -&gt; {</span>
+<span class="fc" id="L191">          try (InputStream in = file.getInputStream()) {</span>
+<span class="fc" id="L192">            ObjectWriteResponse response = minio.putObject(PutObjectArgs.builder()</span>
+<span class="pc bpc" id="L193" title="1 of 2 branches missed.">                .contentType(StringUtils.hasText(file.getContentType())</span>
+<span class="fc" id="L194">                    ? file.getContentType()</span>
+<span class="nc" id="L195">                    : MediaType.APPLICATION_OCTET_STREAM_VALUE)</span>
+<span class="fc" id="L196">                .stream(in, file.getSize(), -1)</span>
+<span class="fc" id="L197">                .region(region)</span>
+<span class="fc" id="L198">                .bucket(bucket)</span>
+<span class="fc" id="L199">                .object(id.getName())</span>
+<span class="fc" id="L200">                .build());</span>
+<span class="pc bpc" id="L201" title="1 of 2 branches missed.">            if (DeleteMode.ON_SUCCESS == deleteMode) {</span>
+<span class="nc" id="L202">              FileAwareMultipartFile.delete(file);</span>
             }
-<span class="fc" id="L185">            return response;</span>
+<span class="fc" id="L204">            return response;</span>
 
-<span class="nc" id="L187">          } catch (IOException e) {</span>
-<span class="nc" id="L188">            throw ServiceException.internalServerError(&quot;Put object failed.&quot;, e);</span>
+<span class="nc" id="L206">          } catch (IOException e) {</span>
+<span class="nc" id="L207">            throw ServiceException.internalServerError(&quot;Put object failed.&quot;, e);</span>
 
           } finally {
-<span class="pc bpc" id="L191" title="1 of 2 branches missed.">            if (DeleteMode.ALWAYS == deleteMode) {</span>
-<span class="fc" id="L192">              FileAwareMultipartFile.delete(file);</span>
+<span class="pc bpc" id="L210" title="1 of 2 branches missed.">            if (DeleteMode.ALWAYS == deleteMode) {</span>
+<span class="fc" id="L211">              FileAwareMultipartFile.delete(file);</span>
             }
           }
         });
@@ -197,105 +216,105 @@ public class MinioRepositoryImpl implements MinioRepository {
 
   @Override
   public boolean exists(MinioObjectId id) {
-<span class="fc" id="L200">    return minio.objectExists(StatObjectArgs.builder()</span>
-<span class="fc" id="L201">        .region(region)</span>
-<span class="fc" id="L202">        .bucket(bucket)</span>
-<span class="fc" id="L203">        .object(id.getName())</span>
-<span class="fc" id="L204">        .versionId(id.getVersionId())</span>
-<span class="fc" id="L205">        .build());</span>
+<span class="fc" id="L219">    return minio.objectExists(StatObjectArgs.builder()</span>
+<span class="fc" id="L220">        .region(region)</span>
+<span class="fc" id="L221">        .bucket(bucket)</span>
+<span class="fc" id="L222">        .object(id.getName())</span>
+<span class="fc" id="L223">        .versionId(id.getVersionId())</span>
+<span class="fc" id="L224">        .build());</span>
   }
 
   @Override
   public Optional&lt;MinioMultipartFile&gt; findOne(MinioObjectId id) {
     try {
-<span class="fc" id="L211">      ObjectStat objectStat = minio.statObject(StatObjectArgs.builder()</span>
-<span class="fc" id="L212">          .region(region)</span>
-<span class="fc" id="L213">          .bucket(bucket)</span>
-<span class="fc" id="L214">          .object(id.getName())</span>
-<span class="fc" id="L215">          .versionId(id.getVersionId())</span>
-<span class="fc" id="L216">          .build());</span>
-<span class="fc" id="L217">      return Optional.of(new MinioMultipartFileImpl(minio, region, objectStat, id.getVersionId()));</span>
+<span class="fc" id="L230">      StatObjectResponse objectStat = minio.statObject(StatObjectArgs.builder()</span>
+<span class="fc" id="L231">          .region(region)</span>
+<span class="fc" id="L232">          .bucket(bucket)</span>
+<span class="fc" id="L233">          .object(id.getName())</span>
+<span class="fc" id="L234">          .versionId(id.getVersionId())</span>
+<span class="fc" id="L235">          .build());</span>
+<span class="fc" id="L236">      return Optional.of(new MinioMultipartFileImpl(minio, region, objectStat));</span>
 
-<span class="nc" id="L219">    } catch (MinioException e) {</span>
-<span class="nc bnc" id="L220" title="All 2 branches missed.">      if (404 == e.status()) {</span>
-<span class="nc" id="L221">        return Optional.empty();</span>
+<span class="nc" id="L238">    } catch (MinioException e) {</span>
+<span class="nc bnc" id="L239" title="All 2 branches missed.">      if (404 == e.status()) {</span>
+<span class="nc" id="L240">        return Optional.empty();</span>
       }
-<span class="nc" id="L223">      throw e;</span>
+<span class="nc" id="L242">      throw e;</span>
     }
   }
 
   @Override
   public List&lt;MinioMultipartFile&gt; findAll(String prefix) {
-<span class="fc" id="L229">    Iterable&lt;Result&lt;Item&gt;&gt; results = minio.listObjects(ListObjectsArgs.builder()</span>
-<span class="fc" id="L230">        .region(region)</span>
-<span class="fc" id="L231">        .bucket(bucket)</span>
-<span class="fc" id="L232">        .includeVersions(enableVersioning)</span>
-<span class="fc" id="L233">        .recursive(true)</span>
-<span class="fc" id="L234">        .prefix(prefix)</span>
-<span class="fc" id="L235">        .build());</span>
-<span class="fc" id="L236">    List&lt;MinioMultipartFile&gt; fileList = new ArrayList&lt;&gt;();</span>
-<span class="fc bfc" id="L237" title="All 2 branches covered.">    for (Result&lt;Item&gt; result : results) {</span>
+<span class="fc" id="L248">    Iterable&lt;Result&lt;Item&gt;&gt; results = minio.listObjects(ListObjectsArgs.builder()</span>
+<span class="fc" id="L249">        .region(region)</span>
+<span class="fc" id="L250">        .bucket(bucket)</span>
+<span class="fc" id="L251">        .includeVersions(enableVersioning)</span>
+<span class="fc" id="L252">        .recursive(true)</span>
+<span class="fc" id="L253">        .prefix(prefix)</span>
+<span class="fc" id="L254">        .build());</span>
+<span class="fc" id="L255">    List&lt;MinioMultipartFile&gt; fileList = new ArrayList&lt;&gt;();</span>
+<span class="fc bfc" id="L256" title="All 2 branches covered.">    for (Result&lt;Item&gt; result : results) {</span>
       try {
-<span class="fc" id="L239">        Item item = result.get();</span>
-<span class="pc bpc" id="L240" title="2 of 4 branches missed.">        if (!item.isDir() &amp;&amp; !item.isDeleteMarker()) {</span>
-<span class="fc" id="L241">          fileList.add(new MinioMultipartFileImpl(</span>
-<span class="fc" id="L242">              getMinioOperations(),</span>
+<span class="fc" id="L258">        Item item = result.get();</span>
+<span class="pc bpc" id="L259" title="2 of 4 branches missed.">        if (!item.isDir() &amp;&amp; !item.isDeleteMarker()) {</span>
+<span class="fc" id="L260">          fileList.add(new MinioMultipartFileImpl(</span>
+<span class="fc" id="L261">              getMinioOperations(),</span>
               region,
               bucket,
               item));
         }
-<span class="nc" id="L247">      } catch (Exception ignored) {</span>
+<span class="nc" id="L266">      } catch (Exception ignored) {</span>
         // ignored
-<span class="fc" id="L249">      }</span>
-<span class="fc" id="L250">    }</span>
-<span class="fc" id="L251">    return fileList;</span>
+<span class="fc" id="L268">      }</span>
+<span class="fc" id="L269">    }</span>
+<span class="fc" id="L270">    return fileList;</span>
   }
 
   @Override
   public void delete(MinioObjectId id) {
-<span class="fc" id="L256">    minio.removeObject(RemoveObjectArgs.builder()</span>
-<span class="fc" id="L257">        .region(region)</span>
-<span class="fc" id="L258">        .bucket(bucket)</span>
-<span class="fc" id="L259">        .object(id.getName())</span>
-<span class="fc" id="L260">        .versionId(id.getVersionId())</span>
-<span class="fc" id="L261">        .build());</span>
-<span class="fc" id="L262">  }</span>
+<span class="fc" id="L275">    minio.removeObject(RemoveObjectArgs.builder()</span>
+<span class="fc" id="L276">        .region(region)</span>
+<span class="fc" id="L277">        .bucket(bucket)</span>
+<span class="fc" id="L278">        .object(id.getName())</span>
+<span class="fc" id="L279">        .versionId(id.getVersionId())</span>
+<span class="fc" id="L280">        .build());</span>
+<span class="fc" id="L281">  }</span>
 
   @Override
   public List&lt;DeleteError&gt; deleteAll(Collection&lt;MinioObjectId&gt; ids) {
 
-<span class="pc bpc" id="L267" title="2 of 4 branches missed.">    if (ids == null || ids.isEmpty()) {</span>
-<span class="nc" id="L268">      return Collections.emptyList();</span>
+<span class="pc bpc" id="L286" title="2 of 4 branches missed.">    if (ids == null || ids.isEmpty()) {</span>
+<span class="nc" id="L287">      return Collections.emptyList();</span>
     }
-<span class="fc" id="L270">    Iterable&lt;Result&lt;DeleteError&gt;&gt; errors = minio.removeObjects(RemoveObjectsArgs.builder()</span>
-<span class="fc" id="L271">        .region(region)</span>
-<span class="fc" id="L272">        .bucket(bucket)</span>
-<span class="fc" id="L273">        .objects(ids.stream()</span>
-<span class="fc" id="L274">            .map(id -&gt; new DeleteObject(id.getName(), id.getVersionId()))</span>
-<span class="fc" id="L275">            .collect(Collectors.toSet()))</span>
-<span class="fc" id="L276">        .build());</span>
-<span class="fc" id="L277">    List&lt;DeleteError&gt; errorList = new ArrayList&lt;&gt;();</span>
-<span class="fc bfc" id="L278" title="All 2 branches covered.">    for (Result&lt;DeleteError&gt; error : errors) {</span>
+<span class="fc" id="L289">    Iterable&lt;Result&lt;DeleteError&gt;&gt; errors = minio.removeObjects(RemoveObjectsArgs.builder()</span>
+<span class="fc" id="L290">        .region(region)</span>
+<span class="fc" id="L291">        .bucket(bucket)</span>
+<span class="fc" id="L292">        .objects(ids.stream()</span>
+<span class="fc" id="L293">            .map(id -&gt; new DeleteObject(id.getName(), id.getVersionId()))</span>
+<span class="fc" id="L294">            .collect(Collectors.toSet()))</span>
+<span class="fc" id="L295">        .build());</span>
+<span class="fc" id="L296">    List&lt;DeleteError&gt; errorList = new ArrayList&lt;&gt;();</span>
+<span class="fc bfc" id="L297" title="All 2 branches covered.">    for (Result&lt;DeleteError&gt; error : errors) {</span>
       try {
-<span class="fc" id="L280">        errorList.add(error.get());</span>
-<span class="nc" id="L281">      } catch (Exception ignored) {</span>
+<span class="fc" id="L299">        errorList.add(error.get());</span>
+<span class="nc" id="L300">      } catch (Exception ignored) {</span>
         // ignored
-<span class="fc" id="L283">      }</span>
-<span class="fc" id="L284">    }</span>
-<span class="fc" id="L285">    return errorList;</span>
+<span class="fc" id="L302">      }</span>
+<span class="fc" id="L303">    }</span>
+<span class="fc" id="L304">    return errorList;</span>
   }
 
   @Override
   public String getPresignedObjectUrl(MinioObjectId id, Method method, Duration duration) {
-<span class="pc bpc" id="L290" title="1 of 2 branches missed.">    Duration expiry = duration != null ? validateDuration(duration) : presignedObjectUrlDuration;</span>
-<span class="fc" id="L291">    return minio.getPresignedObjectUrl(GetPresignedObjectUrlArgs.builder()</span>
-<span class="fc" id="L292">        .expiry((int) expiry.toSeconds())</span>
-<span class="fc" id="L293">        .method(method)</span>
-<span class="fc" id="L294">        .region(region)</span>
-<span class="fc" id="L295">        .bucket(bucket)</span>
-<span class="fc" id="L296">        .object(id.getName())</span>
-<span class="fc" id="L297">        .versionId(id.getVersionId())</span>
-<span class="fc" id="L298">        .build());</span>
+<span class="pc bpc" id="L309" title="1 of 2 branches missed.">    Duration expiry = duration != null ? validateDuration(duration) : presignedObjectUrlDuration;</span>
+<span class="fc" id="L310">    return minio.getPresignedObjectUrl(GetPresignedObjectUrlArgs.builder()</span>
+<span class="fc" id="L311">        .expiry((int) expiry.toSeconds())</span>
+<span class="fc" id="L312">        .method(method)</span>
+<span class="fc" id="L313">        .region(region)</span>
+<span class="fc" id="L314">        .bucket(bucket)</span>
+<span class="fc" id="L315">        .object(id.getName())</span>
+<span class="fc" id="L316">        .versionId(id.getVersionId())</span>
+<span class="fc" id="L317">        .build());</span>
   }
 
 }

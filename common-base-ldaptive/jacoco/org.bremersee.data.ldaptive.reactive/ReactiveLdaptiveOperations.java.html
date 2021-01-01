@@ -1,0 +1,251 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ReactiveLdaptiveOperations.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">common-base-ldaptive</a> &gt; <a href="index.source.html" class="el_package">org.bremersee.data.ldaptive.reactive</a> &gt; <span class="el_source">ReactiveLdaptiveOperations.java</span></div><h1>ReactiveLdaptiveOperations.java</h1><pre class="source lang-java linenums">package org.bremersee.data.ldaptive.reactive;
+
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Objects;
+import java.util.Optional;
+import javax.validation.constraints.NotNull;
+import org.bremersee.data.ldaptive.LdaptiveEntryMapper;
+import org.ldaptive.AddRequest;
+import org.ldaptive.BindRequest;
+import org.ldaptive.CompareRequest;
+import org.ldaptive.ConnectionFactory;
+import org.ldaptive.DeleteRequest;
+import org.ldaptive.LdapEntry;
+import org.ldaptive.ModifyDnRequest;
+import org.ldaptive.ModifyRequest;
+import org.ldaptive.Result;
+import org.ldaptive.SearchRequest;
+import org.ldaptive.extended.ExtendedRequest;
+import org.ldaptive.extended.ExtendedResponse;
+import org.ldaptive.extended.PasswordModifyRequest;
+import org.ldaptive.extended.PasswordModifyResponseParser;
+import org.springframework.lang.Nullable;
+import org.springframework.validation.annotation.Validated;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+
+/**
+ * The reactive ldaptive operations.
+ *
+ * @author Christian Bremer
+ */
+@Validated
+public interface ReactiveLdaptiveOperations {
+
+  /**
+   * Gets connection factory.
+   *
+   * @return the connection factory
+   */
+  @NotNull
+  ConnectionFactory getConnectionFactory();
+
+  /**
+   * Executes add operation.
+   *
+   * @param addRequest the add request
+   * @return the mono
+   */
+  Mono&lt;Result&gt; add(@NotNull AddRequest addRequest);
+
+  /**
+   * Executes bind operation.
+   *
+   * @param bindRequest the bind request
+   * @return the mono
+   */
+  Mono&lt;Boolean&gt; bind(@NotNull BindRequest bindRequest);
+
+  /**
+   * Executes compare operation.
+   *
+   * @param compareRequest the compare request
+   * @return the mono
+   */
+  Mono&lt;Boolean&gt; compare(@NotNull CompareRequest compareRequest);
+
+  /**
+   * Executes delete operation.
+   *
+   * @param deleteRequest the delete request
+   * @return the mono
+   */
+  Mono&lt;Result&gt; delete(@NotNull DeleteRequest deleteRequest);
+
+  /**
+   * Executes extended request.
+   *
+   * @param request the request
+   * @return the mono
+   */
+  Mono&lt;ExtendedResponse&gt; executeExtension(@NotNull ExtendedRequest request);
+
+  /**
+   * Generate user password.
+   *
+   * @param dn the dn
+   * @return the mono
+   */
+  default Mono&lt;String&gt; generateUserPassword(@NotNull String dn) {
+<span class="fc" id="L91">    return executeExtension(new PasswordModifyRequest(dn))</span>
+<span class="fc" id="L92">        .map(PasswordModifyResponseParser::parse);</span>
+  }
+
+  /**
+   * Executes modify operation.
+   *
+   * @param modifyRequest the modify request
+   * @return the mono
+   */
+  Mono&lt;Result&gt; modify(@NotNull ModifyRequest modifyRequest);
+
+  /**
+   * Executes modify DN operation.
+   *
+   * @param modifyDnRequest the modify dn request
+   * @return the mono
+   */
+  Mono&lt;Result&gt; modifyDn(@NotNull ModifyDnRequest modifyDnRequest);
+
+  /**
+   * Modify user password.
+   *
+   * @param dn the dn
+   * @param oldPass the old pass
+   * @param newPass the new pass
+   * @return the mono
+   */
+  default Mono&lt;ExtendedResponse&gt; modifyUserPassword(
+      @NotNull String dn,
+      @Nullable String oldPass,
+      @Nullable String newPass) {
+<span class="fc" id="L123">    return executeExtension(new PasswordModifyRequest(dn, oldPass, newPass));</span>
+  }
+
+  /**
+   * Find one.
+   *
+   * @param searchRequest the search request
+   * @return the mono
+   */
+  Mono&lt;LdapEntry&gt; findOne(@NotNull SearchRequest searchRequest);
+
+  /**
+   * Find one.
+   *
+   * @param &lt;T&gt; the type parameter
+   * @param searchRequest the search request
+   * @param entryMapper the entry mapper
+   * @return the mono
+   */
+  default &lt;T&gt; Mono&lt;T&gt; findOne(@NotNull SearchRequest searchRequest, @NotNull LdaptiveEntryMapper&lt;T&gt; entryMapper) {
+<span class="fc" id="L143">    return findOne(searchRequest)</span>
+<span class="fc" id="L144">        .map(ldapEntry -&gt; Objects.requireNonNull(entryMapper.map(ldapEntry)));</span>
+  }
+
+  /**
+   * Find all.
+   *
+   * @param searchRequest the search request
+   * @return the flux
+   */
+  Flux&lt;LdapEntry&gt; findAll(@NotNull SearchRequest searchRequest);
+
+  /**
+   * Find all.
+   *
+   * @param &lt;T&gt; the type parameter
+   * @param searchRequest the search request
+   * @param entryMapper the entry mapper
+   * @return the flux
+   */
+  default &lt;T&gt; Flux&lt;T&gt; findAll(@NotNull SearchRequest searchRequest, @NotNull LdaptiveEntryMapper&lt;T&gt; entryMapper) {
+<span class="fc" id="L164">    return findAll(searchRequest)</span>
+<span class="fc" id="L165">        .map(ldapEntry -&gt; Objects.requireNonNull(entryMapper.map(ldapEntry)));</span>
+  }
+
+  /**
+   * Exists.
+   *
+   * @param dn the dn
+   * @return the mono
+   */
+  default Mono&lt;Boolean&gt; exists(@NotNull String dn) {
+<span class="fc" id="L175">    int index = dn.indexOf('=');</span>
+<span class="pc bpc" id="L176" title="1 of 2 branches missed.">    if (index &gt; 0) {</span>
+<span class="fc" id="L177">      String attr = dn.substring(0, index).trim();</span>
+<span class="fc" id="L178">      return findOne(SearchRequest.objectScopeSearchRequest(dn, new String[]{attr}))</span>
+<span class="fc" id="L179">          .map(ldapEntry -&gt; true)</span>
+<span class="fc" id="L180">          .defaultIfEmpty(false);</span>
+    }
+<span class="nc" id="L182">    return Mono.just(false);</span>
+  }
+
+  /**
+   * Exists.
+   *
+   * @param &lt;T&gt; the type parameter
+   * @param domainObject the domain object
+   * @param entryMapper the entry mapper
+   * @return the mono
+   */
+  default &lt;T&gt; Mono&lt;Boolean&gt; exists(@NotNull T domainObject, @NotNull LdaptiveEntryMapper&lt;T&gt; entryMapper) {
+<span class="fc" id="L194">    return exists(entryMapper.mapDn(domainObject));</span>
+  }
+
+  /**
+   * Save.
+   *
+   * @param &lt;T&gt; the type parameter
+   * @param domainObject the domain object
+   * @param entryMapper the entry mapper
+   * @return the mono
+   */
+  &lt;T&gt; Mono&lt;T&gt; save(@NotNull T domainObject, @NotNull LdaptiveEntryMapper&lt;T&gt; entryMapper);
+
+  /**
+   * Save all.
+   *
+   * @param &lt;T&gt; the type parameter
+   * @param domainObjects the domain objects
+   * @param entryMapper the entry mapper
+   * @return the flux
+   */
+  default &lt;T&gt; Flux&lt;T&gt; saveAll(@Nullable Collection&lt;T&gt; domainObjects, @NotNull LdaptiveEntryMapper&lt;T&gt; entryMapper) {
+<span class="fc" id="L216">    return Flux.fromIterable(Optional.ofNullable(domainObjects).orElseGet(Collections::emptyList))</span>
+<span class="fc" id="L217">        .flatMap(domainObject -&gt; save(domainObject, entryMapper));</span>
+  }
+
+  /**
+   * Remove.
+   *
+   * @param &lt;T&gt; the type parameter
+   * @param domainObject the domain object
+   * @param entryMapper the entry mapper
+   * @return the mono
+   */
+  default &lt;T&gt; Mono&lt;Result&gt; remove(
+      @NotNull T domainObject,
+      @NotNull LdaptiveEntryMapper&lt;T&gt; entryMapper) {
+<span class="fc" id="L231">    return delete(DeleteRequest.builder().dn(entryMapper.mapDn(domainObject)).build());</span>
+  }
+
+  /**
+   * Remove all.
+   *
+   * @param &lt;T&gt; the type parameter
+   * @param domainObjects the domain objects
+   * @param entryMapper the entry mapper
+   * @return the mono
+   */
+  default &lt;T&gt; Mono&lt;Long&gt; removeAll(
+      @Nullable Collection&lt;T&gt; domainObjects,
+      @NotNull LdaptiveEntryMapper&lt;T&gt; entryMapper) {
+<span class="fc" id="L245">    return Flux.fromIterable(Optional.ofNullable(domainObjects).orElseGet(Collections::emptyList))</span>
+<span class="fc" id="L246">        .flatMap(domainObject -&gt; remove(domainObject, entryMapper))</span>
+<span class="fc" id="L247">        .count();</span>
+  }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

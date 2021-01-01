@@ -23,11 +23,11 @@ under the License.
     <link>https://github.com/bremersee/common-base/common-base-autoconfigure</link>
     <description>common-base-autoconfigure - Checkstyle report</description>
     <language>en-us</language>
-    <copyright>&#169;2020 bremersee.org</copyright>
+    <copyright>&#169;2021 bremersee.org</copyright>
     <item>
-      <title>File: 123,
+      <title>File: 119,
              Errors: 0,
-             Warnings: 9,
+             Warnings: 15,
              Infos: 0
       </title>
             <link>https://github.com/bremersee/common-base/common-base-autoconfigure/checkstyle.html</link>
@@ -472,7 +472,7 @@ under the License.
                   0
                 </td>
                 <td>
-                  0
+                  1
                 </td>
                 <td>
                   0
@@ -495,20 +495,6 @@ under the License.
                           <tr>
                 <td>
                   <a href="https://github.com/bremersee/common-base/common-base-autoconfigure/checkstyle.html#org.bremersee.data.minio.MinioAutoConfiguration.java">org/bremersee/data/minio/MinioAutoConfiguration.java</a>
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-              </tr>
-                          <tr>
-                <td>
-                  <a href="https://github.com/bremersee/common-base/common-base-autoconfigure/checkstyle.html#org.bremersee.data.ldaptive.UnboundIdProviderAutoConfiguration.java">org/bremersee/data/ldaptive/UnboundIdProviderAutoConfiguration.java</a>
                 </td>
                 <td>
                   0
@@ -676,20 +662,6 @@ under the License.
               </tr>
                           <tr>
                 <td>
-                  <a href="https://github.com/bremersee/common-base/common-base-autoconfigure/checkstyle.html#org.bremersee.data.ldaptive.UnboundIdProviderAutoConfigurationTest.java">org/bremersee/data/ldaptive/UnboundIdProviderAutoConfigurationTest.java</a>
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-              </tr>
-                          <tr>
-                <td>
                   <a href="https://github.com/bremersee/common-base/common-base-autoconfigure/checkstyle.html#org.bremersee.web.servlet.ApiExceptionResolverAutoConfiguration.java">org/bremersee/web/servlet/ApiExceptionResolverAutoConfiguration.java</a>
                 </td>
                 <td>
@@ -822,7 +794,7 @@ under the License.
                   0
                 </td>
                 <td>
-                  0
+                  1
                 </td>
                 <td>
                   0
@@ -878,7 +850,7 @@ under the License.
                   0
                 </td>
                 <td>
-                  0
+                  2
                 </td>
                 <td>
                   0
@@ -1152,20 +1124,6 @@ under the License.
               </tr>
                           <tr>
                 <td>
-                  <a href="https://github.com/bremersee/common-base/common-base-autoconfigure/checkstyle.html#org.bremersee.data.ldaptive.LdaptiveConnectionPoolFactoryTest.java">org/bremersee/data/ldaptive/LdaptiveConnectionPoolFactoryTest.java</a>
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-              </tr>
-                          <tr>
-                <td>
                   <a href="https://github.com/bremersee/common-base/common-base-autoconfigure/checkstyle.html#org.bremersee.security.authentication.resourceserver.reactive.withoutredis.TestConfiguration.java">org/bremersee/security/authentication/resourceserver/reactive/withoutredis/TestConfiguration.java</a>
                 </td>
                 <td>
@@ -1382,7 +1340,7 @@ under the License.
                   0
                 </td>
                 <td>
-                  1
+                  2
                 </td>
                 <td>
                   0
@@ -1447,20 +1405,6 @@ under the License.
                           <tr>
                 <td>
                   <a href="https://github.com/bremersee/common-base/common-base-autoconfigure/checkstyle.html#org.bremersee.data.minio.MinioProperties.java">org/bremersee/data/minio/MinioProperties.java</a>
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-              </tr>
-                          <tr>
-                <td>
-                  <a href="https://github.com/bremersee/common-base/common-base-autoconfigure/checkstyle.html#org.bremersee.data.ldaptive.LdaptiveConnectionPoolFactory.java">org/bremersee/data/ldaptive/LdaptiveConnectionPoolFactory.java</a>
                 </td>
                 <td>
                   0
@@ -1648,7 +1592,7 @@ under the License.
                   0
                 </td>
                 <td>
-                  0
+                  1
                 </td>
                 <td>
                   0

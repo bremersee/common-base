@@ -69,7 +69,7 @@
 <a class="jxr_linenumber" name="L61" href="#L61">61</a>      ldaptiveException = LdaptiveException.builder()
 <a class="jxr_linenumber" name="L62" href="#L62">62</a>          .httpStatus(505)
 <a class="jxr_linenumber" name="L63" href="#L63">63</a>          .errorCode(<span class="jxr_string">"1234"</span>)
-<a class="jxr_linenumber" name="L64" href="#L64">64</a>          .cause(<strong class="jxr_keyword">new</strong> LdapException(<span class="jxr_string">"Something went wrong"</span>, ResultCode.CONNECT_ERROR))
+<a class="jxr_linenumber" name="L64" href="#L64">64</a>          .cause(<strong class="jxr_keyword">new</strong> LdapException(ResultCode.CONNECT_ERROR, <span class="jxr_string">"Something went wrong"</span>))
 <a class="jxr_linenumber" name="L65" href="#L65">65</a>          .build();
 <a class="jxr_linenumber" name="L66" href="#L66">66</a>      assertEquals(505, ldaptiveException.status());
 <a class="jxr_linenumber" name="L67" href="#L67">67</a>      assertEquals(<span class="jxr_string">"1234"</span>, ldaptiveException.getErrorCode());
@@ -79,7 +79,7 @@
 <a class="jxr_linenumber" name="L71" href="#L71">71</a>      ldaptiveException = LdaptiveException.builder()
 <a class="jxr_linenumber" name="L72" href="#L72">72</a>          .httpStatus(505)
 <a class="jxr_linenumber" name="L73" href="#L73">73</a>          .errorCode(<span class="jxr_string">"1234"</span>)
-<a class="jxr_linenumber" name="L74" href="#L74">74</a>          .cause(<strong class="jxr_keyword">new</strong> LdapException(<span class="jxr_string">"Something went wrong"</span>, ResultCode.CONNECT_ERROR))
+<a class="jxr_linenumber" name="L74" href="#L74">74</a>          .cause(<strong class="jxr_keyword">new</strong> LdapException(ResultCode.CONNECT_ERROR, <span class="jxr_string">"Something went wrong"</span>))
 <a class="jxr_linenumber" name="L75" href="#L75">75</a>          .reason(<span class="jxr_string">"Oops"</span>)
 <a class="jxr_linenumber" name="L76" href="#L76">76</a>          .build();
 <a class="jxr_linenumber" name="L77" href="#L77">77</a>      assertEquals(505, ldaptiveException.status());
@@ -103,6 +103,6 @@
 <a class="jxr_linenumber" name="L95" href="#L95">95</a>  }
 </pre>
 <hr/>
-<div id="footer">Copyright &#169; 2020 <a href="http://bremersee.org">bremersee.org</a>. All rights reserved.</div>
+<div id="footer">Copyright &#169; 2021 <a href="http://bremersee.org">bremersee.org</a>. All rights reserved.</div>
 </body>
 </html>

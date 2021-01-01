@@ -9,3 +9,4 @@ common-base-test,org.bremersee.test.web,RestApiAssertionType,0,103,0,0,0,13,0,3,
 common-base-test,org.bremersee.test.web,RestApiTesterPath.BuilderImpl,0,43,1,1,0,10,1,4,0,4
 common-base-test,org.bremersee.test.web,RestApiTesterPath.PathType,0,70,0,0,0,10,0,3,0,3
 common-base-test,org.bremersee.test.web,RestApiTesterPath.RestApiTesterPathValues,46,61,13,9,0,6,10,6,1,4
+common-base-test,org.bremersee.test.beans,SimpleObjectProvider,4,64,1,7,1,23,1,12,0,9

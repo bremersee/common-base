@@ -16,21 +16,17 @@
 
 package org.bremersee.data.minio;
 
-import io.minio.ErrorCode;
 import io.minio.errors.BucketPolicyTooLargeException;
 import io.minio.errors.ErrorResponseException;
 import io.minio.errors.InsufficientDataException;
 import io.minio.errors.InternalException;
-import io.minio.errors.InvalidBucketNameException;
-import io.minio.errors.InvalidEndpointException;
-import io.minio.errors.InvalidExpiresRangeException;
-import io.minio.errors.InvalidPortException;
 import io.minio.errors.InvalidResponseException;
-import io.minio.errors.RegionConflictException;
+import io.minio.errors.ServerException;
 import io.minio.errors.XmlParserException;
 import io.minio.messages.ErrorResponse;
 import java.io.IOException;
 import java.util.Optional;
+import okhttp3.Response;
 import org.springframework.util.StringUtils;
 
 /**
@@ -38,131 +34,207 @@ import org.springframework.util.StringUtils;
  *
  * @author Christian Bremer
  */
-<span class="fc" id="L41">public class DefaultMinioErrorHandler extends AbstractMinioErrorHandler {</span>
+<span class="fc" id="L37">public class DefaultMinioErrorHandler extends AbstractMinioErrorHandler {</span>
 
   static final String ERROR_CODE_PREFIX = &quot;MINIO_&quot;;
 
   @Override
   public MinioException map(Throwable t) {
-<span class="fc bfc" id="L47" title="All 2 branches covered.">    if (t instanceof IllegalArgumentException) {</span>
-<span class="fc" id="L48">      return new MinioException(</span>
+<span class="fc bfc" id="L43" title="All 2 branches covered.">    if (t instanceof IllegalArgumentException) {</span>
+<span class="fc" id="L44">      return new MinioException(</span>
           400,
           ERROR_CODE_PREFIX + &quot;BAD_REQUEST&quot;,
-<span class="fc bfc" id="L51" title="All 2 branches covered.">          StringUtils.hasText(t.getMessage()) ? t.getMessage() : &quot;Bad request.&quot;,</span>
+<span class="fc bfc" id="L47" title="All 2 branches covered.">          StringUtils.hasText(t.getMessage()) ? t.getMessage() : &quot;Bad request.&quot;,</span>
           t);
     }
-<span class="fc bfc" id="L54" title="All 2 branches covered.">    if (t instanceof IOException) {</span>
-<span class="fc" id="L55">      return new MinioException(</span>
+<span class="fc bfc" id="L50" title="All 2 branches covered.">    if (t instanceof IOException) {</span>
+<span class="fc" id="L51">      return new MinioException(</span>
           500,
           ERROR_CODE_PREFIX + &quot;IO_ERROR&quot;,
-<span class="fc bfc" id="L58" title="All 2 branches covered.">          StringUtils.hasText(t.getMessage()) ? t.getMessage() : &quot;IO operation failed.&quot;,</span>
+<span class="fc bfc" id="L54" title="All 2 branches covered.">          StringUtils.hasText(t.getMessage()) ? t.getMessage() : &quot;IO operation failed.&quot;,</span>
           t);
     }
-<span class="fc bfc" id="L61" title="All 2 branches covered.">    if (t instanceof io.minio.errors.MinioException) {</span>
-<span class="fc" id="L62">      return mapMinioException((io.minio.errors.MinioException) t);</span>
+<span class="fc bfc" id="L57" title="All 2 branches covered.">    if (t instanceof io.minio.errors.MinioException) {</span>
+<span class="fc" id="L58">      return mapMinioException((io.minio.errors.MinioException) t);</span>
     }
-<span class="fc" id="L64">    return new MinioException(</span>
+<span class="fc" id="L60">    return new MinioException(</span>
         500,
         ERROR_CODE_PREFIX + &quot;UNSPECIFIED&quot;,
-<span class="fc bfc" id="L67" title="All 2 branches covered.">        StringUtils.hasText(t.getMessage()) ? t.getMessage() : &quot;Unmapped minio error.&quot;,</span>
+<span class="fc bfc" id="L63" title="All 2 branches covered.">        StringUtils.hasText(t.getMessage()) ? t.getMessage() : &quot;Unmapped minio error.&quot;,</span>
         t);
   }
 
   private MinioException mapMinioException(io.minio.errors.MinioException e) {
-<span class="fc" id="L72">    int status = 500;</span>
-<span class="fc" id="L73">    String errorCode = ERROR_CODE_PREFIX + &quot;UNSPECIFIED&quot;;</span>
-<span class="fc bfc" id="L74" title="All 2 branches covered.">    String message = StringUtils.hasText(e.getMessage())</span>
-<span class="fc" id="L75">        ? e.getMessage()</span>
-<span class="fc" id="L76">        : &quot;Unspecified minio error.&quot;;</span>
+<span class="fc" id="L68">    int status = 500;</span>
+<span class="fc" id="L69">    String errorCode = ERROR_CODE_PREFIX + &quot;UNSPECIFIED&quot;;</span>
+<span class="fc bfc" id="L70" title="All 2 branches covered.">    String message = StringUtils.hasText(e.getMessage())</span>
+<span class="fc" id="L71">        ? e.getMessage()</span>
+<span class="fc" id="L72">        : &quot;Unspecified minio error.&quot;;</span>
 
-<span class="fc bfc" id="L78" title="All 2 branches covered.">    if (e instanceof BucketPolicyTooLargeException) {</span>
-<span class="fc" id="L79">      status = 400;</span>
-<span class="fc" id="L80">      errorCode = ERROR_CODE_PREFIX + &quot;BUCKET_POLICY_TOO_LARGE&quot;;</span>
-<span class="fc" id="L81">      message = e.toString();</span>
-<span class="fc bfc" id="L82" title="All 2 branches covered.">    } else if (e instanceof ErrorResponseException) {</span>
-<span class="fc" id="L83">      ErrorResponseException ere = (ErrorResponseException) e;</span>
-<span class="fc" id="L84">      status = getStatus(ere);</span>
-<span class="fc" id="L85">      errorCode = getErrorCode(ere);</span>
-<span class="fc" id="L86">      message = getMessage(ere);</span>
-<span class="fc bfc" id="L87" title="All 2 branches covered.">    } else if (e instanceof InsufficientDataException) {</span>
-<span class="fc" id="L88">      status = 400;</span>
-<span class="fc" id="L89">      errorCode = ERROR_CODE_PREFIX + &quot;INSUFFICIENT_DATA&quot;;</span>
-<span class="fc bfc" id="L90" title="All 2 branches covered.">    } else if (e instanceof InternalException) {</span>
-<span class="fc" id="L91">      errorCode = ERROR_CODE_PREFIX + &quot;INTERNAL_ERROR&quot;;</span>
-<span class="fc bfc" id="L92" title="All 2 branches covered.">    } else if (e instanceof InvalidBucketNameException) {</span>
-<span class="fc" id="L93">      status = 400;</span>
-<span class="fc" id="L94">      errorCode = ERROR_CODE_PREFIX + &quot;INVALID_BUCKET_NAME&quot;;</span>
-<span class="fc bfc" id="L95" title="All 2 branches covered.">    } else if (e instanceof InvalidEndpointException) {</span>
-<span class="fc" id="L96">      errorCode = ERROR_CODE_PREFIX + &quot;INVALID_ENDPOINT&quot;;</span>
-<span class="fc bfc" id="L97" title="All 2 branches covered.">    } else if (e instanceof InvalidExpiresRangeException) {</span>
-<span class="fc" id="L98">      status = 400;</span>
-<span class="fc" id="L99">      errorCode = ERROR_CODE_PREFIX + &quot;INVALID_EXPIRES_RANGE&quot;;</span>
-<span class="fc bfc" id="L100" title="All 2 branches covered.">    } else if (e instanceof InvalidPortException) {</span>
-<span class="fc" id="L101">      errorCode = ERROR_CODE_PREFIX + &quot;INVALID_PORT&quot;;</span>
-<span class="fc bfc" id="L102" title="All 2 branches covered.">    } else if (e instanceof InvalidResponseException) {</span>
-<span class="fc" id="L103">      errorCode = ERROR_CODE_PREFIX + &quot;INVALID_RESPONSE&quot;;</span>
-<span class="fc bfc" id="L104" title="All 2 branches covered.">    } else if (e instanceof RegionConflictException) {</span>
-<span class="fc" id="L105">      status = 400;</span>
-<span class="fc" id="L106">      errorCode = ERROR_CODE_PREFIX + &quot;REGION_CONFLICT&quot;;</span>
-<span class="fc bfc" id="L107" title="All 2 branches covered.">    } else if (e instanceof XmlParserException) {</span>
-<span class="fc" id="L108">      errorCode = ERROR_CODE_PREFIX + &quot;XML_PARSER_ERROR&quot;;</span>
+<span class="fc bfc" id="L74" title="All 2 branches covered.">    if (e instanceof BucketPolicyTooLargeException) {</span>
+<span class="fc" id="L75">      status = 400;</span>
+<span class="fc" id="L76">      errorCode = ERROR_CODE_PREFIX + &quot;BUCKET_POLICY_TOO_LARGE&quot;;</span>
+<span class="fc" id="L77">      message = e.toString();</span>
+
+<span class="fc bfc" id="L79" title="All 2 branches covered.">    } else if (e instanceof ErrorResponseException) {</span>
+<span class="fc" id="L80">      ErrorResponseException ere = (ErrorResponseException) e;</span>
+<span class="fc" id="L81">      status = getStatus(ere);</span>
+<span class="fc" id="L82">      errorCode = getErrorCode(ere);</span>
+<span class="fc" id="L83">      message = getMessage(ere);</span>
+
+<span class="fc bfc" id="L85" title="All 2 branches covered.">    } else if (e instanceof InsufficientDataException) {</span>
+<span class="fc" id="L86">      status = 400;</span>
+<span class="fc" id="L87">      errorCode = ERROR_CODE_PREFIX + &quot;INSUFFICIENT_DATA&quot;;</span>
+
+<span class="fc bfc" id="L89" title="All 2 branches covered.">    } else if (e instanceof InternalException) {</span>
+<span class="fc" id="L90">      errorCode = ERROR_CODE_PREFIX + &quot;INTERNAL_ERROR&quot;;</span>
+
+<span class="fc bfc" id="L92" title="All 2 branches covered.">    } else if (e instanceof InvalidResponseException) {</span>
+<span class="fc" id="L93">      errorCode = ERROR_CODE_PREFIX + &quot;INVALID_RESPONSE&quot;;</span>
+
+<span class="fc bfc" id="L95" title="All 2 branches covered.">    } else if (e instanceof ServerException) {</span>
+<span class="fc" id="L96">      errorCode = ERROR_CODE_PREFIX + &quot;SERVER_EXCEPTION&quot;;</span>
+
+<span class="fc bfc" id="L98" title="All 2 branches covered.">    } else if (e instanceof XmlParserException) {</span>
+<span class="fc" id="L99">      errorCode = ERROR_CODE_PREFIX + &quot;XML_PARSER_ERROR&quot;;</span>
     }
-<span class="fc" id="L110">    return new MinioException(status, errorCode, message, e);</span>
+<span class="fc" id="L101">    return new MinioException(status, errorCode, message, e);</span>
   }
 
   private int getStatus(ErrorResponseException e) {
-<span class="fc" id="L114">    return Optional.of(e)</span>
-<span class="fc" id="L115">        .map(ErrorResponseException::errorResponse)</span>
-<span class="fc" id="L116">        .map(ErrorResponse::errorCode)</span>
-<span class="fc" id="L117">        .map(this::getStatus)</span>
-<span class="fc" id="L118">        .orElse(500);</span>
+<span class="fc" id="L105">    return Optional.of(e)</span>
+<span class="fc" id="L106">        .map(ErrorResponseException::errorResponse)</span>
+<span class="fc" id="L107">        .map(ErrorResponse::code)</span>
+<span class="fc" id="L108">        .map(code -&gt; getStatus(code, e.response()))</span>
+<span class="fc" id="L109">        .orElse(500);</span>
   }
 
-  private int getStatus(ErrorCode errorCode) {
-<span class="fc bfc" id="L122" title="All 4 branches covered.">    switch (errorCode) {</span>
-      case NO_SUCH_OBJECT:
-      case RESOURCE_NOT_FOUND:
-      case NO_SUCH_BUCKET:
-      case NO_SUCH_KEY:
-      case NO_SUCH_UPLOAD:
-      case NO_SUCH_VERSION:
-      case NO_SUCH_LIFECYCLE_CONFIGURATION:
-      case NO_SUCH_BUCKET_POLICY:
-      case NO_SUCH_OBJECT_LOCK_CONFIGURATION:
-<span class="fc" id="L132">        return 404;</span>
-      case RESOURCE_CONFLICT:
-      case BUCKET_ALREADY_EXISTS:
-      case BUCKET_ALREADY_OWNED_BY_YOU:
-      case BUCKET_NOT_EMPTY:
-<span class="fc" id="L137">        return 409;</span>
-      case INTERNAL_ERROR:
-      case NOT_IMPLEMENTED:
-      case OPERATION_ABORTED:
-      case RESTORE_ALREADY_IN_PROGRESS:
-      case SERVICE_UNAVAILABLE:
-      case SLOW_DOWN:
-<span class="fc" id="L144">        return 500;</span>
+  private int getStatus(String errorCode, Response response) {
+    // see https://docs.aws.amazon.com/AmazonS3/latest/API/ErrorResponses.html#ErrorCodeList
+<span class="pc bpc" id="L114" title="9 of 13 branches missed.">    switch (errorCode) {</span>
+      case &quot;AmbiguousGrantByEmailAddress&quot;:
+      case &quot;AuthorizationHeaderMalformed&quot;:
+      case &quot;BadDigest&quot;:
+      case &quot;CredentialsNotSupported&quot;:
+      case &quot;EntityTooSmall&quot;:
+      case &quot;EntityTooLarge&quot;:
+      case &quot;ExpiredToken&quot;:
+      case &quot;IllegalLocationConstraintException&quot;:
+      case &quot;IllegalVersioningConfigurationException&quot;:
+      case &quot;IncompleteBody&quot;:
+      case &quot;IncorrectNumberOfFilesInPostRequest&quot;:
+      case &quot;InlineDataTooLarge&quot;:
+      case &quot;InvalidAccessPoint&quot;:
+      case &quot;InvalidArgument&quot;:
+      case &quot;InvalidBucketName&quot;:
+      case &quot;InvalidDigest&quot;:
+      case &quot;InvalidEncryptionAlgorithmError&quot;:
+      case &quot;InvalidLocationConstraint&quot;:
+      case &quot;InvalidPart&quot;:
+      case &quot;InvalidPartOrder&quot;:
+      case &quot;InvalidPolicyDocument&quot;:
+      case &quot;InvalidRequest&quot;:
+      case &quot;InvalidSOAPRequest&quot;:
+      case &quot;InvalidStorageClass&quot;:
+      case &quot;InvalidTargetBucketForLogging&quot;:
+      case &quot;InvalidToken&quot;:
+      case &quot;InvalidURI&quot;:
+      case &quot;KeyTooLongError&quot;:
+      case &quot;MalformedACLError&quot;:
+      case &quot;MalformedPOSTRequest&quot;:
+      case &quot;MalformedXML&quot;:
+      case &quot;MaxMessageLengthExceeded&quot;:
+      case &quot;MaxPostPreDataLengthExceededError&quot;:
+      case &quot;MetadataTooLarge&quot;:
+      case &quot;MissingRequestBodyError&quot;:
+      case &quot;MissingSecurityElement&quot;:
+      case &quot;MissingSecurityHeader&quot;:
+      case &quot;NoLoggingStatusForKey&quot;:
+      case &quot;RequestIsNotMultiPartContent&quot;:
+      case &quot;RequestTimeout&quot;:
+      case &quot;RequestTorrentOfBucketError&quot;:
+      case &quot;ServerSideEncryptionConfigurationNotFoundError&quot;:
+      case &quot;TokenRefreshRequired&quot;:
+      case &quot;TooManyAccessPoints&quot;:
+      case &quot;TooManyBuckets&quot;:
+      case &quot;UnexpectedContent&quot;:
+      case &quot;UnresolvableGrantByEmailAddress&quot;:
+      case &quot;UserKeyMustBeSpecified&quot;:
+      case &quot;InvalidTag&quot;:
+      case &quot;MalformedPolicy&quot;:
+<span class="fc" id="L165">        return 400;</span>
+      case &quot;UnauthorizedAccess&quot;:
+<span class="nc" id="L167">        return 401;</span>
+      case &quot;AccessDenied&quot;:
+      case &quot;AccountProblem&quot;:
+      case &quot;AllAccessDisabled&quot;:
+      case &quot;CrossLocationLoggingProhibited&quot;:
+      case &quot;InvalidAccessKeyId&quot;:
+      case &quot;InvalidObjectState&quot;:
+      case &quot;InvalidPayer&quot;:
+      case &quot;InvalidSecurity&quot;:
+      case &quot;NotSignedUp&quot;:
+      case &quot;RequestTimeTooSkewed&quot;:
+      case &quot;SignatureDoesNotMatch&quot;:
+<span class="nc" id="L179">        return 403;</span>
+      case &quot;ResourceNotFound&quot;: // not in list
+      case &quot;NoSuchAccessPoint&quot;:
+      case &quot;NoSuchBucket&quot;:
+      case &quot;NoSuchKey&quot;:
+      case &quot;NoSuchObject&quot;: // not in list
+      case &quot;NoSuchUpload&quot;:
+      case &quot;NoSuchVersion&quot;:
+      case &quot;NoSuchLifecycleConfiguration&quot;:
+      case &quot;NoSuchBucketPolicy&quot;:
+      case &quot;NoSuchObjectLockConfiguration&quot;: // not in list
+      case &quot;NoSuchOutpost&quot;:
+      case &quot;NoSuchTagSet&quot;:
+      case &quot;UnsupportedOperation&quot;:
+<span class="fc" id="L193">        return 404;</span>
+      case &quot;MethodNotAllowed&quot;:
+<span class="nc" id="L195">        return 405;</span>
+      case &quot;BucketAlreadyExists&quot;:
+      case &quot;BucketAlreadyOwnedByYou&quot;:
+      case &quot;BucketNotEmpty&quot;:
+      case &quot;InvalidBucketState&quot;:
+      case &quot;OperationAborted&quot;:
+      case &quot;InvalidOutpostState&quot;:
+<span class="fc" id="L202">        return 409;</span>
+      case &quot;MissingContentLength&quot;:
+<span class="nc" id="L204">        return 411;</span>
+      case &quot;PreconditionFailed&quot;:
+<span class="nc" id="L206">        return 412;</span>
+      case &quot;InvalidRange&quot;:
+<span class="nc" id="L208">        return 416;</span>
+      case &quot;InternalError&quot;:
+<span class="nc" id="L210">        return 500;</span>
+      case &quot;NotImplemented&quot;:
+<span class="nc" id="L212">        return 501;</span>
+      case &quot;ServiceUnavailable&quot;:
+      case &quot;SlowDown&quot;:
+<span class="nc" id="L215">        return 503;</span>
       default:
-<span class="fc" id="L146">        return 400;</span>
+<span class="fc" id="L217">        return Optional.ofNullable(response)</span>
+<span class="fc" id="L218">            .map(Response::code)</span>
+<span class="pc bpc" id="L219" title="1 of 2 branches missed.">            .filter(code -&gt; code &gt;= 400)</span>
+<span class="fc" id="L220">            .orElse(400);</span>
     }
   }
 
   private String getErrorCode(ErrorResponseException e) {
-<span class="fc" id="L151">    return Optional.of(e)</span>
-<span class="fc" id="L152">        .map(ErrorResponseException::errorResponse)</span>
-<span class="fc" id="L153">        .map(ErrorResponse::errorCode)</span>
-<span class="fc" id="L154">        .map(ErrorCode::name)</span>
-<span class="fc" id="L155">        .orElse(ERROR_CODE_PREFIX + &quot;UNSPECIFIED_ERROR_RESPONSE&quot;);</span>
+<span class="fc" id="L225">    return Optional.of(e)</span>
+<span class="fc" id="L226">        .map(ErrorResponseException::errorResponse)</span>
+<span class="fc" id="L227">        .map(ErrorResponse::code)</span>
+<span class="fc" id="L228">        .orElse(ERROR_CODE_PREFIX + &quot;UNSPECIFIED_ERROR_RESPONSE&quot;);</span>
   }
 
   private String getMessage(ErrorResponseException e) {
-<span class="fc" id="L159">    return Optional.of(e)</span>
-<span class="fc" id="L160">        .map(ErrorResponseException::errorResponse)</span>
-<span class="fc" id="L161">        .map(ErrorResponse::errorCode)</span>
-<span class="fc" id="L162">        .map(ErrorCode::message)</span>
-<span class="pc bnc" id="L163" title="All 2 branches missed.">        .orElseGet(() -&gt; StringUtils.hasText(e.getMessage())</span>
-<span class="nc" id="L164">            ? e.getMessage()</span>
-<span class="nc" id="L165">            : &quot;Unspecified error response.&quot;);</span>
+<span class="fc" id="L232">    return Optional.of(e)</span>
+<span class="fc" id="L233">        .map(ErrorResponseException::errorResponse)</span>
+<span class="fc" id="L234">        .map(ErrorResponse::message)</span>
+<span class="pc bnc" id="L235" title="All 2 branches missed.">        .orElseGet(() -&gt; StringUtils.hasText(e.getMessage())</span>
+<span class="nc" id="L236">            ? e.getMessage()</span>
+<span class="nc" id="L237">            : &quot;Unspecified error response.&quot;);</span>
   }
 
 }
