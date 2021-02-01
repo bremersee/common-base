@@ -31,6 +31,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
 /**
@@ -140,10 +141,8 @@ public class ReactiveInMemoryTest {
         .uri("/protected")
         .headers(httpHeaders -> httpHeaders
             .setBasicAuth("someone", "someone", StandardCharsets.UTF_8))
-        .exchange())
-        .assertNext(clientResponse -> assertEquals(
-            HttpStatus.FORBIDDEN,
-            clientResponse.statusCode()))
+        .exchangeToMono(clientResponse -> Mono.just(clientResponse.statusCode())))
+        .assertNext(status -> assertEquals(HttpStatus.FORBIDDEN, status))
         .verifyComplete();
   }
 
@@ -190,8 +189,8 @@ public class ReactiveInMemoryTest {
         .uri("/actuator/metrics")
         .headers(httpHeaders -> httpHeaders
             .setBasicAuth("actuator", "actuator", StandardCharsets.UTF_8))
-        .exchange())
-        .assertNext(response -> assertEquals(HttpStatus.OK, response.statusCode()))
+        .exchangeToMono(clientResponse -> Mono.just(clientResponse.statusCode())))
+        .assertNext(status -> assertEquals(HttpStatus.OK, status))
         .verifyComplete();
   }
 
@@ -205,10 +204,8 @@ public class ReactiveInMemoryTest {
         .uri("/actuator/metrics")
         .headers(httpHeaders -> httpHeaders
             .setBasicAuth("someone", "someone", StandardCharsets.UTF_8))
-        .exchange())
-        .assertNext(clientResponse -> assertEquals(
-            HttpStatus.FORBIDDEN,
-            clientResponse.statusCode()))
+        .exchangeToMono(clientResponse -> Mono.just(clientResponse.statusCode())))
+        .assertNext(status -> assertEquals(HttpStatus.FORBIDDEN, status))
         .verifyComplete();
   }
 

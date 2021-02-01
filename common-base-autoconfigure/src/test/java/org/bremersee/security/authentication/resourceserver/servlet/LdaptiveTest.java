@@ -14,16 +14,16 @@
  * limitations under the License.
  */
 
-package org.bremersee.security.authentication.resourceserver.reactive;
+package org.bremersee.security.authentication.resourceserver.servlet;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.nio.charset.StandardCharsets;
 import org.bremersee.data.ldaptive.LdaptiveOperations;
 import org.bremersee.data.ldaptive.LdaptiveProperties;
-import org.bremersee.security.authentication.resourceserver.reactive.withoutredis.TestConfiguration;
-import org.bremersee.security.core.userdetails.ReactiveLdaptiveUserDetailsService;
+import org.bremersee.security.authentication.resourceserver.servlet.withoutredis.TestConfiguration;
+import org.bremersee.security.core.userdetails.LdaptiveUserDetailsService;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -31,17 +31,17 @@ import org.junit.jupiter.api.TestInstance.Lifecycle;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
+import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.web.reactive.function.BodyInserters;
-import org.springframework.web.reactive.function.client.WebClient;
-import reactor.core.publisher.Mono;
-import reactor.test.StepVerifier;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.web.client.RestTemplate;
 
 /**
- * The reactive ldap basic auth test.
+ * The ldap basic auth test.
  *
  * @author Christian Bremer
  */
@@ -49,18 +49,18 @@ import reactor.test.StepVerifier;
     classes = TestConfiguration.class,
     webEnvironment = WebEnvironment.RANDOM_PORT,
     properties = {
-        "spring.main.web-application-type=reactive",
+        "spring.main.web-application-type=servlet",
         "spring.application.name=resourceserver-ldaptive",
 
         "spring.ldap.embedded.base-dn=dc=bremersee,dc=org",
         "spring.ldap.embedded.credential.username=uid=admin",
         "spring.ldap.embedded.credential.password=secret",
         "spring.ldap.embedded.ldif=classpath:schema.ldif",
-        "spring.ldap.embedded.port=15389",
+        "spring.ldap.embedded.port=16389",
         "spring.ldap.embedded.validation.enabled=false",
         "bremersee.ldaptive.enabled=true",
         "bremersee.ldaptive.authentication-enabled=true",
-        "bremersee.ldaptive.ldap-url=ldap://localhost:15389",
+        "bremersee.ldaptive.ldap-url=ldap://localhost:16389",
         "bremersee.ldaptive.use-start-tls=false",
         "bremersee.ldaptive.bind-dn=uid=admin",
         "bremersee.ldaptive.bind-credentials=secret",
@@ -91,7 +91,7 @@ import reactor.test.StepVerifier;
     })
 @TestInstance(Lifecycle.PER_CLASS) // allows us to use @BeforeAll with a non-static method
 @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
-public class ReactiveLdaptiveTest {
+public class LdaptiveTest {
 
   /**
    * The properties.
@@ -100,7 +100,7 @@ public class ReactiveLdaptiveTest {
   LdaptiveProperties properties;
 
   /**
-   * The ldaptive operations.
+   * The udaptive operations.
    */
   @Autowired
   LdaptiveOperations ldaptiveOperations;
@@ -109,13 +109,30 @@ public class ReactiveLdaptiveTest {
    * The user details service.
    */
   @Autowired
-  ReactiveLdaptiveUserDetailsService userDetailsService;
+  LdaptiveUserDetailsService userDetailsService;
+
+  /**
+   * The Test rest template.
+   */
+  @Autowired
+  TestRestTemplate testRestTemplate;
+
+  /**
+   * The Rest template builder.
+   */
+  @Autowired
+  RestTemplateBuilder restTemplateBuilder;
 
   /**
    * The local server port.
    */
   @LocalServerPort
   int port;
+
+  /**
+   * The user password.
+   */
+  String userPassword;
 
   /**
    * Base url of the local server.
@@ -127,20 +144,29 @@ public class ReactiveLdaptiveTest {
   }
 
   /**
-   * Creates a new web client, that uses the real security configuration.
+   * Rest template rest template.
    *
-   * @return the web client
+   * @return the rest template
    */
-  WebClient newWebClient() {
-    return WebClient.builder()
-        .baseUrl(baseUrl())
+  RestTemplate restTemplate() {
+    return restTemplateBuilder
+        .rootUri(baseUrl())
         .build();
   }
 
   /**
-   * The user password.
+   * Rest template rest template.
+   *
+   * @param user the user
+   * @param password the password
+   * @return the rest template
    */
-  String userPassword;
+  RestTemplate restTemplate(@SuppressWarnings("SameParameterValue") String user, String password) {
+    return restTemplateBuilder
+        .rootUri(baseUrl())
+        .basicAuthentication(user, password)
+        .build();
+  }
 
   /**
    * Setup tests.
@@ -155,14 +181,12 @@ public class ReactiveLdaptiveTest {
    */
   @Test
   void findUserDetails() {
-    StepVerifier.create(userDetailsService.findByUsername("anna"))
-        .assertNext(userDetails -> {
-          assertEquals("anna", userDetails.getUsername());
-          assertEquals("anna", userDetails.getPassword());
-          assertTrue(userDetails.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_USER")));
-          assertTrue(userDetails.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_ADMIN")));
-        })
-        .verifyComplete();
+    UserDetails userDetails = userDetailsService.loadUserByUsername("anna");
+    assertNotNull(userDetails);
+    assertEquals("anna", userDetails.getUsername());
+    assertEquals("anna", userDetails.getPassword());
+    assertTrue(userDetails.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_USER")));
+    assertTrue(userDetails.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_ADMIN")));
   }
 
   /**
@@ -170,13 +194,11 @@ public class ReactiveLdaptiveTest {
    */
   @Test
   void getPublic() {
-    StepVerifier.create(newWebClient()
-        .get()
-        .uri("/public")
-        .retrieve()
-        .bodyToMono(String.class))
-        .assertNext(body -> assertEquals("public", body))
-        .verifyComplete();
+    assertEquals(
+        "public",
+        restTemplate()
+            .getForEntity("/public", String.class)
+            .getBody());
   }
 
   /**
@@ -184,15 +206,10 @@ public class ReactiveLdaptiveTest {
    */
   @Test
   void getProtected() {
-    StepVerifier.create(newWebClient()
-        .get()
-        .uri("/protected")
-        .headers(httpHeaders -> httpHeaders
-            .setBasicAuth("anna", userPassword, StandardCharsets.UTF_8))
-        .retrieve()
-        .bodyToMono(String.class))
-        .assertNext(body -> assertEquals("protected", body))
-        .verifyComplete();
+    ResponseEntity<String> response = restTemplate("anna", userPassword)
+        .getForEntity("/protected", String.class);
+    assertEquals(HttpStatus.OK, response.getStatusCode());
+    assertEquals("protected", response.getBody());
   }
 
   /**
@@ -200,14 +217,11 @@ public class ReactiveLdaptiveTest {
    */
   @Test
   void getProtectedAndExpectUnauthorized() {
-    StepVerifier.create(newWebClient()
-        .get()
-        .uri("/protected")
-        .headers(httpHeaders -> httpHeaders
-            .setBasicAuth("anna", "someone", StandardCharsets.UTF_8))
-        .exchangeToMono(clientResponse -> Mono.just(clientResponse.statusCode())))
-        .assertNext(statusCode -> assertEquals(HttpStatus.UNAUTHORIZED, statusCode))
-        .verifyComplete();
+    // We use the test rest template here, because the real rest template will throw an exception
+    ResponseEntity<String> response = testRestTemplate
+        .withBasicAuth("anna", "someone")
+        .getForEntity("/protected", String.class);
+    assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
   }
 
   /**
@@ -215,18 +229,10 @@ public class ReactiveLdaptiveTest {
    */
   @Test
   void postProtected() {
-    StepVerifier.create(newWebClient()
-        .post()
-        .uri("/protected")
-        .contentType(MediaType.TEXT_PLAIN)
-        .accept(MediaType.TEXT_PLAIN)
-        .headers(httpHeaders -> httpHeaders
-            .setBasicAuth("anna", userPassword, StandardCharsets.UTF_8))
-        .body(BodyInserters.fromValue("hello"))
-        .retrieve()
-        .bodyToMono(String.class))
-        .assertNext(body -> assertEquals("hello", body))
-        .verifyComplete();
+    ResponseEntity<String> response = restTemplate("anna", userPassword)
+        .postForEntity("/protected", "hello", String.class);
+    assertEquals(HttpStatus.OK, response.getStatusCode());
+    assertEquals("hello", response.getBody());
   }
 
 }

@@ -30,6 +30,7 @@ import org.ldaptive.ConnectionFactory;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.AutoConfigureBefore;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -39,10 +40,10 @@ import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Primary;
 import org.springframework.context.event.EventListener;
 import org.springframework.security.core.userdetails.ReactiveUserDetailsService;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 
@@ -151,11 +152,11 @@ public class LdaptiveUserDetailsAutoConfiguration {
   }
 
   /**
-   * Password encoder ldaptive password matcher.
+   * Ldaptive password matcher.
    *
    * @return the ldaptive password matcher
    */
-  @Primary
+  @ConditionalOnMissingBean(value = {PasswordEncoder.class})
   @Bean
   public LdaptivePasswordMatcher passwordEncoder() {
     LdaptivePasswordMatcher matcher = new LdaptivePasswordMatcher(

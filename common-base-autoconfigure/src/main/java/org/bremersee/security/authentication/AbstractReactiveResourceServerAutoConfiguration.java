@@ -158,7 +158,6 @@ public abstract class AbstractReactiveResourceServerAutoConfiguration {
   }
 
   private AuthorizeExchangeSpec configurePathMatchers(AuthorizeExchangeSpec spec) {
-
     for (PathMatcherProperties props : authProperties.preparePathMatchers(corsProperties)) {
       log.info("Securing requests to {}", props);
       switch (props.getAccessMode()) {
@@ -184,7 +183,6 @@ public abstract class AbstractReactiveResourceServerAutoConfiguration {
   }
 
   private ServerHttpSecurity configureAuthenticationManager(ServerHttpSecurity http) {
-
     return Optional.ofNullable(jwtConverterProvider.getIfAvailable())
         .map(jwtConverter -> http
             .oauth2ResourceServer((rs) -> rs
