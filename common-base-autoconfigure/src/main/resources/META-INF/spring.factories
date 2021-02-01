@@ -12,6 +12,7 @@ org.bremersee.security.authentication.ReactiveInMemoryUserDetailsAutoConfigurati
 org.bremersee.security.authentication.AccessTokenCacheAutoConfiguration,\
 org.bremersee.security.authentication.ReactiveAccessTokenCacheAutoConfiguration,\
 org.bremersee.security.authentication.JwtSupportAutoConfiguration,\
+org.bremersee.security.authentication.LdaptiveUserDetailsAutoConfiguration,\
 org.bremersee.security.authentication.ReactiveJwtSupportAutoConfiguration,\
 org.bremersee.security.authentication.ResourceServerAutoConfiguration,\
 org.bremersee.security.authentication.ReactiveResourceServerAutoConfiguration,\

@@ -17,6 +17,7 @@
 package org.bremersee.data.ldaptive;
 
 import lombok.extern.slf4j.Slf4j;
+import org.bremersee.data.ldaptive.reactive.ReactiveLdaptiveOperations;
 import org.bremersee.data.ldaptive.reactive.ReactiveLdaptiveTemplate;
 import org.bremersee.exception.ServiceException;
 import org.ldaptive.ConnectionFactory;
@@ -27,6 +28,7 @@ import org.ldaptive.SearchResponse;
 import org.ldaptive.pool.IdlePruneStrategy;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -107,6 +109,7 @@ public class LdaptiveAutoConfiguration {
    * @param connectionFactory the connection factory
    * @return the ldaptive template
    */
+  @ConditionalOnMissingBean(LdaptiveOperations.class)
   @Bean
   public LdaptiveTemplate ldaptiveTemplate(ConnectionFactory connectionFactory) {
     return new LdaptiveTemplate(connectionFactory);
@@ -119,6 +122,7 @@ public class LdaptiveAutoConfiguration {
    * @return the reactive ldaptive template
    */
   @ConditionalOnClass(name = {"reactor.core.publisher.Mono"})
+  @ConditionalOnMissingBean(ReactiveLdaptiveOperations.class)
   @Bean
   public ReactiveLdaptiveTemplate reactiveLdaptiveTemplate(ConnectionFactory connectionFactory) {
     return new ReactiveLdaptiveTemplate(connectionFactory);
@@ -129,6 +133,7 @@ public class LdaptiveAutoConfiguration {
    *
    * @return the connection factory bean
    */
+  @ConditionalOnMissingBean(ConnectionFactory.class)
   @Bean(destroyMethod = "close")
   public ConnectionFactory connectionFactory() {
     return properties.isPooled() ? pooledConnectionFactory() : defaultConnectionFactory();

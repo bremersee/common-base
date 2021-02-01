@@ -25,24 +25,7 @@ cn: Anna Livia Plurabelle
 sn: Plurabelle
 uid: anna
 memberOf: cn=developers,ou=groups,dc=bremersee,dc=org
-
-dn: uid=hans,ou=people,dc=bremersee,dc=org
-objectclass: top
-objectclass: person
-objectclass: organizationalPerson
-objectclass: inetOrgPerson
-cn: Hans Castorp
-sn: Castorp
-uid: hans
-
-dn: uid=gustav,ou=people,dc=bremersee,dc=org
-objectclass: top
-objectclass: person
-objectclass: organizationalPerson
-objectclass: inetOrgPerson
-cn: Gustav Anias Horn
-sn: Horn
-uid: gustav
+memberOf: cn=managers,ou=groups,dc=bremersee,dc=org
 
 # Create Groups
 dn: cn=developers,ou=groups,dc=bremersee,dc=org
@@ -51,11 +34,10 @@ objectclass: groupOfUniqueNames
 cn: developers
 ou: developer
 uniqueMember: uid=anna,ou=people,dc=bremersee,dc=org
-uniqueMember: uid=hans,ou=people,dc=bremersee,dc=org
 
 dn: cn=managers,ou=groups,dc=bremersee,dc=org
 objectclass: top
 objectclass: groupOfUniqueNames
 cn: managers
 ou: manager
-uniqueMember: uid=gustav,ou=people,dc=bremersee,dc=org
+uniqueMember: uid=anna,ou=people,dc=bremersee,dc=org

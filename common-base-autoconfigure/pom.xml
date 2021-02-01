@@ -46,6 +46,12 @@
       <version>${project.version}</version>
       <optional>true</optional>
     </dependency>
+    <dependency>
+      <groupId>org.bremersee</groupId>
+      <artifactId>common-base-ldaptive-security</artifactId>
+      <version>${project.version}</version>
+      <optional>true</optional>
+    </dependency>
 
     <dependency>
       <groupId>org.bremersee</groupId>
