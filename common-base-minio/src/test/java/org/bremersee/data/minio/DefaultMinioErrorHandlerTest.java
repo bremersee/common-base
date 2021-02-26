@@ -27,6 +27,7 @@ import okhttp3.Protocol;
 import okhttp3.Request;
 import okhttp3.Response;
 import org.junit.jupiter.api.Test;
+import org.springframework.http.HttpStatus;
 
 /**
  * The default minio error handler test.
@@ -81,13 +82,21 @@ class DefaultMinioErrorHandlerTest {
     me = handler.map(new io.minio.errors.InsufficientDataException("A message."));
     assertEquals(400, me.status());
 
-    me = handler.map(new io.minio.errors.InternalException("A message."));
+    me = handler.map(new io.minio.errors.InternalException(
+        "A message.",
+        HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase()));
     assertEquals(500, me.status());
 
-    me = handler.map(new io.minio.errors.InvalidResponseException(503, "application/json", "{}"));
+    me = handler.map(new io.minio.errors.InvalidResponseException(
+        503,
+        "application/json",
+        "{}",
+        HttpStatus.SERVICE_UNAVAILABLE.getReasonPhrase()));
     assertEquals(500, me.status());
 
-    me = handler.map(new io.minio.errors.ServerException("A message."));
+    me = handler.map(new io.minio.errors.ServerException(
+        "A message.",
+        HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase()));
     assertEquals(500, me.status());
 
     me = handler.map(new io.minio.errors.XmlParserException(new Exception("A message.")));
@@ -102,7 +111,8 @@ class DefaultMinioErrorHandlerTest {
             .request(new Request.Builder()
                 .url("http://example.org")
                 .build())
-            .build()));
+            .build(),
+        HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase()));
     assertEquals(400, me.status());
 
     me = handler.map(new ErrorResponseException(
@@ -114,7 +124,8 @@ class DefaultMinioErrorHandlerTest {
             .request(new Request.Builder()
                 .url("http://example.org")
                 .build())
-            .build()));
+            .build(),
+        HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase()));
     assertEquals(404, me.status());
 
     me = handler.map(new ErrorResponseException(
@@ -126,7 +137,8 @@ class DefaultMinioErrorHandlerTest {
             .request(new Request.Builder()
                 .url("http://example.org")
                 .build())
-            .build()));
+            .build(),
+        HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase()));
     assertEquals(409, me.status());
 
     me = handler.map(new ErrorResponseException(
@@ -138,7 +150,8 @@ class DefaultMinioErrorHandlerTest {
             .request(new Request.Builder()
                 .url("http://example.org")
                 .build())
-            .build()));
+            .build(),
+        HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase()));
     assertEquals(500, me.status());
   }
 }

@@ -151,6 +151,7 @@ import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.TestInstance.Lifecycle;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.mockito.Mockito;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.util.FileCopyUtils;
 
@@ -1069,7 +1070,8 @@ public class MinioTemplateTest {
                     .request(new Request.Builder()
                         .url("http://example.org")
                         .build())
-                    .build()))
+                    .build(),
+                HttpStatus.NOT_FOUND.getReasonPhrase()))
     );
     assertFalse(minio.objectExists(StatObjectArgs.builder()
         .bucket(DEFAULT_BUCKET)
