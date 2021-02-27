@@ -40,7 +40,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.TestInstance.Lifecycle;
 import org.ldaptive.AddRequest;
-import org.ldaptive.BindRequest;
 import org.ldaptive.CompareRequest;
 import org.ldaptive.ConnectionFactory;
 import org.ldaptive.DeleteRequest;

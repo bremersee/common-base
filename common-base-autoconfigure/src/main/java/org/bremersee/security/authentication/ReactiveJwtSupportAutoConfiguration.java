@@ -19,13 +19,12 @@ package org.bremersee.security.authentication;
 import lombok.extern.slf4j.Slf4j;
 import org.bremersee.context.MessageSourceProperties;
 import org.springframework.beans.factory.ObjectProvider;
-import org.springframework.boot.autoconfigure.AutoConfigureAfter;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication.Type;
-import org.springframework.boot.autoconfigure.security.oauth2.resource.reactive.ReactiveOAuth2ResourceServerAutoConfiguration;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -48,7 +47,8 @@ import org.springframework.web.reactive.function.client.WebClient;
     WebClientAccessTokenRetriever.class
 })
 @Configuration
-@AutoConfigureAfter(ReactiveOAuth2ResourceServerAutoConfiguration.class)
+// See JwtSupportAutoConfiguration
+// @AutoConfigureAfter(ReactiveOAuth2ResourceServerAutoConfiguration.class)
 @EnableConfigurationProperties({AuthProperties.class, MessageSourceProperties.class})
 @Slf4j
 public class ReactiveJwtSupportAutoConfiguration {
@@ -163,6 +163,7 @@ public class ReactiveJwtSupportAutoConfiguration {
           "client-id",
           "client-secret"
       })
+  @ConditionalOnBean(JsonPathReactiveJwtConverter.class)
   @ConditionalOnMissingBean
   @Bean
   public PasswordFlowReactiveAuthenticationManager passwordFlowReactiveAuthenticationManager(
