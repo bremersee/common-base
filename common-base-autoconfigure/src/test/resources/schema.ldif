@@ -24,7 +24,7 @@ objectclass: inetOrgPerson
 cn: Anna Livia Plurabelle
 sn: Plurabelle
 uid: anna
-password: secret
+memberOf: cn=developers,ou=groups,dc=bremersee,dc=org
 
 dn: uid=hans,ou=people,dc=bremersee,dc=org
 objectclass: top
@@ -34,7 +34,6 @@ objectclass: inetOrgPerson
 cn: Hans Castorp
 sn: Castorp
 uid: hans
-password: secret
 
 dn: uid=gustav,ou=people,dc=bremersee,dc=org
 objectclass: top
@@ -44,7 +43,6 @@ objectclass: inetOrgPerson
 cn: Gustav Anias Horn
 sn: Horn
 uid: gustav
-password: secret
 
 # Create Groups
 dn: cn=developers,ou=groups,dc=bremersee,dc=org

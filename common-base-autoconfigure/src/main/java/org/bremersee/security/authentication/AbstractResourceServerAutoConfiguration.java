@@ -29,7 +29,6 @@ import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.annotation.web.configurers.ExpressionUrlAuthorizationConfigurer;
-import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.StringUtils;
@@ -191,14 +190,12 @@ public abstract class AbstractResourceServerAutoConfiguration extends WebSecurit
               .jwtAuthenticationConverter(jwtConverterProvider.getIfAvailable())
               .and());
     }
-    log.info("Configure authentication provider with basic auth and in-memory users.");
+    log.info("Configure authentication provider with basic auth and user details service.");
     String realm = environment.getProperty("spring.application.name", "Restricted area");
     return http
-        // .userDetailsService(userDetailsService())
         .formLogin().disable()
         .httpBasic().realmName(realm)
-        .and()
-        .sessionManagement((sm) -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+        .and();
   }
 
 }

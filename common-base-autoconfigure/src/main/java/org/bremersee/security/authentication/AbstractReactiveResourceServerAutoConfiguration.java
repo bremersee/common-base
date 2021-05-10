@@ -30,6 +30,7 @@ import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.config.web.server.ServerHttpSecurity.AuthorizeExchangeSpec;
 import org.springframework.security.core.userdetails.MapReactiveUserDetailsService;
 import org.springframework.security.core.userdetails.ReactiveUserDetailsService;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.server.SecurityWebFilterChain;
 import org.springframework.security.web.server.header.XFrameOptionsServerHttpHeadersWriter.Mode;
@@ -157,7 +158,6 @@ public abstract class AbstractReactiveResourceServerAutoConfiguration {
   }
 
   private AuthorizeExchangeSpec configurePathMatchers(AuthorizeExchangeSpec spec) {
-
     for (PathMatcherProperties props : authProperties.preparePathMatchers(corsProperties)) {
       log.info("Securing requests to {}", props);
       switch (props.getAccessMode()) {
@@ -183,7 +183,6 @@ public abstract class AbstractReactiveResourceServerAutoConfiguration {
   }
 
   private ServerHttpSecurity configureAuthenticationManager(ServerHttpSecurity http) {
-
     return Optional.ofNullable(jwtConverterProvider.getIfAvailable())
         .map(jwtConverter -> http
             .oauth2ResourceServer((rs) -> rs
@@ -198,12 +197,22 @@ public abstract class AbstractReactiveResourceServerAutoConfiguration {
   }
 
   private ReactiveAuthenticationManager userDetailsAuthenticationManager() {
+    ReactiveUserDetailsService userDetailsService = userDetailsServiceProvider
+        .getIfAvailable(this::defaultReactiveUserDetailsService);
+    log.info("Creating ReactiveAuthenticationManager with {}",
+        ClassUtils.getUserClass(userDetailsService).getSimpleName());
+    UserDetailsRepositoryReactiveAuthenticationManager manager
+        = new UserDetailsRepositoryReactiveAuthenticationManager(userDetailsService);
+    passwordEncoderProvider.ifAvailable(passwordEncoder -> {
+      log.info("Setting {} to ReactiveAuthenticationManager", ClassUtils.getUserClass(passwordEncoder).getSimpleName());
+      manager.setPasswordEncoder(passwordEncoder);
+    });
+    return manager;
+  }
 
-    return Optional.ofNullable(userDetailsServiceProvider.getIfAvailable())
-        .map(UserDetailsRepositoryReactiveAuthenticationManager::new)
-        .orElseGet(() -> new UserDetailsRepositoryReactiveAuthenticationManager(
-            new MapReactiveUserDetailsService(authProperties
-                .buildBasicAuthUserDetails(passwordEncoderProvider.getIfAvailable()))));
+  private ReactiveUserDetailsService defaultReactiveUserDetailsService() {
+    UserDetails[] userDetails = authProperties.buildBasicAuthUserDetails(passwordEncoderProvider.getIfAvailable());
+    return new MapReactiveUserDetailsService(userDetails);
   }
 
 }

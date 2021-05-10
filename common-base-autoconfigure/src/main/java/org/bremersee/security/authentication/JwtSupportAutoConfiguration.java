@@ -19,13 +19,12 @@ package org.bremersee.security.authentication;
 import lombok.extern.slf4j.Slf4j;
 import org.bremersee.context.MessageSourceProperties;
 import org.springframework.beans.factory.ObjectProvider;
-import org.springframework.boot.autoconfigure.AutoConfigureAfter;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication.Type;
-import org.springframework.boot.autoconfigure.security.oauth2.resource.servlet.OAuth2ResourceServerAutoConfiguration;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.web.client.RestTemplateBuilder;
@@ -49,7 +48,6 @@ import org.springframework.util.ClassUtils;
     RestTemplateAccessTokenRetriever.class
 })
 @Configuration
-@AutoConfigureAfter(OAuth2ResourceServerAutoConfiguration.class)
 @EnableConfigurationProperties({AuthProperties.class, MessageSourceProperties.class})
 @Slf4j
 public class JwtSupportAutoConfiguration {
@@ -168,6 +166,7 @@ public class JwtSupportAutoConfiguration {
           "client-id",
           "client-secret"
       })
+  @ConditionalOnBean(JsonPathJwtConverter.class)
   @ConditionalOnMissingBean(PasswordFlowAuthenticationManager.class)
   @Bean
   public PasswordFlowAuthenticationManager passwordFlowAuthenticationManager(

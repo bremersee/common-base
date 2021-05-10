@@ -67,7 +67,7 @@ import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
         "spring.ldap.embedded.credential.username=uid=admin",
         "spring.ldap.embedded.credential.password=secret",
         "spring.ldap.embedded.ldif=classpath:schema.ldif",
-        "spring.ldap.embedded.port=12389",
+        "spring.ldap.embedded.port=15389",
         "spring.ldap.embedded.validation.enabled=false"
     })
 @Slf4j

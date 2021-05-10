@@ -22,6 +22,7 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.util.UriBuilder;
 import reactor.test.StepVerifier;
 
 /**
@@ -99,7 +100,7 @@ class WebClientProxyBuilderTest {
   @Test
   void callWithWebClient() {
     StepVerifier
-        .create(newWebClient().get().uri(b -> b.build()).retrieve().bodyToMono(String.class))
+        .create(newWebClient().get().uri(UriBuilder::build).retrieve().bodyToMono(String.class))
         .assertNext(response -> assertEquals(OK_RESPONSE, response))
         .expectNextCount(0)
         .verifyComplete();

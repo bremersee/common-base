@@ -30,6 +30,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
 /**
@@ -144,8 +145,8 @@ public class ReactiveNoneTest {
     StepVerifier.create(newWebClient()
         .get()
         .uri("/actuator/metrics")
-        .exchange())
-        .assertNext(response -> assertEquals(HttpStatus.OK, response.statusCode()))
+        .exchangeToMono(clientResponse -> Mono.just(clientResponse.statusCode())))
+        .assertNext(status -> assertEquals(HttpStatus.OK, status))
         .verifyComplete();
   }
 

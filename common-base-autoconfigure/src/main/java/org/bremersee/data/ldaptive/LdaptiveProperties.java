@@ -18,7 +18,10 @@ package org.bremersee.data.ldaptive;
 
 import java.time.Duration;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import lombok.EqualsAndHashCode;
@@ -26,6 +29,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import org.bremersee.data.ldaptive.transcoder.UserAccountControlValueTranscoder;
 import org.ldaptive.ReturnAttributes;
 import org.ldaptive.SearchConnectionValidator;
 import org.ldaptive.SearchRequest;
@@ -53,6 +57,11 @@ public class LdaptiveProperties {
    * Specifies whether ldap connection should be configured or not.
    */
   private boolean enabled = true;
+
+  /**
+   * Specifies whether an ldap user details service should be configured or not.
+   */
+  private boolean authenticationEnabled = false;
 
   /**
    * URL to the LDAP(s).
@@ -198,6 +207,9 @@ public class LdaptiveProperties {
   @NotNull
   private Duration idleTime = Duration.ofMinutes(10);
 
+  @NotNull
+  private UserDetailsProperties userDetails = new UserDetailsProperties();
+
   /**
    * Create search connection validator search connection validator.
    *
@@ -297,4 +309,39 @@ public class LdaptiveProperties {
     }
   }
 
+  /**
+   * The user details properties.
+   */
+  @Getter
+  @Setter
+  @ToString
+  @EqualsAndHashCode
+  @NoArgsConstructor
+  public static class UserDetailsProperties {
+
+    private String userBaseDn;
+
+    private String userFindOneFilter = "(&(objectClass=group)(sAMAccountName={0}))";
+
+    private SearchScope userFindOneSearchScope = SearchScope.ONELEVEL;
+
+    private String userAccountControlAttributeName = UserAccountControlValueTranscoder.ATTRIBUTE_NAME;
+
+    private String authorityAttributeName = "memberOf";
+
+    private boolean authorityDn = true;
+
+    private List<String> authorities = new LinkedList<>();
+
+    private Map<String, String> authorityMap = new LinkedHashMap<>();
+
+    private String authorityPrefix = "ROLE_";
+
+    private String userPasswordAttributeName = "userPassword";
+
+    private String userPasswordLabel = "SHA";
+
+    private String userPasswordAlgorithm = "SHA";
+
+  }
 }

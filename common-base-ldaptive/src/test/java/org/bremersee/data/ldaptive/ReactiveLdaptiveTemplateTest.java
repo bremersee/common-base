@@ -40,7 +40,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.TestInstance.Lifecycle;
 import org.ldaptive.AddRequest;
-import org.ldaptive.BindRequest;
 import org.ldaptive.CompareRequest;
 import org.ldaptive.ConnectionFactory;
 import org.ldaptive.DeleteRequest;
@@ -72,7 +71,7 @@ import reactor.test.StepVerifier;
         "spring.ldap.embedded.credential.username=uid=admin",
         "spring.ldap.embedded.credential.password=secret",
         "spring.ldap.embedded.ldif=classpath:schema.ldif",
-        "spring.ldap.embedded.port=13389",
+        "spring.ldap.embedded.port=16389",
         "spring.ldap.embedded.validation.enabled=false"
     })
 @TestInstance(Lifecycle.PER_CLASS) // allows us to use @BeforeAll with a non-static method
