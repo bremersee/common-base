@@ -27,7 +27,7 @@ under the License.
     <item>
       <title>File: 31,
              Errors: 0,
-             Warnings: 1,
+             Warnings: 0,
              Infos: 0
       </title>
             <link>https://github.com/bremersee/common-base/common-base-data/checkstyle.html</link>
@@ -304,7 +304,7 @@ under the License.
                   0
                 </td>
                 <td>
-                  1
+                  0
                 </td>
                 <td>
                   0

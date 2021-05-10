@@ -19,13 +19,12 @@ package org.bremersee.security.authentication;
 import lombok.extern.slf4j.Slf4j;
 import org.bremersee.context.MessageSourceProperties;
 import org.springframework.beans.factory.ObjectProvider;
-import org.springframework.boot.autoconfigure.AutoConfigureAfter;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication.Type;
-import org.springframework.boot.autoconfigure.security.oauth2.resource.reactive.ReactiveOAuth2ResourceServerAutoConfiguration;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -48,9 +47,8 @@ import org.springframework.web.reactive.function.client.WebClient;
     WebClientAccessTokenRetriever.class
 })
 @Configuration
-@AutoConfigureAfter(ReactiveOAuth2ResourceServerAutoConfiguration.class)
 @EnableConfigurationProperties({AuthProperties.class, MessageSourceProperties.class})
-<span class="fc" id="L53">@Slf4j</span>
+<span class="fc" id="L51">@Slf4j</span>
 public class ReactiveJwtSupportAutoConfiguration {
 
   private final AuthProperties properties;
@@ -61,16 +59,16 @@ public class ReactiveJwtSupportAutoConfiguration {
    * @param properties the properties
    */
   public ReactiveJwtSupportAutoConfiguration(
-<span class="fc" id="L64">      AuthProperties properties) {</span>
-<span class="fc" id="L65">    this.properties = properties;</span>
-<span class="fc" id="L66">  }</span>
+<span class="fc" id="L62">      AuthProperties properties) {</span>
+<span class="fc" id="L63">    this.properties = properties;</span>
+<span class="fc" id="L64">  }</span>
 
   /**
    * Init.
    */
   @EventListener(ApplicationReadyEvent.class)
   public void init() {
-<span class="fc" id="L73">    log.info(&quot;\n&quot;</span>
+<span class="fc" id="L71">    log.info(&quot;\n&quot;</span>
             + &quot;*********************************************************************************\n&quot;
             + &quot;* {}\n&quot;
             + &quot;*********************************************************************************\n&quot;
@@ -80,13 +78,13 @@ public class ReactiveJwtSupportAutoConfiguration {
             + &quot;* rolePrefix = {}\n&quot;
             + &quot;* nameJsonPath = {}\n&quot;
             + &quot;*********************************************************************************&quot;,
-<span class="fc" id="L83">        ClassUtils.getUserClass(getClass()).getSimpleName(),</span>
-<span class="fc" id="L84">        properties.getRolesJsonPath(),</span>
-<span class="fc" id="L85">        properties.isRolesValueList(),</span>
-<span class="fc" id="L86">        properties.getRolesValueSeparator(),</span>
-<span class="fc" id="L87">        properties.getRolePrefix(),</span>
-<span class="fc" id="L88">        properties.getNameJsonPath());</span>
-<span class="fc" id="L89">  }</span>
+<span class="fc" id="L81">        ClassUtils.getUserClass(getClass()).getSimpleName(),</span>
+<span class="fc" id="L82">        properties.getRolesJsonPath(),</span>
+<span class="fc" id="L83">        properties.isRolesValueList(),</span>
+<span class="fc" id="L84">        properties.getRolesValueSeparator(),</span>
+<span class="fc" id="L85">        properties.getRolePrefix(),</span>
+<span class="fc" id="L86">        properties.getNameJsonPath());</span>
+<span class="fc" id="L87">  }</span>
 
   /**
    * Creates authentication details bean.
@@ -98,11 +96,11 @@ public class ReactiveJwtSupportAutoConfiguration {
   @Bean
   public AuthenticationDetails authenticationDetails(
       MessageSourceProperties messageSourceProperties) {
-<span class="fc" id="L101">    return new JsonPathJwtAuthenticationDetails(</span>
-<span class="fc" id="L102">        messageSourceProperties.defaultLocale(),</span>
-<span class="fc" id="L103">        messageSourceProperties.defaultTimeZone(),</span>
-<span class="fc" id="L104">        properties.getPreferredLanguageJsonPath(),</span>
-<span class="fc" id="L105">        properties.getPreferredTimeZoneJsonPath());</span>
+<span class="fc" id="L99">    return new JsonPathJwtAuthenticationDetails(</span>
+<span class="fc" id="L100">        messageSourceProperties.defaultLocale(),</span>
+<span class="fc" id="L101">        messageSourceProperties.defaultTimeZone(),</span>
+<span class="fc" id="L102">        properties.getPreferredLanguageJsonPath(),</span>
+<span class="fc" id="L103">        properties.getPreferredTimeZoneJsonPath());</span>
   }
 
   /**
@@ -118,14 +116,14 @@ public class ReactiveJwtSupportAutoConfiguration {
   @SuppressWarnings(&quot;DuplicatedCode&quot;)
   public JsonPathReactiveJwtConverter jsonPathReactiveJwtConverter() {
 
-<span class="fc" id="L121">    log.info(&quot;Creating application {} ...&quot;, JsonPathReactiveJwtConverter.class.getSimpleName());</span>
-<span class="fc" id="L122">    JsonPathJwtConverter converter = new JsonPathJwtConverter();</span>
-<span class="fc" id="L123">    converter.setNameJsonPath(properties.getNameJsonPath());</span>
-<span class="fc" id="L124">    converter.setRolePrefix(properties.getRolePrefix());</span>
-<span class="fc" id="L125">    converter.setRolesJsonPath(properties.getRolesJsonPath());</span>
-<span class="fc" id="L126">    converter.setRolesValueList(properties.isRolesValueList());</span>
-<span class="fc" id="L127">    converter.setRolesValueSeparator(properties.getRolesValueSeparator());</span>
-<span class="fc" id="L128">    return new JsonPathReactiveJwtConverter(converter);</span>
+<span class="fc" id="L119">    log.info(&quot;Creating application {} ...&quot;, JsonPathReactiveJwtConverter.class.getSimpleName());</span>
+<span class="fc" id="L120">    JsonPathJwtConverter converter = new JsonPathJwtConverter();</span>
+<span class="fc" id="L121">    converter.setNameJsonPath(properties.getNameJsonPath());</span>
+<span class="fc" id="L122">    converter.setRolePrefix(properties.getRolePrefix());</span>
+<span class="fc" id="L123">    converter.setRolesJsonPath(properties.getRolesJsonPath());</span>
+<span class="fc" id="L124">    converter.setRolesValueList(properties.isRolesValueList());</span>
+<span class="fc" id="L125">    converter.setRolesValueSeparator(properties.getRolesValueSeparator());</span>
+<span class="fc" id="L126">    return new JsonPathReactiveJwtConverter(converter);</span>
   }
 
   /**
@@ -140,11 +138,11 @@ public class ReactiveJwtSupportAutoConfiguration {
   public WebClientAccessTokenRetriever webClientAccessTokenRetriever(
       ObjectProvider&lt;ReactiveAccessTokenCache&gt; accessTokenCache) {
 
-<span class="fc" id="L143">    ReactiveAccessTokenCache cache = accessTokenCache.getIfAvailable();</span>
-<span class="fc" id="L144">    log.info(&quot;Creating common {} with cache {} ...&quot;,</span>
-<span class="fc" id="L145">        WebClientAccessTokenRetriever.class.getSimpleName(), cache);</span>
-<span class="fc" id="L146">    return new WebClientAccessTokenRetriever(</span>
-<span class="fc" id="L147">        WebClient.builder().build(),</span>
+<span class="fc" id="L141">    ReactiveAccessTokenCache cache = accessTokenCache.getIfAvailable();</span>
+<span class="fc" id="L142">    log.info(&quot;Creating common {} with cache {} ...&quot;,</span>
+<span class="fc" id="L143">        WebClientAccessTokenRetriever.class.getSimpleName(), cache);</span>
+<span class="fc" id="L144">    return new WebClientAccessTokenRetriever(</span>
+<span class="fc" id="L145">        WebClient.builder().build(),</span>
         cache);
   }
 
@@ -163,6 +161,7 @@ public class ReactiveJwtSupportAutoConfiguration {
           &quot;client-id&quot;,
           &quot;client-secret&quot;
       })
+  @ConditionalOnBean(JsonPathReactiveJwtConverter.class)
   @ConditionalOnMissingBean
   @Bean
   public PasswordFlowReactiveAuthenticationManager passwordFlowReactiveAuthenticationManager(
@@ -170,14 +169,14 @@ public class ReactiveJwtSupportAutoConfiguration {
       JsonPathReactiveJwtConverter jwtConverter,
       WebClientAccessTokenRetriever tokenRetriever) {
 
-<span class="fc" id="L173">    Assert.notNull(jwtDecoder.getIfAvailable(), &quot;Jwt decoder must be present.&quot;);</span>
-<span class="fc" id="L174">    log.info(&quot;Creating {} ...&quot;, PasswordFlowReactiveAuthenticationManager.class.getSimpleName());</span>
-<span class="fc" id="L175">    return new PasswordFlowReactiveAuthenticationManager(</span>
-<span class="fc" id="L176">        properties.getPasswordFlow(),</span>
-<span class="fc" id="L177">        jwtDecoder.getIfAvailable(),</span>
+<span class="fc" id="L172">    Assert.notNull(jwtDecoder.getIfAvailable(), &quot;Jwt decoder must be present.&quot;);</span>
+<span class="fc" id="L173">    log.info(&quot;Creating {} ...&quot;, PasswordFlowReactiveAuthenticationManager.class.getSimpleName());</span>
+<span class="fc" id="L174">    return new PasswordFlowReactiveAuthenticationManager(</span>
+<span class="fc" id="L175">        properties.getPasswordFlow(),</span>
+<span class="fc" id="L176">        jwtDecoder.getIfAvailable(),</span>
         jwtConverter,
         tokenRetriever);
   }
 
 }
-</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.6.202009150832</span></div></body></html>

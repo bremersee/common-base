@@ -5,6 +5,7 @@ org.bremersee.core
 org.bremersee.data.convert
 org.bremersee.data.ldaptive
 org.bremersee.data.ldaptive.reactive
+org.bremersee.data.ldaptive.transcoder
 org.bremersee.data.minio
 org.bremersee.data.redis
 org.bremersee.exception
@@ -17,6 +18,7 @@ org.bremersee.security
 org.bremersee.security.access
 org.bremersee.security.authentication
 org.bremersee.security.core
+org.bremersee.security.core.userdetails
 org.bremersee.test.beans
 org.bremersee.test.security.authentication
 org.bremersee.test.web

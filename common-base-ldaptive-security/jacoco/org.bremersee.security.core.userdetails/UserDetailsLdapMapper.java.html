@@ -1,0 +1,261 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>UserDetailsLdapMapper.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">common-base-ldaptive-security</a> &gt; <a href="index.source.html" class="el_package">org.bremersee.security.core.userdetails</a> &gt; <span class="el_source">UserDetailsLdapMapper.java</span></div><h1>UserDetailsLdapMapper.java</h1><pre class="source lang-java linenums">/*
+ * Copyright 2021 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package org.bremersee.security.core.userdetails;
+
+import static org.bremersee.data.ldaptive.LdaptiveEntryMapper.getAttributeValue;
+import static org.bremersee.data.ldaptive.LdaptiveEntryMapper.getAttributeValuesAsSet;
+import static org.bremersee.data.ldaptive.transcoder.UserAccountControlValueTranscoder.isUserAccountEnabled;
+
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.ToString;
+import org.bremersee.data.ldaptive.LdaptiveEntryMapper;
+import org.bremersee.data.ldaptive.transcoder.UserAccountControlValueTranscoder;
+import org.ldaptive.AttributeModification;
+import org.ldaptive.LdapEntry;
+import org.ldaptive.transcode.AbstractStringValueTranscoder;
+import org.ldaptive.transcode.ValueTranscoder;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.util.StringUtils;
+
+/**
+ * The user details mapper.
+ *
+ * @author Christian Bremer
+ */
+<span class="fc" id="L49">@ToString</span>
+public class UserDetailsLdapMapper implements LdaptiveEntryMapper&lt;UserDetails&gt; {
+
+<span class="fc" id="L52">  @Getter(value = AccessLevel.PROTECTED)</span>
+  private final String userName;
+
+<span class="fc" id="L55">  @Getter(value = AccessLevel.PROTECTED)</span>
+  private final String userAccountControlAttributeName;
+
+<span class="fc" id="L58">  @Getter(value = AccessLevel.PROTECTED)</span>
+  private final List&lt;String&gt; authorities;
+
+<span class="fc" id="L61">  @Getter(value = AccessLevel.PROTECTED)</span>
+  private final String authorityAttributeName;
+
+<span class="fc" id="L64">  @Getter(value = AccessLevel.PROTECTED)</span>
+  private final String authorityPrefix;
+
+<span class="fc" id="L67">  @Getter(value = AccessLevel.PROTECTED)</span>
+  private final ValueTranscoder&lt;GrantedAuthority&gt; authorityTranscoder;
+
+<span class="fc" id="L70">  @Getter(value = AccessLevel.PROTECTED)</span>
+  private final UserAccountControlValueTranscoder userAccountControlValueTranscoder;
+
+  /**
+   * Instantiates a new user details mapper.
+   *
+   * @param userName the user name
+   * @param userAccountControlAttributeName the user account control attribute name
+   * @param authorities the authorities
+   * @param authorityAttributeName the authority attribute name
+   * @param authorityDn the authority dn
+   * @param authorityMap the authority map
+   * @param authorityPrefix the authority prefix
+   */
+  public UserDetailsLdapMapper(
+      String userName,
+      String userAccountControlAttributeName,
+      List&lt;String&gt; authorities,
+      String authorityAttributeName,
+      boolean authorityDn,
+      Map&lt;String, String&gt; authorityMap,
+<span class="fc" id="L91">      String authorityPrefix) {</span>
+
+<span class="fc" id="L93">    this.userName = userName;</span>
+<span class="fc" id="L94">    this.userAccountControlAttributeName = userAccountControlAttributeName;</span>
+<span class="fc bfc" id="L95" title="All 2 branches covered.">    this.authorities = authorities != null ? authorities : Collections.emptyList();</span>
+<span class="fc" id="L96">    this.authorityAttributeName = authorityAttributeName;</span>
+<span class="fc" id="L97">    this.authorityPrefix = authorityPrefix;</span>
+<span class="fc" id="L98">    this.authorityTranscoder = new GrantedAuthorityValueTranscoder(authorityDn, authorityMap, authorityPrefix);</span>
+<span class="fc bfc" id="L99" title="All 2 branches covered.">    if (StringUtils.hasText(userAccountControlAttributeName)) {</span>
+<span class="fc" id="L100">      userAccountControlValueTranscoder = new UserAccountControlValueTranscoder();</span>
+    } else {
+<span class="fc" id="L102">      userAccountControlValueTranscoder = null;</span>
+    }
+<span class="fc" id="L104">  }</span>
+
+  @Override
+  public String[] getObjectClasses() {
+<span class="fc" id="L108">    return null;</span>
+  }
+
+  @Override
+  public String mapDn(UserDetails domainObject) {
+<span class="fc" id="L113">    return null;</span>
+  }
+
+  @Override
+  public UserDetails map(LdapEntry ldapEntry) {
+<span class="fc" id="L118">    return new User(</span>
+        userName,
+        userName,
+<span class="fc" id="L121">        isAccountEnabled(ldapEntry),</span>
+<span class="fc" id="L122">        isAccountNonExpired(ldapEntry),</span>
+<span class="fc" id="L123">        isCredentialsNonExpired(ldapEntry),</span>
+<span class="fc" id="L124">        isAccountNonLocked(ldapEntry),</span>
+<span class="fc" id="L125">        getGrantedAuthorities(ldapEntry));</span>
+  }
+
+  @Override
+  public void map(LdapEntry source, UserDetails destination) {
+<span class="fc" id="L130">    throw new UnsupportedOperationException(&quot;User details are unmodifiable.&quot;);</span>
+  }
+
+  @Override
+  public AttributeModification[] mapAndComputeModifications(UserDetails source, LdapEntry destination) {
+<span class="fc" id="L135">    return new AttributeModification[0];</span>
+  }
+
+  /**
+   * Determines whether the account is enabled or not.
+   *
+   * @param ldapEntry the ldap entry
+   * @return the boolean
+   */
+  protected boolean isAccountEnabled(LdapEntry ldapEntry) {
+<span class="fc bfc" id="L145" title="All 4 branches covered.">    return !StringUtils.hasText(getUserAccountControlAttributeName()) || isUserAccountEnabled(getAttributeValue(</span>
+<span class="fc" id="L146">        ldapEntry, getUserAccountControlAttributeName(), getUserAccountControlValueTranscoder(), null));</span>
+  }
+
+  /**
+   * Determines whether the account is not expired.
+   *
+   * @param ldapEntry the ldap entry
+   * @return the boolean
+   */
+  protected boolean isAccountNonExpired(@SuppressWarnings(&quot;unused&quot;) LdapEntry ldapEntry) {
+<span class="fc" id="L156">    return true;</span>
+  }
+
+  /**
+   * Determines whether the account credentials are not expired.
+   *
+   * @param ldapEntry the ldap entry
+   * @return the boolean
+   */
+  protected boolean isCredentialsNonExpired(@SuppressWarnings(&quot;unused&quot;) LdapEntry ldapEntry) {
+<span class="fc" id="L166">    return true;</span>
+  }
+
+  /**
+   * Determines whether the account is not locked.
+   *
+   * @param ldapEntry the ldap entry
+   * @return the boolean
+   */
+  protected boolean isAccountNonLocked(@SuppressWarnings(&quot;unused&quot;) LdapEntry ldapEntry) {
+<span class="fc" id="L176">    return true;</span>
+  }
+
+  /**
+   * Gets granted authorities.
+   *
+   * @param ldapEntry the ldap entry
+   * @return the granted authorities
+   */
+  protected Collection&lt;? extends GrantedAuthority&gt; getGrantedAuthorities(LdapEntry ldapEntry) {
+<span class="fc" id="L186">    Set&lt;GrantedAuthority&gt; grantedAuthorities = getAuthorities().stream()</span>
+<span class="fc" id="L187">        .map(value -&gt; UserDetailsLdapMapper.prefixAuthority(getAuthorityPrefix(), value))</span>
+<span class="fc" id="L188">        .map(SimpleGrantedAuthority::new)</span>
+<span class="fc" id="L189">        .collect(Collectors.toSet());</span>
+<span class="fc bfc" id="L190" title="All 2 branches covered.">    if (StringUtils.hasText(getAuthorityAttributeName())) {</span>
+<span class="fc" id="L191">      grantedAuthorities.addAll(</span>
+<span class="fc" id="L192">          getAttributeValuesAsSet(ldapEntry, getAuthorityAttributeName(), getAuthorityTranscoder()));</span>
+    }
+<span class="fc" id="L194">    return grantedAuthorities;</span>
+  }
+
+  /**
+   * Prefix authority.
+   *
+   * @param prefix the prefix
+   * @param value the value
+   * @return the string
+   */
+  protected static String prefixAuthority(String prefix, String value) {
+<span class="fc bfc" id="L205" title="All 4 branches covered.">    return StringUtils.hasText(prefix) &amp;&amp; !value.startsWith(prefix) ? prefix + value : value;</span>
+  }
+
+  /**
+   * The granted authority value transcoder.
+   *
+   * @author Christian Bremer
+   */
+<span class="fc" id="L213">  @ToString</span>
+  protected static class GrantedAuthorityValueTranscoder extends AbstractStringValueTranscoder&lt;GrantedAuthority&gt; {
+
+<span class="fc" id="L216">    @Getter(value = AccessLevel.PROTECTED)</span>
+    private final boolean authorityDn;
+
+<span class="fc" id="L219">    @Getter(value = AccessLevel.PROTECTED)</span>
+    private final Map&lt;String, String&gt; authorityMap;
+
+<span class="fc" id="L222">    @Getter(value = AccessLevel.PROTECTED)</span>
+    private final String authorityPrefix;
+
+    /**
+     * Instantiates a new granted authority value transcoder.
+     *
+     * @param authorityDn the authority dn
+     * @param authorityMap the authority map
+     * @param authorityPrefix the authority prefix
+     */
+    public GrantedAuthorityValueTranscoder(
+        boolean authorityDn,
+        Map&lt;String, String&gt; authorityMap,
+<span class="fc" id="L235">        String authorityPrefix) {</span>
+<span class="fc" id="L236">      this.authorityDn = authorityDn;</span>
+<span class="fc bfc" id="L237" title="All 2 branches covered.">      this.authorityMap = authorityMap != null ? authorityMap : Collections.emptyMap();</span>
+<span class="fc" id="L238">      this.authorityPrefix = authorityPrefix;</span>
+<span class="fc" id="L239">    }</span>
+
+    @Override
+    public GrantedAuthority decodeStringValue(String value) {
+<span class="fc bfc" id="L243" title="All 2 branches covered.">      String ldapValue = isAuthorityDn() ? LdaptiveEntryMapper.getRdn(value) : value;</span>
+<span class="fc" id="L244">      String mappedValue = getAuthorityMap().getOrDefault(ldapValue, ldapValue);</span>
+<span class="fc" id="L245">      String authorityValue = UserDetailsLdapMapper.prefixAuthority(getAuthorityPrefix(), mappedValue);</span>
+<span class="fc" id="L246">      return new SimpleGrantedAuthority(authorityValue);</span>
+    }
+
+    @Override
+    public String encodeStringValue(GrantedAuthority value) {
+<span class="fc" id="L251">      throw new UnsupportedOperationException(&quot;Getting ldap attribute value from granted authority is not supported.&quot;);</span>
+    }
+
+    @Override
+    public Class&lt;GrantedAuthority&gt; getType() {
+<span class="fc" id="L256">      return GrantedAuthority.class;</span>
+    }
+  }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.6.202009150832</span></div></body></html>

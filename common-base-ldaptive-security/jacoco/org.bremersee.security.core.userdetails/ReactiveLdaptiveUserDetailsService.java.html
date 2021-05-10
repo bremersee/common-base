@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ReactiveLdaptiveUserDetailsService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">common-base-ldaptive-security</a> &gt; <a href="index.source.html" class="el_package">org.bremersee.security.core.userdetails</a> &gt; <span class="el_source">ReactiveLdaptiveUserDetailsService.java</span></div><h1>ReactiveLdaptiveUserDetailsService.java</h1><pre class="source lang-java linenums">/*
+ * Copyright 2021 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package org.bremersee.security.core.userdetails;
+
+import java.util.List;
+import java.util.Map;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.ToString;
+import lombok.extern.slf4j.Slf4j;
+import org.bremersee.data.ldaptive.reactive.ReactiveLdaptiveOperations;
+import org.ldaptive.FilterTemplate;
+import org.ldaptive.SearchRequest;
+import org.ldaptive.SearchScope;
+import org.springframework.security.core.userdetails.ReactiveUserDetailsService;
+import org.springframework.security.core.userdetails.UserDetails;
+import reactor.core.publisher.Mono;
+
+/**
+ * The reactive ldaptive user details service.
+ *
+ * @author Christian Bremer
+ */
+<span class="fc" id="L38">@ToString(callSuper = true, exclude = {&quot;ldaptiveOperations&quot;})</span>
+<span class="fc" id="L39">@Slf4j</span>
+public class ReactiveLdaptiveUserDetailsService extends AbstractUserDetailsService implements
+    ReactiveUserDetailsService {
+
+<span class="fc" id="L43">  @Getter(value = AccessLevel.PROTECTED)</span>
+  private final ReactiveLdaptiveOperations ldaptiveOperations;
+
+  /**
+   * Instantiates a new reactive ldaptive user details service.
+   *
+   * @param ldaptiveOperations the ldaptive operations
+   * @param userBaseDn the user base dn
+   * @param userFindOneFilter the user find one filter
+   * @param userFindOneSearchScope the user find one search scope
+   * @param userAccountControlAttributeName the user account control attribute name
+   * @param authorities the authorities
+   * @param authorityAttributeName the authority attribute name
+   * @param authorityDn the authority dn
+   * @param authorityMap the authority map
+   * @param authorityPrefix the authority prefix
+   */
+  public ReactiveLdaptiveUserDetailsService(
+      ReactiveLdaptiveOperations ldaptiveOperations,
+      String userBaseDn,
+      String userFindOneFilter,
+      SearchScope userFindOneSearchScope,
+      String userAccountControlAttributeName,
+      List&lt;String&gt; authorities,
+      String authorityAttributeName,
+      boolean authorityDn,
+      Map&lt;String, String&gt; authorityMap,
+      String authorityPrefix) {
+
+<span class="fc" id="L72">    super(</span>
+        userBaseDn, userFindOneFilter, userFindOneSearchScope, userAccountControlAttributeName, authorities,
+        authorityAttributeName, authorityDn, authorityMap, authorityPrefix);
+<span class="fc" id="L75">    this.ldaptiveOperations = ldaptiveOperations;</span>
+<span class="fc" id="L76">  }</span>
+
+  @Override
+  public Mono&lt;UserDetails&gt; findByUsername(String userName) {
+<span class="fc" id="L80">    return getLdaptiveOperations()</span>
+<span class="fc" id="L81">        .findOne(</span>
+<span class="fc" id="L82">            SearchRequest.builder()</span>
+<span class="fc" id="L83">                .dn(getUserBaseDn())</span>
+<span class="fc" id="L84">                .filter(FilterTemplate.builder()</span>
+<span class="fc" id="L85">                    .filter(getUserFindOneFilter())</span>
+<span class="fc" id="L86">                    .parameters(userName)</span>
+<span class="fc" id="L87">                    .build())</span>
+<span class="fc" id="L88">                .scope(getUserFindOneSearchScope())</span>
+<span class="fc" id="L89">                .returnAttributes(returnAttributes())</span>
+<span class="fc" id="L90">                .sizeLimit(1)</span>
+<span class="fc" id="L91">                .build(),</span>
+<span class="fc" id="L92">            getUserDetailsLdapMapper(userName));</span>
+  }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.6.202009150832</span></div></body></html>

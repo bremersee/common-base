@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+Licensed to the Apache Software Foundation (ASF) under one
+or more contributor license agreements.  See the NOTICE file
+distributed with this work for additional information
+regarding copyright ownership.  The ASF licenses this file
+to you under the Apache License, Version 2.0 (the
+"License"); you may not use this file except in compliance
+with the License.  You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing,
+software distributed under the License is distributed on an
+"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+KIND, either express or implied.  See the License for the
+specific language governing permissions and limitations
+under the License.
+-->
+<rss version="0.91">
+  <channel>
+    <title>common-base-ldaptive-security - Checkstyle report</title>
+    <link>https://github.com/bremersee/common-base/common-base-ldaptive-security</link>
+    <description>common-base-ldaptive-security - Checkstyle report</description>
+    <language>en-us</language>
+    <copyright>&#169;2021 bremersee.org</copyright>
+    <item>
+      <title>File: 10,
+             Errors: 0,
+             Warnings: 21,
+             Infos: 0
+      </title>
+            <link>https://github.com/bremersee/common-base/common-base-ldaptive-security/checkstyle.html</link>
+      <description>
+        <p>Click <a href="https://github.com/bremersee/common-base/common-base-ldaptive-security/checkstyle.html">here</a> for the full Checkstyle report.</p>
+
+        <table summary="Files" boder="1">
+          <thead>
+            <tr>
+              <th>Files</th>
+              <th style="width:30px;"><abbr title="Info">I</abbr></th>
+              <th style="width:30px;"><abbr title="Warning">W</abbr></th>
+              <th style="width:30px;"><abbr title="Error">E</abbr></th>
+            </tr>
+          </thead>
+          <tbody>
+                          <tr>
+                <td>
+                  <a href="https://github.com/bremersee/common-base/common-base-ldaptive-security/checkstyle.html#org.bremersee.security.core.userdetails.LdaptivePasswordEncoder.java">org/bremersee/security/core/userdetails/LdaptivePasswordEncoder.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  2
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/bremersee/common-base/common-base-ldaptive-security/checkstyle.html#org.bremersee.security.core.userdetails.LdaptiveUserDetailsService.java">org/bremersee/security/core/userdetails/LdaptiveUserDetailsService.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  2
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/bremersee/common-base/common-base-ldaptive-security/checkstyle.html#org.bremersee.security.core.userdetails.app.TestConfiguration.java">org/bremersee/security/core/userdetails/app/TestConfiguration.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/bremersee/common-base/common-base-ldaptive-security/checkstyle.html#org.bremersee.security.core.userdetails.AbstractUserDetailsService.java">org/bremersee/security/core/userdetails/AbstractUserDetailsService.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  1
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/bremersee/common-base/common-base-ldaptive-security/checkstyle.html#org.bremersee.security.core.userdetails.LdaptivePasswordMatcher.java">org/bremersee/security/core/userdetails/LdaptivePasswordMatcher.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  4
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/bremersee/common-base/common-base-ldaptive-security/checkstyle.html#org.bremersee.security.core.userdetails.UserDetailsLdapMapper.java">org/bremersee/security/core/userdetails/UserDetailsLdapMapper.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  8
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/bremersee/common-base/common-base-ldaptive-security/checkstyle.html#org.bremersee.security.core.userdetails.UserDetailsLdapMapperTest.java">org/bremersee/security/core/userdetails/UserDetailsLdapMapperTest.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  2
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/bremersee/common-base/common-base-ldaptive-security/checkstyle.html#org.bremersee.security.core.userdetails.LdaptivePasswordEncoderTest.java">org/bremersee/security/core/userdetails/LdaptivePasswordEncoderTest.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/bremersee/common-base/common-base-ldaptive-security/checkstyle.html#org.bremersee.security.core.userdetails.ReactiveLdaptiveUserDetailsService.java">org/bremersee/security/core/userdetails/ReactiveLdaptiveUserDetailsService.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  1
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/bremersee/common-base/common-base-ldaptive-security/checkstyle.html#org.bremersee.security.core.userdetails.LdaptiveAuthenticationTest.java">org/bremersee/security/core/userdetails/LdaptiveAuthenticationTest.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  1
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                      </tbody>
+        </table>
+        
+      </description>
+    </item>
+  </channel>
+</rss>
+

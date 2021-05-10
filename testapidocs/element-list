@@ -40,6 +40,8 @@ org.bremersee.security.authentication.resourceserver.servlet.components
 org.bremersee.security.authentication.resourceserver.servlet.withoutredis
 org.bremersee.security.authentication.resourceserver.servlet.withredis
 org.bremersee.security.core
+org.bremersee.security.core.userdetails
+org.bremersee.security.core.userdetails.app
 org.bremersee.test.beans
 org.bremersee.test.security.authentication
 org.bremersee.test.web

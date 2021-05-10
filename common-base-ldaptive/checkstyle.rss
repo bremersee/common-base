@@ -25,9 +25,9 @@ under the License.
     <language>en-us</language>
     <copyright>&#169;2021 bremersee.org</copyright>
     <item>
-      <title>File: 20,
+      <title>File: 21,
              Errors: 0,
-             Warnings: 34,
+             Warnings: 37,
              Infos: 0
       </title>
             <link>https://github.com/bremersee/common-base/common-base-ldaptive/checkstyle.html</link>
@@ -291,6 +291,20 @@ under the License.
                 </td>
                 <td>
                   0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/bremersee/common-base/common-base-ldaptive/checkstyle.html#org.bremersee.data.ldaptive.transcoder.UserAccountControlValueTranscoder.java">org/bremersee/data/ldaptive/transcoder/UserAccountControlValueTranscoder.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  3
                 </td>
                 <td>
                   0

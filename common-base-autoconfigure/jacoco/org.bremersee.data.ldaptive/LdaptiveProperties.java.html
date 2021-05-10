@@ -18,7 +18,10 @@ package org.bremersee.data.ldaptive;
 
 import java.time.Duration;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import lombok.EqualsAndHashCode;
@@ -26,6 +29,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import org.bremersee.data.ldaptive.transcoder.UserAccountControlValueTranscoder;
 import org.ldaptive.ReturnAttributes;
 import org.ldaptive.SearchConnectionValidator;
 import org.ldaptive.SearchRequest;
@@ -43,160 +47,168 @@ import org.springframework.validation.annotation.Validated;
 @ConfigurationProperties(prefix = &quot;bremersee.ldaptive&quot;)
 @Validated
 @Getter
-<span class="pc" id="L46">@Setter</span>
-<span class="fc" id="L47">@ToString(exclude = {&quot;bindCredentials&quot;})</span>
-<span class="pc bpc" id="L48" title="118 of 174 branches missed.">@EqualsAndHashCode(exclude = {&quot;bindCredentials&quot;})</span>
-<span class="fc" id="L49">@NoArgsConstructor</span>
+<span class="pc" id="L50">@Setter</span>
+<span class="fc" id="L51">@ToString(exclude = {&quot;bindCredentials&quot;})</span>
+<span class="pc bpc" id="L52" title="127 of 186 branches missed.">@EqualsAndHashCode(exclude = {&quot;bindCredentials&quot;})</span>
+<span class="fc" id="L53">@NoArgsConstructor</span>
 public class LdaptiveProperties {
 
   /**
    * Specifies whether ldap connection should be configured or not.
    */
-<span class="fc" id="L55">  private boolean enabled = true;</span>
+<span class="fc" id="L59">  private boolean enabled = true;</span>
+
+  /**
+   * Specifies whether an ldap user details service should be configured or not.
+   */
+<span class="fc" id="L64">  private boolean authenticationEnabled = false;</span>
 
   /**
    * URL to the LDAP(s).
    */
-<span class="fc" id="L60">  private String ldapUrl = &quot;ldap://localhost:12389&quot;;</span>
+<span class="fc" id="L69">  private String ldapUrl = &quot;ldap://localhost:12389&quot;;</span>
 
   /**
    * Duration of time that connects will block.
    */
-<span class="fc" id="L65">  @NotNull</span>
-<span class="fc" id="L66">  private Duration connectTimeout = Duration.ofMinutes(1);</span>
+<span class="fc" id="L74">  @NotNull</span>
+<span class="fc" id="L75">  private Duration connectTimeout = Duration.ofMinutes(1);</span>
 
   /**
    * Duration of time to wait for responses.
    */
-<span class="fc" id="L71">  @NotNull</span>
-<span class="fc" id="L72">  private Duration responseTimeout = Duration.ofMinutes(1);</span>
+<span class="fc" id="L80">  @NotNull</span>
+<span class="fc" id="L81">  private Duration responseTimeout = Duration.ofMinutes(1);</span>
 
   /**
    * Duration of time that operations will block on reconnects, should generally be longer than connect timeout.
    */
-<span class="fc" id="L77">  @NotNull</span>
-<span class="fc" id="L78">  private Duration reconnectTimeout = Duration.ofMinutes(2);</span>
+<span class="fc" id="L86">  @NotNull</span>
+<span class="fc" id="L87">  private Duration reconnectTimeout = Duration.ofMinutes(2);</span>
 
   /**
    * Whether to automatically reconnect to the server when a connection is lost. Default is true.
    */
-<span class="fc" id="L83">  private boolean autoReconnect = true;</span>
+<span class="fc" id="L92">  private boolean autoReconnect = true;</span>
 
-<span class="fc" id="L85">  @Min(0)</span>
-<span class="fc" id="L86">  private int reconnectAttempts = 5;</span>
+<span class="fc" id="L94">  @Min(0)</span>
+<span class="fc" id="L95">  private int reconnectAttempts = 5;</span>
 
-<span class="fc" id="L88">  @NotNull</span>
-<span class="fc" id="L89">  private Duration reconnectBackoffDelay = Duration.ofSeconds(2);</span>
+<span class="fc" id="L97">  @NotNull</span>
+<span class="fc" id="L98">  private Duration reconnectBackoffDelay = Duration.ofSeconds(2);</span>
 
-<span class="fc" id="L91">  private double reconnectBackoffMultiplier = 1.;</span>
+<span class="fc" id="L100">  private double reconnectBackoffMultiplier = 1.;</span>
 
   /**
    * Whether pending operations should be replayed after a reconnect. Default is true.
    */
-<span class="fc" id="L96">  private boolean autoReplay = true;</span>
+<span class="fc" id="L105">  private boolean autoReplay = true;</span>
 
   /**
    * Connect to LDAP using startTLS.
    */
-<span class="fc" id="L101">  private boolean useStartTls;</span>
+<span class="fc" id="L110">  private boolean useStartTls;</span>
 
   /**
    * Name of the trust certificates to use for the SSL connection.
    */
-<span class="fc" id="L106">  private String trustCertificates;</span>
+<span class="fc" id="L115">  private String trustCertificates;</span>
 
   /**
    * Name of the authentication certificate to use for the SSL connection.
    */
-<span class="fc" id="L111">  private String authenticationCertificate;</span>
+<span class="fc" id="L120">  private String authenticationCertificate;</span>
 
   /**
    * Name of the key to use for the SSL connection.
    */
-<span class="fc" id="L116">  private String authenticationKey;</span>
+<span class="fc" id="L125">  private String authenticationKey;</span>
 
   /**
    * DN to bind as before performing operations.
    */
-<span class="fc" id="L121">  private String bindDn;</span>
+<span class="fc" id="L130">  private String bindDn;</span>
 
   /**
    * Credential for the bind DN.
    */
-<span class="fc" id="L126">  private String bindCredentials;</span>
+<span class="fc" id="L135">  private String bindCredentials;</span>
 
   /**
    * Specifies whether the connection should be pooled or not. Default is {@code false}.
    */
-<span class="fc" id="L131">  private boolean pooled = false;</span>
+<span class="fc" id="L140">  private boolean pooled = false;</span>
 
   /**
    * Duration to wait for an available connection.
    */
-<span class="fc" id="L136">  @NotNull</span>
-<span class="fc" id="L137">  private Duration blockWaitTime = Duration.ofMinutes(1);</span>
+<span class="fc" id="L145">  @NotNull</span>
+<span class="fc" id="L146">  private Duration blockWaitTime = Duration.ofMinutes(1);</span>
 
   /**
    * Minimum pool size.
    */
-<span class="fc" id="L142">  private int minPoolSize = 3;</span>
+<span class="fc" id="L151">  private int minPoolSize = 3;</span>
 
   /**
    * Maximum pool size.
    */
-<span class="fc" id="L147">  private int maxPoolSize = 10;</span>
+<span class="fc" id="L156">  private int maxPoolSize = 10;</span>
 
   /**
    * Whether to connect to the ldap on connection creation.
    */
-<span class="fc" id="L152">  private boolean connectOnCreate = true;</span>
+<span class="fc" id="L161">  private boolean connectOnCreate = true;</span>
 
   /**
    * Whether initialize should throw if pooling configuration requirements are not met.
    */
-<span class="fc" id="L157">  private boolean failFastInitialize = true;</span>
+<span class="fc" id="L166">  private boolean failFastInitialize = true;</span>
 
   /**
    * Whether the ldap object should be validated when returned to the pool.
    */
-<span class="fc" id="L162">  private boolean validateOnCheckIn = false;</span>
+<span class="fc" id="L171">  private boolean validateOnCheckIn = false;</span>
 
   /**
    * Whether the ldap object should be validated when given from the pool.
    */
-<span class="fc" id="L167">  private boolean validateOnCheckOut = false;</span>
+<span class="fc" id="L176">  private boolean validateOnCheckOut = false;</span>
 
   /**
    * Whether the pool should be validated periodically.
    */
-<span class="fc" id="L172">  private boolean validatePeriodically = false;</span>
+<span class="fc" id="L181">  private boolean validatePeriodically = false;</span>
 
   /**
    * Validation period.
    */
-<span class="fc" id="L177">  @NotNull</span>
-<span class="fc" id="L178">  private Duration validatePeriod = Duration.ofMinutes(30);</span>
+<span class="fc" id="L186">  @NotNull</span>
+<span class="fc" id="L187">  private Duration validatePeriod = Duration.ofMinutes(30);</span>
 
   /**
    * Maximum length of time a connection validation should block.
    */
-<span class="fc" id="L183">  @NotNull</span>
-<span class="fc" id="L184">  private Duration validateTimeout = Duration.ofSeconds(5);</span>
+<span class="fc" id="L192">  @NotNull</span>
+<span class="fc" id="L193">  private Duration validateTimeout = Duration.ofSeconds(5);</span>
 
-<span class="fc" id="L186">  @NotNull</span>
-<span class="fc" id="L187">  private SearchValidatorProperties searchValidator = new SearchValidatorProperties();</span>
+<span class="fc" id="L195">  @NotNull</span>
+<span class="fc" id="L196">  private SearchValidatorProperties searchValidator = new SearchValidatorProperties();</span>
 
   /**
    * Prune period.
    */
-<span class="fc" id="L192">  @NotNull</span>
-<span class="fc" id="L193">  private Duration prunePeriod = Duration.ofMinutes(5);</span>
+<span class="fc" id="L201">  @NotNull</span>
+<span class="fc" id="L202">  private Duration prunePeriod = Duration.ofMinutes(5);</span>
 
   /**
    * Idle time.
    */
-<span class="fc" id="L198">  @NotNull</span>
-<span class="fc" id="L199">  private Duration idleTime = Duration.ofMinutes(10);</span>
+<span class="fc" id="L207">  @NotNull</span>
+<span class="fc" id="L208">  private Duration idleTime = Duration.ofMinutes(10);</span>
+
+<span class="fc" id="L210">  @NotNull</span>
+<span class="fc" id="L211">  private UserDetailsProperties userDetails = new UserDetailsProperties();</span>
 
   /**
    * Create search connection validator search connection validator.
@@ -205,46 +217,46 @@ public class LdaptiveProperties {
    */
   @NotNull
   public SearchConnectionValidator createSearchConnectionValidator() {
-<span class="nc" id="L208">    return new SearchConnectionValidator(</span>
+<span class="nc" id="L220">    return new SearchConnectionValidator(</span>
         validatePeriod,
         validateTimeout,
-<span class="nc" id="L211">        searchValidator.getSearchRequest().createSearchRequest());</span>
+<span class="nc" id="L223">        searchValidator.getSearchRequest().createSearchRequest());</span>
   }
 
   /**
    * The search validator properties.
    */
   @Getter
-<span class="fc" id="L218">  @Setter</span>
-<span class="fc" id="L219">  @ToString</span>
-<span class="pc bpc" id="L220" title="9 of 14 branches missed.">  @EqualsAndHashCode</span>
-<span class="fc" id="L221">  @NoArgsConstructor</span>
+<span class="fc" id="L230">  @Setter</span>
+<span class="fc" id="L231">  @ToString</span>
+<span class="pc bpc" id="L232" title="9 of 14 branches missed.">  @EqualsAndHashCode</span>
+<span class="fc" id="L233">  @NoArgsConstructor</span>
   public static class SearchValidatorProperties {
 
-<span class="fc" id="L224">    @NotNull</span>
-<span class="fc" id="L225">    private SearchRequestProperties searchRequest = new SearchRequestProperties();</span>
+<span class="fc" id="L236">    @NotNull</span>
+<span class="fc" id="L237">    private SearchRequestProperties searchRequest = new SearchRequestProperties();</span>
 
     /**
      * The search request properties.
      */
     @Getter
-<span class="pc" id="L231">    @Setter</span>
-<span class="fc" id="L232">    @ToString</span>
-<span class="pc bpc" id="L233" title="33 of 46 branches missed.">    @EqualsAndHashCode</span>
-<span class="fc" id="L234">    @NoArgsConstructor</span>
+<span class="pc" id="L243">    @Setter</span>
+<span class="fc" id="L244">    @ToString</span>
+<span class="pc bpc" id="L245" title="33 of 46 branches missed.">    @EqualsAndHashCode</span>
+<span class="fc" id="L246">    @NoArgsConstructor</span>
     public static class SearchRequestProperties {
 
-<span class="fc" id="L237">      private String baseDn;</span>
+<span class="fc" id="L249">      private String baseDn;</span>
 
-<span class="fc" id="L239">      @NotNull</span>
-<span class="fc" id="L240">      private SearchFilterProperties searchFilter = new SearchFilterProperties();</span>
+<span class="fc" id="L251">      @NotNull</span>
+<span class="fc" id="L252">      private SearchFilterProperties searchFilter = new SearchFilterProperties();</span>
 
-<span class="fc" id="L242">      private Integer sizeLimit;</span>
+<span class="fc" id="L254">      private Integer sizeLimit;</span>
 
-<span class="fc" id="L244">      private SearchScope searchScope; // = SearchScope.ONELEVEL;</span>
+<span class="fc" id="L256">      private SearchScope searchScope; // = SearchScope.ONELEVEL;</span>
 
-<span class="fc" id="L246">      @NotNull</span>
-<span class="fc" id="L247">      private List&lt;String&gt; returnAttributes = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L258">      @NotNull</span>
+<span class="fc" id="L259">      private List&lt;String&gt; returnAttributes = new ArrayList&lt;&gt;();</span>
 
       /**
        * Gets the return attributes as array.
@@ -253,10 +265,10 @@ public class LdaptiveProperties {
        */
       @NotNull
       public String[] returnAttributesAsArray() {
-<span class="nc bnc" id="L256" title="All 2 branches missed.">        if (returnAttributes.isEmpty()) {</span>
-<span class="nc" id="L257">          return ReturnAttributes.NONE.value();</span>
+<span class="nc bnc" id="L268" title="All 2 branches missed.">        if (returnAttributes.isEmpty()) {</span>
+<span class="nc" id="L269">          return ReturnAttributes.NONE.value();</span>
         }
-<span class="nc" id="L259">        return returnAttributes.toArray(new String[0]);</span>
+<span class="nc" id="L271">        return returnAttributes.toArray(new String[0]);</span>
       }
 
       /**
@@ -266,36 +278,71 @@ public class LdaptiveProperties {
        */
       @NotNull
       public SearchRequest createSearchRequest() {
-<span class="nc" id="L269">        SearchRequest searchRequest = new SearchRequest();</span>
-<span class="nc bnc" id="L270" title="All 2 branches missed.">        searchRequest.setBaseDn(StringUtils.hasText(getBaseDn()) ? getBaseDn() : &quot;&quot;);</span>
-<span class="nc bnc" id="L271" title="All 2 branches missed.">        if (StringUtils.hasText(getSearchFilter().getFilter())) {</span>
-<span class="nc" id="L272">          searchRequest.setFilter(getSearchFilter().getFilter());</span>
+<span class="nc" id="L281">        SearchRequest searchRequest = new SearchRequest();</span>
+<span class="nc bnc" id="L282" title="All 2 branches missed.">        searchRequest.setBaseDn(StringUtils.hasText(getBaseDn()) ? getBaseDn() : &quot;&quot;);</span>
+<span class="nc bnc" id="L283" title="All 2 branches missed.">        if (StringUtils.hasText(getSearchFilter().getFilter())) {</span>
+<span class="nc" id="L284">          searchRequest.setFilter(getSearchFilter().getFilter());</span>
         }
-<span class="nc" id="L274">        searchRequest.setReturnAttributes(returnAttributesAsArray());</span>
-<span class="nc bnc" id="L275" title="All 2 branches missed.">        if (getSearchScope() != null) {</span>
-<span class="nc" id="L276">          searchRequest.setSearchScope(getSearchScope());</span>
+<span class="nc" id="L286">        searchRequest.setReturnAttributes(returnAttributesAsArray());</span>
+<span class="nc bnc" id="L287" title="All 2 branches missed.">        if (getSearchScope() != null) {</span>
+<span class="nc" id="L288">          searchRequest.setSearchScope(getSearchScope());</span>
         }
-<span class="nc bnc" id="L278" title="All 2 branches missed.">        if (getSizeLimit() != null) {</span>
-<span class="nc" id="L279">          searchRequest.setSizeLimit(getSizeLimit());</span>
+<span class="nc bnc" id="L290" title="All 2 branches missed.">        if (getSizeLimit() != null) {</span>
+<span class="nc" id="L291">          searchRequest.setSizeLimit(getSizeLimit());</span>
         }
-<span class="nc" id="L281">        return searchRequest;</span>
+<span class="nc" id="L293">        return searchRequest;</span>
       }
 
       /**
        * The search filter properties.
        */
       @Getter
-<span class="nc" id="L288">      @Setter</span>
-<span class="fc" id="L289">      @ToString</span>
-<span class="pc bpc" id="L290" title="9 of 14 branches missed.">      @EqualsAndHashCode</span>
-<span class="fc" id="L291">      @NoArgsConstructor</span>
+<span class="nc" id="L300">      @Setter</span>
+<span class="fc" id="L301">      @ToString</span>
+<span class="pc bpc" id="L302" title="9 of 14 branches missed.">      @EqualsAndHashCode</span>
+<span class="fc" id="L303">      @NoArgsConstructor</span>
       public static class SearchFilterProperties {
 
-<span class="fc" id="L294">        private String filter;</span>
+<span class="fc" id="L306">        private String filter;</span>
 
       }
     }
   }
 
+  /**
+   * The user details properties.
+   */
+  @Getter
+<span class="pc" id="L316">  @Setter</span>
+<span class="fc" id="L317">  @ToString</span>
+<span class="pc bpc" id="L318" title="72 of 98 branches missed.">  @EqualsAndHashCode</span>
+<span class="fc" id="L319">  @NoArgsConstructor</span>
+  public static class UserDetailsProperties {
+
+<span class="fc" id="L322">    private String userBaseDn;</span>
+
+<span class="fc" id="L324">    private String userFindOneFilter = &quot;(&amp;(objectClass=group)(sAMAccountName={0}))&quot;;</span>
+
+<span class="fc" id="L326">    private SearchScope userFindOneSearchScope = SearchScope.ONELEVEL;</span>
+
+<span class="fc" id="L328">    private String userAccountControlAttributeName = UserAccountControlValueTranscoder.ATTRIBUTE_NAME;</span>
+
+<span class="fc" id="L330">    private String authorityAttributeName = &quot;memberOf&quot;;</span>
+
+<span class="fc" id="L332">    private boolean authorityDn = true;</span>
+
+<span class="fc" id="L334">    private List&lt;String&gt; authorities = new LinkedList&lt;&gt;();</span>
+
+<span class="fc" id="L336">    private Map&lt;String, String&gt; authorityMap = new LinkedHashMap&lt;&gt;();</span>
+
+<span class="fc" id="L338">    private String authorityPrefix = &quot;ROLE_&quot;;</span>
+
+<span class="fc" id="L340">    private String userPasswordAttributeName = &quot;userPassword&quot;;</span>
+
+<span class="fc" id="L342">    private String userPasswordLabel = &quot;SHA&quot;;</span>
+
+<span class="fc" id="L344">    private String userPasswordAlgorithm = &quot;SHA&quot;;</span>
+
+  }
 }
-</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.6.202009150832</span></div></body></html>

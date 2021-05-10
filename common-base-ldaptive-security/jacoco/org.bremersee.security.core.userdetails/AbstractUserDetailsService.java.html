@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AbstractUserDetailsService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">common-base-ldaptive-security</a> &gt; <a href="index.source.html" class="el_package">org.bremersee.security.core.userdetails</a> &gt; <span class="el_source">AbstractUserDetailsService.java</span></div><h1>AbstractUserDetailsService.java</h1><pre class="source lang-java linenums">/*
+ * Copyright 2021 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package org.bremersee.security.core.userdetails;
+
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.ToString;
+import org.bremersee.data.ldaptive.LdaptiveEntryMapper;
+import org.ldaptive.SearchScope;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.util.StringUtils;
+
+/**
+ * The abstract user details service.
+ *
+ * @author Christian Bremer
+ */
+<span class="fc" id="L36">@ToString</span>
+public abstract class AbstractUserDetailsService {
+
+<span class="fc" id="L39">  @Getter(value = AccessLevel.PROTECTED)</span>
+  private final String userBaseDn;
+
+<span class="fc" id="L42">  @Getter(value = AccessLevel.PROTECTED)</span>
+  private final String userFindOneFilter;
+
+<span class="fc" id="L45">  @Getter(value = AccessLevel.PROTECTED)</span>
+  private final SearchScope userFindOneSearchScope;
+
+<span class="fc" id="L48">  @Getter(value = AccessLevel.PROTECTED)</span>
+  private final String userAccountControlAttributeName;
+
+<span class="fc" id="L51">  @Getter(value = AccessLevel.PROTECTED)</span>
+  private final List&lt;String&gt; authorities;
+
+<span class="fc" id="L54">  @Getter(value = AccessLevel.PROTECTED)</span>
+  private final String authorityAttributeName;
+
+<span class="fc" id="L57">  @Getter(value = AccessLevel.PROTECTED)</span>
+  private final boolean authorityDn;
+
+<span class="fc" id="L60">  @Getter(value = AccessLevel.PROTECTED)</span>
+  private final Map&lt;String, String&gt; authorityMap;
+
+<span class="fc" id="L63">  @Getter(value = AccessLevel.PROTECTED)</span>
+  private final String authorityPrefix;
+
+  /**
+   * Instantiates a new abstract user details service.
+   *
+   * @param userBaseDn the user base dn
+   * @param userFindOneFilter the user find one filter
+   * @param userFindOneSearchScope the user find one search scope
+   * @param userAccountControlAttributeName the user account control attribute name
+   * @param authorities the authorities
+   * @param authorityAttributeName the authority attribute name
+   * @param authorityDn the authority dn
+   * @param authorityMap the authority map
+   * @param authorityPrefix the authority prefix
+   */
+  public AbstractUserDetailsService(
+      String userBaseDn,
+      String userFindOneFilter,
+      SearchScope userFindOneSearchScope,
+      String userAccountControlAttributeName,
+      List&lt;String&gt; authorities,
+      String authorityAttributeName,
+      boolean authorityDn,
+      Map&lt;String, String&gt; authorityMap,
+<span class="fc" id="L88">      String authorityPrefix) {</span>
+
+<span class="fc" id="L90">    this.userBaseDn = userBaseDn;</span>
+<span class="fc" id="L91">    this.userFindOneFilter = userFindOneFilter;</span>
+<span class="pc bpc" id="L92" title="1 of 2 branches missed.">    this.userFindOneSearchScope = userFindOneSearchScope != null ? userFindOneSearchScope : SearchScope.ONELEVEL;</span>
+<span class="fc" id="L93">    this.userAccountControlAttributeName = userAccountControlAttributeName;</span>
+<span class="fc" id="L94">    this.authorities = authorities;</span>
+<span class="fc" id="L95">    this.authorityAttributeName = authorityAttributeName;</span>
+<span class="fc" id="L96">    this.authorityDn = authorityDn;</span>
+<span class="fc" id="L97">    this.authorityMap = authorityMap;</span>
+<span class="fc" id="L98">    this.authorityPrefix = authorityPrefix;</span>
+<span class="fc" id="L99">  }</span>
+
+  /**
+   * Return attributes.
+   *
+   * @return the attributes
+   */
+  protected Set&lt;String&gt; returnAttributes() {
+<span class="fc" id="L107">    Set&lt;String&gt; attributes = new HashSet&lt;&gt;();</span>
+<span class="fc bfc" id="L108" title="All 2 branches covered.">    if (StringUtils.hasText(userAccountControlAttributeName)) {</span>
+<span class="fc" id="L109">      attributes.add(userAccountControlAttributeName);</span>
+    }
+<span class="pc bpc" id="L111" title="1 of 2 branches missed.">    if (StringUtils.hasText(authorityAttributeName)) {</span>
+<span class="fc" id="L112">      attributes.add(authorityAttributeName);</span>
+    }
+<span class="fc" id="L114">    return attributes;</span>
+  }
+
+  /**
+   * Gets user details mapper.
+   *
+   * @param userName the user name
+   * @return the user details mapper
+   */
+  protected LdaptiveEntryMapper&lt;UserDetails&gt; getUserDetailsLdapMapper(String userName) {
+<span class="fc" id="L124">    return new UserDetailsLdapMapper(</span>
+        userName,
+        userAccountControlAttributeName,
+        authorities,
+        authorityAttributeName,
+        authorityDn,
+        authorityMap,
+        authorityPrefix);
+  }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.6.202009150832</span></div></body></html>
