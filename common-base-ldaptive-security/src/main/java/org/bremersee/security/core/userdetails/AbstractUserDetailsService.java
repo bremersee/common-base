@@ -64,7 +64,7 @@ public abstract class AbstractUserDetailsService {
   private final String authorityPrefix;
 
   /**
-   * Instantiates a new Abstract user details service.
+   * Instantiates a new abstract user details service.
    *
    * @param userBaseDn the user base dn
    * @param userFindOneFilter the user find one filter

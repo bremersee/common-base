@@ -47,8 +47,6 @@ import org.springframework.web.reactive.function.client.WebClient;
     WebClientAccessTokenRetriever.class
 })
 @Configuration
-// See JwtSupportAutoConfiguration
-// @AutoConfigureAfter(ReactiveOAuth2ResourceServerAutoConfiguration.class)
 @EnableConfigurationProperties({AuthProperties.class, MessageSourceProperties.class})
 @Slf4j
 public class ReactiveJwtSupportAutoConfiguration {

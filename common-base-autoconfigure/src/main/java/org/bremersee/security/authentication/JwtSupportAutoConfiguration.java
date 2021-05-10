@@ -48,8 +48,6 @@ import org.springframework.util.ClassUtils;
     RestTemplateAccessTokenRetriever.class
 })
 @Configuration
-// breaks tests in org.bremersee.security.authentication.resourceserver.servlet
-//@AutoConfigureAfter(OAuth2ResourceServerAutoConfiguration.class)
 @EnableConfigurationProperties({AuthProperties.class, MessageSourceProperties.class})
 @Slf4j
 public class JwtSupportAutoConfiguration {

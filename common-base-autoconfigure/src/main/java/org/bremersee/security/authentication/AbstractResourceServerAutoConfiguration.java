@@ -193,12 +193,9 @@ public abstract class AbstractResourceServerAutoConfiguration extends WebSecurit
     log.info("Configure authentication provider with basic auth and user details service.");
     String realm = environment.getProperty("spring.application.name", "Restricted area");
     return http
-        // .userDetailsService(userDetailsService())
         .formLogin().disable()
         .httpBasic().realmName(realm)
-        .and()
-        // .sessionManagement((sm) -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-        ;
+        .and();
   }
 
 }
