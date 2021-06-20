@@ -4,10 +4,10 @@ pipeline {
   }
   environment {
     CODECOV_TOKEN = credentials('common-base-codecov-token')
-    DEPLOY = false
-    SNAPSHOT_SITE = false
-    RELEASE_SITE = false
-    DEPLOY_FEATURE = false
+    DEPLOY = true
+    SNAPSHOT_SITE = true
+    RELEASE_SITE = true
+    DEPLOY_FEATURE = true
   }
   tools {
     jdk 'jdk11'
@@ -30,7 +30,7 @@ pipeline {
         }
       }
       steps {
-        sh 'mvn -B -P buildSystem clean test'
+        sh 'mvn -B -P build-system clean test'
       }
       post {
         always {
@@ -52,7 +52,7 @@ pipeline {
         }
       }
       steps {
-        sh 'mvn -B -P deploy clean deploy'
+        sh 'mvn -B -P build-system,deploy clean deploy'
       }
     }
     stage('Snapshot Site') {
@@ -63,7 +63,7 @@ pipeline {
         }
       }
       steps {
-        sh 'mvn -B clean site-deploy'
+        sh 'mvn -B -P build-system clean site-deploy'
       }
       post {
         always {
@@ -79,7 +79,7 @@ pipeline {
         }
       }
       steps {
-        sh 'mvn -B -P gh-pages-site clean site site:stage scm-publish:publish-scm'
+        sh 'mvn -B -P build-system,gh-pages-site clean site site:stage scm-publish:publish-scm'
       }
       post {
         always {
@@ -95,7 +95,7 @@ pipeline {
         }
       }
       steps {
-        sh 'mvn -B -P feature,allow-features clean deploy'
+        sh 'mvn -B -P build-system,feature,allow-features clean deploy'
       }
       post {
         always {

@@ -53,12 +53,4 @@ class TestEnvironmentUtilsTest {
     }
   }
 
-  /**
-   * Is executor specified.
-   */
-  @Test
-  void isExecutorSpecified() {
-    boolean expected = System.getProperty(TestEnvironmentUtils.EXECUTOR_SYSTEM_PROPERTY) != null;
-    assertEquals(expected, TestEnvironmentUtils.isExecutorSpecified());
-  }
 }

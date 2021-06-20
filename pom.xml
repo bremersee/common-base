@@ -93,7 +93,7 @@
 
   <profiles>
     <profile>
-      <id>buildSystem</id>
+      <id>build-system</id>
       <activation>
         <activeByDefault>false</activeByDefault>
       </activation>

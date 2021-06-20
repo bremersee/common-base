@@ -17,6 +17,8 @@
 package org.bremersee.data.minio;
 
 import static org.awaitility.Awaitility.await;
+import static org.bremersee.test.TestEnvironmentUtils.EXECUTOR_BUILD_SYSTEM;
+import static org.bremersee.test.TestEnvironmentUtils.getExecutor;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -141,7 +143,6 @@ import okhttp3.HttpUrl;
 import okhttp3.Protocol;
 import okhttp3.Request;
 import okhttp3.Response;
-import org.bremersee.test.TestEnvironmentUtils;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -219,9 +220,13 @@ public class MinioTemplateTest {
 //      embeddedMinio.makeBucket(MakeBucketArgs.builder().bucket(DEFAULT_BUCKET).build());
 //    }
 
-    if (TestEnvironmentUtils.EXECUTOR_BUILD_SYSTEM.equals(TestEnvironmentUtils.getExecutor())) {
+    String testExecutor = getExecutor();
+    log.info("JUnit test executor is {}", testExecutor);
+    if (EXECUTOR_BUILD_SYSTEM.equals(testExecutor)) {
+      log.info("Test executor is build system, so mocked minio client will be used.");
       playMinioEnabled = false;
     } else {
+      log.info("Test executor is unknown, trying to use play minio client ...");
       try {
         MinioClient playMinioClient = MinioClient.builder()
             .endpoint(HttpUrl.get("https://play.min.io"))
@@ -233,10 +238,11 @@ public class MinioTemplateTest {
         }
         playMinio.makeBucket(MakeBucketArgs.builder().bucket(DEFAULT_BUCKET).build());
         playMinioEnabled = true;
+        log.info("Using play minio client.");
 
       } catch (Exception e) {
         playMinioEnabled = false;
-        log.error("===> play.min.io is not available", e);
+        log.warn("Using play minio client is not possible. Using mocked minio client.", e);
       }
     }
   }

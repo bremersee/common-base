@@ -47,13 +47,4 @@ public class TestEnvironmentUtils {
     return System.getProperty(EXECUTOR_SYSTEM_PROPERTY, EXECUTOR_NOT_SPECIFIED);
   }
 
-  /**
-   * Checks whether an executor is specified or not.
-   *
-   * @return the boolean
-   */
-  public static boolean isExecutorSpecified() {
-    return !EXECUTOR_NOT_SPECIFIED.equals(getExecutor());
-  }
-
 }
