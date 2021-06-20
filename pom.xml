@@ -50,6 +50,8 @@
     <github.repo>common-base</github.repo>
     <!--suppress UnresolvedMavenProperty -->
     <gh-pages-staging-dir>${maven.multiModuleProjectDirectory}/target/staging</gh-pages-staging-dir>
+    <surefireArgLine>-Dorg.bremersee.test.executor=NOT_SPECIFIED</surefireArgLine>
+
     <common-model.version>2.2.1</common-model.version>
   </properties>
 
@@ -86,5 +88,32 @@
       </dependency>
     </dependencies>
   </dependencyManagement>
+
+  <build>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-surefire-plugin</artifactId>
+          <version>${maven-surefire-plugin.version}</version>
+          <configuration>
+            <argLine>${surefireArgLine}</argLine>
+          </configuration>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+  </build>
+
+  <profiles>
+    <profile>
+      <id>buildSystem</id>
+      <activation>
+        <activeByDefault>false</activeByDefault>
+      </activation>
+      <properties>
+        <surefireArgLine>-Dorg.bremersee.test.executor=BUILD_SYSTEM</surefireArgLine>
+      </properties>
+    </profile>
+  </profiles>
 
 </project>

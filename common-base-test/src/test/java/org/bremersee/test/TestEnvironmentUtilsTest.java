@@ -36,6 +36,7 @@ class TestEnvironmentUtilsTest {
   @Test
   void getExecutor() {
     String rawValue = System.getProperty(TestEnvironmentUtils.EXECUTOR_SYSTEM_PROPERTY);
+    log.info("System property {} = {}", TestEnvironmentUtils.EXECUTOR_SYSTEM_PROPERTY, rawValue);
     if (rawValue == null) {
       assertEquals(TestEnvironmentUtils.EXECUTOR_NOT_SPECIFIED, TestEnvironmentUtils.getExecutor());
     } else if (!TestEnvironmentUtils.EXECUTOR_BUILD_SYSTEM.equals(rawValue)) {
