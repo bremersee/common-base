@@ -141,6 +141,7 @@ import okhttp3.HttpUrl;
 import okhttp3.Protocol;
 import okhttp3.Request;
 import okhttp3.Response;
+import org.bremersee.test.TestEnvironmentUtils;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -218,23 +219,26 @@ public class MinioTemplateTest {
 //      embeddedMinio.makeBucket(MakeBucketArgs.builder().bucket(DEFAULT_BUCKET).build());
 //    }
 
-    try {
-      MinioClient playMinioClient = MinioClient.builder()
-          .endpoint(HttpUrl.get("https://play.min.io"))
-          .credentials("Q3AM3UQ867SPQQA43P2F", "zuf+tfteSlswRu7BJ86wekitnifILbZam1KYY3TG")
-          .build();
-      playMinio = new MinioTemplate(playMinioClient);
-      if (playMinio.bucketExists(BucketExistsArgs.builder().bucket(DEFAULT_BUCKET).build())) {
-        playMinio.removeBucket(RemoveBucketArgs.builder().bucket(DEFAULT_BUCKET).build());
-      }
-      playMinio.makeBucket(MakeBucketArgs.builder().bucket(DEFAULT_BUCKET).build());
-      playMinioEnabled = true;
-
-    } catch (Exception e) {
+    if (TestEnvironmentUtils.EXECUTOR_BUILD_SYSTEM.equals(TestEnvironmentUtils.getExecutor())) {
       playMinioEnabled = false;
-      log.error("===> play.min.io is not available", e);
+    } else {
+      try {
+        MinioClient playMinioClient = MinioClient.builder()
+            .endpoint(HttpUrl.get("https://play.min.io"))
+            .credentials("Q3AM3UQ867SPQQA43P2F", "zuf+tfteSlswRu7BJ86wekitnifILbZam1KYY3TG")
+            .build();
+        playMinio = new MinioTemplate(playMinioClient);
+        if (playMinio.bucketExists(BucketExistsArgs.builder().bucket(DEFAULT_BUCKET).build())) {
+          playMinio.removeBucket(RemoveBucketArgs.builder().bucket(DEFAULT_BUCKET).build());
+        }
+        playMinio.makeBucket(MakeBucketArgs.builder().bucket(DEFAULT_BUCKET).build());
+        playMinioEnabled = true;
+
+      } catch (Exception e) {
+        playMinioEnabled = false;
+        log.error("===> play.min.io is not available", e);
+      }
     }
-    playMinioEnabled = false;
   }
 
   /**
@@ -687,7 +691,7 @@ public class MinioTemplateTest {
   @Test
   void putAndRemoveObject() throws Exception {
 
-    String objectName = UUID.randomUUID().toString() + ".txt";
+    String objectName = UUID.randomUUID() + ".txt";
 
     MinioTemplate minio = minioTemplate("putAndRemoveObject", mock -> {
       when(mock.putObject(any(PutObjectArgs.class)))
@@ -752,7 +756,7 @@ public class MinioTemplateTest {
   @Test
   void uploadObject() throws Exception {
 
-    String objectName = UUID.randomUUID().toString() + ".txt";
+    String objectName = UUID.randomUUID() + ".txt";
     MinioTemplate minio = minioTemplate("uploadObject", mock -> {
       when(mock.uploadObject(any(UploadObjectArgs.class)))
           .thenReturn(new ObjectWriteResponse(
@@ -817,7 +821,7 @@ public class MinioTemplateTest {
   @Test
   void downloadObject() throws Exception {
 
-    String objectName = UUID.randomUUID().toString() + ".txt";
+    String objectName = UUID.randomUUID() + ".txt";
     MinioTemplate minio = minioTemplate("downloadObject", mock -> {
       when(mock.putObject(any(PutObjectArgs.class)))
           .thenReturn(new ObjectWriteResponse(
@@ -881,7 +885,7 @@ public class MinioTemplateTest {
   @Test
   void presignedObjectUrl() throws Exception {
 
-    String objectName = UUID.randomUUID().toString() + ".txt";
+    String objectName = UUID.randomUUID() + ".txt";
     MinioTemplate minio = minioTemplate("presignedObjectUrl", mock -> {
       when(mock.putObject(any(PutObjectArgs.class)))
           .thenReturn(new ObjectWriteResponse(
@@ -934,7 +938,7 @@ public class MinioTemplateTest {
   @Test
   void presignedPostFormData() {
 
-    String objectName = UUID.randomUUID().toString() + ".txt";
+    String objectName = UUID.randomUUID() + ".txt";
     MinioTemplate minio = minioTemplate("presignedPostFormData", mock ->
         when(mock.getPresignedPostFormData(any(PostPolicy.class)))
             .thenReturn(Map.of("key", "value"))
@@ -956,7 +960,7 @@ public class MinioTemplateTest {
   @Order(1060)
   @Test
   void statObject() {
-    String objectName = UUID.randomUUID().toString() + ".txt";
+    String objectName = UUID.randomUUID() + ".txt";
     byte[] value = "Hello Minio".getBytes(StandardCharsets.UTF_8);
     MinioTemplate minio = minioTemplate("statObject", mock -> {
       when(mock.putObject(any(PutObjectArgs.class)))
@@ -1008,7 +1012,7 @@ public class MinioTemplateTest {
   @Order(1070)
   @Test
   void objectExists() {
-    String objectName = UUID.randomUUID().toString() + ".txt";
+    String objectName = UUID.randomUUID() + ".txt";
     byte[] value = "Hello Minio".getBytes(StandardCharsets.UTF_8);
     MinioTemplate minio = minioTemplate("objectExists", mock -> {
       when(mock.putObject(any(PutObjectArgs.class)))
@@ -1058,7 +1062,7 @@ public class MinioTemplateTest {
   @Order(1080)
   @Test
   void objectNotExists() {
-    String objectName = UUID.randomUUID().toString() + ".nil";
+    String objectName = UUID.randomUUID() + ".nil";
     MinioTemplate minio = minioTemplate("objectNotExists", mock ->
         when(mock.statObject(any(StatObjectArgs.class)))
             .thenThrow(new ErrorResponseException(
@@ -1087,7 +1091,7 @@ public class MinioTemplateTest {
   @Order(1090)
   @Test
   void getObject() throws Exception {
-    String objectName = UUID.randomUUID().toString() + ".txt";
+    String objectName = UUID.randomUUID() + ".txt";
     byte[] value = "Hello Minio".getBytes(StandardCharsets.UTF_8);
     MinioTemplate minio = minioTemplate("getObject", mock -> {
       when(mock.putObject(any(PutObjectArgs.class)))
@@ -1161,7 +1165,7 @@ public class MinioTemplateTest {
   void composeObject() throws Exception {
 
     String destBucket = newBucketName();
-    String destObjectName = UUID.randomUUID().toString() + ".txt";
+    String destObjectName = UUID.randomUUID() + ".txt";
 
     MinioTemplate minio = minioTemplate("composeObject", mock -> {
       when(mock.putObject(any(PutObjectArgs.class)))
@@ -1188,7 +1192,7 @@ public class MinioTemplateTest {
 
     Random random = new Random();
     final int size = 5242882;
-    String objectName0 = UUID.randomUUID().toString() + ".dat";
+    String objectName0 = UUID.randomUUID() + ".dat";
     byte[] value0 = new byte[size];
     random.nextBytes(value0);
     ObjectWriteResponse response = minio.putObject(PutObjectArgs.builder()
@@ -1199,7 +1203,7 @@ public class MinioTemplateTest {
         .build());
     assertNotNull(response);
 
-    String objectName1 = UUID.randomUUID().toString() + ".dat";
+    String objectName1 = UUID.randomUUID() + ".dat";
     byte[] value1 = new byte[size];
     random.nextBytes(value1);
     response = minio.putObject(PutObjectArgs.builder()
@@ -1269,9 +1273,9 @@ public class MinioTemplateTest {
   @Test
   void copyObject() {
 
-    String objectName = UUID.randomUUID().toString() + ".txt";
+    String objectName = UUID.randomUUID() + ".txt";
     String destBucket = newBucketName();
-    String destObjectName = UUID.randomUUID().toString() + ".txt";
+    String destObjectName = UUID.randomUUID() + ".txt";
     byte[] value = "Hello Minio".getBytes(StandardCharsets.UTF_8);
 
     MinioTemplate minio = minioTemplate("copyObject", mock -> {
@@ -1375,7 +1379,7 @@ public class MinioTemplateTest {
   @Test
   void objectRetention() {
     String bucket = newBucketName();
-    String objectName = UUID.randomUUID().toString() + ".txt";
+    String objectName = UUID.randomUUID() + ".txt";
     ZonedDateTime until = ZonedDateTime.now().plus(10L, ChronoUnit.SECONDS);
 
     MinioTemplate minio = minioTemplate("objectRetention", mock -> {
@@ -1447,7 +1451,7 @@ public class MinioTemplateTest {
   void objectTags() {
 
     String bucket = newBucketName();
-    String objectName = UUID.randomUUID().toString() + ".txt";
+    String objectName = UUID.randomUUID() + ".txt";
 
     MinioTemplate minio = minioTemplate("objectTags", mock -> {
       when(mock.putObject(any(PutObjectArgs.class)))
@@ -1521,7 +1525,7 @@ public class MinioTemplateTest {
   @Test
   void objectLegalHold() {
     String bucket = newBucketName();
-    String objectName = UUID.randomUUID().toString() + ".txt";
+    String objectName = UUID.randomUUID() + ".txt";
 
     MinioTemplate minio = minioTemplate("objectLegalHold", mock -> {
       when(mock.putObject(any(PutObjectArgs.class)))

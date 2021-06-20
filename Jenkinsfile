@@ -30,7 +30,7 @@ pipeline {
         }
       }
       steps {
-        sh 'mvn -B clean test'
+        sh 'mvn -DargLine="-Dorg.bremersee.test.executor=BUILD_SYSTEM" -B clean test'
       }
       post {
         always {
@@ -52,7 +52,7 @@ pipeline {
         }
       }
       steps {
-        sh 'mvn -B -P deploy clean deploy'
+        sh 'mvn -DargLine="-Dorg.bremersee.test.executor=BUILD_SYSTEM" -B -P deploy clean deploy'
       }
     }
     stage('Snapshot Site') {
@@ -63,7 +63,7 @@ pipeline {
         }
       }
       steps {
-        sh 'mvn -B clean site-deploy'
+        sh 'mvn -DargLine="-Dorg.bremersee.test.executor=BUILD_SYSTEM" -B clean site-deploy'
       }
       post {
         always {
@@ -79,7 +79,7 @@ pipeline {
         }
       }
       steps {
-        sh 'mvn -B -P gh-pages-site clean site site:stage scm-publish:publish-scm'
+        sh 'mvn -DargLine="-Dorg.bremersee.test.executor=BUILD_SYSTEM" -B -P gh-pages-site clean site site:stage scm-publish:publish-scm'
       }
       post {
         always {
@@ -95,7 +95,7 @@ pipeline {
         }
       }
       steps {
-        sh 'mvn -B -P feature,allow-features clean deploy'
+        sh 'mvn -DargLine="-Dorg.bremersee.test.executor=BUILD_SYSTEM" -B -P feature,allow-features clean deploy'
       }
       post {
         always {
