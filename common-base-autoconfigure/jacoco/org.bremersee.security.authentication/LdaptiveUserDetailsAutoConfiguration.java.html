@@ -30,7 +30,6 @@ import org.ldaptive.ConnectionFactory;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.AutoConfigureBefore;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -65,7 +64,7 @@ import org.springframework.util.ClassUtils;
     name = {&quot;enabled&quot;, &quot;authentication-enabled&quot;},
     havingValue = &quot;true&quot;)
 @EnableConfigurationProperties(LdaptiveProperties.class)
-<span class="fc" id="L68">@Slf4j</span>
+<span class="fc" id="L67">@Slf4j</span>
 public class LdaptiveUserDetailsAutoConfiguration {
 
   private final UserDetailsProperties properties;
@@ -80,28 +79,28 @@ public class LdaptiveUserDetailsAutoConfiguration {
    */
   public LdaptiveUserDetailsAutoConfiguration(
       LdaptiveProperties properties,
-<span class="fc" id="L83">      ObjectProvider&lt;LdaptiveOperations&gt; ldaptiveOperationsProvider) {</span>
-<span class="fc" id="L84">    this.properties = properties.getUserDetails();</span>
-<span class="fc" id="L85">    this.ldaptiveOperations = ldaptiveOperationsProvider.getIfAvailable();</span>
-<span class="fc" id="L86">    Assert.notNull(this.ldaptiveOperations, &quot;Ldap operations must not be present.&quot;);</span>
-<span class="fc" id="L87">  }</span>
+<span class="fc" id="L82">      ObjectProvider&lt;LdaptiveOperations&gt; ldaptiveOperationsProvider) {</span>
+<span class="fc" id="L83">    this.properties = properties.getUserDetails();</span>
+<span class="fc" id="L84">    this.ldaptiveOperations = ldaptiveOperationsProvider.getIfAvailable();</span>
+<span class="fc" id="L85">    Assert.notNull(this.ldaptiveOperations, &quot;Ldap operations must not be present.&quot;);</span>
+<span class="fc" id="L86">  }</span>
 
   /**
    * Init.
    */
   @EventListener(ApplicationReadyEvent.class)
   public void init() {
-<span class="fc" id="L94">    log.info(&quot;\n&quot;</span>
+<span class="fc" id="L93">    log.info(&quot;\n&quot;</span>
             + &quot;*********************************************************************************\n&quot;
             + &quot;* {}\n&quot;
             + &quot;*********************************************************************************\n&quot;
             + &quot;* properties = {}\n&quot;
             + &quot;*********************************************************************************&quot;,
-<span class="fc" id="L100">        ClassUtils.getUserClass(getClass()).getSimpleName(),</span>
+<span class="fc" id="L99">        ClassUtils.getUserClass(getClass()).getSimpleName(),</span>
         properties);
-<span class="fc" id="L102">    Assert.hasText(properties.getUserBaseDn(), &quot;User base dn must be present.&quot;);</span>
-<span class="fc" id="L103">    Assert.hasText(properties.getUserFindOneFilter(), &quot;User find one filter must be present.&quot;);</span>
-<span class="fc" id="L104">  }</span>
+<span class="fc" id="L101">    Assert.hasText(properties.getUserBaseDn(), &quot;User base dn must be present.&quot;);</span>
+<span class="fc" id="L102">    Assert.hasText(properties.getUserFindOneFilter(), &quot;User find one filter must be present.&quot;);</span>
+<span class="fc" id="L103">  }</span>
 
   /**
    * Ldaptive user details service.
@@ -112,17 +111,17 @@ public class LdaptiveUserDetailsAutoConfiguration {
   @ConditionalOnMissingBean(value = {UserDetailsService.class})
   @Bean
   public LdaptiveUserDetailsService ldaptiveUserDetailsService() {
-<span class="fc" id="L115">    return new LdaptiveUserDetailsService(</span>
+<span class="fc" id="L114">    return new LdaptiveUserDetailsService(</span>
         ldaptiveOperations,
-<span class="fc" id="L117">        properties.getUserBaseDn(),</span>
-<span class="fc" id="L118">        properties.getUserFindOneFilter(),</span>
-<span class="fc" id="L119">        properties.getUserFindOneSearchScope(),</span>
-<span class="fc" id="L120">        properties.getUserAccountControlAttributeName(),</span>
-<span class="fc" id="L121">        properties.getAuthorities(),</span>
-<span class="fc" id="L122">        properties.getAuthorityAttributeName(),</span>
-<span class="fc" id="L123">        properties.isAuthorityDn(),</span>
-<span class="fc" id="L124">        properties.getAuthorityMap(),</span>
-<span class="fc" id="L125">        properties.getAuthorityPrefix());</span>
+<span class="fc" id="L116">        properties.getUserBaseDn(),</span>
+<span class="fc" id="L117">        properties.getUserFindOneFilter(),</span>
+<span class="fc" id="L118">        properties.getUserFindOneSearchScope(),</span>
+<span class="fc" id="L119">        properties.getUserAccountControlAttributeName(),</span>
+<span class="fc" id="L120">        properties.getAuthorities(),</span>
+<span class="fc" id="L121">        properties.getAuthorityAttributeName(),</span>
+<span class="fc" id="L122">        properties.isAuthorityDn(),</span>
+<span class="fc" id="L123">        properties.getAuthorityMap(),</span>
+<span class="fc" id="L124">        properties.getAuthorityPrefix());</span>
   }
 
   /**
@@ -136,19 +135,19 @@ public class LdaptiveUserDetailsAutoConfiguration {
   @Bean
   public ReactiveLdaptiveUserDetailsService reactiveLdaptiveUserDetailsService(
       ObjectProvider&lt;ReactiveLdaptiveOperations&gt; reactiveLdaptiveOperationsProvider) {
-<span class="fc" id="L139">    ReactiveLdaptiveOperations reactiveLdaptiveOperations = reactiveLdaptiveOperationsProvider.getIfAvailable();</span>
-<span class="fc" id="L140">    Assert.notNull(reactiveLdaptiveOperations, &quot;Reactive ldap operations must not be present.&quot;);</span>
-<span class="fc" id="L141">    return new ReactiveLdaptiveUserDetailsService(</span>
+<span class="fc" id="L138">    ReactiveLdaptiveOperations reactiveLdaptiveOperations = reactiveLdaptiveOperationsProvider.getIfAvailable();</span>
+<span class="fc" id="L139">    Assert.notNull(reactiveLdaptiveOperations, &quot;Reactive ldap operations must not be present.&quot;);</span>
+<span class="fc" id="L140">    return new ReactiveLdaptiveUserDetailsService(</span>
         reactiveLdaptiveOperations,
-<span class="fc" id="L143">        properties.getUserBaseDn(),</span>
-<span class="fc" id="L144">        properties.getUserFindOneFilter(),</span>
-<span class="fc" id="L145">        properties.getUserFindOneSearchScope(),</span>
-<span class="fc" id="L146">        properties.getUserAccountControlAttributeName(),</span>
-<span class="fc" id="L147">        properties.getAuthorities(),</span>
-<span class="fc" id="L148">        properties.getAuthorityAttributeName(),</span>
-<span class="fc" id="L149">        properties.isAuthorityDn(),</span>
-<span class="fc" id="L150">        properties.getAuthorityMap(),</span>
-<span class="fc" id="L151">        properties.getAuthorityPrefix());</span>
+<span class="fc" id="L142">        properties.getUserBaseDn(),</span>
+<span class="fc" id="L143">        properties.getUserFindOneFilter(),</span>
+<span class="fc" id="L144">        properties.getUserFindOneSearchScope(),</span>
+<span class="fc" id="L145">        properties.getUserAccountControlAttributeName(),</span>
+<span class="fc" id="L146">        properties.getAuthorities(),</span>
+<span class="fc" id="L147">        properties.getAuthorityAttributeName(),</span>
+<span class="fc" id="L148">        properties.isAuthorityDn(),</span>
+<span class="fc" id="L149">        properties.getAuthorityMap(),</span>
+<span class="fc" id="L150">        properties.getAuthorityPrefix());</span>
   }
 
   /**
@@ -159,17 +158,17 @@ public class LdaptiveUserDetailsAutoConfiguration {
   @ConditionalOnMissingBean(value = {PasswordEncoder.class})
   @Bean
   public LdaptivePasswordMatcher passwordEncoder() {
-<span class="fc" id="L162">    LdaptivePasswordMatcher matcher = new LdaptivePasswordMatcher(</span>
+<span class="fc" id="L161">    LdaptivePasswordMatcher matcher = new LdaptivePasswordMatcher(</span>
         ldaptiveOperations,
-<span class="fc" id="L164">        properties.getUserBaseDn(),</span>
-<span class="fc" id="L165">        properties.getUserFindOneFilter());</span>
-<span class="fc" id="L166">    matcher.setUserPasswordAttributeName(properties.getUserAccountControlAttributeName());</span>
-<span class="fc" id="L167">    matcher.setUserFindOneSearchScope(properties.getUserFindOneSearchScope());</span>
-<span class="fc" id="L168">    matcher.setUserPasswordAttributeName(properties.getUserPasswordAttributeName());</span>
-<span class="fc" id="L169">    matcher.setDelegate(new LdaptivePasswordEncoder(</span>
-<span class="fc" id="L170">        properties.getUserPasswordLabel(),</span>
-<span class="fc" id="L171">        properties.getUserPasswordAlgorithm()));</span>
-<span class="fc" id="L172">    return matcher;</span>
+<span class="fc" id="L163">        properties.getUserBaseDn(),</span>
+<span class="fc" id="L164">        properties.getUserFindOneFilter());</span>
+<span class="fc" id="L165">    matcher.setUserPasswordAttributeName(properties.getUserAccountControlAttributeName());</span>
+<span class="fc" id="L166">    matcher.setUserFindOneSearchScope(properties.getUserFindOneSearchScope());</span>
+<span class="fc" id="L167">    matcher.setUserPasswordAttributeName(properties.getUserPasswordAttributeName());</span>
+<span class="fc" id="L168">    matcher.setDelegate(new LdaptivePasswordEncoder(</span>
+<span class="fc" id="L169">        properties.getUserPasswordLabel(),</span>
+<span class="fc" id="L170">        properties.getUserPasswordAlgorithm()));</span>
+<span class="fc" id="L171">    return matcher;</span>
   }
 
 }

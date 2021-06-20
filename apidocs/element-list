@@ -19,6 +19,7 @@ org.bremersee.security.access
 org.bremersee.security.authentication
 org.bremersee.security.core
 org.bremersee.security.core.userdetails
+org.bremersee.test
 org.bremersee.test.beans
 org.bremersee.test.security.authentication
 org.bremersee.test.web
