@@ -38,18 +38,17 @@ class TestEnvironmentUtilsTest {
     String rawValue = System.getProperty(TestEnvironmentUtils.EXECUTOR_SYSTEM_PROPERTY);
     if (rawValue == null) {
       assertEquals(TestEnvironmentUtils.EXECUTOR_NOT_SPECIFIED, TestEnvironmentUtils.getExecutor());
-    }
-    if (!TestEnvironmentUtils.EXECUTOR_BUILD_SYSTEM.equals(rawValue)) {
+    } else if (!TestEnvironmentUtils.EXECUTOR_BUILD_SYSTEM.equals(rawValue)) {
       try {
         String newValue = UUID.randomUUID().toString().replace("-", "");
         System.setProperty(TestEnvironmentUtils.EXECUTOR_SYSTEM_PROPERTY, newValue);
         assertEquals(newValue, TestEnvironmentUtils.getExecutor());
 
       } finally {
-        if (rawValue != null) {
-          System.setProperty(TestEnvironmentUtils.EXECUTOR_SYSTEM_PROPERTY, rawValue);
-        }
+        System.setProperty(TestEnvironmentUtils.EXECUTOR_SYSTEM_PROPERTY, rawValue);
       }
+    } else {
+      assertEquals(rawValue, TestEnvironmentUtils.getExecutor());
     }
   }
 
