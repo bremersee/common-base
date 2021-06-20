@@ -50,7 +50,9 @@
     <github.repo>common-base</github.repo>
     <!--suppress UnresolvedMavenProperty -->
     <gh-pages-staging-dir>${maven.multiModuleProjectDirectory}/target/staging</gh-pages-staging-dir>
-    <surefireArgLine>-Dorg.bremersee.test.executor=NOT_SPECIFIED</surefireArgLine>
+
+    <!-- see https://www.eclemma.org/jacoco/trunk/doc/prepare-agent-mojo.html -->
+    <argLine>-Dorg.bremersee.test.executor=NOT_SPECIFIED</argLine>
 
     <common-model.version>2.2.1</common-model.version>
   </properties>
@@ -96,7 +98,7 @@
         <activeByDefault>false</activeByDefault>
       </activation>
       <properties>
-        <surefireArgLine>-Dorg.bremersee.test.executor=BUILD_SYSTEM</surefireArgLine>
+        <argLine>-Dorg.bremersee.test.executor=BUILD_SYSTEM</argLine>
       </properties>
     </profile>
   </profiles>
