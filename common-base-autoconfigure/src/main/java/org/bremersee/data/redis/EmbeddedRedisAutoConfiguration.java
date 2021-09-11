@@ -63,9 +63,10 @@ public class EmbeddedRedisAutoConfiguration {
    *
    * @param redisProperties the redis properties
    * @return the redis server
+   * @throws Exception the exception
    */
   @Bean(initMethod = "start", destroyMethod = "stop")
-  public RedisServer redisServer(RedisProperties redisProperties) {
+  public RedisServer redisServer(RedisProperties redisProperties) throws Exception {
     log.info("\n"
             + "*********************************************************************************\n"
             + "* {}\n"
