@@ -61,20 +61,6 @@ public class WebClientException
     this.restApiException = restApiException;
   }
 
-  /**
-   * Gets the response headers.
-   *
-   * @return the headers
-   * @deprecated in favour of {@link #getResponseHeaders()}
-   */
-  @SuppressWarnings("deprecation")
-  @Deprecated
-  @NonNull
-  @Override
-  public Map<String, String> getHeaders() {
-    return HttpResponseHeadersAware.createHeaders(getMultiValueHeaders());
-  }
-
   @NonNull
   @Override
   public HttpHeaders getResponseHeaders() {
