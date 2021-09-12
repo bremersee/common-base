@@ -32,7 +32,7 @@ import org.bremersee.exception.RestApiExceptionUtils;
 import org.bremersee.exception.ServiceException;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.autoconfigure.web.ResourceProperties;
+import org.springframework.boot.autoconfigure.web.WebProperties.Resources;
 import org.springframework.boot.web.reactive.error.ErrorAttributes;
 import org.springframework.context.ApplicationContext;
 import org.springframework.http.HttpHeaders;
@@ -75,7 +75,7 @@ class ApiExceptionHandlerTest {
     ErrorAttributes errorAttributes = mock(ErrorAttributes.class);
     when(errorAttributes.getError(any(ServerRequest.class))).thenReturn(exception);
 
-    final ResourceProperties resourceProperties = new ResourceProperties();
+    final Resources resources = new Resources();
 
     ApplicationContext applicationContext = mock(ApplicationContext.class);
     when(applicationContext.getClassLoader())
@@ -85,7 +85,7 @@ class ApiExceptionHandlerTest {
 
     exceptionHandler = new ApiExceptionHandler(
         errorAttributes,
-        resourceProperties,
+        resources,
         applicationContext,
         codecConfigurer,
         mapper);

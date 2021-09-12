@@ -28,12 +28,13 @@ import org.bremersee.exception.RestApiExceptionMapper;
 import org.bremersee.exception.RestApiExceptionUtils;
 import org.bremersee.exception.model.RestApiException;
 import org.bremersee.http.MediaTypeHelper;
-import org.springframework.boot.autoconfigure.web.ResourceProperties;
+import org.springframework.boot.autoconfigure.web.WebProperties;
 import org.springframework.boot.autoconfigure.web.reactive.error.AbstractErrorWebExceptionHandler;
 import org.springframework.boot.web.reactive.error.ErrorAttributes;
 import org.springframework.context.ApplicationContext;
 import org.springframework.http.MediaType;
 import org.springframework.http.codec.ServerCodecConfigurer;
+import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 import org.springframework.util.AntPathMatcher;
 import org.springframework.util.PathMatcher;
@@ -68,19 +69,19 @@ public class ApiExceptionHandler extends AbstractErrorWebExceptionHandler {
    * Instantiates a new api exception handler.
    *
    * @param errorAttributes the error attributes
-   * @param resourceProperties the resource properties
+   * @param resources the resources
    * @param applicationContext the application context
    * @param serverCodecConfigurer the server codec configurer
    * @param restApiExceptionMapper the rest api exception mapper
    */
   public ApiExceptionHandler(
       @NotNull final ErrorAttributes errorAttributes,
-      @NotNull final ResourceProperties resourceProperties,
+      @NotNull final WebProperties.Resources resources,
       @NotNull final ApplicationContext applicationContext,
       @Nullable final ServerCodecConfigurer serverCodecConfigurer,
       @NotNull final RestApiExceptionMapper restApiExceptionMapper) {
 
-    super(errorAttributes, resourceProperties, applicationContext);
+    super(errorAttributes, resources, applicationContext);
     if (serverCodecConfigurer != null) {
       setMessageReaders(serverCodecConfigurer.getReaders());
       setMessageWriters(serverCodecConfigurer.getWriters());
@@ -112,6 +113,7 @@ public class ApiExceptionHandler extends AbstractErrorWebExceptionHandler {
    * @param request the request
    * @return the server response
    */
+  @NonNull
   protected Mono<ServerResponse> renderErrorResponse(final ServerRequest request) {
 
     final RestApiException response = getRestApiExceptionMapper()

@@ -72,7 +72,7 @@ class MessageAwareWebClientErrorDecoderTest {
         .create(decoder.apply(clientResponse))
         .assertNext(webClientException -> {
           assertEquals("FOO", webClientException.getErrorCode());
-          assertTrue(webClientException.getHeaders().containsKey("x-foo"));
+          assertTrue(webClientException.getResponseHeaders().containsKey("x-foo"));
           assertNotNull(webClientException.getRestApiException());
           assertEquals("Error message",
               webClientException.getRestApiException().getMessage());

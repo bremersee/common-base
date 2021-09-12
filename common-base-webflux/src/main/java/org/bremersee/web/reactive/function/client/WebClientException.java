@@ -18,14 +18,16 @@ package org.bremersee.web.reactive.function.client;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import lombok.Getter;
 import org.bremersee.exception.ErrorCodeAware;
 import org.bremersee.exception.HttpResponseHeadersAware;
 import org.bremersee.exception.RestApiExceptionAware;
 import org.bremersee.exception.model.RestApiException;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.lang.Nullable;
+import org.springframework.lang.NonNull;
 import org.springframework.web.server.ResponseStatusException;
 
 /**
@@ -40,7 +42,6 @@ public class WebClientException
   private final Map<String, ? extends Collection<String>> headers;
 
   @Getter
-  @Nullable
   private final RestApiException restApiException;
 
   /**
@@ -60,9 +61,28 @@ public class WebClientException
     this.restApiException = restApiException;
   }
 
+  /**
+   * Gets the response headers.
+   *
+   * @return the headers
+   * @deprecated in favour of {@link #getResponseHeaders()}
+   */
+  @SuppressWarnings("deprecation")
+  @Deprecated
+  @NonNull
   @Override
   public Map<String, String> getHeaders() {
     return HttpResponseHeadersAware.createHeaders(getMultiValueHeaders());
+  }
+
+  @NonNull
+  @Override
+  public HttpHeaders getResponseHeaders() {
+    HttpHeaders httpHeaders = new HttpHeaders();
+    for (Map.Entry<String, ? extends Collection<String>> entry : headers.entrySet()) {
+      httpHeaders.put(entry.getKey(), List.copyOf(entry.getValue()));
+    }
+    return httpHeaders;
   }
 
   @Override

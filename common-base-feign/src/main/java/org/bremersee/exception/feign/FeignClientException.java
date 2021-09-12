@@ -44,14 +44,12 @@ public class FeignClientException extends FeignException implements HttpStatusAw
     HttpResponseHeadersAware, RestApiExceptionAware, ErrorCodeAware {
 
   @Getter
-  @Nullable
   private final Request request;
 
   @NotNull
   private final Map<String, ? extends Collection<String>> headers;
 
   @Getter
-  @Nullable
   private final RestApiException restApiException;
 
   /**

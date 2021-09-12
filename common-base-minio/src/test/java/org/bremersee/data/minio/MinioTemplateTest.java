@@ -162,12 +162,6 @@ import org.springframework.util.FileCopyUtils;
  *
  * @author Christian Bremer
  */
-//@SpringBootTest(
-//    classes = {TestConfiguration.class},
-//    webEnvironment = WebEnvironment.NONE,
-//    properties = {
-//        "embedded.minio.browser=off"
-//    })
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @TestInstance(Lifecycle.PER_CLASS) // allows us to use @BeforeAll with a non-static method
 @Slf4j
@@ -179,20 +173,6 @@ public class MinioTemplateTest {
   private static final String DEFAULT_BUCKET = "bremersee-"
       + SDF.format(new Date()) + "-"
       + UUID.randomUUID().toString().replace("-", "").toLowerCase();
-
-//  @Value("${embedded.minio.host}")
-//  private String minioHost;
-//
-//  @Value("${embedded.minio.port}")
-//  private int minioPort;
-//
-//  @Value("${embedded.minio.accessKey}")
-//  private String accessKey;
-//
-//  @Value("${embedded.minio.secretKey}")
-//  private String secretKey;
-//
-//  private MinioTemplate embeddedMinio;
 
   private MinioTemplate playMinio;
 
@@ -207,19 +187,6 @@ public class MinioTemplateTest {
    */
   @BeforeAll
   void setUp() {
-//    log.info("minioHost = {}, minioPort = {}, accessKey = {}, secretKey = {}",
-//        minioHost, minioPort, accessKey, secretKey);
-//    MinioClient minioClient = MinioClient.builder()
-//        .endpoint(minioHost, minioPort, false)
-//        .credentials(accessKey, secretKey)
-//        .build();
-//    embeddedMinio = new MinioTemplate(minioClient);
-//    embeddedMinio.setErrorHandler(null);
-//    embeddedMinio.setErrorHandler(new DefaultMinioErrorHandler());
-//    if (!embeddedMinio.bucketExists(BucketExistsArgs.builder().bucket(DEFAULT_BUCKET).build())) {
-//      embeddedMinio.makeBucket(MakeBucketArgs.builder().bucket(DEFAULT_BUCKET).build());
-//    }
-
     String testExecutor = getExecutor();
     log.info("JUnit test executor is {}", testExecutor);
     if (EXECUTOR_BUILD_SYSTEM.equals(testExecutor)) {
@@ -1078,7 +1045,7 @@ public class MinioTemplateTest {
                     .code(500)
                     .message("Internal server error")
                     .request(new Request.Builder()
-                        .url("http://example.org")
+                        .url("https://example.org")
                         .build())
                     .build(),
                 HttpStatus.NOT_FOUND.getReasonPhrase()))

@@ -53,10 +53,10 @@ import org.springframework.web.server.ResponseStatusException;
 public class RestApiExceptionMapperImpl implements RestApiExceptionMapper {
 
   @Getter(AccessLevel.PROTECTED)
-  private RestApiExceptionMapperProperties properties;
+  private final RestApiExceptionMapperProperties properties;
 
   @Getter(AccessLevel.PROTECTED)
-  private String applicationName;
+  private final String applicationName;
 
   /**
    * Instantiates a new rest api exception mapper.

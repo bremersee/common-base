@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -20,6 +20,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
@@ -30,6 +31,7 @@ import feign.Response.Body;
 import feign.RetryableException;
 import feign.Util;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
@@ -74,10 +76,11 @@ class FeignClientExceptionErrorDecoderTest {
         .request(Request
             .create(
                 HttpMethod.GET,
-                "http://example.org",
+                "https://example.org",
                 new HashMap<>(),
                 null,
-                StandardCharsets.UTF_8))
+                StandardCharsets.UTF_8,
+                null))
         .body(getJsonMapper().writeValueAsBytes(expected))
         .headers((Map) headers)
         .reason("Something bad")
@@ -107,10 +110,11 @@ class FeignClientExceptionErrorDecoderTest {
         .request(Request
             .create(
                 HttpMethod.GET,
-                "http://example.org",
+                "https://example.org",
                 new HashMap<>(),
                 null,
-                StandardCharsets.UTF_8))
+                StandardCharsets.UTF_8,
+                null))
         .body(getXmlMapper().writeValueAsBytes(expected))
         .headers((Map) headers)
         .reason("Nothing found")
@@ -139,10 +143,11 @@ class FeignClientExceptionErrorDecoderTest {
         .request(Request
             .create(
                 HttpMethod.GET,
-                "http://example.org",
+                "https://example.org",
                 new HashMap<>(),
                 null,
-                StandardCharsets.UTF_8))
+                StandardCharsets.UTF_8,
+                null))
         .body(body.getBytes(StandardCharsets.UTF_8))
         .headers((Map) headers)
         .reason("Something bad")
@@ -171,10 +176,11 @@ class FeignClientExceptionErrorDecoderTest {
         .request(Request
             .create(
                 HttpMethod.GET,
-                "http://example.org",
+                "https://example.org",
                 new HashMap<>(),
                 null,
-                StandardCharsets.UTF_8))
+                StandardCharsets.UTF_8,
+                null))
         .body(body.getBytes(StandardCharsets.UTF_8))
         .headers((Map) headers)
         .reason("Something bad")
@@ -203,10 +209,11 @@ class FeignClientExceptionErrorDecoderTest {
         .request(Request
             .create(
                 HttpMethod.GET,
-                "http://example.org",
+                "https://example.org",
                 new HashMap<>(),
                 null,
-                StandardCharsets.UTF_8))
+                StandardCharsets.UTF_8,
+                null))
         .body(getJsonMapper().writeValueAsBytes(restException))
         .headers((Map) headers)
         .reason("Something went wrong.")
@@ -245,10 +252,11 @@ class FeignClientExceptionErrorDecoderTest {
         .request(Request
             .create(
                 HttpMethod.GET,
-                "http://example.org",
+                "https://example.org",
                 new HashMap<>(),
                 null,
-                StandardCharsets.UTF_8))
+                StandardCharsets.UTF_8,
+                null))
         .body("Not found.".getBytes())
         .headers((Map) headers)
         .reason("Nothing found")
@@ -268,16 +276,17 @@ class FeignClientExceptionErrorDecoderTest {
     final MultiValueMap<String, String> headers = new LinkedMultiValueMap<>();
     headers.add(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_PLAIN_VALUE);
     final Body body = Mockito.mock(Body.class);
-    Mockito.when(body.asReader()).thenThrow(new IOException("Can happen"));
+    Mockito.when(body.asReader(any(Charset.class))).thenThrow(new IOException("Can happen"));
     @SuppressWarnings({"unchecked", "rawtypes"}) final Response response = Response
         .builder()
         .request(Request
             .create(
                 HttpMethod.GET,
-                "http://example.org",
+                "https://example.org",
                 new HashMap<>(),
                 null,
-                StandardCharsets.UTF_8))
+                StandardCharsets.UTF_8,
+                null))
         .body(body)
         .headers((Map) headers)
         .reason("Nothing found")
@@ -332,10 +341,11 @@ class FeignClientExceptionErrorDecoderTest {
         .request(Request
             .create(
                 HttpMethod.GET,
-                "http://example.org",
+                "https://example.org",
                 new HashMap<>(),
                 null,
-                StandardCharsets.UTF_8))
+                StandardCharsets.UTF_8,
+                null))
         .body("Not found.".getBytes())
         .headers((Map) headers)
         .reason("Nothing found")

@@ -135,8 +135,6 @@ class LdaptiveTemplateTest {
 
     // without mapper
     Collection<LdapEntry> entries = ldaptiveTemplate.findAll(searchRequest);
-    System.out.println("====> size = " + entries.size());
-    System.out.println("====> entries = " + entries);
     entries.forEach(ldapEntry -> log.info("Ldap entry found with cn = {}",
         ldapEntry.getAttribute("cn").getStringValue()));
     assertTrue(entries.stream()
@@ -457,11 +455,11 @@ class LdaptiveTemplateTest {
         .build());
 
     Optional<Person> pr = ldaptiveTemplate.findAll(
-        SearchRequest.builder()
-            .dn("ou=people," + baseDn)
-            .filter("(sn=Benn)")
-            .build(),
-        personMapper)
+            SearchRequest.builder()
+                .dn("ou=people," + baseDn)
+                .filter("(sn=Benn)")
+                .build(),
+            personMapper)
         .filter(p -> "gbn".equals(p.getUid()))
         .findAny();
     assertTrue(pr.isPresent());
