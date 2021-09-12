@@ -118,8 +118,7 @@ public interface MinioOperations {
    * List<Bucket> bucketList = minioOperations.listBuckets();
    * for (Bucket bucket : bucketList) {
    *   System.out.println(bucket.creationDate() + ", " + bucket.name());
-   * }
-   * }
+   * }}
    * </pre>
    *
    * @return list of bucket information*
