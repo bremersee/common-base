@@ -165,12 +165,12 @@ public class AuthProperties {
     final PasswordEncoder encoder = Optional.ofNullable(passwordEncoder)
         .orElseGet(PasswordEncoderFactories::createDelegatingPasswordEncoder);
     return getInMemoryUsers().stream().map(
-        simpleUser -> User.builder()
-            .username(simpleUser.getName())
-            .password(simpleUser.getPassword())
-            .authorities(simpleUser.buildAuthorities())
-            .passwordEncoder(encoder::encode)
-            .build())
+            simpleUser -> User.builder()
+                .username(simpleUser.getName())
+                .password(simpleUser.getPassword())
+                .authorities(simpleUser.buildAuthorities())
+                .passwordEncoder(encoder::encode)
+                .build())
         .toArray(UserDetails[]::new);
   }
 

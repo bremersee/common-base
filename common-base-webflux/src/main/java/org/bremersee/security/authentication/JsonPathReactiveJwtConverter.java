@@ -19,6 +19,7 @@ package org.bremersee.security.authentication;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import org.springframework.core.convert.converter.Converter;
+import org.springframework.lang.NonNull;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import reactor.core.publisher.Mono;
@@ -52,7 +53,7 @@ public class JsonPathReactiveJwtConverter implements Converter<Jwt, Mono<JwtAuth
   }
 
   @Override
-  public Mono<JwtAuthenticationToken> convert(final Jwt jwt) {
+  public Mono<JwtAuthenticationToken> convert(@NonNull Jwt jwt) {
     //noinspection NullableInLambdaInTransform
     return Mono.just(jwt).map(this.converter::convert);
   }

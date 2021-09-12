@@ -38,6 +38,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
+import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 import org.springframework.util.AntPathMatcher;
 import org.springframework.util.PathMatcher;
@@ -85,7 +86,7 @@ public class ApiExceptionResolver implements HandlerExceptionResolver {
    * @param exceptionMapper the exception mapper
    */
   public ApiExceptionResolver(
-      final RestApiExceptionMapper exceptionMapper) {
+      RestApiExceptionMapper exceptionMapper) {
     this.exceptionMapper = exceptionMapper;
     this.objectMapper = Jackson2ObjectMapperBuilder.json().build();
     this.xmlMapper = Jackson2ObjectMapperBuilder.xml().createXmlMapper(true).build();
@@ -98,8 +99,8 @@ public class ApiExceptionResolver implements HandlerExceptionResolver {
    * @param objectMapperBuilder the object mapper builder
    */
   public ApiExceptionResolver(
-      final RestApiExceptionMapper exceptionMapper,
-      final Jackson2ObjectMapperBuilder objectMapperBuilder) {
+      RestApiExceptionMapper exceptionMapper,
+      Jackson2ObjectMapperBuilder objectMapperBuilder) {
     this.exceptionMapper = exceptionMapper;
     this.objectMapper = objectMapperBuilder.build();
     this.xmlMapper = objectMapperBuilder.createXmlMapper(true).build();
@@ -113,7 +114,7 @@ public class ApiExceptionResolver implements HandlerExceptionResolver {
    * @param xmlMapper the xml mapper
    */
   public ApiExceptionResolver(
-      final RestApiExceptionMapper exceptionMapper,
+      RestApiExceptionMapper exceptionMapper,
       ObjectMapper objectMapper,
       XmlMapper xmlMapper) {
     this.exceptionMapper = exceptionMapper;
@@ -123,22 +124,22 @@ public class ApiExceptionResolver implements HandlerExceptionResolver {
 
   @Override
   public ModelAndView resolveException(
-      final HttpServletRequest request,
-      final HttpServletResponse response,
-      final @Nullable Object handler,
-      final Exception ex) {
+      @NonNull HttpServletRequest request,
+      @NonNull HttpServletResponse response,
+      @Nullable Object handler,
+      @NonNull Exception ex) {
 
     if (!isExceptionHandlerResponsible(request, handler)) {
       return null;
     }
 
-    final RestApiException payload = exceptionMapper.build(ex, request.getRequestURI(), handler);
+    RestApiException payload = exceptionMapper.build(ex, request.getRequestURI(), handler);
 
     ModelAndView modelAndView;
-    final ResponseFormatAndContentType chooser = new ResponseFormatAndContentType(request);
+    ResponseFormatAndContentType chooser = new ResponseFormatAndContentType(request);
     switch (chooser.getResponseFormat()) {
       case JSON:
-        final MappingJackson2JsonView mjv = new MappingJackson2JsonView(objectMapper);
+        MappingJackson2JsonView mjv = new MappingJackson2JsonView(objectMapper);
         mjv.setContentType(chooser.getContentType());
         mjv.setPrettyPrint(true);
         mjv.setModelKey(MODEL_KEY);
@@ -147,7 +148,7 @@ public class ApiExceptionResolver implements HandlerExceptionResolver {
         break;
 
       case XML:
-        final MappingJackson2XmlView mxv = new MappingJackson2XmlView(xmlMapper);
+        MappingJackson2XmlView mxv = new MappingJackson2XmlView(xmlMapper);
         mxv.setContentType(chooser.getContentType());
         mxv.setPrettyPrint(true);
         mxv.setModelKey(MODEL_KEY);
@@ -159,7 +160,7 @@ public class ApiExceptionResolver implements HandlerExceptionResolver {
     }
 
     response.setContentType(chooser.getContentType());
-    final int statusCode = exceptionMapper.detectHttpStatus(ex, handler).value();
+    int statusCode = exceptionMapper.detectHttpStatus(ex, handler).value();
     modelAndView.setStatus(HttpStatus.resolve(statusCode));
     applyStatusCodeIfPossible(request, response, statusCode);
     return modelAndView;
@@ -174,8 +175,8 @@ public class ApiExceptionResolver implements HandlerExceptionResolver {
    */
   @SuppressWarnings("WeakerAccess")
   protected boolean isExceptionHandlerResponsible(
-      final HttpServletRequest request,
-      final @Nullable Object handler) {
+      HttpServletRequest request,
+      @Nullable Object handler) {
 
     if (!exceptionMapper.getApiPaths().isEmpty()) {
       return exceptionMapper.getApiPaths().stream().anyMatch(
@@ -185,10 +186,10 @@ public class ApiExceptionResolver implements HandlerExceptionResolver {
     if (handler == null) {
       return false;
     }
-    final Class<?> cls = handler instanceof HandlerMethod
+    Class<?> cls = handler instanceof HandlerMethod
         ? ((HandlerMethod) handler).getBean().getClass()
         : handler.getClass();
-    final boolean result = AnnotationUtils.findAnnotation(cls, RestController.class) != null;
+    boolean result = AnnotationUtils.findAnnotation(cls, RestController.class) != null;
     if (log.isDebugEnabled()) {
       log.debug("Is handler [" + handler + "] a rest controller? " + result);
     }
@@ -204,9 +205,9 @@ public class ApiExceptionResolver implements HandlerExceptionResolver {
    */
   @SuppressWarnings("WeakerAccess")
   protected final void applyStatusCodeIfPossible(
-      final HttpServletRequest request,
-      final HttpServletResponse response,
-      final int statusCode) {
+      HttpServletRequest request,
+      HttpServletResponse response,
+      int statusCode) {
 
     if (!WebUtils.isIncludeRequest(request)) {
       if (log.isDebugEnabled()) {
@@ -244,18 +245,18 @@ public class ApiExceptionResolver implements HandlerExceptionResolver {
   static class ResponseFormatAndContentType {
 
     @Getter(AccessLevel.PROTECTED)
-    private ResponseFormat responseFormat;
+    private final ResponseFormat responseFormat;
 
     @Getter(AccessLevel.PROTECTED)
-    private String contentType;
+    private final String contentType;
 
     /**
      * Instantiates a new response format and content type.
      *
      * @param request the request
      */
-    ResponseFormatAndContentType(final @NotNull HttpServletRequest request) {
-      final String acceptHeader = request.getHeader(HttpHeaders.ACCEPT);
+    ResponseFormatAndContentType(@NotNull HttpServletRequest request) {
+      String acceptHeader = request.getHeader(HttpHeaders.ACCEPT);
       if (MediaTypeHelper.canContentTypeBeJson(acceptHeader)) {
         responseFormat = ResponseFormat.JSON;
         contentType = MediaType.APPLICATION_JSON_VALUE;
@@ -265,7 +266,7 @@ public class ApiExceptionResolver implements HandlerExceptionResolver {
       } else {
         responseFormat = ResponseFormat.EMPTY;
         if (StringUtils.hasText(acceptHeader)) {
-          final List<MediaType> accepts = MediaType.parseMediaTypes(acceptHeader);
+          List<MediaType> accepts = MediaType.parseMediaTypes(acceptHeader);
           contentType = String
               .valueOf(MediaTypeHelper.findContentType(accepts, MediaType.TEXT_PLAIN));
         } else {
@@ -291,16 +292,16 @@ public class ApiExceptionResolver implements HandlerExceptionResolver {
      * @param payload the payload
      * @param contentType the content type
      */
-    EmptyView(final @NotNull RestApiException payload, final String contentType) {
+    EmptyView(@NotNull RestApiException payload, String contentType) {
       this.restApiException = payload;
       setContentType(contentType);
     }
 
     @Override
     protected void renderMergedOutputModel(
-        @Nullable final Map<String, Object> map,
-        final HttpServletRequest httpServletRequest,
-        final HttpServletResponse httpServletResponse) {
+        @Nullable Map<String, Object> map,
+        @NonNull HttpServletRequest httpServletRequest,
+        HttpServletResponse httpServletResponse) {
 
       httpServletResponse.addHeader(RestApiExceptionUtils.ID_HEADER_NAME,
           StringUtils.hasText(restApiException.getId())

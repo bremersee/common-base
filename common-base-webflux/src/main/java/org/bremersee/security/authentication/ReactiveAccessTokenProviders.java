@@ -57,7 +57,7 @@ public interface ReactiveAccessTokenProviders {
   /**
    * Provider that retrieves the access token from an OpenId server.
    *
-   * @param retriever  the retriever
+   * @param retriever the retriever
    * @param properties the properties
    * @return the access token provider
    */

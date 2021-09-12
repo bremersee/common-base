@@ -71,15 +71,13 @@ public class ActuatorAuthProperties {
   private List<Class<?>> unauthenticatedEndpoints = new ArrayList<>();
 
   /**
-   * The roles which can write to protected actuator endpoints. The role names normally start with
-   * {@code ROLE_}.
+   * The roles which can write to protected actuator endpoints. The role names normally start with {@code ROLE_}.
    */
   @NotNull
   private List<String> adminRoles = new ArrayList<>();
 
   /**
-   * The roles which can read protected actuator endpoints. The role names normally start with
-   * {@code ROLE_}.
+   * The roles which can read protected actuator endpoints. The role names normally start with {@code ROLE_}.
    */
   @NotNull
   private List<String> roles = new ArrayList<>();

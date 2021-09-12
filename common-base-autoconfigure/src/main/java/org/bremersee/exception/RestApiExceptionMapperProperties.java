@@ -45,8 +45,7 @@ public class RestApiExceptionMapperProperties {
   private List<String> apiPaths = new ArrayList<>();
 
   /**
-   * The default values of a rest api exception that will be set, if a value is not detected. The
-   * default values are:
+   * The default values of a rest api exception that will be set, if a value is not detected. The default values are:
    * <table style="border: 1px solid">
    * <thead>
    * <tr>
@@ -73,8 +72,8 @@ public class RestApiExceptionMapperProperties {
   private ExceptionMapping defaultExceptionMapping;
 
   /**
-   * Values ​​of errors whose values ​​can not be determined automatically. The name of the
-   * exception can be a package, too (e. g. org.bremersee.foobar.*).
+   * Values ​​of errors whose values ​​can not be determined automatically. The name of the exception can be a package,
+   * too (e. g. org.bremersee.foobar.*).
    *
    * <p>Examples application.yml:
    * <pre>
@@ -142,8 +141,8 @@ public class RestApiExceptionMapperProperties {
   private ExceptionMappingConfig defaultExceptionMappingConfig;
 
   /**
-   * Specifies mapping configuration per exception class.  The name of the exception can be a
-   * package, too (e. g. org.bremersee.foobar.*).
+   * Specifies mapping configuration per exception class.  The name of the exception can be a package, too (e. g.
+   * org.bremersee.foobar.*).
    *
    * <p>Examples application.yml:
    * <pre>

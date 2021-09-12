@@ -32,8 +32,7 @@ import reactor.core.publisher.Mono;
 public class ReactiveIpAddressMatcher extends IpAddressMatcher implements ServerWebExchangeMatcher {
 
   /**
-   * Takes a specific IP address or a range specified using the IP/Netmask (e.g. 192.168.1.0/24 or
-   * 202.24.0.0/14).
+   * Takes a specific IP address or a range specified using the IP/Netmask (e.g. 192.168.1.0/24 or 202.24.0.0/14).
    *
    * @param ipAddress the address or range of addresses from which the request must come.
    */

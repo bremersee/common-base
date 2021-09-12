@@ -47,8 +47,8 @@ class JsonPathJwtParser {
   /**
    * Read the value of the given json path.
    *
-   * @param <T>         the type of the result
-   * @param jsonPath    the json path
+   * @param <T> the type of the result
+   * @param jsonPath the json path
    * @param resultClass the result class
    * @return the value of the json path
    */

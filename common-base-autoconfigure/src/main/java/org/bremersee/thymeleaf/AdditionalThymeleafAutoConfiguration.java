@@ -59,7 +59,7 @@ public class AdditionalThymeleafAutoConfiguration {
 
   private final AdditionalThymeleafProperties properties;
 
-  private TemplateEngine templateEngine;
+  private final TemplateEngine templateEngine;
 
   /**
    * Instantiates a new additional thymeleaf auto configuration.

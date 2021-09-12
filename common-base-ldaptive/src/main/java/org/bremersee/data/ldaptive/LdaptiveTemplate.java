@@ -153,11 +153,11 @@ public class LdaptiveTemplate implements LdaptiveOperations, Cloneable {
   @Override
   public boolean compare(CompareRequest request) {
     return Optional.ofNullable(execute(
-        CompareOperation.builder()
-            .factory(getConnectionFactory())
-            .throwIf(NOT_COMPARE_RESULT)
-            .build(),
-        request))
+            CompareOperation.builder()
+                .factory(getConnectionFactory())
+                .throwIf(NOT_COMPARE_RESULT)
+                .build(),
+            request))
         .map(CompareResponse::isTrue)
         .orElse(false);
   }

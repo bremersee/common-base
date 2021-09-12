@@ -126,8 +126,8 @@ public interface MultipartFileBuilder {
       String... requestParameters);
 
   /**
-   * Get multipart file with the specified index. If the list is smaller than the index, an empty
-   * multipart file will be returned.
+   * Get multipart file with the specified index. If the list is smaller than the index, an empty multipart file will be
+   * returned.
    *
    * @param list the list
    * @param index the index
@@ -142,8 +142,8 @@ public interface MultipartFileBuilder {
   }
 
   /**
-   * Get multipart file with the specified request parameter name. If no such multipart file
-   * exists, an empty one will be returned.
+   * Get multipart file with the specified request parameter name. If no such multipart file exists, an empty one will
+   * be returned.
    *
    * @param map the map
    * @param name the request parameter name
@@ -158,8 +158,8 @@ public interface MultipartFileBuilder {
   }
 
   /**
-   * Get multipart files with the specified request parameter. If no such list of multipart files
-   * exists, an empty list will be returned.
+   * Get multipart files with the specified request parameter. If no such list of multipart files exists, an empty list
+   * will be returned.
    *
    * @param map the map
    * @param name the name

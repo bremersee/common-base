@@ -37,13 +37,6 @@ public class LdaptiveException extends ServiceException implements HttpStatusAwa
 
   /**
    * Instantiates a new ldaptive exception.
-   */
-  protected LdaptiveException() {
-    super();
-  }
-
-  /**
-   * Instantiates a new ldaptive exception.
    *
    * @param httpStatus the http status
    * @param errorCode the error code

@@ -21,6 +21,7 @@ import org.bremersee.security.authentication.AccessTokenRetriever;
 import org.bremersee.security.authentication.AccessTokenRetrieverProperties;
 import org.bremersee.security.authentication.ReactiveAccessTokenProviders;
 import org.springframework.http.HttpHeaders;
+import org.springframework.lang.NonNull;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 import org.springframework.web.reactive.function.client.ClientRequest;
@@ -48,8 +49,9 @@ public class AccessTokenAppender implements ExchangeFilterFunction {
     this.accessTokenProvider = accessTokenProvider;
   }
 
+  @NonNull
   @Override
-  public Mono<ClientResponse> filter(ClientRequest request, ExchangeFunction next) {
+  public Mono<ClientResponse> filter(@NonNull ClientRequest request, @NonNull ExchangeFunction next) {
     return accessTokenProvider.getAccessToken()
         .switchIfEmpty(Mono.just(""))
         .flatMap(tokenValue -> exchangeWithToken(request, tokenValue, next));

@@ -34,7 +34,7 @@ public interface ExceptionParser<T> {
    * Parse exception.
    *
    * @param response the response
-   * @param headers  the headers
+   * @param headers the headers
    * @return the parsed exception
    */
   T parseException(
