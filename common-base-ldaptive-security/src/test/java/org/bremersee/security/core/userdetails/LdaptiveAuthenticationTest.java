@@ -28,9 +28,8 @@ import org.bremersee.data.ldaptive.reactive.ReactiveLdaptiveTemplate;
 import org.bremersee.data.ldaptive.transcoder.UserAccountControlValueTranscoder;
 import org.bremersee.security.core.userdetails.app.TestConfiguration;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
-import org.junit.jupiter.api.TestInstance.Lifecycle;
 import org.ldaptive.FilterTemplate;
 import org.ldaptive.LdapEntry;
 import org.ldaptive.SearchRequest;
@@ -44,6 +43,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.util.SocketUtils;
 import reactor.test.StepVerifier;
 
 /**
@@ -60,10 +60,8 @@ import reactor.test.StepVerifier;
         "spring.ldap.embedded.credential.username=uid=admin",
         "spring.ldap.embedded.credential.password=secret",
         "spring.ldap.embedded.ldif=classpath:schema.ldif",
-        "spring.ldap.embedded.port=17389",
         "spring.ldap.embedded.validation.enabled=false"
     })
-@TestInstance(Lifecycle.PER_CLASS) // allows us to use @BeforeAll with a non-static method
 @Slf4j
 class LdaptiveAuthenticationTest {
 
@@ -85,9 +83,18 @@ class LdaptiveAuthenticationTest {
   private String annaPassword;
 
   /**
-   * Sets up.
+   * Sets embedded ldap port.
    */
   @BeforeAll
+  static void setEmbeddedLdapPort() {
+    int embeddedLdapPort = SocketUtils.findAvailableTcpPort(10000);
+    System.setProperty("spring.ldap.embedded.port", String.valueOf(embeddedLdapPort));
+  }
+
+  /**
+   * Sets up.
+   */
+  @BeforeEach
   void setUp() {
     String userBaseDn = "ou=people," + baseDn;
     String userFindOneFilter = "(&(objectClass=person)(uid={0}))";
@@ -123,12 +130,12 @@ class LdaptiveAuthenticationTest {
     annaPassword = ldaptiveTemplate.generateUserPassword("uid=anna," + userBaseDn);
 
     LdapEntry entry = ldaptiveTemplate.findOne(SearchRequest.builder()
-        .dn(userBaseDn)
-        .filter(FilterTemplate.builder()
-            .filter(userFindOneFilter)
-            .parameters("anna")
+            .dn(userBaseDn)
+            .filter(FilterTemplate.builder()
+                .filter(userFindOneFilter)
+                .parameters("anna")
+                .build())
             .build())
-        .build())
         .orElse(null);
     assertNotNull(entry);
   }

@@ -23,6 +23,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.bremersee.data.ldaptive.app.GroupMapper;
 import org.bremersee.data.ldaptive.app.PersonMapper;
 import org.bremersee.data.ldaptive.app.TestConfiguration;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.ldaptive.LdapEntry;
 import org.ldaptive.SearchRequest;
@@ -31,6 +32,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
+import org.springframework.util.SocketUtils;
 
 /**
  * The ldaptive integration test.
@@ -46,10 +48,9 @@ import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
         "spring.ldap.embedded.credential.username=uid=admin",
         "spring.ldap.embedded.credential.password=secret",
         "spring.ldap.embedded.ldif=classpath:schema.ldif",
-        "spring.ldap.embedded.port=11389",
         "spring.ldap.embedded.validation.enabled=false",
         "bremersee.ldaptive.enabled=true",
-        "bremersee.ldaptive.ldap-url=ldap://localhost:11389",
+        "bremersee.ldaptive.ldap-url=ldap://localhost:${spring.ldap.embedded.port}",
         "bremersee.ldaptive.use-start-tls=false",
         "bremersee.ldaptive.bind-dn=uid=admin",
         "bremersee.ldaptive.bind-credentials=secret",
@@ -74,6 +75,15 @@ class LdaptiveIntegrationTest {
 
   @Autowired
   private PersonMapper personMapper;
+
+  /**
+   * Sets embedded ldap port.
+   */
+  @BeforeAll
+  static void setEmbeddedLdapPort() {
+    int embeddedLdapPort = SocketUtils.findAvailableTcpPort(10000);
+    System.setProperty("spring.ldap.embedded.port", String.valueOf(embeddedLdapPort));
+  }
 
   /**
    * Find existing persons.
