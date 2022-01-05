@@ -112,9 +112,11 @@ public class AuthProperties {
   @NotEmpty
   private String nameJsonPath = "$.preferred_username";
 
+  @Deprecated
   @NotNull
   private Map<String, List<String>> roleDefinitions = new LinkedHashMap<>();
 
+  @Deprecated
   @NotNull
   private Map<String, List<String>> ipDefinitions = new LinkedHashMap<>();
 
