@@ -47,6 +47,7 @@ import org.springframework.core.io.buffer.DataBufferUtils;
 import org.springframework.core.log.LogFormatUtils;
 import org.springframework.http.MediaType;
 import org.springframework.http.codec.xml.XmlEventDecoder;
+import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
@@ -105,10 +106,9 @@ public class ReactiveJaxbDecoder extends AbstractDecoder<Object> {
   }
 
   /**
-   * Set the max number of bytes that can be buffered by this decoder. This is either the size of
-   * the entire input when decoding as a whole, or when using async parsing with Aalto XML, it is
-   * the size of one top-level XML tree. When the limit is exceeded,
-   * {@link DataBufferLimitException} is raised.
+   * Set the max number of bytes that can be buffered by this decoder. This is either the size of the entire input when
+   * decoding as a whole, or when using async parsing with Aalto XML, it is the size of one top-level XML tree. When the
+   * limit is exceeded, {@link DataBufferLimitException} is raised.
    *
    * <p>By default this is set to 256K.
    *
@@ -130,7 +130,7 @@ public class ReactiveJaxbDecoder extends AbstractDecoder<Object> {
 
 
   @Override
-  public boolean canDecode(final ResolvableType elementType, @Nullable final MimeType mimeType) {
+  public boolean canDecode(@NonNull ResolvableType elementType, @Nullable MimeType mimeType) {
     if (super.canDecode(elementType, mimeType)) {
       final Class<?> outputClass = elementType.getRawClass();
       return jaxbContextBuilder.canUnmarshal(outputClass);
@@ -139,8 +139,9 @@ public class ReactiveJaxbDecoder extends AbstractDecoder<Object> {
     }
   }
 
+  @NonNull
   @Override
-  public Flux<Object> decode(Publisher<DataBuffer> inputStream, ResolvableType elementType,
+  public Flux<Object> decode(@NonNull Publisher<DataBuffer> inputStream, ResolvableType elementType,
       @Nullable MimeType mimeType, @Nullable Map<String, Object> hints) {
 
     Flux<XMLEvent> xmlEventFlux = this.xmlEventDecoder.decode(
@@ -160,6 +161,7 @@ public class ReactiveJaxbDecoder extends AbstractDecoder<Object> {
     });
   }
 
+  @NonNull
   @Override
   @SuppressWarnings({"rawtypes", "unchecked", "cast"})
   // XMLEventReader is Iterator<Object> on JDK 9
@@ -178,8 +180,9 @@ public class ReactiveJaxbDecoder extends AbstractDecoder<Object> {
     }
   }
 
+  @NonNull
   @Override
-  public Mono<Object> decodeToMono(Publisher<DataBuffer> input, ResolvableType elementType,
+  public Mono<Object> decodeToMono(@NonNull Publisher<DataBuffer> input, @NonNull ResolvableType elementType,
       @Nullable MimeType mimeType, @Nullable Map<String, Object> hints) {
 
     //noinspection NullableInLambdaInTransform
@@ -205,8 +208,7 @@ public class ReactiveJaxbDecoder extends AbstractDecoder<Object> {
   }
 
   /**
-   * Returns the qualified name for the given class, according to the mapping rules in the JAXB
-   * specification.
+   * Returns the qualified name for the given class, according to the mapping rules in the JAXB specification.
    *
    * @param outputClass the output class
    * @return the q name
@@ -244,11 +246,10 @@ public class ReactiveJaxbDecoder extends AbstractDecoder<Object> {
   }
 
   /**
-   * Split a flux of {@link XMLEvent XMLEvents} into a flux of XMLEvent lists, one list for each
-   * branch of the tree that starts with the given qualified name. That is, given the XMLEvents
-   * shown {@linkplain XmlEventDecoder here}, and the {@code desiredName} "{@code child}", this
-   * method returns a flux of two lists, each of which containing the events of a particular branch
-   * of the tree that starts with "{@code child}".
+   * Split a flux of {@link XMLEvent XMLEvents} into a flux of XMLEvent lists, one list for each branch of the tree that
+   * starts with the given qualified name. That is, given the XMLEvents shown {@linkplain XmlEventDecoder here}, and the
+   * {@code desiredName} "{@code child}", this method returns a flux of two lists, each of which containing the events
+   * of a particular branch of the tree that starts with "{@code child}".
    * <ol>
    * <li>The first list, dealing with the first branch of the tree:
    * <ol>
@@ -279,7 +280,6 @@ public class ReactiveJaxbDecoder extends AbstractDecoder<Object> {
 
     private final QName desiredName;
 
-    @Nullable
     private List<XMLEvent> events;
 
     private int elementDepth = 0;

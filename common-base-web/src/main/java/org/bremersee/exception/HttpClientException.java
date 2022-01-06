@@ -44,9 +44,9 @@ public class HttpClientException extends RuntimeException
   /**
    * Instantiates a new http client exception.
    *
-   * @param status           the status
-   * @param message          the message
-   * @param headers          the headers
+   * @param status the status
+   * @param message the message
+   * @param headers the headers
    * @param restApiException the rest api exception
    */
   @SuppressWarnings("WeakerAccess")
@@ -60,11 +60,6 @@ public class HttpClientException extends RuntimeException
     this.status = status;
     this.headers = headers != null ? headers : Collections.emptyMap();
     this.restApiException = restApiException;
-  }
-
-  @Override
-  public Map<String, String> getHeaders() {
-    return HttpResponseHeadersAware.createHeaders(getMultiValueHeaders());
   }
 
   @Override

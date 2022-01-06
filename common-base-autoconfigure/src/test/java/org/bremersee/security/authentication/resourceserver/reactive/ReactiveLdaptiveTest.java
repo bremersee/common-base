@@ -25,9 +25,8 @@ import org.bremersee.data.ldaptive.LdaptiveProperties;
 import org.bremersee.security.authentication.resourceserver.reactive.withoutredis.TestConfiguration;
 import org.bremersee.security.core.userdetails.ReactiveLdaptiveUserDetailsService;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
-import org.junit.jupiter.api.TestInstance.Lifecycle;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
@@ -35,6 +34,7 @@ import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.util.SocketUtils;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
@@ -56,11 +56,10 @@ import reactor.test.StepVerifier;
         "spring.ldap.embedded.credential.username=uid=admin",
         "spring.ldap.embedded.credential.password=secret",
         "spring.ldap.embedded.ldif=classpath:schema.ldif",
-        "spring.ldap.embedded.port=13389",
         "spring.ldap.embedded.validation.enabled=false",
         "bremersee.ldaptive.enabled=true",
         "bremersee.ldaptive.authentication-enabled=true",
-        "bremersee.ldaptive.ldap-url=ldap://localhost:13389",
+        "bremersee.ldaptive.ldap-url=ldap://localhost:${spring.ldap.embedded.port}",
         "bremersee.ldaptive.use-start-tls=false",
         "bremersee.ldaptive.bind-dn=uid=admin",
         "bremersee.ldaptive.bind-credentials=secret",
@@ -89,7 +88,6 @@ import reactor.test.StepVerifier;
         "bremersee.auth.path-matchers[2].ant-pattern=/protected/**",
         "bremersee.auth.path-matchers[2].roles=ROLE_USER"
     })
-@TestInstance(Lifecycle.PER_CLASS) // allows us to use @BeforeAll with a non-static method
 @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
 public class ReactiveLdaptiveTest {
 
@@ -143,9 +141,18 @@ public class ReactiveLdaptiveTest {
   String userPassword;
 
   /**
-   * Setup tests.
+   * Sets embedded ldap port.
    */
   @BeforeAll
+  static void setEmbeddedLdapPort() {
+    int embeddedLdapPort = SocketUtils.findAvailableTcpPort(10000);
+    System.setProperty("spring.ldap.embedded.port", String.valueOf(embeddedLdapPort));
+  }
+
+  /**
+   * Setup tests.
+   */
+  @BeforeEach
   void setUp() {
     userPassword = ldaptiveOperations.generateUserPassword("uid=anna," + properties.getUserDetails().getUserBaseDn());
   }
@@ -171,10 +178,10 @@ public class ReactiveLdaptiveTest {
   @Test
   void getPublic() {
     StepVerifier.create(newWebClient()
-        .get()
-        .uri("/public")
-        .retrieve()
-        .bodyToMono(String.class))
+            .get()
+            .uri("/public")
+            .retrieve()
+            .bodyToMono(String.class))
         .assertNext(body -> assertEquals("public", body))
         .verifyComplete();
   }
@@ -185,12 +192,12 @@ public class ReactiveLdaptiveTest {
   @Test
   void getProtected() {
     StepVerifier.create(newWebClient()
-        .get()
-        .uri("/protected")
-        .headers(httpHeaders -> httpHeaders
-            .setBasicAuth("anna", userPassword, StandardCharsets.UTF_8))
-        .retrieve()
-        .bodyToMono(String.class))
+            .get()
+            .uri("/protected")
+            .headers(httpHeaders -> httpHeaders
+                .setBasicAuth("anna", userPassword, StandardCharsets.UTF_8))
+            .retrieve()
+            .bodyToMono(String.class))
         .assertNext(body -> assertEquals("protected", body))
         .verifyComplete();
   }
@@ -201,11 +208,11 @@ public class ReactiveLdaptiveTest {
   @Test
   void getProtectedAndExpectUnauthorized() {
     StepVerifier.create(newWebClient()
-        .get()
-        .uri("/protected")
-        .headers(httpHeaders -> httpHeaders
-            .setBasicAuth("anna", "someone", StandardCharsets.UTF_8))
-        .exchangeToMono(clientResponse -> Mono.just(clientResponse.statusCode())))
+            .get()
+            .uri("/protected")
+            .headers(httpHeaders -> httpHeaders
+                .setBasicAuth("anna", "someone", StandardCharsets.UTF_8))
+            .exchangeToMono(clientResponse -> Mono.just(clientResponse.statusCode())))
         .assertNext(statusCode -> assertEquals(HttpStatus.UNAUTHORIZED, statusCode))
         .verifyComplete();
   }
@@ -216,15 +223,15 @@ public class ReactiveLdaptiveTest {
   @Test
   void postProtected() {
     StepVerifier.create(newWebClient()
-        .post()
-        .uri("/protected")
-        .contentType(MediaType.TEXT_PLAIN)
-        .accept(MediaType.TEXT_PLAIN)
-        .headers(httpHeaders -> httpHeaders
-            .setBasicAuth("anna", userPassword, StandardCharsets.UTF_8))
-        .body(BodyInserters.fromValue("hello"))
-        .retrieve()
-        .bodyToMono(String.class))
+            .post()
+            .uri("/protected")
+            .contentType(MediaType.TEXT_PLAIN)
+            .accept(MediaType.TEXT_PLAIN)
+            .headers(httpHeaders -> httpHeaders
+                .setBasicAuth("anna", userPassword, StandardCharsets.UTF_8))
+            .body(BodyInserters.fromValue("hello"))
+            .retrieve()
+            .bodyToMono(String.class))
         .assertNext(body -> assertEquals("hello", body))
         .verifyComplete();
   }

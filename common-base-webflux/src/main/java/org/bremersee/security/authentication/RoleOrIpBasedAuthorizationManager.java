@@ -29,7 +29,7 @@ import reactor.core.publisher.Mono;
  */
 public class RoleOrIpBasedAuthorizationManager extends RoleBasedAuthorizationManager {
 
-  private IpBasedAuthorizationManager ipBasedAuthorizationManager;
+  private final IpBasedAuthorizationManager ipBasedAuthorizationManager;
 
   /**
    * Instantiates a new role or ip based authorization manager.

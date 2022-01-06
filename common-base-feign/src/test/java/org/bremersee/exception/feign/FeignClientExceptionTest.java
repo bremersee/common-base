@@ -21,7 +21,9 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import org.bremersee.exception.RestApiExceptionUtils;
 import org.bremersee.exception.model.RestApiException;
@@ -78,9 +80,9 @@ class FeignClientExceptionTest {
     assertEquals(restApiException, exception.getRestApiException());
     assertEquals("TEST:0001", exception.getErrorCode());
 
-    final Map<String, String> actualHeaders = exception.getHeaders();
+    final Map<String, ? extends Collection<String>> actualHeaders = exception.getMultiValueHeaders();
     assertNotNull(actualHeaders);
-    assertEquals(MediaType.APPLICATION_JSON_VALUE, actualHeaders.get(HttpHeaders.CONTENT_TYPE));
+    assertEquals(List.of(MediaType.APPLICATION_JSON_VALUE), actualHeaders.get(HttpHeaders.CONTENT_TYPE));
   }
 
 }

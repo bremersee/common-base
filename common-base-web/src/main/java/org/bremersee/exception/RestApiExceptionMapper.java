@@ -39,12 +39,12 @@ public interface RestApiExceptionMapper {
   @NotNull List<String> getApiPaths();
 
   /**
-   * Build the exception model from the exception, the requested path and an handler. Typically the
-   * handler is of type {@link org.springframework.web.method.HandlerMethod}.
+   * Build the exception model from the exception, the requested path and an handler. Typically the handler is of type
+   * {@link org.springframework.web.method.HandlerMethod}.
    *
-   * @param exception   the exception (required)
+   * @param exception the exception (required)
    * @param requestPath the requested path (optional)
-   * @param handler     the handler (optional)
+   * @param handler the handler (optional)
    * @return the rest api exception
    */
   @NotNull RestApiException build(
@@ -56,7 +56,7 @@ public interface RestApiExceptionMapper {
    * Detects the http status.
    *
    * @param exception the exception (required)
-   * @param handler   the handler (optional)
+   * @param handler the handler (optional)
    * @return the http status
    */
   @NotNull

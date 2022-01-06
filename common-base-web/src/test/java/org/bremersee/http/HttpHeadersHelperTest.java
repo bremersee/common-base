@@ -18,8 +18,10 @@ package org.bremersee.http;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -60,5 +62,41 @@ class HttpHeadersHelperTest {
     httpHeaders = HttpHeadersHelper.buildHttpHeaders(map);
     assertNotNull(httpHeaders);
     assertEquals(MediaType.TEXT_PLAIN_VALUE, httpHeaders.getFirst("Accept"));
+  }
+
+  @Test
+  void getContentCharset() {
+    assertNull(HttpHeadersHelper.getContentCharset(null, null));
+    assertEquals(
+        StandardCharsets.UTF_8,
+        HttpHeadersHelper.getContentCharset(null, StandardCharsets.UTF_8));
+
+    HttpHeaders httpHeaders = new HttpHeaders();
+    assertEquals(
+        StandardCharsets.UTF_8,
+        HttpHeadersHelper.getContentCharset(httpHeaders, StandardCharsets.UTF_8));
+
+    httpHeaders.clear();
+    httpHeaders.put("content-type", List.of(MediaType.TEXT_PLAIN_VALUE));
+    assertEquals(
+        StandardCharsets.UTF_8,
+        HttpHeadersHelper.getContentCharset(httpHeaders, StandardCharsets.UTF_8));
+
+    httpHeaders.put("content-type", List.of(MediaType.TEXT_PLAIN_VALUE, "charset=US-ASCII"));
+    assertEquals(
+        StandardCharsets.US_ASCII,
+        HttpHeadersHelper.getContentCharset(httpHeaders, StandardCharsets.UTF_8));
+
+    httpHeaders.clear();
+    httpHeaders.put("Content-Type", List.of(MediaType.APPLICATION_JSON_VALUE, "charset=utf-8"));
+    assertEquals(
+        StandardCharsets.UTF_8,
+        HttpHeadersHelper.getContentCharset(httpHeaders, StandardCharsets.US_ASCII));
+
+    httpHeaders.clear();
+    httpHeaders.put("Content-Type", List.of(MediaType.APPLICATION_JSON_VALUE, "charset=foobar"));
+    assertEquals(
+        StandardCharsets.UTF_8,
+        HttpHeadersHelper.getContentCharset(httpHeaders, StandardCharsets.UTF_8));
   }
 }

@@ -48,21 +48,6 @@ class AclMapperImplTest {
    * Admin role.
    */
   @Test
-  void adminRole() {
-    AclMapperImpl<Acl<? extends Ace>> mapper = new AclMapperImpl<>(
-        AclImpl::new,
-        PermissionConstants.ALL,
-        true,
-        false
-    );
-    mapper.setAdminRole("ROLE_SUPER_USER");
-    assertEquals("ROLE_SUPER_USER", mapper.getAdminRole());
-  }
-
-  /**
-   * Admin role.
-   */
-  @Test
   void adminRoles() {
     AclMapperImpl<Acl<? extends Ace>> mapper = new AclMapperImpl<>(
         AclImpl::new,

@@ -28,20 +28,20 @@ import org.springframework.util.StringUtils;
  * address will never match a request which returns an IPv6 address, and vice-versa.
  *
  * <p>The original Spring {@code org.springframework.security.web.util.matcher.IpAddressMatcher}
- * imports {@code javax.servlet.http.HttpServletRequest}, that is not available in a reactive
- * environment. Here is the method {@code boolean matches(HttpServletRequest request)} skipped and
- * ths class does not implements {@code org.springframework.security.web.util.matcher.RequestMatcher},
+ * imports {@code javax.servlet.http.HttpServletRequest}, that is not available in a reactive environment. Here is the
+ * method {@code boolean matches(HttpServletRequest request)} skipped and ths class does not implements {@code
+ * org.springframework.security.web.util.matcher.RequestMatcher},
  *
  * @author Luke Taylor
  */
 public class IpAddressMatcher {
 
   private final int numMaskBits;
+
   private final InetAddress requiredAddress;
 
   /**
-   * Takes a specific IP address or a range specified using the IP/Netmask (e.g. 192.168.1.0/24 or
-   * 202.24.0.0/14).
+   * Takes a specific IP address or a range specified using the IP/Netmask (e.g. 192.168.1.0/24 or 202.24.0.0/14).
    *
    * @param ipAddress the address or range of addresses from which the request must come.
    */
@@ -65,8 +65,7 @@ public class IpAddressMatcher {
    * Matches an IPv6 and IPv4 address.
    *
    * @param address the address
-   * @return the {@code true} id the given address matches an IPv6 and IPv4 address, otherwise
-   *     {@code false}
+   * @return the {@code true} id the given address matches an IPv6 and IPv4 address, otherwise {@code false}
    */
   public boolean matches(String address) {
     InetAddress remoteAddress = parseAddress(address);

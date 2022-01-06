@@ -36,6 +36,7 @@ import org.bremersee.data.ldaptive.app.Person;
 import org.bremersee.data.ldaptive.app.PersonMapper;
 import org.bremersee.data.ldaptive.app.TestConfiguration;
 import org.bremersee.exception.ServiceException;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.ldaptive.AddRequest;
 import org.ldaptive.CompareRequest;
@@ -52,6 +53,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
+import org.springframework.util.SocketUtils;
 
 /**
  * The ldaptive template test.
@@ -67,7 +69,6 @@ import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
         "spring.ldap.embedded.credential.username=uid=admin",
         "spring.ldap.embedded.credential.password=secret",
         "spring.ldap.embedded.ldif=classpath:schema.ldif",
-        "spring.ldap.embedded.port=15389",
         "spring.ldap.embedded.validation.enabled=false"
     })
 @Slf4j
@@ -84,6 +85,15 @@ class LdaptiveTemplateTest {
 
   @Autowired
   private GroupMapper groupMapper;
+
+  /**
+   * Sets embedded ldap port.
+   */
+  @BeforeAll
+  static void setEmbeddedLdapPort() {
+    int embeddedLdapPort = SocketUtils.findAvailableTcpPort(10000);
+    System.setProperty("spring.ldap.embedded.port", String.valueOf(embeddedLdapPort));
+  }
 
   /**
    * Find existing persons.
@@ -135,8 +145,6 @@ class LdaptiveTemplateTest {
 
     // without mapper
     Collection<LdapEntry> entries = ldaptiveTemplate.findAll(searchRequest);
-    System.out.println("====> size = " + entries.size());
-    System.out.println("====> entries = " + entries);
     entries.forEach(ldapEntry -> log.info("Ldap entry found with cn = {}",
         ldapEntry.getAttribute("cn").getStringValue()));
     assertTrue(entries.stream()
@@ -457,11 +465,11 @@ class LdaptiveTemplateTest {
         .build());
 
     Optional<Person> pr = ldaptiveTemplate.findAll(
-        SearchRequest.builder()
-            .dn("ou=people," + baseDn)
-            .filter("(sn=Benn)")
-            .build(),
-        personMapper)
+            SearchRequest.builder()
+                .dn("ou=people," + baseDn)
+                .filter("(sn=Benn)")
+                .build(),
+            personMapper)
         .filter(p -> "gbn".equals(p.getUid()))
         .findAny();
     assertTrue(pr.isPresent());

@@ -12,13 +12,13 @@ import org.springframework.util.StringUtils;
 public class AccessTokenRetrieverAuthenticationException extends AuthenticationException
     implements HttpStatusAware {
 
-  private HttpStatus httpStatus;
+  private final HttpStatus httpStatus;
 
   /**
    * Instantiates a new access token retriever authentication exception.
    *
    * @param httpStatus the http status
-   * @param body       the body
+   * @param body the body
    */
   public AccessTokenRetrieverAuthenticationException(
       final HttpStatus httpStatus, final String body) {

@@ -104,6 +104,7 @@ public class JsonPathJwtConverter implements Converter<Jwt, JwtAuthenticationTok
     }
   }
 
+  @NonNull
   @Override
   public JwtAuthenticationToken convert(@NonNull final Jwt source) {
     final JsonPathJwtParser parser = new JsonPathJwtParser(source);

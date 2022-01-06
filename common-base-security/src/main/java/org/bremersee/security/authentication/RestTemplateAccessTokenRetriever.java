@@ -27,6 +27,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.client.ClientHttpResponse;
+import org.springframework.lang.NonNull;
 import org.springframework.util.StringUtils;
 import org.springframework.web.client.DefaultResponseErrorHandler;
 import org.springframework.web.client.RestTemplate;
@@ -80,10 +81,10 @@ public class RestTemplateAccessTokenRetriever implements AccessTokenRetriever<St
                   basicAuthProperties.getPassword()));
           final HttpEntity<?> request = new HttpEntity<>(input.createBody(), headers);
           final String response = restTemplate.exchange(
-              input.getTokenEndpoint(),
-              HttpMethod.POST,
-              request,
-              String.class)
+                  input.getTokenEndpoint(),
+                  HttpMethod.POST,
+                  request,
+                  String.class)
               .getBody();
           final JSONObject json = (JSONObject) JSONValue.parse(response);
           final String accessToken = json.getAsString("access_token");
@@ -101,7 +102,7 @@ public class RestTemplateAccessTokenRetriever implements AccessTokenRetriever<St
   private static class ErrorHandler extends DefaultResponseErrorHandler {
 
     @Override
-    protected void handleError(final ClientHttpResponse response, final HttpStatus statusCode)
+    protected void handleError(final ClientHttpResponse response, @NonNull final HttpStatus statusCode)
         throws IOException {
       final String statusText = response.getStatusText();
       throw new AccessTokenRetrieverAuthenticationException(statusCode, statusText);

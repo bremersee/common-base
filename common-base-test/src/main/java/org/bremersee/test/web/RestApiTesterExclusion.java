@@ -52,10 +52,10 @@ public class RestApiTesterExclusion {
   }
 
   @Getter
-  private RestApiTesterPath path;
+  private final RestApiTesterPath path;
 
   @Getter
-  private RestApiAssertionType type;
+  private final RestApiAssertionType type;
 
   /**
    * Instantiates a new rest api tester exclusion.

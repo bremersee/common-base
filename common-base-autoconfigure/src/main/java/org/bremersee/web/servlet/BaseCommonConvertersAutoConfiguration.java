@@ -24,6 +24,7 @@ import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.event.EventListener;
 import org.springframework.format.FormatterRegistry;
+import org.springframework.lang.NonNull;
 import org.springframework.util.ClassUtils;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
@@ -50,7 +51,7 @@ public class BaseCommonConvertersAutoConfiguration implements WebMvcConfigurer {
   }
 
   @Override
-  public void addFormatters(FormatterRegistry registry) {
+  public void addFormatters(@NonNull FormatterRegistry registry) {
     BaseCommonConverters.registerAll(registry);
   }
 

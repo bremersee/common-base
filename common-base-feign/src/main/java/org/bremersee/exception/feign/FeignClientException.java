@@ -34,9 +34,9 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.StringUtils;
 
 /**
- * Feign exception that stores the error payload as a {@link RestApiException}. If the error payload
- * cannot be parsed as {@link RestApiException}, the whole body of the error payload will be stored
- * in the message field of the {@link RestApiException}.
+ * Feign exception that stores the error payload as a {@link RestApiException}. If the error payload cannot be parsed as
+ * {@link RestApiException}, the whole body of the error payload will be stored in the message field of the {@link
+ * RestApiException}.
  *
  * @author Christian Bremer
  */
@@ -44,23 +44,21 @@ public class FeignClientException extends FeignException implements HttpStatusAw
     HttpResponseHeadersAware, RestApiExceptionAware, ErrorCodeAware {
 
   @Getter
-  @Nullable
   private final Request request;
 
   @NotNull
   private final Map<String, ? extends Collection<String>> headers;
 
   @Getter
-  @Nullable
   private final RestApiException restApiException;
 
   /**
    * Default constructor.
    *
-   * @param request          the original request
-   * @param headers          the response headers
-   * @param status           the response status code
-   * @param message          the message of this {@link FeignClientException}
+   * @param request the original request
+   * @param headers the response headers
+   * @param status the response status code
+   * @param message the message of this {@link FeignClientException}
    * @param restApiException the rest api exception
    */
   @SuppressWarnings("WeakerAccess")
@@ -82,11 +80,6 @@ public class FeignClientException extends FeignException implements HttpStatusAw
     this.request = request;
     this.headers = headers != null ? headers : Collections.emptyMap();
     this.restApiException = restApiException;
-  }
-
-  @Override
-  public Map<String, String> getHeaders() {
-    return HttpResponseHeadersAware.createHeaders(getMultiValueHeaders());
   }
 
   @Override

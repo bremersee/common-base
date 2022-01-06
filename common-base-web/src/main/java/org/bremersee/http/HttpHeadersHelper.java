@@ -16,11 +16,15 @@
 
 package org.bremersee.http;
 
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.BiConsumer;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.springframework.http.HttpHeaders;
 import org.springframework.util.MultiValueMap;
 
@@ -60,4 +64,27 @@ public abstract class HttpHeadersHelper {
     }
     return httpHeaders;
   }
+
+  /**
+   * Gets content charset.
+   *
+   * @param headers the headers
+   * @param defaultCharset the default charset
+   * @return the content charset or the default charset if no content charset is specified
+   */
+  public static Charset getContentCharset(HttpHeaders headers, Charset defaultCharset) {
+    return Optional.ofNullable(headers)
+        .map(h -> h.get(HttpHeaders.CONTENT_TYPE))
+        .filter(l -> l.size() > 1)
+        .map(l -> l.subList(1, l.size()))
+        .flatMap(l -> l.stream()
+            .map(value -> Pattern.compile(".*charset=([^\\s|^;]+).*").matcher(value))
+            .filter(Matcher::lookingAt)
+            .map(matcher -> matcher.group(1))
+            .filter(Charset::isSupported)
+            .map(Charset::forName)
+            .findFirst())
+        .orElse(defaultCharset);
+  }
+
 }

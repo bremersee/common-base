@@ -27,8 +27,6 @@ import org.bremersee.security.authentication.resourceserver.reactive.withredis.W
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
-import org.junit.jupiter.api.TestInstance.Lifecycle;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -48,14 +46,12 @@ import reactor.test.StepVerifier;
         "spring.application.name=resourceserver-jwt",
         "spring.security.oauth2.resourceserver.jwt.jwk-set-uri=http://localhost/jwk",
         "spring.redis.host=unknown",
-        "spring.redis.port=11999",
         "bremersee.redis.embedded=false",
         "bremersee.auth.resource-server=auto",
         "bremersee.auth.any-access-mode=deny_all",
         "bremersee.exception-mapping.api-paths=/**"
     })
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-@TestInstance(Lifecycle.PER_CLASS) // allows us to use @BeforeAll with a non-static method
 public class ReactiveRedisAccessTokenCacheExceptionTest {
 
   /**

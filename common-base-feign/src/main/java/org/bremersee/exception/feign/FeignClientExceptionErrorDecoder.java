@@ -18,12 +18,16 @@ package org.bremersee.exception.feign;
 
 import static feign.Util.RETRY_AFTER;
 import static java.util.concurrent.TimeUnit.SECONDS;
+import static org.bremersee.http.HttpHeadersHelper.buildHttpHeaders;
+import static org.bremersee.http.HttpHeadersHelper.getContentCharset;
 
 import feign.Request.HttpMethod;
 import feign.Response;
 import feign.RetryableException;
 import feign.Util;
 import feign.codec.ErrorDecoder;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Collections;
@@ -32,12 +36,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.bremersee.exception.RestApiExceptionParser;
 import org.bremersee.exception.RestApiExceptionParserImpl;
 import org.bremersee.exception.model.RestApiException;
-import org.bremersee.http.HttpHeadersHelper;
 import org.springframework.http.HttpHeaders;
 
 /**
- * This error decoder produces either a {@link FeignClientException} or a {@link
- * feign.RetryableException}.
+ * This error decoder produces either a {@link FeignClientException} or a {@link feign.RetryableException}.
  *
  * @author Christian Bremer
  */
@@ -85,7 +87,7 @@ public class FeignClientExceptionErrorDecoder implements ErrorDecoder {
         response.status(),
         message,
         restApiException);
-    final HttpHeaders httpHeaders = HttpHeadersHelper.buildHttpHeaders(response.headers());
+    final HttpHeaders httpHeaders = buildHttpHeaders(response.headers());
     final Date retryAfter = determineRetryAfter(httpHeaders.getFirst(RETRY_AFTER));
     if (retryAfter != null) {
       return new RetryableException(
@@ -103,8 +105,9 @@ public class FeignClientExceptionErrorDecoder implements ErrorDecoder {
     if (response == null || response.body() == null) {
       return null;
     }
+    Charset charset = getContentCharset(buildHttpHeaders(response.headers()), StandardCharsets.UTF_8);
     try {
-      return Util.toString(response.body().asReader());
+      return Util.toString(response.body().asReader(charset));
     } catch (Exception ignored) {
       return null;
     }

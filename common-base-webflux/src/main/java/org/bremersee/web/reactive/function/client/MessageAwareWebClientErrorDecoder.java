@@ -42,7 +42,7 @@ public class MessageAwareWebClientErrorDecoder
   private final ExceptionParser<String> parser;
 
   @Getter(AccessLevel.PACKAGE)
-  private String errorCode;
+  private final String errorCode;
 
   /**
    * Instantiates a new message aware web client error decoder.

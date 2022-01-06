@@ -25,7 +25,7 @@ import org.bremersee.exception.RestApiExceptionMapperImpl;
 import org.bremersee.exception.RestApiExceptionMapperProperties;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.ObjectProvider;
-import org.springframework.boot.autoconfigure.web.ResourceProperties;
+import org.springframework.boot.autoconfigure.web.WebProperties.Resources;
 import org.springframework.boot.web.reactive.error.ErrorAttributes;
 import org.springframework.context.ApplicationContext;
 import org.springframework.http.codec.ServerCodecConfigurer;
@@ -47,7 +47,7 @@ class ApiExceptionHandlerAutoConfigurationTest {
     configuration.init();
     assertNotNull(configuration.apiExceptionHandler(
         errorAttributes(),
-        resourceProperties(),
+        resources(),
         applicationContext(),
         codecConfigurer(),
         restApiExceptionMapper()));
@@ -61,10 +61,10 @@ class ApiExceptionHandlerAutoConfigurationTest {
     return provider;
   }
 
-  private static ObjectProvider<ResourceProperties> resourceProperties() {
-    ResourceProperties value = mock(ResourceProperties.class);
+  private static ObjectProvider<Resources> resources() {
+    Resources value = mock(Resources.class);
     //noinspection unchecked
-    ObjectProvider<ResourceProperties> provider = mock(ObjectProvider.class);
+    ObjectProvider<Resources> provider = mock(ObjectProvider.class);
     when(provider.getIfAvailable()).thenReturn(value);
     return provider;
   }

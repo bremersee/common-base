@@ -36,9 +36,8 @@ import org.bremersee.data.ldaptive.reactive.ReactiveLdaptiveTemplate;
 import org.bremersee.exception.ServiceException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
-import org.junit.jupiter.api.TestInstance.Lifecycle;
 import org.ldaptive.AddRequest;
 import org.ldaptive.CompareRequest;
 import org.ldaptive.ConnectionFactory;
@@ -55,6 +54,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
+import org.springframework.util.SocketUtils;
 import reactor.test.StepVerifier;
 
 /**
@@ -71,10 +71,8 @@ import reactor.test.StepVerifier;
         "spring.ldap.embedded.credential.username=uid=admin",
         "spring.ldap.embedded.credential.password=secret",
         "spring.ldap.embedded.ldif=classpath:schema.ldif",
-        "spring.ldap.embedded.port=16389",
         "spring.ldap.embedded.validation.enabled=false"
     })
-@TestInstance(Lifecycle.PER_CLASS) // allows us to use @BeforeAll with a non-static method
 @Slf4j
 class ReactiveLdaptiveTemplateTest {
 
@@ -93,9 +91,18 @@ class ReactiveLdaptiveTemplateTest {
   private ReactiveLdaptiveTemplate ldaptiveTemplate;
 
   /**
-   * Sets up.
+   * Sets embedded ldap port.
    */
   @BeforeAll
+  static void setEmbeddedLdapPort() {
+    int embeddedLdapPort = SocketUtils.findAvailableTcpPort(10000);
+    System.setProperty("spring.ldap.embedded.port", String.valueOf(embeddedLdapPort));
+  }
+
+  /**
+   * Sets up.
+   */
+  @BeforeEach
   void setUp() {
     ldaptiveTemplate = new ReactiveLdaptiveTemplate(connectionFactory);
     ldaptiveTemplate.setErrorHandler(new DefaultLdaptiveErrorHandler());
@@ -228,9 +235,9 @@ class ReactiveLdaptiveTemplateTest {
             .assertNext(extendedResponse -> {
               assertTrue(extendedResponse.isSuccess());
               StepVerifier.create(ldaptiveTemplate.bind(SimpleBindRequest.builder()
-                  .dn(dn)
-                  .password(newPasswd)
-                  .build()))
+                      .dn(dn)
+                      .password(newPasswd)
+                      .build()))
                   .expectNext(true)
                   .verifyComplete();
             })
@@ -488,7 +495,7 @@ class ReactiveLdaptiveTemplateTest {
     assertNotNull(p0);
 
     StepVerifier.create(ldaptiveTemplate
-        .findOne(SearchRequest.builder().filter("(uid=mrt)").build()))
+            .findOne(SearchRequest.builder().filter("(uid=mrt)").build()))
         .assertNext(ldapEntry -> {
           assertEquals("mrt", ldapEntry.getAttribute("uid").getStringValue());
           StepVerifier.create(ldaptiveTemplate.delete(DeleteRequest.builder().dn(ldapEntry.getDn()).build()))

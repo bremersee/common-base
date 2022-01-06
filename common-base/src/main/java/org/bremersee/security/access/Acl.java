@@ -41,8 +41,8 @@ public interface Acl<E extends Ace> {
   void setOwner(String owner);
 
   /**
-   * Returns the entries of this access control list. The key of the map is the permission. This map
-   * is normally unmodifiable.
+   * Returns the entries of this access control list. The key of the map is the permission. This map is normally
+   * unmodifiable.
    *
    * @return the map
    */

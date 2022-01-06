@@ -17,11 +17,7 @@
 package org.bremersee.exception;
 
 import java.util.Collection;
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import javax.validation.constraints.NotNull;
 
 /**
@@ -30,55 +26,6 @@ import javax.validation.constraints.NotNull;
  * @author Christian Bremer
  */
 public interface HttpResponseHeadersAware {
-
-  /**
-   * Create headers map.
-   *
-   * @param headers the headers
-   * @return the map
-   */
-  static Map<String, String> createHeaders(Map<String, ? extends Collection<String>> headers) {
-    if (headers == null || headers.isEmpty()) {
-      return Collections.emptyMap();
-    }
-    final Map<String, String> map = new LinkedHashMap<>();
-    for (Entry<String, ? extends Collection<String>> entry : headers.entrySet()) {
-      if (entry.getValue() != null && !entry.getValue().isEmpty()) {
-        map.put(entry.getKey(), entry.getValue().iterator().next());
-      } else {
-        map.put(entry.getKey(), "");
-      }
-    }
-    return map;
-  }
-
-  /**
-   * Create multi value headers map.
-   *
-   * @param headers the headers
-   * @return the map
-   */
-  static Map<String, ? extends Collection<String>> createMultiValueHeaders(
-      Map<String, String> headers) {
-    if (headers == null || headers.isEmpty()) {
-      return Collections.emptyMap();
-    }
-    final Map<String, List<String>> map = new LinkedHashMap<>();
-    for (Entry<String, String> entry : headers.entrySet()) {
-      if (entry.getValue() != null) {
-        map.put(entry.getKey(), Collections.singletonList(entry.getValue()));
-      }
-    }
-    return map;
-  }
-
-  /**
-   * Gets the response headers.
-   *
-   * @return the response headers
-   */
-  @NotNull
-  Map<String, String> getHeaders();
 
   /**
    * Gets the response headers as multi value map.

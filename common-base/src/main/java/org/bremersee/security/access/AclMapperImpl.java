@@ -25,7 +25,6 @@ import javax.validation.constraints.NotNull;
 import org.bremersee.common.model.AccessControlList;
 import org.bremersee.security.core.AuthorityConstants;
 import org.springframework.lang.Nullable;
-import org.springframework.util.StringUtils;
 
 /**
  * The acl mapper implementation.
@@ -88,32 +87,6 @@ public class AclMapperImpl<T extends Acl<? extends Ace>> implements AclMapper<T>
     this.switchAdminAccess = switchAdminAccess;
     this.returnNull = returnNull;
     getAdminRoles().add(AuthorityConstants.ADMIN_ROLE_NAME);
-  }
-
-  /**
-   * Gets admin role.
-   *
-   * @return the admin role
-   * @deprecated Use {@link #getAdminRoles()} instead.
-   */
-  @Deprecated
-  public String getAdminRole() {
-    return adminRoles != null && !adminRoles.isEmpty() ? adminRoles.iterator().next() : null;
-  }
-
-  /**
-   * Sets admin role.
-   *
-   * @param adminRole the admin role
-   * @deprecated Use {@link #setAdminRoles(Set)} instead.
-   */
-  @Deprecated
-  public void setAdminRole(String adminRole) {
-    if (StringUtils.hasText(adminRole)) {
-      this.setAdminRoles(Collections.singleton(adminRole));
-    } else {
-      this.setAdminRoles(Collections.emptySet());
-    }
   }
 
   /**

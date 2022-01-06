@@ -92,7 +92,7 @@ public interface RestApiTesterPath {
    */
   class BuilderImpl implements RestApiTesterPath.Builder {
 
-    private List<RestApiTesterPathValues> values = new ArrayList<>();
+    private final List<RestApiTesterPathValues> values = new ArrayList<>();
 
     private BuilderImpl() {
     }
@@ -145,7 +145,7 @@ public interface RestApiTesterPath {
      */
     ATTRIBUTE("Attribute");
 
-    private String value;
+    private final String value;
 
     PathType(String value) {
       this.value = value;
@@ -163,9 +163,9 @@ public interface RestApiTesterPath {
   @EqualsAndHashCode(doNotUseGetters = true)
   class RestApiTesterPathValues {
 
-    private PathType type;
+    private final PathType type;
 
-    private String value;
+    private final String value;
 
     /**
      * Instantiates a new path model.

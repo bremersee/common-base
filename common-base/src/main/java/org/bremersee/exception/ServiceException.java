@@ -54,7 +54,7 @@ public class ServiceException extends RuntimeException
    * Instantiates a new service exception.
    *
    * @param httpStatus the http status
-   * @param errorCode  the error code
+   * @param errorCode the error code
    */
   protected ServiceException(final int httpStatus, final String errorCode) {
     super();
@@ -66,8 +66,8 @@ public class ServiceException extends RuntimeException
    * Instantiates a new service exception.
    *
    * @param httpStatus the http status
-   * @param errorCode  the error code
-   * @param reason     the reason
+   * @param errorCode the error code
+   * @param reason the reason
    */
   protected ServiceException(final int httpStatus, final String errorCode, final String reason) {
     super(reason);
@@ -79,8 +79,8 @@ public class ServiceException extends RuntimeException
    * Instantiates a new service exception.
    *
    * @param httpStatus the http status
-   * @param errorCode  the error code
-   * @param cause      the cause
+   * @param errorCode the error code
+   * @param cause the cause
    */
   protected ServiceException(final int httpStatus, final String errorCode, final Throwable cause) {
     super(cause);
@@ -92,9 +92,9 @@ public class ServiceException extends RuntimeException
    * Instantiates a new service exception.
    *
    * @param httpStatus the http status
-   * @param errorCode  the error code
-   * @param reason     the reason
-   * @param cause      the cause
+   * @param errorCode the error code
+   * @param reason the reason
+   * @param cause the cause
    */
   protected ServiceException(
       final int httpStatus,
@@ -139,7 +139,7 @@ public class ServiceException extends RuntimeException
    * Internal server error service exception.
    *
    * @param reason the reason
-   * @param cause  the cause
+   * @param cause the cause
    * @return the service exception
    */
   public static ServiceException internalServerError(final String reason, final Throwable cause) {
@@ -149,7 +149,7 @@ public class ServiceException extends RuntimeException
   /**
    * Internal server error service exception.
    *
-   * @param reason    the reason
+   * @param reason the reason
    * @param errorCode the error code
    * @return the service exception
    */
@@ -160,9 +160,9 @@ public class ServiceException extends RuntimeException
   /**
    * Internal server error service exception.
    *
-   * @param reason    the reason
+   * @param reason the reason
    * @param errorCode the error code
-   * @param cause     the cause
+   * @param cause the cause
    * @return the service exception
    */
   public static ServiceException internalServerError(
@@ -201,7 +201,7 @@ public class ServiceException extends RuntimeException
    * Bad request service exception.
    *
    * @param reason the reason
-   * @param cause  the cause
+   * @param cause the cause
    * @return the service exception
    */
   public static ServiceException badRequest(final String reason, final Throwable cause) {
@@ -211,7 +211,7 @@ public class ServiceException extends RuntimeException
   /**
    * Bad request service exception.
    *
-   * @param reason    the reason
+   * @param reason the reason
    * @param errorCode the error code
    * @return the service exception
    */
@@ -222,9 +222,9 @@ public class ServiceException extends RuntimeException
   /**
    * Bad request service exception.
    *
-   * @param reason    the reason
+   * @param reason the reason
    * @param errorCode the error code
-   * @param cause     the cause
+   * @param cause the cause
    * @return the service exception
    */
   public static ServiceException badRequest(
@@ -273,7 +273,7 @@ public class ServiceException extends RuntimeException
    * Not found with error code service exception.
    *
    * @param entityName the entity name
-   * @param errorCode  the error code
+   * @param errorCode the error code
    * @return the service exception
    */
   public static ServiceException notFoundWithErrorCode(
@@ -287,7 +287,7 @@ public class ServiceException extends RuntimeException
    *
    * @param entityType the entity type
    * @param entityName the entity name
-   * @param errorCode  the error code
+   * @param errorCode the error code
    * @return the service exception
    */
   public static ServiceException notFoundWithErrorCode(
@@ -335,7 +335,7 @@ public class ServiceException extends RuntimeException
    * Already exists with error code service exception.
    *
    * @param entityName the entity name
-   * @param errorCode  the error code
+   * @param errorCode the error code
    * @return the service exception
    */
   public static ServiceException alreadyExistsWithErrorCode(
@@ -349,7 +349,7 @@ public class ServiceException extends RuntimeException
    *
    * @param entityType the entity type
    * @param entityName the entity name
-   * @param errorCode  the error code
+   * @param errorCode the error code
    * @return the service exception
    */
   public static ServiceException alreadyExistsWithErrorCode(
@@ -405,7 +405,7 @@ public class ServiceException extends RuntimeException
    * Forbidden with error code service exception.
    *
    * @param entityName the entity name
-   * @param errorCode  the error code
+   * @param errorCode the error code
    * @return the service exception
    */
   public static ServiceException forbiddenWithErrorCode(Object entityName, String errorCode) {
@@ -418,7 +418,7 @@ public class ServiceException extends RuntimeException
    *
    * @param entityType the entity type
    * @param entityName the entity name
-   * @param errorCode  the error code
+   * @param errorCode the error code
    * @return the service exception
    */
   public static ServiceException forbiddenWithErrorCode(

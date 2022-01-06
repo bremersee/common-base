@@ -24,7 +24,8 @@ import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication.Type;
-import org.springframework.boot.autoconfigure.web.ResourceProperties;
+import org.springframework.boot.autoconfigure.web.WebProperties;
+import org.springframework.boot.autoconfigure.web.WebProperties.Resources;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.boot.web.reactive.error.ErrorAttributes;
 import org.springframework.context.ApplicationContext;
@@ -44,7 +45,7 @@ import org.springframework.util.ClassUtils;
 @ConditionalOnWebApplication(type = Type.REACTIVE)
 @ConditionalOnBean({
     ErrorAttributes.class,
-    ResourceProperties.class,
+    Resources.class,
     ServerCodecConfigurer.class,
     RestApiExceptionMapper.class
 })
@@ -71,7 +72,7 @@ public class ApiExceptionHandlerAutoConfiguration {
    * Builds api exception handler bean.
    *
    * @param errorAttributes the error attributes
-   * @param resourceProperties the resource properties
+   * @param resources the resources
    * @param applicationContext the application context
    * @param serverCodecConfigurer the server codec configurer
    * @param restApiExceptionMapper the rest api exception mapper
@@ -81,7 +82,7 @@ public class ApiExceptionHandlerAutoConfiguration {
   @Order(-2)
   public ApiExceptionHandler apiExceptionHandler(
       ObjectProvider<ErrorAttributes> errorAttributes,
-      ObjectProvider<ResourceProperties> resourceProperties,
+      ObjectProvider<WebProperties.Resources> resources,
       ApplicationContext applicationContext,
       ObjectProvider<ServerCodecConfigurer> serverCodecConfigurer,
       ObjectProvider<RestApiExceptionMapper> restApiExceptionMapper) {
@@ -90,8 +91,8 @@ public class ApiExceptionHandlerAutoConfiguration {
         errorAttributes.getIfAvailable(),
         "Error attributes must be present.");
     Assert.notNull(
-        resourceProperties.getIfAvailable(),
-        "Resource properties must be present.");
+        resources.getIfAvailable(),
+        "Resources must be present.");
     Assert.notNull(
         serverCodecConfigurer.getIfAvailable(),
         "Server codec configurer must be present.");
@@ -103,7 +104,7 @@ public class ApiExceptionHandlerAutoConfiguration {
 
     return new ApiExceptionHandler(
         errorAttributes.getIfAvailable(),
-        resourceProperties.getIfAvailable(),
+        resources.getIfAvailable(),
         applicationContext,
         serverCodecConfigurer.getIfAvailable(),
         restApiExceptionMapper.getIfAvailable());

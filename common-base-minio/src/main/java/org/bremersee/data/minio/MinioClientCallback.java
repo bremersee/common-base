@@ -24,7 +24,6 @@ import org.springframework.validation.annotation.Validated;
  * The minio client callback.
  *
  * @param <T> the type of the result
- *
  * @author Christian Bremer
  */
 @Validated

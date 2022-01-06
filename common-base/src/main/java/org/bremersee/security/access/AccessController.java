@@ -46,18 +46,17 @@ public interface AccessController {
    * @param acl the access control list
    * @return the access controller
    */
-  @SuppressWarnings("rawtypes")
+  @SuppressWarnings({"rawtypes", "unchecked"})
   static AccessController from(@Nullable Acl acl) {
     return acl == null ? new Impl() : new Impl(AclBuilder.builder().from(acl).buildAcl());
   }
 
   /**
-   * Determines whether the given user with the given roles and groups has the specified
-   * permission.
+   * Determines whether the given user with the given roles and groups has the specified permission.
    *
-   * @param user       the user
-   * @param roles      the roles
-   * @param groups     the groups
+   * @param user the user
+   * @param roles the roles
+   * @param groups the groups
    * @param permission the permission
    * @return {@code true} if the user has the permission, otherwise {@code false}
    */
@@ -68,12 +67,11 @@ public interface AccessController {
       @Nullable String permission);
 
   /**
-   * Determines whether the given user with the given roles and groups has at least one of the
-   * specified permissions.
+   * Determines whether the given user with the given roles and groups has at least one of the specified permissions.
    *
-   * @param user        the user
-   * @param roles       the roles
-   * @param groups      the groups
+   * @param user the user
+   * @param roles the roles
+   * @param groups the groups
    * @param permissions the permissions
    * @return {@code true} if the user has at least one permission, otherwise {@code false}
    */
@@ -91,12 +89,11 @@ public interface AccessController {
   }
 
   /**
-   * Determines whether the given user with the given roles and groups has at least one of the
-   * specified permissions.
+   * Determines whether the given user with the given roles and groups has at least one of the specified permissions.
    *
-   * @param user        the user
-   * @param roles       the roles
-   * @param groups      the groups
+   * @param user the user
+   * @param roles the roles
+   * @param groups the groups
    * @param permissions the permissions
    * @return {@code true} if the user has at least one permission, otherwise {@code false}
    */
@@ -114,12 +111,11 @@ public interface AccessController {
   }
 
   /**
-   * Determines whether the given user with the given roles and groups has all specified
-   * permissions.
+   * Determines whether the given user with the given roles and groups has all specified permissions.
    *
-   * @param user        the user
-   * @param roles       the roles
-   * @param groups      the groups
+   * @param user the user
+   * @param roles the roles
+   * @param groups the groups
    * @param permissions the permissions
    * @return {@code true} if the user has all permissions, otherwise {@code false}
    */
@@ -137,12 +133,11 @@ public interface AccessController {
   }
 
   /**
-   * Determines whether the given user with the given roles and groups has all specified
-   * permissions.
+   * Determines whether the given user with the given roles and groups has all specified permissions.
    *
-   * @param user        the user
-   * @param roles       the roles
-   * @param groups      the groups
+   * @param user the user
+   * @param roles the roles
+   * @param groups the groups
    * @param permissions the permissions
    * @return {@code true} if the user has all permissions, otherwise {@code false}
    */

@@ -25,9 +25,8 @@ import org.bremersee.data.ldaptive.LdaptiveProperties;
 import org.bremersee.security.authentication.resourceserver.servlet.withoutredis.TestConfiguration;
 import org.bremersee.security.core.userdetails.LdaptiveUserDetailsService;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
-import org.junit.jupiter.api.TestInstance.Lifecycle;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
@@ -38,6 +37,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.util.SocketUtils;
 import org.springframework.web.client.RestTemplate;
 
 /**
@@ -56,11 +56,10 @@ import org.springframework.web.client.RestTemplate;
         "spring.ldap.embedded.credential.username=uid=admin",
         "spring.ldap.embedded.credential.password=secret",
         "spring.ldap.embedded.ldif=classpath:schema.ldif",
-        "spring.ldap.embedded.port=14389",
         "spring.ldap.embedded.validation.enabled=false",
         "bremersee.ldaptive.enabled=true",
         "bremersee.ldaptive.authentication-enabled=true",
-        "bremersee.ldaptive.ldap-url=ldap://localhost:14389",
+        "bremersee.ldaptive.ldap-url=ldap://localhost:${spring.ldap.embedded.port}",
         "bremersee.ldaptive.use-start-tls=false",
         "bremersee.ldaptive.bind-dn=uid=admin",
         "bremersee.ldaptive.bind-credentials=secret",
@@ -89,7 +88,6 @@ import org.springframework.web.client.RestTemplate;
         "bremersee.auth.path-matchers[2].ant-pattern=/protected/**",
         "bremersee.auth.path-matchers[2].roles=ROLE_USER"
     })
-@TestInstance(Lifecycle.PER_CLASS) // allows us to use @BeforeAll with a non-static method
 @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
 public class LdaptiveTest {
 
@@ -169,9 +167,18 @@ public class LdaptiveTest {
   }
 
   /**
-   * Setup tests.
+   * Sets embedded ldap port.
    */
   @BeforeAll
+  static void setEmbeddedLdapPort() {
+    int embeddedLdapPort = SocketUtils.findAvailableTcpPort(10000);
+    System.setProperty("spring.ldap.embedded.port", String.valueOf(embeddedLdapPort));
+  }
+
+  /**
+   * Setup tests.
+   */
+  @BeforeEach
   void setUp() {
     userPassword = ldaptiveOperations.generateUserPassword("uid=anna," + properties.getUserDetails().getUserBaseDn());
   }
