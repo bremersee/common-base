@@ -52,11 +52,11 @@ import org.springframework.web.server.ResponseStatusException;
 <span class="fc" id="L52">@Slf4j</span>
 public class RestApiExceptionMapperImpl implements RestApiExceptionMapper {
 
-<span class="fc" id="L55">  @Getter(AccessLevel.PROTECTED)</span>
-  private RestApiExceptionMapperProperties properties;
+  @Getter(AccessLevel.PROTECTED)
+  private final RestApiExceptionMapperProperties properties;
 
-<span class="fc" id="L58">  @Getter(AccessLevel.PROTECTED)</span>
-  private String applicationName;
+  @Getter(AccessLevel.PROTECTED)
+  private final String applicationName;
 
   /**
    * Instantiates a new rest api exception mapper.

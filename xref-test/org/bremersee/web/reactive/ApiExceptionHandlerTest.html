@@ -40,7 +40,7 @@
 <a class="jxr_linenumber" name="L32" href="#L32">32</a>  <strong class="jxr_keyword">import</strong> org.bremersee.exception.ServiceException;
 <a class="jxr_linenumber" name="L33" href="#L33">33</a>  <strong class="jxr_keyword">import</strong> org.junit.jupiter.api.BeforeAll;
 <a class="jxr_linenumber" name="L34" href="#L34">34</a>  <strong class="jxr_keyword">import</strong> org.junit.jupiter.api.Test;
-<a class="jxr_linenumber" name="L35" href="#L35">35</a>  <strong class="jxr_keyword">import</strong> org.springframework.boot.autoconfigure.web.ResourceProperties;
+<a class="jxr_linenumber" name="L35" href="#L35">35</a>  <strong class="jxr_keyword">import</strong> org.springframework.boot.autoconfigure.web.WebProperties.Resources;
 <a class="jxr_linenumber" name="L36" href="#L36">36</a>  <strong class="jxr_keyword">import</strong> org.springframework.boot.web.reactive.error.ErrorAttributes;
 <a class="jxr_linenumber" name="L37" href="#L37">37</a>  <strong class="jxr_keyword">import</strong> org.springframework.context.ApplicationContext;
 <a class="jxr_linenumber" name="L38" href="#L38">38</a>  <strong class="jxr_keyword">import</strong> org.springframework.http.HttpHeaders;
@@ -83,7 +83,7 @@
 <a class="jxr_linenumber" name="L75" href="#L75">75</a>      ErrorAttributes errorAttributes = mock(ErrorAttributes.<strong class="jxr_keyword">class</strong>);
 <a class="jxr_linenumber" name="L76" href="#L76">76</a>      when(errorAttributes.getError(any(ServerRequest.<strong class="jxr_keyword">class</strong>))).thenReturn(exception);
 <a class="jxr_linenumber" name="L77" href="#L77">77</a>  
-<a class="jxr_linenumber" name="L78" href="#L78">78</a>      <strong class="jxr_keyword">final</strong> ResourceProperties resourceProperties = <strong class="jxr_keyword">new</strong> ResourceProperties();
+<a class="jxr_linenumber" name="L78" href="#L78">78</a>      <strong class="jxr_keyword">final</strong> Resources resources = <strong class="jxr_keyword">new</strong> Resources();
 <a class="jxr_linenumber" name="L79" href="#L79">79</a>  
 <a class="jxr_linenumber" name="L80" href="#L80">80</a>      ApplicationContext applicationContext = mock(ApplicationContext.<strong class="jxr_keyword">class</strong>);
 <a class="jxr_linenumber" name="L81" href="#L81">81</a>      when(applicationContext.getClassLoader())
@@ -93,7 +93,7 @@
 <a class="jxr_linenumber" name="L85" href="#L85">85</a>  
 <a class="jxr_linenumber" name="L86" href="#L86">86</a>      exceptionHandler = <strong class="jxr_keyword">new</strong> ApiExceptionHandler(
 <a class="jxr_linenumber" name="L87" href="#L87">87</a>          errorAttributes,
-<a class="jxr_linenumber" name="L88" href="#L88">88</a>          resourceProperties,
+<a class="jxr_linenumber" name="L88" href="#L88">88</a>          resources,
 <a class="jxr_linenumber" name="L89" href="#L89">89</a>          applicationContext,
 <a class="jxr_linenumber" name="L90" href="#L90">90</a>          codecConfigurer,
 <a class="jxr_linenumber" name="L91" href="#L91">91</a>          mapper);
@@ -181,6 +181,6 @@
 <a class="jxr_linenumber" name="L173" href="#L173">173</a> }
 </pre>
 <hr/>
-<div id="footer">Copyright &#169; 2021 <a href="http://bremersee.org">bremersee.org</a>. All rights reserved.</div>
+<div id="footer">Copyright &#169; 2022 <a href="http://bremersee.org">bremersee.org</a>. All rights reserved.</div>
 </body>
 </html>

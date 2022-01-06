@@ -24,7 +24,8 @@ import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication.Type;
-import org.springframework.boot.autoconfigure.web.ResourceProperties;
+import org.springframework.boot.autoconfigure.web.WebProperties;
+import org.springframework.boot.autoconfigure.web.WebProperties.Resources;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.boot.web.reactive.error.ErrorAttributes;
 import org.springframework.context.ApplicationContext;
@@ -44,7 +45,7 @@ import org.springframework.util.ClassUtils;
 @ConditionalOnWebApplication(type = Type.REACTIVE)
 @ConditionalOnBean({
     ErrorAttributes.class,
-    ResourceProperties.class,
+    Resources.class,
     ServerCodecConfigurer.class,
     RestApiExceptionMapper.class
 })
@@ -52,26 +53,26 @@ import org.springframework.util.ClassUtils;
     RestApiExceptionMapperAutoConfiguration.class
 })
 @Configuration
-<span class="fc" id="L55">@Slf4j</span>
-<span class="fc" id="L56">public class ApiExceptionHandlerAutoConfiguration {</span>
+<span class="fc" id="L56">@Slf4j</span>
+<span class="fc" id="L57">public class ApiExceptionHandlerAutoConfiguration {</span>
 
   /**
    * Init.
    */
   @EventListener(ApplicationReadyEvent.class)
   public void init() {
-<span class="fc" id="L63">    log.info(&quot;\n&quot;</span>
+<span class="fc" id="L64">    log.info(&quot;\n&quot;</span>
             + &quot;*********************************************************************************\n&quot;
             + &quot;* {}\n&quot;
             + &quot;*********************************************************************************&quot;,
-<span class="fc" id="L67">        ClassUtils.getUserClass(getClass()).getSimpleName());</span>
-<span class="fc" id="L68">  }</span>
+<span class="fc" id="L68">        ClassUtils.getUserClass(getClass()).getSimpleName());</span>
+<span class="fc" id="L69">  }</span>
 
   /**
    * Builds api exception handler bean.
    *
    * @param errorAttributes the error attributes
-   * @param resourceProperties the resource properties
+   * @param resources the resources
    * @param applicationContext the application context
    * @param serverCodecConfigurer the server codec configurer
    * @param restApiExceptionMapper the rest api exception mapper
@@ -81,32 +82,32 @@ import org.springframework.util.ClassUtils;
   @Order(-2)
   public ApiExceptionHandler apiExceptionHandler(
       ObjectProvider&lt;ErrorAttributes&gt; errorAttributes,
-      ObjectProvider&lt;ResourceProperties&gt; resourceProperties,
+      ObjectProvider&lt;WebProperties.Resources&gt; resources,
       ApplicationContext applicationContext,
       ObjectProvider&lt;ServerCodecConfigurer&gt; serverCodecConfigurer,
       ObjectProvider&lt;RestApiExceptionMapper&gt; restApiExceptionMapper) {
 
-<span class="fc" id="L89">    Assert.notNull(</span>
-<span class="fc" id="L90">        errorAttributes.getIfAvailable(),</span>
+<span class="fc" id="L90">    Assert.notNull(</span>
+<span class="fc" id="L91">        errorAttributes.getIfAvailable(),</span>
         &quot;Error attributes must be present.&quot;);
-<span class="fc" id="L92">    Assert.notNull(</span>
-<span class="fc" id="L93">        resourceProperties.getIfAvailable(),</span>
-        &quot;Resource properties must be present.&quot;);
-<span class="fc" id="L95">    Assert.notNull(</span>
-<span class="fc" id="L96">        serverCodecConfigurer.getIfAvailable(),</span>
+<span class="fc" id="L93">    Assert.notNull(</span>
+<span class="fc" id="L94">        resources.getIfAvailable(),</span>
+        &quot;Resources must be present.&quot;);
+<span class="fc" id="L96">    Assert.notNull(</span>
+<span class="fc" id="L97">        serverCodecConfigurer.getIfAvailable(),</span>
         &quot;Server codec configurer must be present.&quot;);
-<span class="fc" id="L98">    Assert.notNull(</span>
-<span class="fc" id="L99">        restApiExceptionMapper.getIfAvailable(),</span>
+<span class="fc" id="L99">    Assert.notNull(</span>
+<span class="fc" id="L100">        restApiExceptionMapper.getIfAvailable(),</span>
         &quot;Rest api exception mapper must be present.&quot;);
-<span class="fc" id="L101">    log.info(&quot;Creating api exception handler [{}].&quot;,</span>
-<span class="fc" id="L102">        ClassUtils.getUserClass(restApiExceptionMapper.getIfAvailable()).getSimpleName());</span>
+<span class="fc" id="L102">    log.info(&quot;Creating api exception handler [{}].&quot;,</span>
+<span class="fc" id="L103">        ClassUtils.getUserClass(restApiExceptionMapper.getIfAvailable()).getSimpleName());</span>
 
-<span class="fc" id="L104">    return new ApiExceptionHandler(</span>
-<span class="fc" id="L105">        errorAttributes.getIfAvailable(),</span>
-<span class="fc" id="L106">        resourceProperties.getIfAvailable(),</span>
+<span class="fc" id="L105">    return new ApiExceptionHandler(</span>
+<span class="fc" id="L106">        errorAttributes.getIfAvailable(),</span>
+<span class="fc" id="L107">        resources.getIfAvailable(),</span>
         applicationContext,
-<span class="fc" id="L108">        serverCodecConfigurer.getIfAvailable(),</span>
-<span class="fc" id="L109">        restApiExceptionMapper.getIfAvailable());</span>
+<span class="fc" id="L109">        serverCodecConfigurer.getIfAvailable(),</span>
+<span class="fc" id="L110">        restApiExceptionMapper.getIfAvailable());</span>
   }
 
 }

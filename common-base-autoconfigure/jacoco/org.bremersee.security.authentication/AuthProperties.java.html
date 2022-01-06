@@ -56,9 +56,9 @@ import org.springframework.validation.annotation.Validated;
  */
 @ConfigurationProperties(prefix = &quot;bremersee.auth&quot;)
 @Getter
-<span class="pc" id="L59">@Setter</span>
-<span class="fc" id="L60">@ToString(exclude = {&quot;roleDefinitions&quot;, &quot;ipDefinitions&quot;})</span>
-<span class="pc bpc" id="L61" title="90 of 148 branches missed.">@EqualsAndHashCode</span>
+@Setter
+@ToString(exclude = {&quot;roleDefinitions&quot;, &quot;ipDefinitions&quot;})
+@EqualsAndHashCode
 @Validated
 <span class="fc" id="L63">public class AuthProperties {</span>
 
@@ -66,13 +66,13 @@ import org.springframework.validation.annotation.Validated;
    * Specifies the behaviour of the resource server security auto configuration.
    */
 <span class="fc" id="L68">  @NotNull</span>
-<span class="fc" id="L69">  private AutoSecurityMode resourceServer = AutoSecurityMode.OTHER;</span>
+  private AutoSecurityMode resourceServer = AutoSecurityMode.OTHER;
 
   /**
    * Specifies the {@code X-Frame-Options} value.
    */
 <span class="fc" id="L74">  @NotNull</span>
-<span class="fc" id="L75">  private FrameOptionsMode frameOptionsMode = FrameOptionsMode.DENY;</span>
+  private FrameOptionsMode frameOptionsMode = FrameOptionsMode.DENY;
 
   /**
    * The order of the resource server security auto configuration.
@@ -83,13 +83,13 @@ import org.springframework.validation.annotation.Validated;
    * The role prefix to add.
    */
 <span class="fc" id="L85">  @NotNull</span>
-<span class="fc" id="L86">  private String rolePrefix = &quot;ROLE_&quot;;</span>
+  private String rolePrefix = &quot;ROLE_&quot;;
 
   /**
    * The json path in the JWT to the roles.
    */
 <span class="fc" id="L91">  @NotEmpty</span>
-<span class="fc" id="L92">  private String rolesJsonPath = &quot;$.realm_access.roles&quot;;</span>
+  private String rolesJsonPath = &quot;$.realm_access.roles&quot;;
 
   /**
    * Specifies whether the roles value is a list (json array) or a simple string.
@@ -104,55 +104,57 @@ import org.springframework.validation.annotation.Validated;
    * The role value separator to use if the role value is a simple string.
    */
 <span class="fc" id="L106">  @NotNull</span>
-<span class="fc" id="L107">  private String rolesValueSeparator = &quot; &quot;;</span>
+  private String rolesValueSeparator = &quot; &quot;;
 
   /**
    * The json path in the JWT to the user name.
    */
 <span class="fc" id="L112">  @NotEmpty</span>
-<span class="fc" id="L113">  private String nameJsonPath = &quot;$.preferred_username&quot;;</span>
+  private String nameJsonPath = &quot;$.preferred_username&quot;;
 
-<span class="fc" id="L115">  @NotNull</span>
-<span class="fc" id="L116">  private Map&lt;String, List&lt;String&gt;&gt; roleDefinitions = new LinkedHashMap&lt;&gt;();</span>
+<span class="fc" id="L115">  @Deprecated</span>
+  @NotNull
+  private Map&lt;String, List&lt;String&gt;&gt; roleDefinitions = new LinkedHashMap&lt;&gt;();
 
-<span class="fc" id="L118">  @NotNull</span>
-<span class="fc" id="L119">  private Map&lt;String, List&lt;String&gt;&gt; ipDefinitions = new LinkedHashMap&lt;&gt;();</span>
+<span class="fc" id="L119">  @Deprecated</span>
+  @NotNull
+  private Map&lt;String, List&lt;String&gt;&gt; ipDefinitions = new LinkedHashMap&lt;&gt;();
 
-<span class="fc" id="L121">  @NotNull</span>
-<span class="fc" id="L122">  private List&lt;PathMatcherProperties&gt; pathMatchers = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L123">  @NotNull</span>
+  private List&lt;PathMatcherProperties&gt; pathMatchers = new ArrayList&lt;&gt;();
 
-<span class="fc" id="L124">  @NotNull</span>
-<span class="fc" id="L125">  private AccessMode anyAccessMode = AccessMode.AUTHENTICATED;</span>
+<span class="fc" id="L126">  @NotNull</span>
+  private AccessMode anyAccessMode = AccessMode.AUTHENTICATED;
 
   /**
    * Properties for eureka endpoints.
    */
-<span class="fc" id="L130">  @NotNull</span>
-<span class="fc" id="L131">  private EurekaAccessProperties eureka = new EurekaAccessProperties();</span>
+<span class="fc" id="L132">  @NotNull</span>
+  private EurekaAccessProperties eureka = new EurekaAccessProperties();
 
   /**
    * Properties of the jwt cache.
    */
-<span class="fc" id="L136">  @NotNull</span>
-<span class="fc" id="L137">  private JwtCache jwtCache = new JwtCache();</span>
+<span class="fc" id="L138">  @NotNull</span>
+  private JwtCache jwtCache = new JwtCache();
 
   /**
    * The properties for the oauth2 password flow.
    */
-<span class="fc" id="L142">  @NotNull</span>
-<span class="fc" id="L143">  private PasswordFlow passwordFlow = new PasswordFlow();</span>
+<span class="fc" id="L144">  @NotNull</span>
+  private PasswordFlow passwordFlow = new PasswordFlow();
 
   /**
    * The properties for the client credentials flow.
    */
-<span class="fc" id="L148">  @NotNull</span>
-<span class="fc" id="L149">  private ClientCredentialsFlow clientCredentialsFlow = new ClientCredentialsFlow();</span>
+<span class="fc" id="L150">  @NotNull</span>
+  private ClientCredentialsFlow clientCredentialsFlow = new ClientCredentialsFlow();
 
   /**
    * A list of in-memory users, that can login with basic authentication for testing purposes.
    */
-<span class="fc" id="L154">  @NotNull</span>
-<span class="fc" id="L155">  private List&lt;SimpleUser&gt; inMemoryUsers = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L156">  @NotNull</span>
+  private List&lt;SimpleUser&gt; inMemoryUsers = new ArrayList&lt;&gt;();
 
   /**
    * Build user details from in memory users.
@@ -162,16 +164,16 @@ import org.springframework.validation.annotation.Validated;
    */
   @NotNull
   public UserDetails[] buildBasicAuthUserDetails(@Nullable PasswordEncoder passwordEncoder) {
-<span class="fc" id="L165">    final PasswordEncoder encoder = Optional.ofNullable(passwordEncoder)</span>
-<span class="fc" id="L166">        .orElseGet(PasswordEncoderFactories::createDelegatingPasswordEncoder);</span>
-<span class="fc" id="L167">    return getInMemoryUsers().stream().map(</span>
-<span class="fc" id="L168">        simpleUser -&gt; User.builder()</span>
-<span class="fc" id="L169">            .username(simpleUser.getName())</span>
-<span class="fc" id="L170">            .password(simpleUser.getPassword())</span>
-<span class="fc" id="L171">            .authorities(simpleUser.buildAuthorities())</span>
-<span class="fc" id="L172">            .passwordEncoder(encoder::encode)</span>
-<span class="fc" id="L173">            .build())</span>
-<span class="fc" id="L174">        .toArray(UserDetails[]::new);</span>
+<span class="fc" id="L167">    final PasswordEncoder encoder = Optional.ofNullable(passwordEncoder)</span>
+<span class="fc" id="L168">        .orElseGet(PasswordEncoderFactories::createDelegatingPasswordEncoder);</span>
+<span class="fc" id="L169">    return getInMemoryUsers().stream().map(</span>
+<span class="fc" id="L170">            simpleUser -&gt; User.builder()</span>
+<span class="fc" id="L171">                .username(simpleUser.getName())</span>
+<span class="fc" id="L172">                .password(simpleUser.getPassword())</span>
+<span class="fc" id="L173">                .authorities(simpleUser.buildAuthorities())</span>
+<span class="fc" id="L174">                .passwordEncoder(encoder::encode)</span>
+<span class="fc" id="L175">                .build())</span>
+<span class="fc" id="L176">        .toArray(UserDetails[]::new);</span>
   }
 
   /**
@@ -182,8 +184,8 @@ import org.springframework.validation.annotation.Validated;
    */
   @NotEmpty
   public String ensureRolePrefix(@NotEmpty String role) {
-<span class="fc" id="L185">    final String prefix = rolePrefix.trim();</span>
-<span class="fc bfc" id="L186" title="All 4 branches covered.">    return StringUtils.hasText(prefix) &amp;&amp; role.startsWith(prefix) ? role : prefix + role;</span>
+<span class="fc" id="L187">    final String prefix = rolePrefix.trim();</span>
+<span class="fc bfc" id="L188" title="All 4 branches covered.">    return StringUtils.hasText(prefix) &amp;&amp; role.startsWith(prefix) ? role : prefix + role;</span>
   }
 
   /**
@@ -196,27 +198,27 @@ import org.springframework.validation.annotation.Validated;
   public List&lt;PathMatcherProperties&gt; preparePathMatchers(
       @NotNull CorsProperties corsProperties) {
 
-<span class="fc" id="L199">    List&lt;PathMatcherProperties&gt; pathMatchers = new ArrayList&lt;&gt;(getPathMatchers());</span>
-<span class="fc" id="L200">    PathMatcherProperties corsMatcher = new PathMatcherProperties();</span>
-<span class="fc" id="L201">    corsMatcher.setHttpMethod(HttpMethod.OPTIONS.name());</span>
-<span class="fc" id="L202">    corsMatcher.setAccessMode(AccessMode.PERMIT_ALL);</span>
-<span class="pc bpc" id="L203" title="2 of 4 branches missed.">    if (corsProperties.isEnable() &amp;&amp; !pathMatchers.contains(corsMatcher)) {</span>
-<span class="fc" id="L204">      pathMatchers.add(0, corsMatcher);</span>
+<span class="fc" id="L201">    List&lt;PathMatcherProperties&gt; pathMatchers = new ArrayList&lt;&gt;(getPathMatchers());</span>
+<span class="fc" id="L202">    PathMatcherProperties corsMatcher = new PathMatcherProperties();</span>
+<span class="fc" id="L203">    corsMatcher.setHttpMethod(HttpMethod.OPTIONS.name());</span>
+<span class="fc" id="L204">    corsMatcher.setAccessMode(AccessMode.PERMIT_ALL);</span>
+<span class="pc bpc" id="L205" title="2 of 4 branches missed.">    if (corsProperties.isEnable() &amp;&amp; !pathMatchers.contains(corsMatcher)) {</span>
+<span class="fc" id="L206">      pathMatchers.add(0, corsMatcher);</span>
     }
-<span class="fc" id="L206">    PathMatcherProperties anyRequestMatcher = new PathMatcherProperties();</span>
-<span class="fc" id="L207">    anyRequestMatcher.setAccessMode(getAnyAccessMode());</span>
-<span class="pc bpc" id="L208" title="1 of 2 branches missed.">    if (!pathMatchers.contains(anyRequestMatcher)) {</span>
-<span class="fc" id="L209">      pathMatchers.add(anyRequestMatcher);</span>
+<span class="fc" id="L208">    PathMatcherProperties anyRequestMatcher = new PathMatcherProperties();</span>
+<span class="fc" id="L209">    anyRequestMatcher.setAccessMode(getAnyAccessMode());</span>
+<span class="pc bpc" id="L210" title="1 of 2 branches missed.">    if (!pathMatchers.contains(anyRequestMatcher)) {</span>
+<span class="fc" id="L211">      pathMatchers.add(anyRequestMatcher);</span>
     }
-<span class="fc" id="L211">    return pathMatchers;</span>
+<span class="fc" id="L213">    return pathMatchers;</span>
   }
 
   /**
    * The path matcher properties.
    */
-<span class="fc" id="L217">  @Setter</span>
-<span class="pc bpc" id="L218" title="11 of 22 branches missed.">  @EqualsAndHashCode(of = {&quot;httpMethod&quot;, &quot;antPattern&quot;})</span>
-<span class="fc" id="L219">  @NoArgsConstructor</span>
+  @Setter
+  @EqualsAndHashCode(of = {&quot;httpMethod&quot;, &quot;antPattern&quot;})
+  @NoArgsConstructor
   @Validated
   public static class PathMatcherProperties {
 
@@ -230,21 +232,21 @@ import org.springframework.validation.annotation.Validated;
      */
     public static final String ANY_PATH = &quot;/**&quot;;
 
-<span class="fc" id="L233">    @NotNull</span>
+    @NotNull
     private String httpMethod = ALL_HTTP_METHODS;
 
-<span class="fc" id="L236">    @NotNull</span>
+    @NotNull
     private String antPattern = ANY_PATH;
 
-<span class="fc" id="L239">    @Getter</span>
+    @Getter
     @NotNull
     private AccessMode accessMode = AccessMode.AUTHENTICATED;
 
-<span class="fc" id="L243">    @Getter</span>
+    @Getter
     @NotNull
     private List&lt;String&gt; roles = new ArrayList&lt;&gt;();
 
-<span class="fc" id="L247">    @Getter</span>
+    @Getter
     @NotNull
     private List&lt;String&gt; ipAddresses = new ArrayList&lt;&gt;();
 
@@ -255,11 +257,11 @@ import org.springframework.validation.annotation.Validated;
      */
     @NotEmpty
     public String getHttpMethod() {
-<span class="pc bpc" id="L258" title="1 of 2 branches missed.">      if (StringUtils.hasText(httpMethod)</span>
-<span class="fc bfc" id="L259" title="All 2 branches covered.">          &amp;&amp; HttpMethod.resolve(httpMethod.toUpperCase()) != null) {</span>
-<span class="fc" id="L260">        return httpMethod.toUpperCase();</span>
+<span class="pc bpc" id="L260" title="1 of 2 branches missed.">      if (StringUtils.hasText(httpMethod)</span>
+<span class="fc bfc" id="L261" title="All 2 branches covered.">          &amp;&amp; HttpMethod.resolve(httpMethod.toUpperCase()) != null) {</span>
+<span class="fc" id="L262">        return httpMethod.toUpperCase();</span>
       }
-<span class="fc" id="L262">      return ALL_HTTP_METHODS;</span>
+<span class="fc" id="L264">      return ALL_HTTP_METHODS;</span>
     }
 
     /**
@@ -269,7 +271,7 @@ import org.springframework.validation.annotation.Validated;
      */
     @NotEmpty
     public String getAntPattern() {
-<span class="pc bpc" id="L272" title="1 of 2 branches missed.">      return StringUtils.hasText(antPattern) ? antPattern : ANY_PATH;</span>
+<span class="pc bpc" id="L274" title="1 of 2 branches missed.">      return StringUtils.hasText(antPattern) ? antPattern : ANY_PATH;</span>
     }
 
     /**
@@ -279,7 +281,7 @@ import org.springframework.validation.annotation.Validated;
      */
     @Nullable
     public HttpMethod httpMethod() {
-<span class="fc" id="L282">      return HttpMethod.resolve(getHttpMethod());</span>
+<span class="fc" id="L284">      return HttpMethod.resolve(getHttpMethod());</span>
     }
 
     /**
@@ -291,7 +293,7 @@ import org.springframework.validation.annotation.Validated;
     @NotEmpty
     public String accessExpression(
         @Nullable Function&lt;String, String&gt; ensureRolePrefixFunction) {
-<span class="fc" id="L294">      return AccessExpressionUtils.buildAccessExpression(this, ensureRolePrefixFunction);</span>
+<span class="fc" id="L296">      return AccessExpressionUtils.buildAccessExpression(this, ensureRolePrefixFunction);</span>
     }
 
     /**
@@ -301,23 +303,23 @@ import org.springframework.validation.annotation.Validated;
      * @return the valid roles
      */
     public Set&lt;String&gt; roles(@Nullable Function&lt;String, String&gt; ensureRolePrefixFunction) {
-<span class="fc" id="L304">      return roles.stream()</span>
-<span class="fc" id="L305">          .filter(StringUtils::hasText)</span>
-<span class="fc bfc" id="L306" title="All 2 branches covered.">          .map(role -&gt; ensureRolePrefixFunction != null</span>
-<span class="fc" id="L307">              ? ensureRolePrefixFunction.apply(role)</span>
-<span class="fc" id="L308">              : role)</span>
-<span class="fc" id="L309">          .collect(Collectors.toSet());</span>
+<span class="fc" id="L306">      return roles.stream()</span>
+<span class="fc" id="L307">          .filter(StringUtils::hasText)</span>
+<span class="fc bfc" id="L308" title="All 2 branches covered.">          .map(role -&gt; ensureRolePrefixFunction != null</span>
+<span class="fc" id="L309">              ? ensureRolePrefixFunction.apply(role)</span>
+<span class="fc" id="L310">              : role)</span>
+<span class="fc" id="L311">          .collect(Collectors.toSet());</span>
     }
 
     @Override
     public String toString() {
       final String path;
-<span class="fc bfc" id="L315" title="All 2 branches covered.">      if (ALL_HTTP_METHODS.equals(getHttpMethod())) {</span>
-<span class="fc" id="L316">        path = getAntPattern();</span>
+<span class="fc bfc" id="L317" title="All 2 branches covered.">      if (ALL_HTTP_METHODS.equals(getHttpMethod())) {</span>
+<span class="fc" id="L318">        path = getAntPattern();</span>
       } else {
-<span class="fc" id="L318">        path = getHttpMethod() + &quot;: &quot; + getAntPattern();</span>
+<span class="fc" id="L320">        path = getHttpMethod() + &quot;: &quot; + getAntPattern();</span>
       }
-<span class="fc" id="L320">      return path + &quot; with access = &quot; + accessExpression(null);</span>
+<span class="fc" id="L322">      return path + &quot; with access = &quot; + accessExpression(null);</span>
     }
   }
 
@@ -325,24 +327,24 @@ import org.springframework.validation.annotation.Validated;
    * The eureka access properties.
    */
   @Getter
-<span class="fc" id="L328">  @Setter</span>
-<span class="fc" id="L329">  @ToString(exclude = {&quot;password&quot;})</span>
-<span class="pc bpc" id="L330" title="17 of 38 branches missed.">  @EqualsAndHashCode</span>
-<span class="fc" id="L331">  @NoArgsConstructor</span>
+  @Setter
+  @ToString(exclude = {&quot;password&quot;})
+  @EqualsAndHashCode
+  @NoArgsConstructor
   @Validated
   public static class EurekaAccessProperties {
 
-<span class="fc" id="L335">    private String username;</span>
+    private String username;
 
-<span class="fc" id="L337">    private String password;</span>
+    private String password;
 
-<span class="fc" id="L339">    private String role = AuthorityConstants.EUREKA_ROLE_NAME;</span>
+    private String role = AuthorityConstants.EUREKA_ROLE_NAME;
 
     /**
      * The IP addresses which can access protected eureka endpoints without authentication.
      */
-<span class="fc" id="L344">    @NotNull</span>
-<span class="fc" id="L345">    private List&lt;String&gt; ipAddresses = new ArrayList&lt;&gt;();</span>
+    @NotNull
+    private List&lt;String&gt; ipAddresses = new ArrayList&lt;&gt;();
 
     /**
      * Returns the role.
@@ -352,9 +354,9 @@ import org.springframework.validation.annotation.Validated;
      */
     @Nullable
     public String role(@Nullable Function&lt;String, String&gt; ensureRolePrefixFunction) {
-<span class="fc" id="L355">      return Optional.ofNullable(ensureRolePrefixFunction)</span>
-<span class="pc bpc" id="L356" title="1 of 2 branches missed.">          .map(func -&gt; StringUtils.hasText(role) ? func.apply(role) : role)</span>
-<span class="fc" id="L357">          .orElse(role);</span>
+<span class="fc" id="L357">      return Optional.ofNullable(ensureRolePrefixFunction)</span>
+<span class="pc bpc" id="L358" title="1 of 2 branches missed.">          .map(func -&gt; StringUtils.hasText(role) ? func.apply(role) : role)</span>
+<span class="fc" id="L359">          .orElse(role);</span>
     }
 
     /**
@@ -366,7 +368,7 @@ import org.springframework.validation.annotation.Validated;
     @NotEmpty
     public String buildAccessExpression(
         @Nullable Function&lt;String, String&gt; ensureRolePrefixFunction) {
-<span class="fc" id="L369">      return AccessExpressionUtils.buildAccessExpression(this, ensureRolePrefixFunction);</span>
+<span class="fc" id="L371">      return AccessExpressionUtils.buildAccessExpression(this, ensureRolePrefixFunction);</span>
     }
 
     /**
@@ -381,30 +383,30 @@ import org.springframework.validation.annotation.Validated;
         @Nullable PasswordEncoder passwordEncoder,
         UserDetails... otherUserDetails) {
 
-<span class="fc bfc" id="L384" title="All 2 branches covered.">      if (!StringUtils.hasText(username)) {</span>
-<span class="fc" id="L385">        return Optional.ofNullable(otherUserDetails).orElse(new UserDetails[0]);</span>
+<span class="fc bfc" id="L386" title="All 2 branches covered.">      if (!StringUtils.hasText(username)) {</span>
+<span class="fc" id="L387">        return Optional.ofNullable(otherUserDetails).orElse(new UserDetails[0]);</span>
       }
-<span class="pc bpc" id="L387" title="1 of 2 branches missed.">      final PasswordEncoder encoder = passwordEncoder != null</span>
-<span class="nc" id="L388">          ? passwordEncoder</span>
-<span class="fc" id="L389">          : PasswordEncoderFactories.createDelegatingPasswordEncoder();</span>
-<span class="fc" id="L390">      final SimpleUser user = new SimpleUser();</span>
-<span class="fc" id="L391">      user.setName(username);</span>
-<span class="pc bpc" id="L392" title="1 of 2 branches missed.">      user.setPassword(StringUtils.hasText(password) ? password : &quot;&quot;);</span>
-<span class="pc bpc" id="L393" title="1 of 2 branches missed.">      if (StringUtils.hasText(role)) {</span>
-<span class="fc" id="L394">        user.setAuthorities(Collections.singletonList(role));</span>
+<span class="pc bpc" id="L389" title="1 of 2 branches missed.">      final PasswordEncoder encoder = passwordEncoder != null</span>
+<span class="nc" id="L390">          ? passwordEncoder</span>
+<span class="fc" id="L391">          : PasswordEncoderFactories.createDelegatingPasswordEncoder();</span>
+<span class="fc" id="L392">      final SimpleUser user = new SimpleUser();</span>
+<span class="fc" id="L393">      user.setName(username);</span>
+<span class="pc bpc" id="L394" title="1 of 2 branches missed.">      user.setPassword(StringUtils.hasText(password) ? password : &quot;&quot;);</span>
+<span class="pc bpc" id="L395" title="1 of 2 branches missed.">      if (StringUtils.hasText(role)) {</span>
+<span class="fc" id="L396">        user.setAuthorities(Collections.singletonList(role));</span>
       }
-<span class="fc" id="L396">      final UserDetails userDetails = User.builder()</span>
-<span class="fc" id="L397">          .username(user.getName())</span>
-<span class="fc" id="L398">          .password(user.getPassword())</span>
-<span class="fc" id="L399">          .authorities(user.buildAuthorities())</span>
-<span class="fc" id="L400">          .passwordEncoder(encoder::encode)</span>
-<span class="fc" id="L401">          .build();</span>
-<span class="fc" id="L402">      List&lt;UserDetails&gt; users = new ArrayList&lt;&gt;();</span>
-<span class="pc bpc" id="L403" title="1 of 2 branches missed.">      if (otherUserDetails != null) {</span>
-<span class="fc" id="L404">        users.addAll(Arrays.asList(otherUserDetails));</span>
+<span class="fc" id="L398">      final UserDetails userDetails = User.builder()</span>
+<span class="fc" id="L399">          .username(user.getName())</span>
+<span class="fc" id="L400">          .password(user.getPassword())</span>
+<span class="fc" id="L401">          .authorities(user.buildAuthorities())</span>
+<span class="fc" id="L402">          .passwordEncoder(encoder::encode)</span>
+<span class="fc" id="L403">          .build();</span>
+<span class="fc" id="L404">      List&lt;UserDetails&gt; users = new ArrayList&lt;&gt;();</span>
+<span class="pc bpc" id="L405" title="1 of 2 branches missed.">      if (otherUserDetails != null) {</span>
+<span class="fc" id="L406">        users.addAll(Arrays.asList(otherUserDetails));</span>
       }
-<span class="fc" id="L406">      users.add(userDetails);</span>
-<span class="fc" id="L407">      return users.toArray(new UserDetails[0]);</span>
+<span class="fc" id="L408">      users.add(userDetails);</span>
+<span class="fc" id="L409">      return users.toArray(new UserDetails[0]);</span>
     }
   }
 
@@ -412,46 +414,46 @@ import org.springframework.validation.annotation.Validated;
    * The client credentials flow.
    */
   @Getter
-<span class="fc" id="L415">  @Setter</span>
-<span class="fc" id="L416">  @ToString(exclude = {&quot;clientSecret&quot;})</span>
-<span class="pc bpc" id="L417" title="7 of 22 branches missed.">  @EqualsAndHashCode(exclude = {&quot;clientSecret&quot;})</span>
-<span class="fc" id="L418">  public static class ClientCredentialsFlow implements ClientCredentialsFlowProperties {</span>
+  @Setter
+  @ToString(exclude = {&quot;clientSecret&quot;})
+  @EqualsAndHashCode(exclude = {&quot;clientSecret&quot;})
+<span class="fc" id="L420">  public static class ClientCredentialsFlow implements ClientCredentialsFlowProperties {</span>
 
-<span class="fc" id="L420">    private String tokenEndpoint;</span>
+    private String tokenEndpoint;
 
-<span class="fc" id="L422">    private String clientId;</span>
+    private String clientId;
 
-<span class="fc" id="L424">    private String clientSecret;</span>
+    private String clientSecret;
   }
 
   /**
    * OAuth2 password flow configuration properties.
    */
   @Getter
-<span class="fc" id="L431">  @Setter</span>
-<span class="fc" id="L432">  @ToString(exclude = {&quot;clientSecret&quot;, &quot;password&quot;})</span>
-<span class="pc bpc" id="L433" title="10 of 30 branches missed.">  @EqualsAndHashCode(exclude = {&quot;clientSecret&quot;, &quot;password&quot;})</span>
-<span class="fc" id="L434">  public static class PasswordFlow implements PasswordFlowProperties {</span>
+  @Setter
+  @ToString(exclude = {&quot;clientSecret&quot;, &quot;password&quot;})
+  @EqualsAndHashCode(exclude = {&quot;clientSecret&quot;, &quot;password&quot;})
+<span class="fc" id="L436">  public static class PasswordFlow implements PasswordFlowProperties {</span>
 
-<span class="fc" id="L436">    private String tokenEndpoint;</span>
+    private String tokenEndpoint;
 
-<span class="fc" id="L438">    private String clientId;</span>
+    private String clientId;
 
-<span class="fc" id="L440">    private String clientSecret;</span>
+    private String clientSecret;
 
-<span class="fc" id="L442">    private String username;</span>
+    private String username;
 
-<span class="fc" id="L444">    private String password;</span>
+    private String password;
   }
 
   /**
    * A simple user.
    */
   @Getter
-<span class="fc" id="L451">  @Setter</span>
-<span class="fc" id="L452">  @ToString(exclude = &quot;password&quot;)</span>
-<span class="pc bpc" id="L453" title="11 of 22 branches missed.">  @EqualsAndHashCode(exclude = &quot;password&quot;)</span>
-<span class="fc" id="L454">  @NoArgsConstructor</span>
+  @Setter
+  @ToString(exclude = &quot;password&quot;)
+  @EqualsAndHashCode(exclude = &quot;password&quot;)
+  @NoArgsConstructor
   @Validated
   public static class SimpleUser implements Serializable, Principal {
 
@@ -460,18 +462,18 @@ import org.springframework.validation.annotation.Validated;
     /**
      * The user name of the user.
      */
-<span class="fc" id="L463">    private String name;</span>
+    private String name;
 
     /**
      * The password of the user.
      */
-<span class="fc" id="L468">    private String password;</span>
+    private String password;
 
     /**
      * The granted authorities of the user. The names of the authorities starts with {@code ROLE_}.
      */
-<span class="fc" id="L473">    @NotNull</span>
-<span class="fc" id="L474">    private List&lt;String&gt; authorities = new ArrayList&lt;&gt;();</span>
+    @NotNull
+    private List&lt;String&gt; authorities = new ArrayList&lt;&gt;();
 
     /**
      * Build authorities.
@@ -479,12 +481,12 @@ import org.springframework.validation.annotation.Validated;
      * @return the authorities
      */
     String[] buildAuthorities() {
-<span class="fc bfc" id="L482" title="All 2 branches covered.">      if (authorities.isEmpty()) {</span>
-<span class="fc" id="L483">        return new String[]{</span>
+<span class="fc bfc" id="L484" title="All 2 branches covered.">      if (authorities.isEmpty()) {</span>
+<span class="fc" id="L485">        return new String[]{</span>
             AuthorityConstants.USER_ROLE_NAME
         };
       }
-<span class="fc" id="L487">      return authorities.toArray(new String[0]);</span>
+<span class="fc" id="L489">      return authorities.toArray(new String[0]);</span>
     }
   }
 
@@ -492,26 +494,26 @@ import org.springframework.validation.annotation.Validated;
    * The jwt cache properties.
    */
   @Getter
-<span class="nc" id="L495">  @Setter</span>
-<span class="fc" id="L496">  @ToString</span>
-<span class="pc bpc" id="L497" title="18 of 30 branches missed.">  @EqualsAndHashCode</span>
-<span class="fc" id="L498">  @NoArgsConstructor</span>
+  @Setter
+  @ToString
+  @EqualsAndHashCode
+  @NoArgsConstructor
   @Validated
   public static class JwtCache {
 
-<span class="fc" id="L502">    @NotEmpty</span>
-<span class="fc" id="L503">    private String externalCacheName = AccessTokenCache.CACHE_NAME;</span>
+    @NotEmpty
+    private String externalCacheName = AccessTokenCache.CACHE_NAME;
 
     /**
      * The expiration time threshold.
      */
-<span class="fc" id="L508">    @NotNull</span>
-<span class="fc" id="L509">    private Duration expirationTimeThreshold = Duration.ofSeconds(20L);</span>
+    @NotNull
+    private Duration expirationTimeThreshold = Duration.ofSeconds(20L);
 
     /**
      * The database or cache key prefix.
      */
-<span class="fc" id="L514">    private String keyPrefix = &quot;jwt:&quot;;</span>
+    private String keyPrefix = &quot;jwt:&quot;;
 
     /**
      * Add key prefix to the given key.
@@ -520,11 +522,11 @@ import org.springframework.validation.annotation.Validated;
      * @return the string
      */
     public String addKeyPrefix(String givenKey) {
-<span class="pc bpc" id="L523" title="1 of 2 branches missed.">      if (StringUtils.hasText(getKeyPrefix())</span>
-<span class="pc bpc" id="L524" title="1 of 2 branches missed.">          &amp;&amp; !givenKey.startsWith(getKeyPrefix())) {</span>
-<span class="fc" id="L525">        return getKeyPrefix() + givenKey;</span>
+<span class="pc bpc" id="L525" title="1 of 2 branches missed.">      if (StringUtils.hasText(getKeyPrefix())</span>
+<span class="pc bpc" id="L526" title="1 of 2 branches missed.">          &amp;&amp; !givenKey.startsWith(getKeyPrefix())) {</span>
+<span class="fc" id="L527">        return getKeyPrefix() + givenKey;</span>
       }
-<span class="nc" id="L527">      return givenKey;</span>
+<span class="nc" id="L529">      return givenKey;</span>
     }
 
   }

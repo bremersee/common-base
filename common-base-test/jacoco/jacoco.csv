@@ -1,13 +1,12 @@
 GROUP,PACKAGE,CLASS,INSTRUCTION_MISSED,INSTRUCTION_COVERED,BRANCH_MISSED,BRANCH_COVERED,LINE_MISSED,LINE_COVERED,COMPLEXITY_MISSED,COMPLEXITY_COVERED,METHOD_MISSED,METHOD_COVERED
 common-base-test,org.bremersee.test.security.authentication,JwtAuthenticationTokenSecurityContextFactory,34,346,11,17,8,85,11,13,0,10
 common-base-test,org.bremersee.test,TestEnvironmentUtils,3,4,0,0,1,1,1,1,1,1
-common-base-test,org.bremersee.test.web,RestApiTesterExclusion.RestApiTesterExclusionBuilder,6,21,0,0,0,1,1,4,1,4
 common-base-test,org.bremersee.test.web,RestApiTesterPath.Impl,0,13,0,0,0,4,0,3,0,3
-common-base-test,org.bremersee.test.web,RestApiTesterExclusion,1,70,5,13,0,14,5,9,0,5
+common-base-test,org.bremersee.test.web,RestApiTesterExclusion,1,60,5,13,0,11,5,6,0,2
 common-base-test,org.bremersee.test.web,RestApiTesterPath,0,4,0,0,0,1,0,1,0,1
 common-base-test,org.bremersee.test.web,RestApiTester,15,535,10,38,3,122,10,25,0,11
-common-base-test,org.bremersee.test.web,RestApiAssertionType,0,103,0,0,0,13,0,3,0,3
+common-base-test,org.bremersee.test.web,RestApiAssertionType,0,100,0,0,0,12,0,2,0,2
 common-base-test,org.bremersee.test.web,RestApiTesterPath.BuilderImpl,0,43,1,1,0,10,1,4,0,4
+common-base-test,org.bremersee.test.web,RestApiTesterPath.RestApiTesterPathValues,0,15,0,0,0,5,0,2,0,2
 common-base-test,org.bremersee.test.web,RestApiTesterPath.PathType,0,70,0,0,0,10,0,3,0,3
-common-base-test,org.bremersee.test.web,RestApiTesterPath.RestApiTesterPathValues,46,61,13,9,0,6,10,6,1,4
 common-base-test,org.bremersee.test.beans,SimpleObjectProvider,4,64,1,7,1,23,1,12,0,9

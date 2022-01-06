@@ -46,18 +46,17 @@ public interface AccessController {
    * @param acl the access control list
    * @return the access controller
    */
-  @SuppressWarnings(&quot;rawtypes&quot;)
+  @SuppressWarnings({&quot;rawtypes&quot;, &quot;unchecked&quot;})
   static AccessController from(@Nullable Acl acl) {
 <span class="fc bfc" id="L51" title="All 2 branches covered.">    return acl == null ? new Impl() : new Impl(AclBuilder.builder().from(acl).buildAcl());</span>
   }
 
   /**
-   * Determines whether the given user with the given roles and groups has the specified
-   * permission.
+   * Determines whether the given user with the given roles and groups has the specified permission.
    *
-   * @param user       the user
-   * @param roles      the roles
-   * @param groups     the groups
+   * @param user the user
+   * @param roles the roles
+   * @param groups the groups
    * @param permission the permission
    * @return {@code true} if the user has the permission, otherwise {@code false}
    */
@@ -68,12 +67,11 @@ public interface AccessController {
       @Nullable String permission);
 
   /**
-   * Determines whether the given user with the given roles and groups has at least one of the
-   * specified permissions.
+   * Determines whether the given user with the given roles and groups has at least one of the specified permissions.
    *
-   * @param user        the user
-   * @param roles       the roles
-   * @param groups      the groups
+   * @param user the user
+   * @param roles the roles
+   * @param groups the groups
    * @param permissions the permissions
    * @return {@code true} if the user has at least one permission, otherwise {@code false}
    */
@@ -83,20 +81,19 @@ public interface AccessController {
       @Nullable Collection&lt;String&gt; groups,
       @Nullable String... permissions) {
 
-<span class="fc" id="L86">    return hasAnyPermission(</span>
+<span class="fc" id="L84">    return hasAnyPermission(</span>
         user,
         roles,
         groups,
-<span class="pc bpc" id="L90" title="1 of 2 branches missed.">        permissions == null ? Collections.emptyList() : Arrays.asList(permissions));</span>
+<span class="pc bpc" id="L88" title="1 of 2 branches missed.">        permissions == null ? Collections.emptyList() : Arrays.asList(permissions));</span>
   }
 
   /**
-   * Determines whether the given user with the given roles and groups has at least one of the
-   * specified permissions.
+   * Determines whether the given user with the given roles and groups has at least one of the specified permissions.
    *
-   * @param user        the user
-   * @param roles       the roles
-   * @param groups      the groups
+   * @param user the user
+   * @param roles the roles
+   * @param groups the groups
    * @param permissions the permissions
    * @return {@code true} if the user has at least one permission, otherwise {@code false}
    */
@@ -106,20 +103,19 @@ public interface AccessController {
       @Nullable Collection&lt;String&gt; groups,
       @Nullable Collection&lt;String&gt; permissions) {
 
-<span class="pc bpc" id="L109" title="1 of 2 branches missed.">    return permissions != null</span>
-<span class="fc bfc" id="L110" title="All 2 branches covered.">        &amp;&amp; !permissions.isEmpty()</span>
+<span class="pc bpc" id="L106" title="1 of 2 branches missed.">    return permissions != null</span>
+<span class="fc bfc" id="L107" title="All 2 branches covered.">        &amp;&amp; !permissions.isEmpty()</span>
         &amp;&amp; permissions
-<span class="fc" id="L112">        .stream()</span>
-<span class="fc bfc" id="L113" title="All 2 branches covered.">        .anyMatch(permission -&gt; hasPermission(user, roles, groups, permission));</span>
+<span class="fc" id="L109">        .stream()</span>
+<span class="fc bfc" id="L110" title="All 2 branches covered.">        .anyMatch(permission -&gt; hasPermission(user, roles, groups, permission));</span>
   }
 
   /**
-   * Determines whether the given user with the given roles and groups has all specified
-   * permissions.
+   * Determines whether the given user with the given roles and groups has all specified permissions.
    *
-   * @param user        the user
-   * @param roles       the roles
-   * @param groups      the groups
+   * @param user the user
+   * @param roles the roles
+   * @param groups the groups
    * @param permissions the permissions
    * @return {@code true} if the user has all permissions, otherwise {@code false}
    */
@@ -129,20 +125,19 @@ public interface AccessController {
       Collection&lt;String&gt; groups,
       String... permissions) {
 
-<span class="fc" id="L132">    return hasAllPermissions(</span>
+<span class="fc" id="L128">    return hasAllPermissions(</span>
         user,
         roles,
         groups,
-<span class="pc bpc" id="L136" title="1 of 2 branches missed.">        permissions == null ? Collections.emptyList() : Arrays.asList(permissions));</span>
+<span class="pc bpc" id="L132" title="1 of 2 branches missed.">        permissions == null ? Collections.emptyList() : Arrays.asList(permissions));</span>
   }
 
   /**
-   * Determines whether the given user with the given roles and groups has all specified
-   * permissions.
+   * Determines whether the given user with the given roles and groups has all specified permissions.
    *
-   * @param user        the user
-   * @param roles       the roles
-   * @param groups      the groups
+   * @param user the user
+   * @param roles the roles
+   * @param groups the groups
    * @param permissions the permissions
    * @return {@code true} if the user has all permissions, otherwise {@code false}
    */
@@ -152,11 +147,11 @@ public interface AccessController {
       Collection&lt;String&gt; groups,
       Collection&lt;String&gt; permissions) {
 
-<span class="pc bpc" id="L155" title="1 of 2 branches missed.">    return permissions != null</span>
-<span class="fc bfc" id="L156" title="All 2 branches covered.">        &amp;&amp; !permissions.isEmpty()</span>
+<span class="pc bpc" id="L150" title="1 of 2 branches missed.">    return permissions != null</span>
+<span class="fc bfc" id="L151" title="All 2 branches covered.">        &amp;&amp; !permissions.isEmpty()</span>
         &amp;&amp; permissions
-<span class="fc" id="L158">        .stream()</span>
-<span class="fc bfc" id="L159" title="All 2 branches covered.">        .allMatch(permission -&gt; hasPermission(user, roles, groups, permission));</span>
+<span class="fc" id="L153">        .stream()</span>
+<span class="fc bfc" id="L154" title="All 2 branches covered.">        .allMatch(permission -&gt; hasPermission(user, roles, groups, permission));</span>
   }
 
   /**
@@ -169,18 +164,18 @@ public interface AccessController {
     /**
      * Instantiates a new access controller.
      */
-<span class="fc" id="L172">    Impl() {</span>
-<span class="fc" id="L173">      acl = null;</span>
-<span class="fc" id="L174">    }</span>
+<span class="fc" id="L167">    Impl() {</span>
+<span class="fc" id="L168">      acl = null;</span>
+<span class="fc" id="L169">    }</span>
 
     /**
      * Instantiates a new access controller.
      *
      * @param acl the acl
      */
-<span class="fc" id="L181">    Impl(final Acl&lt;? extends Ace&gt; acl) {</span>
-<span class="fc" id="L182">      this.acl = acl;</span>
-<span class="fc" id="L183">    }</span>
+<span class="fc" id="L176">    Impl(final Acl&lt;? extends Ace&gt; acl) {</span>
+<span class="fc" id="L177">      this.acl = acl;</span>
+<span class="fc" id="L178">    }</span>
 
     @Override
     public boolean hasPermission(
@@ -189,33 +184,33 @@ public interface AccessController {
         final Collection&lt;String&gt; groups,
         final String permission) {
 
-<span class="fc bfc" id="L192" title="All 2 branches covered.">      if (acl == null) {</span>
-<span class="fc" id="L193">        return false;</span>
+<span class="fc bfc" id="L187" title="All 2 branches covered.">      if (acl == null) {</span>
+<span class="fc" id="L188">        return false;</span>
       }
-<span class="fc bfc" id="L195" title="All 2 branches covered.">      if (permission == null) {</span>
-<span class="fc" id="L196">        return false;</span>
+<span class="fc bfc" id="L190" title="All 2 branches covered.">      if (permission == null) {</span>
+<span class="fc" id="L191">        return false;</span>
       }
-<span class="pc bpc" id="L198" title="1 of 4 branches missed.">      if (user != null &amp;&amp; user.equals(acl.getOwner())) {</span>
-<span class="fc" id="L199">        return true;</span>
+<span class="pc bpc" id="L193" title="1 of 4 branches missed.">      if (user != null &amp;&amp; user.equals(acl.getOwner())) {</span>
+<span class="fc" id="L194">        return true;</span>
       }
-<span class="fc" id="L201">      final Map&lt;String, ? extends Ace&gt; map = acl.entryMap();</span>
-<span class="pc bpc" id="L202" title="1 of 2 branches missed.">      if (map == null) {</span>
-<span class="nc" id="L203">        return false;</span>
+<span class="fc" id="L196">      final Map&lt;String, ? extends Ace&gt; map = acl.entryMap();</span>
+<span class="pc bpc" id="L197" title="1 of 2 branches missed.">      if (map == null) {</span>
+<span class="nc" id="L198">        return false;</span>
       }
-<span class="fc" id="L205">      final Ace ace = map.get(permission.toLowerCase());</span>
-<span class="fc bfc" id="L206" title="All 2 branches covered.">      if (ace == null) {</span>
-<span class="fc" id="L207">        return false;</span>
+<span class="fc" id="L200">      final Ace ace = map.get(permission.toLowerCase());</span>
+<span class="fc bfc" id="L201" title="All 2 branches covered.">      if (ace == null) {</span>
+<span class="fc" id="L202">        return false;</span>
       }
-<span class="fc bfc" id="L209" title="All 2 branches covered.">      if (ace.isGuest()) {</span>
-<span class="fc" id="L210">        return true;</span>
+<span class="fc bfc" id="L204" title="All 2 branches covered.">      if (ace.isGuest()) {</span>
+<span class="fc" id="L205">        return true;</span>
       }
-<span class="fc bfc" id="L212" title="All 2 branches covered.">      if (ace.getUsers().contains(user)) {</span>
-<span class="fc" id="L213">        return true;</span>
+<span class="fc bfc" id="L207" title="All 2 branches covered.">      if (ace.getUsers().contains(user)) {</span>
+<span class="fc" id="L208">        return true;</span>
       }
-<span class="pc bpc" id="L215" title="1 of 4 branches missed.">      if (roles != null &amp;&amp; roles.stream().anyMatch(role -&gt; ace.getRoles().contains(role))) {</span>
-<span class="fc" id="L216">        return true;</span>
+<span class="pc bpc" id="L210" title="1 of 4 branches missed.">      if (roles != null &amp;&amp; roles.stream().anyMatch(role -&gt; ace.getRoles().contains(role))) {</span>
+<span class="fc" id="L211">        return true;</span>
       }
-<span class="pc bpc" id="L218" title="1 of 4 branches missed.">      return groups != null &amp;&amp; groups.stream().anyMatch(group -&gt; ace.getGroups().contains(group));</span>
+<span class="pc bpc" id="L213" title="1 of 4 branches missed.">      return groups != null &amp;&amp; groups.stream().anyMatch(group -&gt; ace.getGroups().contains(group));</span>
     }
   }
 

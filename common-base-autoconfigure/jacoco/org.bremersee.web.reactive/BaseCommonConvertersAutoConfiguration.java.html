@@ -24,6 +24,7 @@ import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.event.EventListener;
 import org.springframework.format.FormatterRegistry;
+import org.springframework.lang.NonNull;
 import org.springframework.util.ClassUtils;
 import org.springframework.web.reactive.config.WebFluxConfigurer;
 
@@ -34,25 +35,25 @@ import org.springframework.web.reactive.config.WebFluxConfigurer;
  */
 @ConditionalOnWebApplication(type = Type.REACTIVE)
 @Configuration
-<span class="fc" id="L37">@Slf4j</span>
-<span class="fc" id="L38">public class BaseCommonConvertersAutoConfiguration implements WebFluxConfigurer {</span>
+<span class="fc" id="L38">@Slf4j</span>
+<span class="fc" id="L39">public class BaseCommonConvertersAutoConfiguration implements WebFluxConfigurer {</span>
 
   /**
    * Init.
    */
   @EventListener(ApplicationReadyEvent.class)
   public void init() {
-<span class="fc" id="L45">    log.info(&quot;\n&quot;</span>
+<span class="fc" id="L46">    log.info(&quot;\n&quot;</span>
             + &quot;*********************************************************************************\n&quot;
             + &quot;* {}\n&quot;
             + &quot;*********************************************************************************&quot;,
-<span class="fc" id="L49">        ClassUtils.getUserClass(getClass()).getSimpleName());</span>
-<span class="fc" id="L50">  }</span>
+<span class="fc" id="L50">        ClassUtils.getUserClass(getClass()).getSimpleName());</span>
+<span class="fc" id="L51">  }</span>
 
   @Override
-  public void addFormatters(FormatterRegistry registry) {
-<span class="fc" id="L54">    BaseCommonConverters.registerAll(registry);</span>
-<span class="fc" id="L55">  }</span>
+  public void addFormatters(@NonNull FormatterRegistry registry) {
+<span class="fc" id="L55">    BaseCommonConverters.registerAll(registry);</span>
+<span class="fc" id="L56">  }</span>
 
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.6.202009150832</span></div></body></html>

@@ -92,7 +92,7 @@ public interface RestApiTesterPath {
    */
   class BuilderImpl implements RestApiTesterPath.Builder {
 
-<span class="fc" id="L95">    private List&lt;RestApiTesterPathValues&gt; values = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L95">    private final List&lt;RestApiTesterPathValues&gt; values = new ArrayList&lt;&gt;();</span>
 
 <span class="fc" id="L97">    private BuilderImpl() {</span>
 <span class="fc" id="L98">    }</span>
@@ -145,7 +145,7 @@ public interface RestApiTesterPath {
      */
 <span class="fc" id="L146">    ATTRIBUTE(&quot;Attribute&quot;);</span>
 
-    private String value;
+    private final String value;
 
 <span class="fc" id="L150">    PathType(String value) {</span>
 <span class="fc" id="L151">      this.value = value;</span>
@@ -160,12 +160,12 @@ public interface RestApiTesterPath {
   /**
    * The path values.
    */
-<span class="pc bpc" id="L163" title="13 of 22 branches missed.">  @EqualsAndHashCode(doNotUseGetters = true)</span>
+  @EqualsAndHashCode(doNotUseGetters = true)
   class RestApiTesterPathValues {
 
-    private PathType type;
+    private final PathType type;
 
-    private String value;
+    private final String value;
 
     /**
      * Instantiates a new path model.

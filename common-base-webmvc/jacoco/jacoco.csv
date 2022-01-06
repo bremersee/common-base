@@ -1,5 +1,5 @@
 GROUP,PACKAGE,CLASS,INSTRUCTION_MISSED,INSTRUCTION_COVERED,BRANCH_MISSED,BRANCH_COVERED,LINE_MISSED,LINE_COVERED,COMPLEXITY_MISSED,COMPLEXITY_COVERED,METHOD_MISSED,METHOD_COVERED
 common-base-webmvc,org.bremersee.web.servlet,ApiExceptionResolver.ResponseFormat,0,34,0,0,0,4,0,1,0,1
 common-base-webmvc,org.bremersee.web.servlet,ApiExceptionResolver.EmptyView,19,61,5,5,5,20,5,2,0,2
-common-base-webmvc,org.bremersee.web.servlet,ApiExceptionResolver,2,261,4,15,0,63,4,19,0,13
-common-base-webmvc,org.bremersee.web.servlet,ApiExceptionResolver.ResponseFormatAndContentType,3,49,1,5,1,17,1,5,0,3
+common-base-webmvc,org.bremersee.web.servlet,ApiExceptionResolver,2,245,4,15,0,59,4,14,0,8
+common-base-webmvc,org.bremersee.web.servlet,ApiExceptionResolver.ResponseFormatAndContentType,3,43,1,5,1,15,1,3,0,1

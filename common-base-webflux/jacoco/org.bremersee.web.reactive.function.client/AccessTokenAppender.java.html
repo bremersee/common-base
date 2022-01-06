@@ -21,6 +21,7 @@ import org.bremersee.security.authentication.AccessTokenRetriever;
 import org.bremersee.security.authentication.AccessTokenRetrieverProperties;
 import org.bremersee.security.authentication.ReactiveAccessTokenProviders;
 import org.springframework.http.HttpHeaders;
+import org.springframework.lang.NonNull;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 import org.springframework.web.reactive.function.client.ClientRequest;
@@ -43,16 +44,17 @@ public class AccessTokenAppender implements ExchangeFilterFunction {
    *
    * @param accessTokenProvider the access token provider
    */
-<span class="fc" id="L46">  public AccessTokenAppender(AccessTokenProvider&lt;Mono&lt;String&gt;&gt; accessTokenProvider) {</span>
-<span class="fc" id="L47">    Assert.notNull(accessTokenProvider, &quot;Access token provider must be present.&quot;);</span>
-<span class="fc" id="L48">    this.accessTokenProvider = accessTokenProvider;</span>
-<span class="fc" id="L49">  }</span>
+<span class="fc" id="L47">  public AccessTokenAppender(AccessTokenProvider&lt;Mono&lt;String&gt;&gt; accessTokenProvider) {</span>
+<span class="fc" id="L48">    Assert.notNull(accessTokenProvider, &quot;Access token provider must be present.&quot;);</span>
+<span class="fc" id="L49">    this.accessTokenProvider = accessTokenProvider;</span>
+<span class="fc" id="L50">  }</span>
 
+  @NonNull
   @Override
-  public Mono&lt;ClientResponse&gt; filter(ClientRequest request, ExchangeFunction next) {
-<span class="fc" id="L53">    return accessTokenProvider.getAccessToken()</span>
-<span class="fc" id="L54">        .switchIfEmpty(Mono.just(&quot;&quot;))</span>
-<span class="fc" id="L55">        .flatMap(tokenValue -&gt; exchangeWithToken(request, tokenValue, next));</span>
+  public Mono&lt;ClientResponse&gt; filter(@NonNull ClientRequest request, @NonNull ExchangeFunction next) {
+<span class="fc" id="L55">    return accessTokenProvider.getAccessToken()</span>
+<span class="fc" id="L56">        .switchIfEmpty(Mono.just(&quot;&quot;))</span>
+<span class="fc" id="L57">        .flatMap(tokenValue -&gt; exchangeWithToken(request, tokenValue, next));</span>
   }
 
   private Mono&lt;ClientResponse&gt; exchangeWithToken(
@@ -60,13 +62,13 @@ public class AccessTokenAppender implements ExchangeFilterFunction {
       String tokenValue,
       ExchangeFunction next) {
 
-<span class="fc bfc" id="L63" title="All 2 branches covered.">    if (StringUtils.hasText(tokenValue)) {</span>
-<span class="fc" id="L64">      return next.exchange(ClientRequest</span>
-<span class="fc" id="L65">          .from(request)</span>
-<span class="fc" id="L66">          .headers(headers -&gt; headers.set(HttpHeaders.AUTHORIZATION, &quot;Bearer &quot; + tokenValue))</span>
-<span class="fc" id="L67">          .build());</span>
+<span class="fc bfc" id="L65" title="All 2 branches covered.">    if (StringUtils.hasText(tokenValue)) {</span>
+<span class="fc" id="L66">      return next.exchange(ClientRequest</span>
+<span class="fc" id="L67">          .from(request)</span>
+<span class="fc" id="L68">          .headers(headers -&gt; headers.set(HttpHeaders.AUTHORIZATION, &quot;Bearer &quot; + tokenValue))</span>
+<span class="fc" id="L69">          .build());</span>
     } else {
-<span class="fc" id="L69">      return next.exchange(request);</span>
+<span class="fc" id="L71">      return next.exchange(request);</span>
     }
   }
 
@@ -76,7 +78,7 @@ public class AccessTokenAppender implements ExchangeFilterFunction {
    * @return the access token appender
    */
   public static AccessTokenAppender fromAuthentication() {
-<span class="fc" id="L79">    return new AccessTokenAppender(ReactiveAccessTokenProviders.fromAuthentication());</span>
+<span class="fc" id="L81">    return new AccessTokenAppender(ReactiveAccessTokenProviders.fromAuthentication());</span>
   }
 
   /**
@@ -88,8 +90,8 @@ public class AccessTokenAppender implements ExchangeFilterFunction {
   @SuppressWarnings(&quot;unused&quot;)
   public static AccessTokenAppender withAccessTokenRetriever(
       final AccessTokenRetrieverProperties properties) {
-<span class="nc" id="L91">    return new AccessTokenAppender(</span>
-<span class="nc" id="L92">        ReactiveAccessTokenProviders.withAccessTokenRetriever(properties));</span>
+<span class="nc" id="L93">    return new AccessTokenAppender(</span>
+<span class="nc" id="L94">        ReactiveAccessTokenProviders.withAccessTokenRetriever(properties));</span>
   }
 
   /**
@@ -102,8 +104,8 @@ public class AccessTokenAppender implements ExchangeFilterFunction {
   public static AccessTokenAppender withAccessTokenRetriever(
       final AccessTokenRetriever&lt;Mono&lt;String&gt;&gt; retriever,
       final AccessTokenRetrieverProperties properties) {
-<span class="fc" id="L105">    return new AccessTokenAppender(</span>
-<span class="fc" id="L106">        ReactiveAccessTokenProviders.withAccessTokenRetriever(retriever, properties));</span>
+<span class="fc" id="L107">    return new AccessTokenAppender(</span>
+<span class="fc" id="L108">        ReactiveAccessTokenProviders.withAccessTokenRetriever(retriever, properties));</span>
   }
 
 }

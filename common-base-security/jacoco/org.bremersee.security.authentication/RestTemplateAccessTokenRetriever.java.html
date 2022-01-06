@@ -27,6 +27,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.client.ClientHttpResponse;
+import org.springframework.lang.NonNull;
 import org.springframework.util.StringUtils;
 import org.springframework.web.client.DefaultResponseErrorHandler;
 import org.springframework.web.client.RestTemplate;
@@ -48,8 +49,8 @@ public class RestTemplateAccessTokenRetriever implements AccessTokenRetriever&lt
    * @param restTemplate the rest template
    */
   public RestTemplateAccessTokenRetriever(RestTemplate restTemplate) {
-<span class="fc" id="L51">    this(restTemplate, null);</span>
-<span class="fc" id="L52">  }</span>
+<span class="fc" id="L52">    this(restTemplate, null);</span>
+<span class="fc" id="L53">  }</span>
 
   /**
    * Instantiates a new rest template access token retriever.
@@ -59,41 +60,41 @@ public class RestTemplateAccessTokenRetriever implements AccessTokenRetriever&lt
    */
   public RestTemplateAccessTokenRetriever(
       RestTemplate restTemplate,
-<span class="fc" id="L62">      AccessTokenCache accessTokenCache) {</span>
+<span class="fc" id="L63">      AccessTokenCache accessTokenCache) {</span>
 
-<span class="fc" id="L64">    this.restTemplate = restTemplate;</span>
-<span class="fc" id="L65">    this.restTemplate.setErrorHandler(new ErrorHandler());</span>
-<span class="fc" id="L66">    this.accessTokenCache = accessTokenCache;</span>
-<span class="fc" id="L67">  }</span>
+<span class="fc" id="L65">    this.restTemplate = restTemplate;</span>
+<span class="fc" id="L66">    this.restTemplate.setErrorHandler(new ErrorHandler());</span>
+<span class="fc" id="L67">    this.accessTokenCache = accessTokenCache;</span>
+<span class="fc" id="L68">  }</span>
 
   @Override
   public String retrieveAccessToken(AccessTokenRetrieverProperties input) {
-<span class="fc" id="L71">    final String cacheKey = input.createCacheKeyHashed();</span>
-<span class="fc" id="L72">    return Optional.ofNullable(accessTokenCache)</span>
-<span class="pc" id="L73">        .flatMap(cache -&gt; cache.findAccessToken(cacheKey))</span>
-<span class="fc" id="L74">        .orElseGet(() -&gt; {</span>
-<span class="fc" id="L75">          final HttpHeaders headers = new HttpHeaders();</span>
-<span class="fc" id="L76">          headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);</span>
-<span class="fc" id="L77">          input.getBasicAuthProperties()</span>
-<span class="pc" id="L78">              .ifPresent(basicAuthProperties -&gt; headers.setBasicAuth(</span>
-<span class="nc" id="L79">                  basicAuthProperties.getUsername(),</span>
-<span class="nc" id="L80">                  basicAuthProperties.getPassword()));</span>
-<span class="fc" id="L81">          final HttpEntity&lt;?&gt; request = new HttpEntity&lt;&gt;(input.createBody(), headers);</span>
-<span class="fc" id="L82">          final String response = restTemplate.exchange(</span>
-<span class="fc" id="L83">              input.getTokenEndpoint(),</span>
-              HttpMethod.POST,
-              request,
-              String.class)
-<span class="fc" id="L87">              .getBody();</span>
-<span class="fc" id="L88">          final JSONObject json = (JSONObject) JSONValue.parse(response);</span>
-<span class="fc" id="L89">          final String accessToken = json.getAsString(&quot;access_token&quot;);</span>
-<span class="fc bfc" id="L90" title="All 2 branches covered.">          if (StringUtils.hasText(accessToken)) {</span>
-<span class="pc bpc" id="L91" title="1 of 2 branches missed.">            if (accessTokenCache != null) {</span>
-<span class="nc" id="L92">              accessTokenCache.putAccessToken(cacheKey, accessToken);</span>
+<span class="fc" id="L72">    final String cacheKey = input.createCacheKeyHashed();</span>
+<span class="fc" id="L73">    return Optional.ofNullable(accessTokenCache)</span>
+<span class="pc" id="L74">        .flatMap(cache -&gt; cache.findAccessToken(cacheKey))</span>
+<span class="fc" id="L75">        .orElseGet(() -&gt; {</span>
+<span class="fc" id="L76">          final HttpHeaders headers = new HttpHeaders();</span>
+<span class="fc" id="L77">          headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);</span>
+<span class="fc" id="L78">          input.getBasicAuthProperties()</span>
+<span class="pc" id="L79">              .ifPresent(basicAuthProperties -&gt; headers.setBasicAuth(</span>
+<span class="nc" id="L80">                  basicAuthProperties.getUsername(),</span>
+<span class="nc" id="L81">                  basicAuthProperties.getPassword()));</span>
+<span class="fc" id="L82">          final HttpEntity&lt;?&gt; request = new HttpEntity&lt;&gt;(input.createBody(), headers);</span>
+<span class="fc" id="L83">          final String response = restTemplate.exchange(</span>
+<span class="fc" id="L84">                  input.getTokenEndpoint(),</span>
+                  HttpMethod.POST,
+                  request,
+                  String.class)
+<span class="fc" id="L88">              .getBody();</span>
+<span class="fc" id="L89">          final JSONObject json = (JSONObject) JSONValue.parse(response);</span>
+<span class="fc" id="L90">          final String accessToken = json.getAsString(&quot;access_token&quot;);</span>
+<span class="fc bfc" id="L91" title="All 2 branches covered.">          if (StringUtils.hasText(accessToken)) {</span>
+<span class="pc bpc" id="L92" title="1 of 2 branches missed.">            if (accessTokenCache != null) {</span>
+<span class="nc" id="L93">              accessTokenCache.putAccessToken(cacheKey, accessToken);</span>
             }
-<span class="fc" id="L94">            return accessToken;</span>
+<span class="fc" id="L95">            return accessToken;</span>
           }
-<span class="fc" id="L96">          throw new AccessTokenRetrieverAuthenticationException(HttpStatus.UNAUTHORIZED,</span>
+<span class="fc" id="L97">          throw new AccessTokenRetrieverAuthenticationException(HttpStatus.UNAUTHORIZED,</span>
               &quot;There is no access token in the response: &quot; + accessToken);
         });
   }
@@ -101,10 +102,10 @@ public class RestTemplateAccessTokenRetriever implements AccessTokenRetriever&lt
   private static class ErrorHandler extends DefaultResponseErrorHandler {
 
     @Override
-    protected void handleError(final ClientHttpResponse response, final HttpStatus statusCode)
+    protected void handleError(final ClientHttpResponse response, @NonNull final HttpStatus statusCode)
         throws IOException {
-<span class="nc" id="L106">      final String statusText = response.getStatusText();</span>
-<span class="nc" id="L107">      throw new AccessTokenRetrieverAuthenticationException(statusCode, statusText);</span>
+<span class="nc" id="L107">      final String statusText = response.getStatusText();</span>
+<span class="nc" id="L108">      throw new AccessTokenRetrieverAuthenticationException(statusCode, statusText);</span>
     }
   }
 

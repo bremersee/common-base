@@ -40,8 +40,8 @@ public abstract class OrderedProxy {
    * @param &lt;T&gt; the type of the proxy
    * @param target the target
    * @param orderedValue the ordered value
-   * @return the type of the proxy; if the target implements one or more interfaces, it must be one
-   *     of these interfaces, otherwise it must be {@link Ordered}
+   * @return the type of the proxy; if the target implements one or more interfaces, it must be one of these interfaces,
+   *     otherwise it must be {@link Ordered}
    */
   public static &lt;T&gt; T create(@NotNull Object target, int orderedValue) {
 <span class="fc bfc" id="L47" title="All 4 branches covered.">    if (target instanceof Ordered &amp;&amp; ((Ordered) target).getOrder() == orderedValue) {</span>

@@ -35,12 +35,12 @@ import reactor.core.publisher.Mono;
  *
  * @author Christian Bremer
  */
-<span class="fc" id="L38">@ToString(callSuper = true, exclude = {&quot;ldaptiveOperations&quot;})</span>
+@ToString(callSuper = true, exclude = {&quot;ldaptiveOperations&quot;})
 <span class="fc" id="L39">@Slf4j</span>
 public class ReactiveLdaptiveUserDetailsService extends AbstractUserDetailsService implements
     ReactiveUserDetailsService {
 
-<span class="fc" id="L43">  @Getter(value = AccessLevel.PROTECTED)</span>
+  @Getter(value = AccessLevel.PROTECTED)
   private final ReactiveLdaptiveOperations ldaptiveOperations;
 
   /**

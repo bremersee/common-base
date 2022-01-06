@@ -26,13 +26,13 @@ import lombok.ToString;
  * The default minio object id.
  */
 @Getter
-<span class="fc" id="L29">@ToString</span>
-<span class="pc bpc" id="L30" title="11 of 22 branches missed.">@EqualsAndHashCode</span>
+@ToString
+@EqualsAndHashCode
 public class DefaultMinioObjectId implements MinioObjectId {
 
-<span class="fc" id="L33">  private final String name;</span>
+  private final String name;
 
-<span class="fc" id="L35">  private final String versionId;</span>
+  private final String versionId;
 
   /**
    * Instantiates a new default minio object id.

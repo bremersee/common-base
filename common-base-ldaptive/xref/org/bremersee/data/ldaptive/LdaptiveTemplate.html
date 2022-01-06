@@ -161,11 +161,11 @@
 <a class="jxr_linenumber" name="L153" href="#L153">153</a>   @Override
 <a class="jxr_linenumber" name="L154" href="#L154">154</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">boolean</strong> compare(CompareRequest request) {
 <a class="jxr_linenumber" name="L155" href="#L155">155</a>     <strong class="jxr_keyword">return</strong> Optional.ofNullable(execute(
-<a class="jxr_linenumber" name="L156" href="#L156">156</a>         CompareOperation.builder()
-<a class="jxr_linenumber" name="L157" href="#L157">157</a>             .factory(getConnectionFactory())
-<a class="jxr_linenumber" name="L158" href="#L158">158</a>             .throwIf(NOT_COMPARE_RESULT)
-<a class="jxr_linenumber" name="L159" href="#L159">159</a>             .build(),
-<a class="jxr_linenumber" name="L160" href="#L160">160</a>         request))
+<a class="jxr_linenumber" name="L156" href="#L156">156</a>             CompareOperation.builder()
+<a class="jxr_linenumber" name="L157" href="#L157">157</a>                 .factory(getConnectionFactory())
+<a class="jxr_linenumber" name="L158" href="#L158">158</a>                 .throwIf(NOT_COMPARE_RESULT)
+<a class="jxr_linenumber" name="L159" href="#L159">159</a>                 .build(),
+<a class="jxr_linenumber" name="L160" href="#L160">160</a>             request))
 <a class="jxr_linenumber" name="L161" href="#L161">161</a>         .map(CompareResponse::isTrue)
 <a class="jxr_linenumber" name="L162" href="#L162">162</a>         .orElse(false);
 <a class="jxr_linenumber" name="L163" href="#L163">163</a>   }
@@ -277,6 +277,6 @@
 <a class="jxr_linenumber" name="L269" href="#L269">269</a> }
 </pre>
 <hr/>
-<div id="footer">Copyright &#169; 2021 <a href="http://bremersee.org">bremersee.org</a>. All rights reserved.</div>
+<div id="footer">Copyright &#169; 2022 <a href="http://bremersee.org">bremersee.org</a>. All rights reserved.</div>
 </body>
 </html>

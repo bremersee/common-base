@@ -40,50 +40,47 @@ import org.springframework.validation.annotation.Validated;
  */
 @ConfigurationProperties(&quot;bremersee.messages&quot;)
 @Getter
-<span class="fc" id="L43">@Setter</span>
-<span class="fc" id="L44">@ToString</span>
-<span class="pc bpc" id="L45" title="48 of 68 branches missed.">@EqualsAndHashCode</span>
+@Setter
+@ToString
+@EqualsAndHashCode
 @Validated
 <span class="fc" id="L47">public class MessageSourceProperties {</span>
 
   /**
-   * Set whether to always apply the {@code MessageFormat} rules, parsing even messages without
-   * arguments.
+   * Set whether to always apply the {@code MessageFormat} rules, parsing even messages without arguments.
    *
    * &lt;p&gt;Default is &quot;false&quot;: Messages without arguments are by default
-   * returned as-is, without parsing them through MessageFormat. Set this to &quot;true&quot; to enforce
-   * MessageFormat for all messages, expecting all message texts to be written with MessageFormat
-   * escaping.
+   * returned as-is, without parsing them through MessageFormat. Set this to &quot;true&quot; to enforce MessageFormat for all
+   * messages, expecting all message texts to be written with MessageFormat escaping.
    *
    * &lt;p&gt;For example, MessageFormat expects a single quote to be escaped
-   * as &quot;''&quot;. If your message texts are all written with such escaping, even when not defining
-   * argument placeholders, you need to set this flag to &quot;true&quot;. Else, only message texts with
-   * actual arguments are supposed to be written with MessageFormat escaping.
+   * as &quot;''&quot;. If your message texts are all written with such escaping, even when not defining argument placeholders,
+   * you need to set this flag to &quot;true&quot;. Else, only message texts with actual arguments are supposed to be written with
+   * MessageFormat escaping.
    *
    * @see java.text.MessageFormat
    */
-<span class="fc" id="L65">  private boolean alwaysUseMessageFormat = false; // from MessageSourceSupport</span>
+<span class="fc" id="L63">  private boolean alwaysUseMessageFormat = false; // from MessageSourceSupport</span>
 
   /**
-   * Set whether to use the message code as default message instead of throwing a
-   * NoSuchMessageException. Useful for development and debugging. Default is &quot;false&quot;.
+   * Set whether to use the message code as default message instead of throwing a NoSuchMessageException. Useful for
+   * development and debugging. Default is &quot;false&quot;.
    */
-<span class="fc" id="L71">  private boolean useCodeAsDefaultMessage = false; // from AbstractMessageSource</span>
+<span class="fc" id="L69">  private boolean useCodeAsDefaultMessage = false; // from AbstractMessageSource</span>
 
   /**
-   * Set an list of basenames, each following the basic ResourceBundle convention of not specifying
-   * file extension or language codes. The resource location format is up to the specific {@code
-   * MessageSource} implementation.
+   * Set an list of basenames, each following the basic ResourceBundle convention of not specifying file extension or
+   * language codes. The resource location format is up to the specific {@code MessageSource} implementation.
    *
    * &lt;p&gt;Regular and XMl properties files are supported: e.g. &quot;messages&quot; will find
-   * a &quot;messages.properties&quot;, &quot;messages_en.properties&quot; etc arrangement as well as &quot;messages.xml&quot;,
-   * &quot;messages_en.xml&quot; etc.
+   * a &quot;messages.properties&quot;, &quot;messages_en.properties&quot; etc arrangement as well as &quot;messages.xml&quot;, &quot;messages_en.xml&quot;
+   * etc.
    *
    * &lt;p&gt;The associated resource bundles will be checked sequentially when resolving
-   * a message code. Note that message definitions in a &lt;i&gt;previous&lt;/i&gt; resource bundle will
-   * override ones in a later bundle, due to the sequential lookup.
+   * a message code. Note that message definitions in a &lt;i&gt;previous&lt;/i&gt; resource bundle will override ones in a later
+   * bundle, due to the sequential lookup.
    */
-<span class="fc" id="L86">  private List&lt;String&gt; baseNames = new ArrayList&lt;&gt;(); // from AbstractResourceBasedMessageSource</span>
+<span class="fc" id="L83">  private List&lt;String&gt; baseNames = new ArrayList&lt;&gt;(); // from AbstractResourceBasedMessageSource</span>
 
   /**
    * Set the number of seconds to cache loaded properties files.
@@ -99,68 +96,65 @@ import org.springframework.validation.annotation.Validated;
    * every message access. &lt;b&gt;Do not use this in a production environment!&lt;/b&gt;
    * &lt;/ul&gt;
    */
-<span class="fc" id="L102">  private int cacheSeconds = -1; // from AbstractResourceBasedMessageSource</span>
+<span class="fc" id="L99">  private int cacheSeconds = -1; // from AbstractResourceBasedMessageSource</span>
 
   /**
-   * Set the default charset to use for parsing properties files. Used if no file-specific charset
-   * is specified for a file.
+   * Set the default charset to use for parsing properties files. Used if no file-specific charset is specified for a
+   * file.
    *
    * &lt;p&gt;The effective default is the {@code java.util.Properties}
    * default encoding: ISO-8859-1. A {@code null} value indicates the platform default encoding.
    *
    * &lt;p&gt;Only applies to classic properties files, not to XML files.
    */
-<span class="fc" id="L113">  private String defaultEncoding = StandardCharsets.UTF_8.name(); // from AbstractResourceBasedM.</span>
+<span class="fc" id="L110">  private String defaultEncoding = StandardCharsets.UTF_8.name(); // from AbstractResourceBasedM.</span>
 
   /**
-   * Set whether to fall back to the system Locale if no files for a specific Locale have been
-   * found. Default is &quot;true&quot;; if this is turned off, the only fallback will be the default file
-   * (e.g. &quot;messages.properties&quot; for basename &quot;messages&quot;).
+   * Set whether to fall back to the system Locale if no files for a specific Locale have been found. Default is &quot;true&quot;;
+   * if this is turned off, the only fallback will be the default file (e.g. &quot;messages.properties&quot; for basename
+   * &quot;messages&quot;).
    *
    * &lt;p&gt;Falling back to the system Locale is the default behavior of
-   * {@code java.util.ResourceBundle}. However, this is often not desirable in an application server
-   * environment, where the system Locale is not relevant to the application at all: set this flag
-   * to &quot;false&quot; in such a scenario.
+   * {@code java.util.ResourceBundle}. However, this is often not desirable in an application server environment, where
+   * the system Locale is not relevant to the application at all: set this flag to &quot;false&quot; in such a scenario.
    */
-<span class="fc" id="L125">  private boolean fallbackToSystemLocale = true;</span>
+<span class="fc" id="L121">  private boolean fallbackToSystemLocale = true;</span>
 
   /**
-   * Specify a default Locale to fall back to, as an alternative to falling back to the system
-   * Locale.
+   * Specify a default Locale to fall back to, as an alternative to falling back to the system Locale.
    *
    * &lt;p&gt;Default is to fall back to the system Locale. You may override this with
-   * a locally specified default Locale here, or enforce no fallback locale at all through
-   * disabling.
+   * a locally specified default Locale here, or enforce no fallback locale at all through disabling.
    */
-<span class="fc" id="L135">  private String defaultLocale = &quot;de-DE&quot;;</span>
+<span class="fc" id="L129">  private String defaultLocale = &quot;de-DE&quot;;</span>
 
   /**
    * Specify a default time zone to fall back to.
    */
-<span class="fc" id="L140">  private String defaultTimeZone = &quot;Europe/Berlin&quot;;</span>
+<span class="fc" id="L134">  private String defaultTimeZone = &quot;Europe/Berlin&quot;;</span>
 
   /**
    * Specifies whether the resource bundles are reloadable or not.
    */
-<span class="fc" id="L145">  private boolean useReloadableMessageSource = false;</span>
+<span class="fc" id="L139">  private boolean useReloadableMessageSource = false;</span>
 
   /**
-   * Specify whether to allow for concurrent refresh behavior, i.e. one thread locked in a refresh
-   * attempt for a specific cached properties file whereas other threads keep returning the old
-   * properties for the time being, until the refresh attempt has completed.
+   * Specify whether to allow for concurrent refresh behavior, i.e. one thread locked in a refresh attempt for a
+   * specific cached properties file whereas other threads keep returning the old properties for the time being, until
+   * the refresh attempt has completed.
    *
    * &lt;p&gt;Default is &quot;true&quot;: this behavior is new as of Spring Framework 4.1,
-   * minimizing contention between threads. If you prefer the old behavior, i.e. to fully block on
-   * refresh, switch this flag to &quot;false&quot;.
+   * minimizing contention between threads. If you prefer the old behavior, i.e. to fully block on refresh, switch this
+   * flag to &quot;false&quot;.
    */
-<span class="fc" id="L156">  private boolean concurrentRefresh = true; // ReloadableResourceBundleMessageSource</span>
+<span class="fc" id="L150">  private boolean concurrentRefresh = true; // ReloadableResourceBundleMessageSource</span>
 
   /**
    * Set per-file charsets to use for parsing properties files.
    *
    * &lt;p&gt;Only applies to classic properties files, not to XML files.
    */
-<span class="fc" id="L163">  private Map&lt;String, String&gt; fileEncodings = new HashMap&lt;&gt;(); // ReloadableResourceBundleMessageS.</span>
+<span class="fc" id="L157">  private Map&lt;String, String&gt; fileEncodings = new HashMap&lt;&gt;(); // ReloadableResourceBundleMessageS.</span>
 
   /**
    * Default locale.
@@ -169,9 +163,9 @@ import org.springframework.validation.annotation.Validated;
    */
   @NotNull
   public Locale defaultLocale() {
-<span class="pc bpc" id="L172" title="1 of 2 branches missed.">    return StringUtils.hasText(getDefaultLocale())</span>
-<span class="fc" id="L173">        ? JavaLocale.fromValue(getDefaultLocale()).toLocale(Locale.getDefault())</span>
-<span class="nc" id="L174">        : Locale.getDefault();</span>
+<span class="pc bpc" id="L166" title="1 of 2 branches missed.">    return StringUtils.hasText(getDefaultLocale())</span>
+<span class="fc" id="L167">        ? JavaLocale.fromValue(getDefaultLocale()).toLocale(Locale.getDefault())</span>
+<span class="nc" id="L168">        : Locale.getDefault();</span>
   }
 
   /**
@@ -181,9 +175,9 @@ import org.springframework.validation.annotation.Validated;
    */
   @NotNull
   public TimeZone defaultTimeZone() {
-<span class="pc bpc" id="L184" title="1 of 2 branches missed.">    return StringUtils.hasText(getDefaultTimeZone())</span>
-<span class="fc" id="L185">        ? TimeZone.getTimeZone(getDefaultTimeZone())</span>
-<span class="nc" id="L186">        : TimeZone.getDefault();</span>
+<span class="pc bpc" id="L178" title="1 of 2 branches missed.">    return StringUtils.hasText(getDefaultTimeZone())</span>
+<span class="fc" id="L179">        ? TimeZone.getTimeZone(getDefaultTimeZone())</span>
+<span class="nc" id="L180">        : TimeZone.getDefault();</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.6.202009150832</span></div></body></html>

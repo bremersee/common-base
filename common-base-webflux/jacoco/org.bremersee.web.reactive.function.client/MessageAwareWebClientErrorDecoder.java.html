@@ -38,11 +38,11 @@ import org.springframework.web.reactive.function.client.ClientResponse;
 public class MessageAwareWebClientErrorDecoder
     extends AbstractWebClientErrorDecoder&lt;WebClientException&gt; {
 
-<span class="fc" id="L41">  @Getter(AccessLevel.PACKAGE)</span>
+  @Getter(AccessLevel.PACKAGE)
   private final ExceptionParser&lt;String&gt; parser;
 
-<span class="fc" id="L44">  @Getter(AccessLevel.PACKAGE)</span>
-  private String errorCode;
+  @Getter(AccessLevel.PACKAGE)
+  private final String errorCode;
 
   /**
    * Instantiates a new message aware web client error decoder.

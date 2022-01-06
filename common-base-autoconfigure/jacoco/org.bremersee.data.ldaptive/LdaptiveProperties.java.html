@@ -47,168 +47,168 @@ import org.springframework.validation.annotation.Validated;
 @ConfigurationProperties(prefix = &quot;bremersee.ldaptive&quot;)
 @Validated
 @Getter
-<span class="pc" id="L50">@Setter</span>
-<span class="fc" id="L51">@ToString(exclude = {&quot;bindCredentials&quot;})</span>
-<span class="pc bpc" id="L52" title="127 of 186 branches missed.">@EqualsAndHashCode(exclude = {&quot;bindCredentials&quot;})</span>
-<span class="fc" id="L53">@NoArgsConstructor</span>
+@Setter
+@ToString(exclude = {&quot;bindCredentials&quot;})
+@EqualsAndHashCode(exclude = {&quot;bindCredentials&quot;})
+@NoArgsConstructor
 public class LdaptiveProperties {
 
   /**
    * Specifies whether ldap connection should be configured or not.
    */
-<span class="fc" id="L59">  private boolean enabled = true;</span>
+  private boolean enabled = true;
 
   /**
    * Specifies whether an ldap user details service should be configured or not.
    */
-<span class="fc" id="L64">  private boolean authenticationEnabled = false;</span>
+  private boolean authenticationEnabled = false;
 
   /**
    * URL to the LDAP(s).
    */
-<span class="fc" id="L69">  private String ldapUrl = &quot;ldap://localhost:12389&quot;;</span>
+  private String ldapUrl = &quot;ldap://localhost:12389&quot;;
 
   /**
    * Duration of time that connects will block.
    */
-<span class="fc" id="L74">  @NotNull</span>
-<span class="fc" id="L75">  private Duration connectTimeout = Duration.ofMinutes(1);</span>
+  @NotNull
+  private Duration connectTimeout = Duration.ofMinutes(1);
 
   /**
    * Duration of time to wait for responses.
    */
-<span class="fc" id="L80">  @NotNull</span>
-<span class="fc" id="L81">  private Duration responseTimeout = Duration.ofMinutes(1);</span>
+  @NotNull
+  private Duration responseTimeout = Duration.ofMinutes(1);
 
   /**
    * Duration of time that operations will block on reconnects, should generally be longer than connect timeout.
    */
-<span class="fc" id="L86">  @NotNull</span>
-<span class="fc" id="L87">  private Duration reconnectTimeout = Duration.ofMinutes(2);</span>
+  @NotNull
+  private Duration reconnectTimeout = Duration.ofMinutes(2);
 
   /**
    * Whether to automatically reconnect to the server when a connection is lost. Default is true.
    */
-<span class="fc" id="L92">  private boolean autoReconnect = true;</span>
+  private boolean autoReconnect = true;
 
-<span class="fc" id="L94">  @Min(0)</span>
-<span class="fc" id="L95">  private int reconnectAttempts = 5;</span>
+  @Min(0)
+  private int reconnectAttempts = 5;
 
-<span class="fc" id="L97">  @NotNull</span>
-<span class="fc" id="L98">  private Duration reconnectBackoffDelay = Duration.ofSeconds(2);</span>
+  @NotNull
+  private Duration reconnectBackoffDelay = Duration.ofSeconds(2);
 
-<span class="fc" id="L100">  private double reconnectBackoffMultiplier = 1.;</span>
+  private double reconnectBackoffMultiplier = 1.;
 
   /**
    * Whether pending operations should be replayed after a reconnect. Default is true.
    */
-<span class="fc" id="L105">  private boolean autoReplay = true;</span>
+  private boolean autoReplay = true;
 
   /**
    * Connect to LDAP using startTLS.
    */
-<span class="fc" id="L110">  private boolean useStartTls;</span>
+  private boolean useStartTls;
 
   /**
    * Name of the trust certificates to use for the SSL connection.
    */
-<span class="fc" id="L115">  private String trustCertificates;</span>
+  private String trustCertificates;
 
   /**
    * Name of the authentication certificate to use for the SSL connection.
    */
-<span class="fc" id="L120">  private String authenticationCertificate;</span>
+  private String authenticationCertificate;
 
   /**
    * Name of the key to use for the SSL connection.
    */
-<span class="fc" id="L125">  private String authenticationKey;</span>
+  private String authenticationKey;
 
   /**
    * DN to bind as before performing operations.
    */
-<span class="fc" id="L130">  private String bindDn;</span>
+  private String bindDn;
 
   /**
    * Credential for the bind DN.
    */
-<span class="fc" id="L135">  private String bindCredentials;</span>
+  private String bindCredentials;
 
   /**
    * Specifies whether the connection should be pooled or not. Default is {@code false}.
    */
-<span class="fc" id="L140">  private boolean pooled = false;</span>
+  private boolean pooled = false;
 
   /**
    * Duration to wait for an available connection.
    */
-<span class="fc" id="L145">  @NotNull</span>
-<span class="fc" id="L146">  private Duration blockWaitTime = Duration.ofMinutes(1);</span>
+  @NotNull
+  private Duration blockWaitTime = Duration.ofMinutes(1);
 
   /**
    * Minimum pool size.
    */
-<span class="fc" id="L151">  private int minPoolSize = 3;</span>
+  private int minPoolSize = 3;
 
   /**
    * Maximum pool size.
    */
-<span class="fc" id="L156">  private int maxPoolSize = 10;</span>
+  private int maxPoolSize = 10;
 
   /**
    * Whether to connect to the ldap on connection creation.
    */
-<span class="fc" id="L161">  private boolean connectOnCreate = true;</span>
+  private boolean connectOnCreate = true;
 
   /**
    * Whether initialize should throw if pooling configuration requirements are not met.
    */
-<span class="fc" id="L166">  private boolean failFastInitialize = true;</span>
+  private boolean failFastInitialize = true;
 
   /**
    * Whether the ldap object should be validated when returned to the pool.
    */
-<span class="fc" id="L171">  private boolean validateOnCheckIn = false;</span>
+  private boolean validateOnCheckIn = false;
 
   /**
    * Whether the ldap object should be validated when given from the pool.
    */
-<span class="fc" id="L176">  private boolean validateOnCheckOut = false;</span>
+  private boolean validateOnCheckOut = false;
 
   /**
    * Whether the pool should be validated periodically.
    */
-<span class="fc" id="L181">  private boolean validatePeriodically = false;</span>
+  private boolean validatePeriodically = false;
 
   /**
    * Validation period.
    */
-<span class="fc" id="L186">  @NotNull</span>
-<span class="fc" id="L187">  private Duration validatePeriod = Duration.ofMinutes(30);</span>
+  @NotNull
+  private Duration validatePeriod = Duration.ofMinutes(30);
 
   /**
    * Maximum length of time a connection validation should block.
    */
-<span class="fc" id="L192">  @NotNull</span>
-<span class="fc" id="L193">  private Duration validateTimeout = Duration.ofSeconds(5);</span>
+  @NotNull
+  private Duration validateTimeout = Duration.ofSeconds(5);
 
-<span class="fc" id="L195">  @NotNull</span>
-<span class="fc" id="L196">  private SearchValidatorProperties searchValidator = new SearchValidatorProperties();</span>
+  @NotNull
+  private SearchValidatorProperties searchValidator = new SearchValidatorProperties();
 
   /**
    * Prune period.
    */
-<span class="fc" id="L201">  @NotNull</span>
-<span class="fc" id="L202">  private Duration prunePeriod = Duration.ofMinutes(5);</span>
+  @NotNull
+  private Duration prunePeriod = Duration.ofMinutes(5);
 
   /**
    * Idle time.
    */
-<span class="fc" id="L207">  @NotNull</span>
-<span class="fc" id="L208">  private Duration idleTime = Duration.ofMinutes(10);</span>
+  @NotNull
+  private Duration idleTime = Duration.ofMinutes(10);
 
-<span class="fc" id="L210">  @NotNull</span>
-<span class="fc" id="L211">  private UserDetailsProperties userDetails = new UserDetailsProperties();</span>
+  @NotNull
+  private UserDetailsProperties userDetails = new UserDetailsProperties();
 
   /**
    * Create search connection validator search connection validator.
@@ -227,36 +227,36 @@ public class LdaptiveProperties {
    * The search validator properties.
    */
   @Getter
-<span class="fc" id="L230">  @Setter</span>
-<span class="fc" id="L231">  @ToString</span>
-<span class="pc bpc" id="L232" title="9 of 14 branches missed.">  @EqualsAndHashCode</span>
-<span class="fc" id="L233">  @NoArgsConstructor</span>
+  @Setter
+  @ToString
+  @EqualsAndHashCode
+  @NoArgsConstructor
   public static class SearchValidatorProperties {
 
-<span class="fc" id="L236">    @NotNull</span>
-<span class="fc" id="L237">    private SearchRequestProperties searchRequest = new SearchRequestProperties();</span>
+    @NotNull
+    private SearchRequestProperties searchRequest = new SearchRequestProperties();
 
     /**
      * The search request properties.
      */
     @Getter
-<span class="pc" id="L243">    @Setter</span>
-<span class="fc" id="L244">    @ToString</span>
-<span class="pc bpc" id="L245" title="33 of 46 branches missed.">    @EqualsAndHashCode</span>
-<span class="fc" id="L246">    @NoArgsConstructor</span>
+    @Setter
+    @ToString
+    @EqualsAndHashCode
+    @NoArgsConstructor
     public static class SearchRequestProperties {
 
-<span class="fc" id="L249">      private String baseDn;</span>
+      private String baseDn;
 
-<span class="fc" id="L251">      @NotNull</span>
-<span class="fc" id="L252">      private SearchFilterProperties searchFilter = new SearchFilterProperties();</span>
+      @NotNull
+      private SearchFilterProperties searchFilter = new SearchFilterProperties();
 
-<span class="fc" id="L254">      private Integer sizeLimit;</span>
+      private Integer sizeLimit;
 
-<span class="fc" id="L256">      private SearchScope searchScope; // = SearchScope.ONELEVEL;</span>
+      private SearchScope searchScope; // = SearchScope.ONELEVEL;
 
-<span class="fc" id="L258">      @NotNull</span>
-<span class="fc" id="L259">      private List&lt;String&gt; returnAttributes = new ArrayList&lt;&gt;();</span>
+      @NotNull
+      private List&lt;String&gt; returnAttributes = new ArrayList&lt;&gt;();
 
       /**
        * Gets the return attributes as array.
@@ -297,13 +297,13 @@ public class LdaptiveProperties {
        * The search filter properties.
        */
       @Getter
-<span class="nc" id="L300">      @Setter</span>
-<span class="fc" id="L301">      @ToString</span>
-<span class="pc bpc" id="L302" title="9 of 14 branches missed.">      @EqualsAndHashCode</span>
-<span class="fc" id="L303">      @NoArgsConstructor</span>
+      @Setter
+      @ToString
+      @EqualsAndHashCode
+      @NoArgsConstructor
       public static class SearchFilterProperties {
 
-<span class="fc" id="L306">        private String filter;</span>
+        private String filter;
 
       }
     }
@@ -313,35 +313,35 @@ public class LdaptiveProperties {
    * The user details properties.
    */
   @Getter
-<span class="pc" id="L316">  @Setter</span>
-<span class="fc" id="L317">  @ToString</span>
-<span class="pc bpc" id="L318" title="72 of 98 branches missed.">  @EqualsAndHashCode</span>
-<span class="fc" id="L319">  @NoArgsConstructor</span>
+  @Setter
+  @ToString
+  @EqualsAndHashCode
+  @NoArgsConstructor
   public static class UserDetailsProperties {
 
-<span class="fc" id="L322">    private String userBaseDn;</span>
+    private String userBaseDn;
 
-<span class="fc" id="L324">    private String userFindOneFilter = &quot;(&amp;(objectClass=group)(sAMAccountName={0}))&quot;;</span>
+    private String userFindOneFilter = &quot;(&amp;(objectClass=group)(sAMAccountName={0}))&quot;;
 
-<span class="fc" id="L326">    private SearchScope userFindOneSearchScope = SearchScope.ONELEVEL;</span>
+    private SearchScope userFindOneSearchScope = SearchScope.ONELEVEL;
 
-<span class="fc" id="L328">    private String userAccountControlAttributeName = UserAccountControlValueTranscoder.ATTRIBUTE_NAME;</span>
+    private String userAccountControlAttributeName = UserAccountControlValueTranscoder.ATTRIBUTE_NAME;
 
-<span class="fc" id="L330">    private String authorityAttributeName = &quot;memberOf&quot;;</span>
+    private String authorityAttributeName = &quot;memberOf&quot;;
 
-<span class="fc" id="L332">    private boolean authorityDn = true;</span>
+    private boolean authorityDn = true;
 
-<span class="fc" id="L334">    private List&lt;String&gt; authorities = new LinkedList&lt;&gt;();</span>
+    private List&lt;String&gt; authorities = new LinkedList&lt;&gt;();
 
-<span class="fc" id="L336">    private Map&lt;String, String&gt; authorityMap = new LinkedHashMap&lt;&gt;();</span>
+    private Map&lt;String, String&gt; authorityMap = new LinkedHashMap&lt;&gt;();
 
-<span class="fc" id="L338">    private String authorityPrefix = &quot;ROLE_&quot;;</span>
+    private String authorityPrefix = &quot;ROLE_&quot;;
 
-<span class="fc" id="L340">    private String userPasswordAttributeName = &quot;userPassword&quot;;</span>
+    private String userPasswordAttributeName = &quot;userPassword&quot;;
 
-<span class="fc" id="L342">    private String userPasswordLabel = &quot;SHA&quot;;</span>
+    private String userPasswordLabel = &quot;SHA&quot;;
 
-<span class="fc" id="L344">    private String userPasswordAlgorithm = &quot;SHA&quot;;</span>
+    private String userPasswordAlgorithm = &quot;SHA&quot;;
 
   }
 }

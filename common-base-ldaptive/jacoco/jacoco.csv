@@ -1,12 +1,12 @@
 GROUP,PACKAGE,CLASS,INSTRUCTION_MISSED,INSTRUCTION_COVERED,BRANCH_MISSED,BRANCH_COVERED,LINE_MISSED,LINE_COVERED,COMPLEXITY_MISSED,COMPLEXITY_COVERED,METHOD_MISSED,METHOD_COVERED
 common-base-ldaptive,org.bremersee.data.ldaptive,DefaultLdaptiveErrorHandler,2,57,1,3,1,19,1,7,0,5
 common-base-ldaptive,org.bremersee.data.ldaptive,LdaptiveException.new AbstractServiceExceptionBuilder() {...},0,31,0,0,0,5,0,5,0,5
-common-base-ldaptive,org.bremersee.data.ldaptive,LdaptiveException,38,48,8,4,3,12,8,9,4,7
+common-base-ldaptive,org.bremersee.data.ldaptive,LdaptiveException,0,48,0,4,0,12,0,9,0,7
 common-base-ldaptive,org.bremersee.data.ldaptive,LdaptiveTemplate,27,330,7,17,8,96,7,27,0,22
 common-base-ldaptive,org.bremersee.data.ldaptive,LdaptiveOperations,0,125,0,0,0,28,0,14,0,14
 common-base-ldaptive,org.bremersee.data.ldaptive,AbstractLdaptiveErrorHandler,0,35,0,4,0,11,0,5,0,3
 common-base-ldaptive,org.bremersee.data.ldaptive,LdaptiveEntryMapper,18,412,14,56,5,86,14,38,0,17
-common-base-ldaptive,org.bremersee.data.ldaptive.transcoder,UserAccountControlValueTranscoder,108,0,16,0,25,0,18,0,10,0
+common-base-ldaptive,org.bremersee.data.ldaptive.transcoder,UserAccountControlValueTranscoder,106,0,16,0,24,0,17,0,9,0
 common-base-ldaptive,org.bremersee.data.ldaptive.reactive,ReactiveLdaptiveTemplate,146,552,6,10,20,123,15,31,9,29
 common-base-ldaptive,org.bremersee.data.ldaptive.reactive,ReactiveLdaptiveTemplate.FluxSinkAwareResultHandler,11,24,2,2,1,8,2,2,0,2
 common-base-ldaptive,org.bremersee.data.ldaptive.reactive,ReactiveLdaptiveTemplate.FutureAwareResultHandler,0,53,1,7,0,11,1,5,0,2

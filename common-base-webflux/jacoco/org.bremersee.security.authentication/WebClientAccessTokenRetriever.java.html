@@ -87,7 +87,7 @@ public class WebClientAccessTokenRetriever
   @Override
   public Mono&lt;String&gt; retrieveAccessToken(final AccessTokenRetrieverProperties properties) {
 <span class="pc bpc" id="L89" title="1 of 2 branches missed.">    if (log.isDebugEnabled()) {</span>
-<span class="nc" id="L90">      log.debug(&quot;Retrieving access token with password flow, properties = {}&quot;, properties);</span>
+<span class="fc" id="L90">      log.debug(&quot;Retrieving access token with password flow, properties = {}&quot;, properties);</span>
     }
 <span class="fc" id="L92">    final String cacheKey = properties.createCacheKeyHashed();</span>
 <span class="fc" id="L93">    return Mono.justOrEmpty(accessTokenCache)</span>

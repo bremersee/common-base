@@ -32,25 +32,25 @@ import org.springframework.http.HttpStatus;
  * @author Christian Bremer
  */
 @Getter
-<span class="nc" id="L35">@Setter(AccessLevel.PRIVATE)</span>
+@Setter(AccessLevel.PRIVATE)
 @SuppressWarnings(&quot;WeakerAccess&quot;)
 public class InvocationFunctions {
 
-<span class="fc" id="L39">  private RequestUriSpecBuilder uriSpecBuilder;</span>
+  private RequestUriSpecBuilder uriSpecBuilder;
 
-<span class="fc" id="L41">  private RequestUriBuilder uriBuilder;</span>
+  private RequestUriBuilder uriBuilder;
 
-<span class="fc" id="L43">  private RequestHeadersBuilder headersBuilder;</span>
+  private RequestHeadersBuilder headersBuilder;
 
-<span class="fc" id="L45">  private RequestCookiesBuilder cookiesBuilder;</span>
+  private RequestCookiesBuilder cookiesBuilder;
 
-<span class="fc" id="L47">  private RequestBodyInserter bodyInserter;</span>
+  private RequestBodyInserter bodyInserter;
 
-<span class="fc" id="L49">  private Predicate&lt;HttpStatus&gt; errorDetector;</span>
+  private Predicate&lt;HttpStatus&gt; errorDetector;
 
-<span class="fc" id="L51">  private WebClientErrorDecoder&lt;? extends Throwable&gt; errorDecoder;</span>
+  private WebClientErrorDecoder&lt;? extends Throwable&gt; errorDecoder;
 
-<span class="fc" id="L53">  private RequestResponseBuilder responseBuilder;</span>
+  private RequestResponseBuilder responseBuilder;
 
   private InvocationFunctions() {
 <span class="fc" id="L56">    this(RequestUriSpecBuilder.defaultBuilder(),</span>
@@ -75,7 +75,7 @@ public class InvocationFunctions {
    * @param errorDecoder the error decoder
    * @param responseBuilder the response builder
    */
-<span class="pc" id="L78">  @Builder</span>
+  @Builder
   public InvocationFunctions(
       final RequestUriSpecBuilder uriSpecBuilder,
       final RequestUriBuilder uriBuilder,

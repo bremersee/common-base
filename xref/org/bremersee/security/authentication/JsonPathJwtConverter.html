@@ -112,41 +112,42 @@
 <a class="jxr_linenumber" name="L104" href="#L104">104</a>     }
 <a class="jxr_linenumber" name="L105" href="#L105">105</a>   }
 <a class="jxr_linenumber" name="L106" href="#L106">106</a> 
-<a class="jxr_linenumber" name="L107" href="#L107">107</a>   @Override
-<a class="jxr_linenumber" name="L108" href="#L108">108</a>   <strong class="jxr_keyword">public</strong> JwtAuthenticationToken convert(@NonNull <strong class="jxr_keyword">final</strong> Jwt source) {
-<a class="jxr_linenumber" name="L109" href="#L109">109</a>     <strong class="jxr_keyword">final</strong> <a name="JsonPathJwtParser" href="../../../../org/bremersee/security<a name="JsonPathJwtParser" href="../../../../org/bremersee/security/authentication/JsonPathJwtParser.html#JsonPathJwtParser">JsonPathJwtParser</a>sonPathJwtParser.html#JsonPathJwtParser">JsonPathJwtParser</a> parser = <strong class="jxr_keyword">new</strong> <a name="JsonPathJwtParser" href="../../../../org/bremersee/security/authentication/JsonPathJwtParser.html#JsonPathJwtParser">JsonPathJwtParser</a>(source);
-<a class="jxr_linenumber" name="L110" href="#L110">110</a>     <strong class="jxr_keyword">final</strong> List&lt;String&gt; roleValues;
-<a class="jxr_linenumber" name="L111" href="#L111">111</a>     <strong class="jxr_keyword">if</strong> (rolesValueList) {
-<a class="jxr_linenumber" name="L112" href="#L112">112</a>       <strong class="jxr_keyword">final</strong> List&lt;?&gt; rawList = parser.read(rolesJsonPath, List.<strong class="jxr_keyword">class</strong>);
-<a class="jxr_linenumber" name="L113" href="#L113">113</a>       roleValues = rawList == <strong class="jxr_keyword">null</strong>
-<a class="jxr_linenumber" name="L114" href="#L114">114</a>           ? Collections.emptyList()
-<a class="jxr_linenumber" name="L115" href="#L115">115</a>           : rawList.stream()
-<a class="jxr_linenumber" name="L116" href="#L116">116</a>               .filter(Objects::nonNull)
-<a class="jxr_linenumber" name="L117" href="#L117">117</a>               .map(Object::toString)
-<a class="jxr_linenumber" name="L118" href="#L118">118</a>               .collect(Collectors.toList());
-<a class="jxr_linenumber" name="L119" href="#L119">119</a>     } <strong class="jxr_keyword">else</strong> {
-<a class="jxr_linenumber" name="L120" href="#L120">120</a>       <strong class="jxr_keyword">final</strong> String roleValue = parser.read(rolesJsonPath, String.<strong class="jxr_keyword">class</strong>);
-<a class="jxr_linenumber" name="L121" href="#L121">121</a>       <strong class="jxr_keyword">if</strong> (StringUtils.hasText(roleValue)) {
-<a class="jxr_linenumber" name="L122" href="#L122">122</a>         roleValues = Arrays.asList(roleValue.split(rolesValueSeparator));
-<a class="jxr_linenumber" name="L123" href="#L123">123</a>       } <strong class="jxr_keyword">else</strong> {
-<a class="jxr_linenumber" name="L124" href="#L124">124</a>         roleValues = Collections.emptyList();
-<a class="jxr_linenumber" name="L125" href="#L125">125</a>       }
-<a class="jxr_linenumber" name="L126" href="#L126">126</a>     }
-<a class="jxr_linenumber" name="L127" href="#L127">127</a>     <strong class="jxr_keyword">final</strong> Set&lt;GrantedAuthority&gt; authorities = roleValues.stream()
-<a class="jxr_linenumber" name="L128" href="#L128">128</a>         .filter(roleName -&gt; roleName.trim().length() &gt; 0)
-<a class="jxr_linenumber" name="L129" href="#L129">129</a>         .map(roleName -&gt; roleName.startsWith(rolePrefix) ? roleName : rolePrefix + roleName)
-<a class="jxr_linenumber" name="L130" href="#L130">130</a>         .map(SimpleGrantedAuthority::<strong class="jxr_keyword">new</strong>)
-<a class="jxr_linenumber" name="L131" href="#L131">131</a>         .collect(Collectors.toSet());
-<a class="jxr_linenumber" name="L132" href="#L132">132</a>     <strong class="jxr_keyword">final</strong> String name = parser.read(nameJsonPath, String.<strong class="jxr_keyword">class</strong>);
-<a class="jxr_linenumber" name="L133" href="#L133">133</a>     <strong class="jxr_keyword">return</strong> <strong class="jxr_keyword">new</strong> JwtAuthenticationToken(
-<a class="jxr_linenumber" name="L134" href="#L134">134</a>         source,
-<a class="jxr_linenumber" name="L135" href="#L135">135</a>         authorities,
-<a class="jxr_linenumber" name="L136" href="#L136">136</a>         StringUtils.hasText(name) ? name : source.getSubject());
-<a class="jxr_linenumber" name="L137" href="#L137">137</a>   }
-<a class="jxr_linenumber" name="L138" href="#L138">138</a> 
-<a class="jxr_linenumber" name="L139" href="#L139">139</a> }
+<a class="jxr_linenumber" name="L107" href="#L107">107</a>   @NonNull
+<a class="jxr_linenumber" name="L108" href="#L108">108</a>   @Override
+<a class="jxr_linenumber" name="L109" href="#L109">109</a>   <strong class="jxr_keyword">public</strong> JwtAuthenticationToken convert(@NonNull <strong class="jxr_keyword">final</strong> Jwt source) {
+<a class="jxr_linenumber" name="L110" href="#L110">110</a>     <strong class="jxr_keyword">final</strong> <a name="JsonPathJwtParser" href="../../../../org/bremersee/security<a name="JsonPathJwtParser" href="../../../../org/bremersee/security/authentication/JsonPathJwtParser.html#JsonPathJwtParser">JsonPathJwtParser</a>sonPathJwtParser.html#JsonPathJwtParser">JsonPathJwtParser</a> parser = <strong class="jxr_keyword">new</strong> <a name="JsonPathJwtParser" href="../../../../org/bremersee/security/authentication/JsonPathJwtParser.html#JsonPathJwtParser">JsonPathJwtParser</a>(source);
+<a class="jxr_linenumber" name="L111" href="#L111">111</a>     <strong class="jxr_keyword">final</strong> List&lt;String&gt; roleValues;
+<a class="jxr_linenumber" name="L112" href="#L112">112</a>     <strong class="jxr_keyword">if</strong> (rolesValueList) {
+<a class="jxr_linenumber" name="L113" href="#L113">113</a>       <strong class="jxr_keyword">final</strong> List&lt;?&gt; rawList = parser.read(rolesJsonPath, List.<strong class="jxr_keyword">class</strong>);
+<a class="jxr_linenumber" name="L114" href="#L114">114</a>       roleValues = rawList == <strong class="jxr_keyword">null</strong>
+<a class="jxr_linenumber" name="L115" href="#L115">115</a>           ? Collections.emptyList()
+<a class="jxr_linenumber" name="L116" href="#L116">116</a>           : rawList.stream()
+<a class="jxr_linenumber" name="L117" href="#L117">117</a>               .filter(Objects::nonNull)
+<a class="jxr_linenumber" name="L118" href="#L118">118</a>               .map(Object::toString)
+<a class="jxr_linenumber" name="L119" href="#L119">119</a>               .collect(Collectors.toList());
+<a class="jxr_linenumber" name="L120" href="#L120">120</a>     } <strong class="jxr_keyword">else</strong> {
+<a class="jxr_linenumber" name="L121" href="#L121">121</a>       <strong class="jxr_keyword">final</strong> String roleValue = parser.read(rolesJsonPath, String.<strong class="jxr_keyword">class</strong>);
+<a class="jxr_linenumber" name="L122" href="#L122">122</a>       <strong class="jxr_keyword">if</strong> (StringUtils.hasText(roleValue)) {
+<a class="jxr_linenumber" name="L123" href="#L123">123</a>         roleValues = Arrays.asList(roleValue.split(rolesValueSeparator));
+<a class="jxr_linenumber" name="L124" href="#L124">124</a>       } <strong class="jxr_keyword">else</strong> {
+<a class="jxr_linenumber" name="L125" href="#L125">125</a>         roleValues = Collections.emptyList();
+<a class="jxr_linenumber" name="L126" href="#L126">126</a>       }
+<a class="jxr_linenumber" name="L127" href="#L127">127</a>     }
+<a class="jxr_linenumber" name="L128" href="#L128">128</a>     <strong class="jxr_keyword">final</strong> Set&lt;GrantedAuthority&gt; authorities = roleValues.stream()
+<a class="jxr_linenumber" name="L129" href="#L129">129</a>         .filter(roleName -&gt; roleName.trim().length() &gt; 0)
+<a class="jxr_linenumber" name="L130" href="#L130">130</a>         .map(roleName -&gt; roleName.startsWith(rolePrefix) ? roleName : rolePrefix + roleName)
+<a class="jxr_linenumber" name="L131" href="#L131">131</a>         .map(SimpleGrantedAuthority::<strong class="jxr_keyword">new</strong>)
+<a class="jxr_linenumber" name="L132" href="#L132">132</a>         .collect(Collectors.toSet());
+<a class="jxr_linenumber" name="L133" href="#L133">133</a>     <strong class="jxr_keyword">final</strong> String name = parser.read(nameJsonPath, String.<strong class="jxr_keyword">class</strong>);
+<a class="jxr_linenumber" name="L134" href="#L134">134</a>     <strong class="jxr_keyword">return</strong> <strong class="jxr_keyword">new</strong> JwtAuthenticationToken(
+<a class="jxr_linenumber" name="L135" href="#L135">135</a>         source,
+<a class="jxr_linenumber" name="L136" href="#L136">136</a>         authorities,
+<a class="jxr_linenumber" name="L137" href="#L137">137</a>         StringUtils.hasText(name) ? name : source.getSubject());
+<a class="jxr_linenumber" name="L138" href="#L138">138</a>   }
+<a class="jxr_linenumber" name="L139" href="#L139">139</a> 
+<a class="jxr_linenumber" name="L140" href="#L140">140</a> }
 </pre>
 <hr/>
-<div id="footer">Copyright &#169; 2021 <a href="http://bremersee.org">bremersee.org</a>. All rights reserved.</div>
+<div id="footer">Copyright &#169; 2022 <a href="http://bremersee.org">bremersee.org</a>. All rights reserved.</div>
 </body>
 </html>

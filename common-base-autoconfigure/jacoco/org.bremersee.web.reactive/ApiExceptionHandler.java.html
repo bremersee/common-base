@@ -28,12 +28,13 @@ import org.bremersee.exception.RestApiExceptionMapper;
 import org.bremersee.exception.RestApiExceptionUtils;
 import org.bremersee.exception.model.RestApiException;
 import org.bremersee.http.MediaTypeHelper;
-import org.springframework.boot.autoconfigure.web.ResourceProperties;
+import org.springframework.boot.autoconfigure.web.WebProperties;
 import org.springframework.boot.autoconfigure.web.reactive.error.AbstractErrorWebExceptionHandler;
 import org.springframework.boot.web.reactive.error.ErrorAttributes;
 import org.springframework.context.ApplicationContext;
 import org.springframework.http.MediaType;
 import org.springframework.http.codec.ServerCodecConfigurer;
+import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 import org.springframework.util.AntPathMatcher;
 import org.springframework.util.PathMatcher;
@@ -52,15 +53,15 @@ import reactor.core.publisher.Mono;
  * @author Christian Bremer
  */
 @Validated
-<span class="fc" id="L55">@Slf4j</span>
+<span class="fc" id="L56">@Slf4j</span>
 public class ApiExceptionHandler extends AbstractErrorWebExceptionHandler {
 
-<span class="fc" id="L58">  @Getter(AccessLevel.PROTECTED)</span>
-<span class="fc" id="L59">  @Setter</span>
+<span class="fc" id="L59">  @Getter(AccessLevel.PROTECTED)</span>
+  @Setter
   @NotNull
   private PathMatcher pathMatcher = new AntPathMatcher();
 
-<span class="fc" id="L63">  @Getter(AccessLevel.PROTECTED)</span>
+  @Getter(AccessLevel.PROTECTED)
   @NotNull
   private final RestApiExceptionMapper restApiExceptionMapper;
 
@@ -68,31 +69,31 @@ public class ApiExceptionHandler extends AbstractErrorWebExceptionHandler {
    * Instantiates a new api exception handler.
    *
    * @param errorAttributes the error attributes
-   * @param resourceProperties the resource properties
+   * @param resources the resources
    * @param applicationContext the application context
    * @param serverCodecConfigurer the server codec configurer
    * @param restApiExceptionMapper the rest api exception mapper
    */
   public ApiExceptionHandler(
       @NotNull final ErrorAttributes errorAttributes,
-      @NotNull final ResourceProperties resourceProperties,
+      @NotNull final WebProperties.Resources resources,
       @NotNull final ApplicationContext applicationContext,
       @Nullable final ServerCodecConfigurer serverCodecConfigurer,
       @NotNull final RestApiExceptionMapper restApiExceptionMapper) {
 
-<span class="fc" id="L83">    super(errorAttributes, resourceProperties, applicationContext);</span>
-<span class="pc bpc" id="L84" title="1 of 2 branches missed.">    if (serverCodecConfigurer != null) {</span>
-<span class="fc" id="L85">      setMessageReaders(serverCodecConfigurer.getReaders());</span>
-<span class="fc" id="L86">      setMessageWriters(serverCodecConfigurer.getWriters());</span>
+<span class="fc" id="L84">    super(errorAttributes, resources, applicationContext);</span>
+<span class="pc bpc" id="L85" title="1 of 2 branches missed.">    if (serverCodecConfigurer != null) {</span>
+<span class="fc" id="L86">      setMessageReaders(serverCodecConfigurer.getReaders());</span>
+<span class="fc" id="L87">      setMessageWriters(serverCodecConfigurer.getWriters());</span>
     }
-<span class="fc" id="L88">    this.restApiExceptionMapper = restApiExceptionMapper;</span>
-<span class="fc" id="L89">  }</span>
+<span class="fc" id="L89">    this.restApiExceptionMapper = restApiExceptionMapper;</span>
+<span class="fc" id="L90">  }</span>
 
   @Override
   protected RouterFunction&lt;ServerResponse&gt; getRoutingFunction(
       final ErrorAttributes errorAttributes) {
 
-<span class="fc" id="L95">    return RouterFunctions.route(this::isResponsibleExceptionHandler, this::renderErrorResponse);</span>
+<span class="fc" id="L96">    return RouterFunctions.route(this::isResponsibleExceptionHandler, this::renderErrorResponse);</span>
   }
 
   /**
@@ -102,8 +103,8 @@ public class ApiExceptionHandler extends AbstractErrorWebExceptionHandler {
    * @return {@code true} if it is responsible, otherwise {@code false}
    */
   protected boolean isResponsibleExceptionHandler(final ServerRequest request) {
-<span class="fc" id="L105">    return getRestApiExceptionMapper().getApiPaths().stream().anyMatch(</span>
-<span class="fc" id="L106">        path -&gt; getPathMatcher().match(path, request.path()));</span>
+<span class="fc" id="L106">    return getRestApiExceptionMapper().getApiPaths().stream().anyMatch(</span>
+<span class="fc" id="L107">        path -&gt; getPathMatcher().match(path, request.path()));</span>
   }
 
   /**
@@ -112,47 +113,48 @@ public class ApiExceptionHandler extends AbstractErrorWebExceptionHandler {
    * @param request the request
    * @return the server response
    */
+  @NonNull
   protected Mono&lt;ServerResponse&gt; renderErrorResponse(final ServerRequest request) {
 
-<span class="fc" id="L117">    final RestApiException response = getRestApiExceptionMapper()</span>
-<span class="fc" id="L118">        .build(getError(request), request.path(), null);</span>
-<span class="fc" id="L119">    final String accepts = MediaTypeHelper.toString(request.headers().accept());</span>
-<span class="fc bfc" id="L120" title="All 2 branches covered.">    if (MediaTypeHelper.canContentTypeBeJson(accepts)) {</span>
-<span class="fc" id="L121">      return ServerResponse</span>
-<span class="fc" id="L122">          .status(getRestApiExceptionMapper().detectHttpStatus(getError(request), null))</span>
-<span class="fc" id="L123">          .contentType(MediaType.APPLICATION_JSON)</span>
-<span class="fc" id="L124">          .body(BodyInserters.fromValue(response));</span>
-<span class="fc bfc" id="L125" title="All 2 branches covered.">    } else if (MediaTypeHelper.canContentTypeBeXml(accepts)) {</span>
-<span class="fc" id="L126">      return ServerResponse</span>
-<span class="fc" id="L127">          .status(getRestApiExceptionMapper().detectHttpStatus(getError(request), null))</span>
-<span class="fc" id="L128">          .contentType(MediaType.APPLICATION_XML)</span>
-<span class="fc" id="L129">          .body(BodyInserters.fromValue(response));</span>
+<span class="fc" id="L119">    final RestApiException response = getRestApiExceptionMapper()</span>
+<span class="fc" id="L120">        .build(getError(request), request.path(), null);</span>
+<span class="fc" id="L121">    final String accepts = MediaTypeHelper.toString(request.headers().accept());</span>
+<span class="fc bfc" id="L122" title="All 2 branches covered.">    if (MediaTypeHelper.canContentTypeBeJson(accepts)) {</span>
+<span class="fc" id="L123">      return ServerResponse</span>
+<span class="fc" id="L124">          .status(getRestApiExceptionMapper().detectHttpStatus(getError(request), null))</span>
+<span class="fc" id="L125">          .contentType(MediaType.APPLICATION_JSON)</span>
+<span class="fc" id="L126">          .body(BodyInserters.fromValue(response));</span>
+<span class="fc bfc" id="L127" title="All 2 branches covered.">    } else if (MediaTypeHelper.canContentTypeBeXml(accepts)) {</span>
+<span class="fc" id="L128">      return ServerResponse</span>
+<span class="fc" id="L129">          .status(getRestApiExceptionMapper().detectHttpStatus(getError(request), null))</span>
+<span class="fc" id="L130">          .contentType(MediaType.APPLICATION_XML)</span>
+<span class="fc" id="L131">          .body(BodyInserters.fromValue(response));</span>
     } else {
-<span class="pc bpc" id="L131" title="1 of 2 branches missed.">      final String id = StringUtils.hasText(response.getId())</span>
-<span class="fc" id="L132">          ? response.getId()</span>
-<span class="pc" id="L133">          : RestApiExceptionUtils.NO_ID_VALUE;</span>
-<span class="pc bpc" id="L134" title="1 of 2 branches missed.">      final String timestamp = response.getTimestamp() != null</span>
-<span class="fc" id="L135">          ? response.getTimestamp().format(RestApiExceptionUtils.TIMESTAMP_FORMATTER)</span>
-<span class="pc" id="L136">          : OffsetDateTime.now(ZoneOffset.UTC).format(RestApiExceptionUtils.TIMESTAMP_FORMATTER);</span>
-<span class="pc bpc" id="L137" title="1 of 2 branches missed.">      final String msg = StringUtils.hasText(response.getMessage())</span>
-<span class="fc" id="L138">          ? response.getMessage()</span>
-<span class="pc" id="L139">          : RestApiExceptionUtils.NO_MESSAGE_VALUE;</span>
-<span class="pc bpc" id="L140" title="1 of 2 branches missed.">      final String code = StringUtils.hasText(response.getErrorCode())</span>
-<span class="fc" id="L141">          ? response.getErrorCode()</span>
-<span class="pc" id="L142">          : RestApiExceptionUtils.NO_ERROR_CODE_VALUE;</span>
-<span class="pc bpc" id="L143" title="1 of 2 branches missed.">      final String cls = StringUtils.hasText(response.getClassName())</span>
-<span class="fc" id="L144">          ? response.getClassName()</span>
-<span class="pc" id="L145">          : RestApiExceptionUtils.NO_CLASS_VALUE;</span>
-<span class="fc" id="L146">      return ServerResponse</span>
-<span class="fc" id="L147">          .status(getRestApiExceptionMapper().detectHttpStatus(getError(request), null))</span>
-<span class="fc" id="L148">          .header(RestApiExceptionUtils.ID_HEADER_NAME, id)</span>
-<span class="fc" id="L149">          .header(RestApiExceptionUtils.TIMESTAMP_HEADER_NAME, timestamp)</span>
-<span class="fc" id="L150">          .header(RestApiExceptionUtils.MESSAGE_HEADER_NAME, msg)</span>
-<span class="fc" id="L151">          .header(RestApiExceptionUtils.CODE_HEADER_NAME, code)</span>
-<span class="fc" id="L152">          .header(RestApiExceptionUtils.CLASS_HEADER_NAME, cls)</span>
-<span class="fc" id="L153">          .contentType(Objects.requireNonNull(MediaTypeHelper.findContentType(</span>
-<span class="fc" id="L154">              request.headers().accept(), MediaType.TEXT_PLAIN)))</span>
-<span class="fc" id="L155">          .body(BodyInserters.empty());</span>
+<span class="pc bpc" id="L133" title="1 of 2 branches missed.">      final String id = StringUtils.hasText(response.getId())</span>
+<span class="fc" id="L134">          ? response.getId()</span>
+<span class="pc" id="L135">          : RestApiExceptionUtils.NO_ID_VALUE;</span>
+<span class="pc bpc" id="L136" title="1 of 2 branches missed.">      final String timestamp = response.getTimestamp() != null</span>
+<span class="fc" id="L137">          ? response.getTimestamp().format(RestApiExceptionUtils.TIMESTAMP_FORMATTER)</span>
+<span class="pc" id="L138">          : OffsetDateTime.now(ZoneOffset.UTC).format(RestApiExceptionUtils.TIMESTAMP_FORMATTER);</span>
+<span class="pc bpc" id="L139" title="1 of 2 branches missed.">      final String msg = StringUtils.hasText(response.getMessage())</span>
+<span class="fc" id="L140">          ? response.getMessage()</span>
+<span class="pc" id="L141">          : RestApiExceptionUtils.NO_MESSAGE_VALUE;</span>
+<span class="pc bpc" id="L142" title="1 of 2 branches missed.">      final String code = StringUtils.hasText(response.getErrorCode())</span>
+<span class="fc" id="L143">          ? response.getErrorCode()</span>
+<span class="pc" id="L144">          : RestApiExceptionUtils.NO_ERROR_CODE_VALUE;</span>
+<span class="pc bpc" id="L145" title="1 of 2 branches missed.">      final String cls = StringUtils.hasText(response.getClassName())</span>
+<span class="fc" id="L146">          ? response.getClassName()</span>
+<span class="pc" id="L147">          : RestApiExceptionUtils.NO_CLASS_VALUE;</span>
+<span class="fc" id="L148">      return ServerResponse</span>
+<span class="fc" id="L149">          .status(getRestApiExceptionMapper().detectHttpStatus(getError(request), null))</span>
+<span class="fc" id="L150">          .header(RestApiExceptionUtils.ID_HEADER_NAME, id)</span>
+<span class="fc" id="L151">          .header(RestApiExceptionUtils.TIMESTAMP_HEADER_NAME, timestamp)</span>
+<span class="fc" id="L152">          .header(RestApiExceptionUtils.MESSAGE_HEADER_NAME, msg)</span>
+<span class="fc" id="L153">          .header(RestApiExceptionUtils.CODE_HEADER_NAME, code)</span>
+<span class="fc" id="L154">          .header(RestApiExceptionUtils.CLASS_HEADER_NAME, cls)</span>
+<span class="fc" id="L155">          .contentType(Objects.requireNonNull(MediaTypeHelper.findContentType(</span>
+<span class="fc" id="L156">              request.headers().accept(), MediaType.TEXT_PLAIN)))</span>
+<span class="fc" id="L157">          .body(BodyInserters.empty());</span>
     }
   }
 

@@ -60,8 +60,8 @@ public interface AccessTokenCache {
   void putAccessToken(@NotNull String key, @NotNull String accessToken);
 
   /**
-   * Checks whether the access token is expired. If no expiration claim is present, the result will
-   * always be {@code true}.
+   * Checks whether the access token is expired. If no expiration claim is present, the result will always be {@code
+   * true}.
    *
    * @param tokenValue the token value
    * @param accessTokenThreshold the access token threshold

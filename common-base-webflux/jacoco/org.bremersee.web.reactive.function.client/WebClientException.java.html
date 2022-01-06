@@ -18,14 +18,16 @@ package org.bremersee.web.reactive.function.client;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import lombok.Getter;
 import org.bremersee.exception.ErrorCodeAware;
 import org.bremersee.exception.HttpResponseHeadersAware;
 import org.bremersee.exception.RestApiExceptionAware;
 import org.bremersee.exception.model.RestApiException;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.lang.Nullable;
+import org.springframework.lang.NonNull;
 import org.springframework.web.server.ResponseStatusException;
 
 /**
@@ -39,8 +41,7 @@ public class WebClientException
 
   private final Map&lt;String, ? extends Collection&lt;String&gt;&gt; headers;
 
-<span class="fc" id="L42">  @Getter</span>
-  @Nullable
+  @Getter
   private final RestApiException restApiException;
 
   /**
@@ -55,24 +56,29 @@ public class WebClientException
       final Map&lt;String, ? extends Collection&lt;String&gt;&gt; headers,
       final RestApiException restApiException) {
 
-<span class="fc" id="L58">    super(status);</span>
-<span class="pc bpc" id="L59" title="1 of 2 branches missed.">    this.headers = headers != null ? headers : Collections.emptyMap();</span>
-<span class="fc" id="L60">    this.restApiException = restApiException;</span>
-<span class="fc" id="L61">  }</span>
+<span class="fc" id="L59">    super(status);</span>
+<span class="pc bpc" id="L60" title="1 of 2 branches missed.">    this.headers = headers != null ? headers : Collections.emptyMap();</span>
+<span class="fc" id="L61">    this.restApiException = restApiException;</span>
+<span class="fc" id="L62">  }</span>
 
+  @NonNull
   @Override
-  public Map&lt;String, String&gt; getHeaders() {
-<span class="fc" id="L65">    return HttpResponseHeadersAware.createHeaders(getMultiValueHeaders());</span>
+  public HttpHeaders getResponseHeaders() {
+<span class="fc" id="L67">    HttpHeaders httpHeaders = new HttpHeaders();</span>
+<span class="fc bfc" id="L68" title="All 2 branches covered.">    for (Map.Entry&lt;String, ? extends Collection&lt;String&gt;&gt; entry : headers.entrySet()) {</span>
+<span class="fc" id="L69">      httpHeaders.put(entry.getKey(), List.copyOf(entry.getValue()));</span>
+<span class="fc" id="L70">    }</span>
+<span class="fc" id="L71">    return httpHeaders;</span>
   }
 
   @Override
   public Map&lt;String, ? extends Collection&lt;String&gt;&gt; getMultiValueHeaders() {
-<span class="fc" id="L70">    return headers;</span>
+<span class="nc" id="L76">    return headers;</span>
   }
 
   @Override
   public String getErrorCode() {
-<span class="pc bpc" id="L75" title="1 of 2 branches missed.">    return getRestApiException() != null ? getRestApiException().getErrorCode() : null;</span>
+<span class="pc bpc" id="L81" title="1 of 2 branches missed.">    return getRestApiException() != null ? getRestApiException().getErrorCode() : null;</span>
   }
 
 }

@@ -38,6 +38,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
+import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 import org.springframework.util.AntPathMatcher;
 import org.springframework.util.PathMatcher;
@@ -58,7 +59,7 @@ import org.springframework.web.util.WebUtils;
  * @author Christian Bremer
  */
 @Validated
-<span class="fc" id="L61">@Slf4j</span>
+<span class="fc" id="L62">@Slf4j</span>
 public class ApiExceptionResolver implements HandlerExceptionResolver {
 
   /**
@@ -66,17 +67,17 @@ public class ApiExceptionResolver implements HandlerExceptionResolver {
    */
   protected static final String MODEL_KEY = &quot;error&quot;;
 
-<span class="fc" id="L69">  @Getter(AccessLevel.PROTECTED)</span>
-<span class="fc" id="L70">  @Setter</span>
+<span class="fc" id="L70">  @Getter(AccessLevel.PROTECTED)</span>
+  @Setter
   private PathMatcher pathMatcher = new AntPathMatcher();
 
-<span class="fc" id="L73">  @Getter(AccessLevel.PROTECTED)</span>
+  @Getter(AccessLevel.PROTECTED)
   private final RestApiExceptionMapper exceptionMapper;
 
-<span class="fc" id="L76">  @Getter(AccessLevel.PROTECTED)</span>
+  @Getter(AccessLevel.PROTECTED)
   private final ObjectMapper objectMapper;
 
-<span class="fc" id="L79">  @Getter(AccessLevel.PROTECTED)</span>
+  @Getter(AccessLevel.PROTECTED)
   private final XmlMapper xmlMapper;
 
   /**
@@ -85,11 +86,11 @@ public class ApiExceptionResolver implements HandlerExceptionResolver {
    * @param exceptionMapper the exception mapper
    */
   public ApiExceptionResolver(
-<span class="fc" id="L88">      final RestApiExceptionMapper exceptionMapper) {</span>
-<span class="fc" id="L89">    this.exceptionMapper = exceptionMapper;</span>
-<span class="fc" id="L90">    this.objectMapper = Jackson2ObjectMapperBuilder.json().build();</span>
-<span class="fc" id="L91">    this.xmlMapper = Jackson2ObjectMapperBuilder.xml().createXmlMapper(true).build();</span>
-<span class="fc" id="L92">  }</span>
+<span class="fc" id="L89">      RestApiExceptionMapper exceptionMapper) {</span>
+<span class="fc" id="L90">    this.exceptionMapper = exceptionMapper;</span>
+<span class="fc" id="L91">    this.objectMapper = Jackson2ObjectMapperBuilder.json().build();</span>
+<span class="fc" id="L92">    this.xmlMapper = Jackson2ObjectMapperBuilder.xml().createXmlMapper(true).build();</span>
+<span class="fc" id="L93">  }</span>
 
   /**
    * Instantiates a new api exception resolver.
@@ -98,12 +99,12 @@ public class ApiExceptionResolver implements HandlerExceptionResolver {
    * @param objectMapperBuilder the object mapper builder
    */
   public ApiExceptionResolver(
-      final RestApiExceptionMapper exceptionMapper,
-<span class="fc" id="L102">      final Jackson2ObjectMapperBuilder objectMapperBuilder) {</span>
-<span class="fc" id="L103">    this.exceptionMapper = exceptionMapper;</span>
-<span class="fc" id="L104">    this.objectMapper = objectMapperBuilder.build();</span>
-<span class="fc" id="L105">    this.xmlMapper = objectMapperBuilder.createXmlMapper(true).build();</span>
-<span class="fc" id="L106">  }</span>
+      RestApiExceptionMapper exceptionMapper,
+<span class="fc" id="L103">      Jackson2ObjectMapperBuilder objectMapperBuilder) {</span>
+<span class="fc" id="L104">    this.exceptionMapper = exceptionMapper;</span>
+<span class="fc" id="L105">    this.objectMapper = objectMapperBuilder.build();</span>
+<span class="fc" id="L106">    this.xmlMapper = objectMapperBuilder.createXmlMapper(true).build();</span>
+<span class="fc" id="L107">  }</span>
 
   /**
    * Instantiates a new api exception resolver.
@@ -113,56 +114,56 @@ public class ApiExceptionResolver implements HandlerExceptionResolver {
    * @param xmlMapper the xml mapper
    */
   public ApiExceptionResolver(
-      final RestApiExceptionMapper exceptionMapper,
+      RestApiExceptionMapper exceptionMapper,
       ObjectMapper objectMapper,
-<span class="fc" id="L118">      XmlMapper xmlMapper) {</span>
-<span class="fc" id="L119">    this.exceptionMapper = exceptionMapper;</span>
-<span class="fc" id="L120">    this.objectMapper = objectMapper;</span>
-<span class="fc" id="L121">    this.xmlMapper = xmlMapper;</span>
-<span class="fc" id="L122">  }</span>
+<span class="fc" id="L119">      XmlMapper xmlMapper) {</span>
+<span class="fc" id="L120">    this.exceptionMapper = exceptionMapper;</span>
+<span class="fc" id="L121">    this.objectMapper = objectMapper;</span>
+<span class="fc" id="L122">    this.xmlMapper = xmlMapper;</span>
+<span class="fc" id="L123">  }</span>
 
   @Override
   public ModelAndView resolveException(
-      final HttpServletRequest request,
-      final HttpServletResponse response,
-      final @Nullable Object handler,
-      final Exception ex) {
+      @NonNull HttpServletRequest request,
+      @NonNull HttpServletResponse response,
+      @Nullable Object handler,
+      @NonNull Exception ex) {
 
-<span class="fc bfc" id="L131" title="All 2 branches covered.">    if (!isExceptionHandlerResponsible(request, handler)) {</span>
-<span class="fc" id="L132">      return null;</span>
+<span class="fc bfc" id="L132" title="All 2 branches covered.">    if (!isExceptionHandlerResponsible(request, handler)) {</span>
+<span class="fc" id="L133">      return null;</span>
     }
 
-<span class="fc" id="L135">    final RestApiException payload = exceptionMapper.build(ex, request.getRequestURI(), handler);</span>
+<span class="fc" id="L136">    RestApiException payload = exceptionMapper.build(ex, request.getRequestURI(), handler);</span>
 
     ModelAndView modelAndView;
-<span class="fc" id="L138">    final ResponseFormatAndContentType chooser = new ResponseFormatAndContentType(request);</span>
-<span class="fc bfc" id="L139" title="All 3 branches covered.">    switch (chooser.getResponseFormat()) {</span>
+<span class="fc" id="L139">    ResponseFormatAndContentType chooser = new ResponseFormatAndContentType(request);</span>
+<span class="fc bfc" id="L140" title="All 3 branches covered.">    switch (chooser.getResponseFormat()) {</span>
       case JSON:
-<span class="fc" id="L141">        final MappingJackson2JsonView mjv = new MappingJackson2JsonView(objectMapper);</span>
-<span class="fc" id="L142">        mjv.setContentType(chooser.getContentType());</span>
-<span class="fc" id="L143">        mjv.setPrettyPrint(true);</span>
-<span class="fc" id="L144">        mjv.setModelKey(MODEL_KEY);</span>
-<span class="fc" id="L145">        mjv.setExtractValueFromSingleKeyModel(true); // removes the MODEL_KEY from the output</span>
-<span class="fc" id="L146">        modelAndView = new ModelAndView(mjv, MODEL_KEY, payload);</span>
-<span class="fc" id="L147">        break;</span>
+<span class="fc" id="L142">        MappingJackson2JsonView mjv = new MappingJackson2JsonView(objectMapper);</span>
+<span class="fc" id="L143">        mjv.setContentType(chooser.getContentType());</span>
+<span class="fc" id="L144">        mjv.setPrettyPrint(true);</span>
+<span class="fc" id="L145">        mjv.setModelKey(MODEL_KEY);</span>
+<span class="fc" id="L146">        mjv.setExtractValueFromSingleKeyModel(true); // removes the MODEL_KEY from the output</span>
+<span class="fc" id="L147">        modelAndView = new ModelAndView(mjv, MODEL_KEY, payload);</span>
+<span class="fc" id="L148">        break;</span>
 
       case XML:
-<span class="fc" id="L150">        final MappingJackson2XmlView mxv = new MappingJackson2XmlView(xmlMapper);</span>
-<span class="fc" id="L151">        mxv.setContentType(chooser.getContentType());</span>
-<span class="fc" id="L152">        mxv.setPrettyPrint(true);</span>
-<span class="fc" id="L153">        mxv.setModelKey(MODEL_KEY);</span>
-<span class="fc" id="L154">        modelAndView = new ModelAndView(mxv, MODEL_KEY, payload);</span>
-<span class="fc" id="L155">        break;</span>
+<span class="fc" id="L151">        MappingJackson2XmlView mxv = new MappingJackson2XmlView(xmlMapper);</span>
+<span class="fc" id="L152">        mxv.setContentType(chooser.getContentType());</span>
+<span class="fc" id="L153">        mxv.setPrettyPrint(true);</span>
+<span class="fc" id="L154">        mxv.setModelKey(MODEL_KEY);</span>
+<span class="fc" id="L155">        modelAndView = new ModelAndView(mxv, MODEL_KEY, payload);</span>
+<span class="fc" id="L156">        break;</span>
 
       default:
-<span class="fc" id="L158">        modelAndView = new ModelAndView(new EmptyView(payload, chooser.getContentType()));</span>
+<span class="fc" id="L159">        modelAndView = new ModelAndView(new EmptyView(payload, chooser.getContentType()));</span>
     }
 
-<span class="fc" id="L161">    response.setContentType(chooser.getContentType());</span>
-<span class="fc" id="L162">    final int statusCode = exceptionMapper.detectHttpStatus(ex, handler).value();</span>
-<span class="fc" id="L163">    modelAndView.setStatus(HttpStatus.resolve(statusCode));</span>
-<span class="fc" id="L164">    applyStatusCodeIfPossible(request, response, statusCode);</span>
-<span class="fc" id="L165">    return modelAndView;</span>
+<span class="fc" id="L162">    response.setContentType(chooser.getContentType());</span>
+<span class="fc" id="L163">    int statusCode = exceptionMapper.detectHttpStatus(ex, handler).value();</span>
+<span class="fc" id="L164">    modelAndView.setStatus(HttpStatus.resolve(statusCode));</span>
+<span class="fc" id="L165">    applyStatusCodeIfPossible(request, response, statusCode);</span>
+<span class="fc" id="L166">    return modelAndView;</span>
   }
 
   /**
@@ -174,25 +175,25 @@ public class ApiExceptionResolver implements HandlerExceptionResolver {
    */
   @SuppressWarnings(&quot;WeakerAccess&quot;)
   protected boolean isExceptionHandlerResponsible(
-      final HttpServletRequest request,
-      final @Nullable Object handler) {
+      HttpServletRequest request,
+      @Nullable Object handler) {
 
-<span class="fc bfc" id="L180" title="All 2 branches covered.">    if (!exceptionMapper.getApiPaths().isEmpty()) {</span>
-<span class="fc" id="L181">      return exceptionMapper.getApiPaths().stream().anyMatch(</span>
-<span class="fc" id="L182">          s -&gt; pathMatcher.match(s, request.getServletPath()));</span>
+<span class="fc bfc" id="L181" title="All 2 branches covered.">    if (!exceptionMapper.getApiPaths().isEmpty()) {</span>
+<span class="fc" id="L182">      return exceptionMapper.getApiPaths().stream().anyMatch(</span>
+<span class="fc" id="L183">          s -&gt; pathMatcher.match(s, request.getServletPath()));</span>
     }
 
-<span class="fc bfc" id="L185" title="All 2 branches covered.">    if (handler == null) {</span>
-<span class="fc" id="L186">      return false;</span>
+<span class="fc bfc" id="L186" title="All 2 branches covered.">    if (handler == null) {</span>
+<span class="fc" id="L187">      return false;</span>
     }
-<span class="pc bpc" id="L188" title="1 of 2 branches missed.">    final Class&lt;?&gt; cls = handler instanceof HandlerMethod</span>
-<span class="fc" id="L189">        ? ((HandlerMethod) handler).getBean().getClass()</span>
-<span class="pc" id="L190">        : handler.getClass();</span>
-<span class="fc bfc" id="L191" title="All 2 branches covered.">    final boolean result = AnnotationUtils.findAnnotation(cls, RestController.class) != null;</span>
-<span class="pc bpc" id="L192" title="1 of 2 branches missed.">    if (log.isDebugEnabled()) {</span>
-<span class="fc" id="L193">      log.debug(&quot;Is handler [&quot; + handler + &quot;] a rest controller? &quot; + result);</span>
+<span class="pc bpc" id="L189" title="1 of 2 branches missed.">    Class&lt;?&gt; cls = handler instanceof HandlerMethod</span>
+<span class="fc" id="L190">        ? ((HandlerMethod) handler).getBean().getClass()</span>
+<span class="pc" id="L191">        : handler.getClass();</span>
+<span class="fc bfc" id="L192" title="All 2 branches covered.">    boolean result = AnnotationUtils.findAnnotation(cls, RestController.class) != null;</span>
+<span class="pc bpc" id="L193" title="1 of 2 branches missed.">    if (log.isDebugEnabled()) {</span>
+<span class="fc" id="L194">      log.debug(&quot;Is handler [&quot; + handler + &quot;] a rest controller? &quot; + result);</span>
     }
-<span class="fc" id="L195">    return result;</span>
+<span class="fc" id="L196">    return result;</span>
   }
 
   /**
@@ -204,38 +205,38 @@ public class ApiExceptionResolver implements HandlerExceptionResolver {
    */
   @SuppressWarnings(&quot;WeakerAccess&quot;)
   protected final void applyStatusCodeIfPossible(
-      final HttpServletRequest request,
-      final HttpServletResponse response,
-      final int statusCode) {
+      HttpServletRequest request,
+      HttpServletResponse response,
+      int statusCode) {
 
-<span class="pc bpc" id="L211" title="1 of 2 branches missed.">    if (!WebUtils.isIncludeRequest(request)) {</span>
-<span class="pc bpc" id="L212" title="1 of 2 branches missed.">      if (log.isDebugEnabled()) {</span>
-<span class="fc" id="L213">        log.debug(&quot;Applying HTTP status code &quot; + statusCode);</span>
+<span class="pc bpc" id="L212" title="1 of 2 branches missed.">    if (!WebUtils.isIncludeRequest(request)) {</span>
+<span class="pc bpc" id="L213" title="1 of 2 branches missed.">      if (log.isDebugEnabled()) {</span>
+<span class="fc" id="L214">        log.debug(&quot;Applying HTTP status code &quot; + statusCode);</span>
       }
-<span class="fc" id="L215">      response.setStatus(statusCode);</span>
-<span class="fc" id="L216">      request.setAttribute(WebUtils.ERROR_STATUS_CODE_ATTRIBUTE, statusCode);</span>
+<span class="fc" id="L216">      response.setStatus(statusCode);</span>
+<span class="fc" id="L217">      request.setAttribute(WebUtils.ERROR_STATUS_CODE_ATTRIBUTE, statusCode);</span>
     }
-<span class="fc" id="L218">  }</span>
+<span class="fc" id="L219">  }</span>
 
   /**
    * The response format.
    */
-<span class="fc" id="L223">  enum ResponseFormat {</span>
+<span class="fc" id="L224">  enum ResponseFormat {</span>
 
     /**
      * Json response format.
      */
-<span class="fc" id="L228">    JSON,</span>
+<span class="fc" id="L229">    JSON,</span>
 
     /**
      * Xml response format.
      */
-<span class="fc" id="L233">    XML,</span>
+<span class="fc" id="L234">    XML,</span>
 
     /**
      * Empty response format.
      */
-<span class="fc" id="L238">    EMPTY</span>
+<span class="fc" id="L239">    EMPTY</span>
   }
 
   /**
@@ -243,36 +244,36 @@ public class ApiExceptionResolver implements HandlerExceptionResolver {
    */
   static class ResponseFormatAndContentType {
 
-<span class="fc" id="L246">    @Getter(AccessLevel.PROTECTED)</span>
-    private ResponseFormat responseFormat;
+    @Getter(AccessLevel.PROTECTED)
+    private final ResponseFormat responseFormat;
 
-<span class="fc" id="L249">    @Getter(AccessLevel.PROTECTED)</span>
-    private String contentType;
+    @Getter(AccessLevel.PROTECTED)
+    private final String contentType;
 
     /**
      * Instantiates a new response format and content type.
      *
      * @param request the request
      */
-<span class="fc" id="L257">    ResponseFormatAndContentType(final @NotNull HttpServletRequest request) {</span>
-<span class="fc" id="L258">      final String acceptHeader = request.getHeader(HttpHeaders.ACCEPT);</span>
-<span class="fc bfc" id="L259" title="All 2 branches covered.">      if (MediaTypeHelper.canContentTypeBeJson(acceptHeader)) {</span>
-<span class="fc" id="L260">        responseFormat = ResponseFormat.JSON;</span>
-<span class="fc" id="L261">        contentType = MediaType.APPLICATION_JSON_VALUE;</span>
-<span class="fc bfc" id="L262" title="All 2 branches covered.">      } else if (MediaTypeHelper.canContentTypeBeXml(acceptHeader)) {</span>
-<span class="fc" id="L263">        responseFormat = ResponseFormat.XML;</span>
-<span class="fc" id="L264">        contentType = MediaType.APPLICATION_XML_VALUE;</span>
+<span class="fc" id="L258">    ResponseFormatAndContentType(@NotNull HttpServletRequest request) {</span>
+<span class="fc" id="L259">      String acceptHeader = request.getHeader(HttpHeaders.ACCEPT);</span>
+<span class="fc bfc" id="L260" title="All 2 branches covered.">      if (MediaTypeHelper.canContentTypeBeJson(acceptHeader)) {</span>
+<span class="fc" id="L261">        responseFormat = ResponseFormat.JSON;</span>
+<span class="fc" id="L262">        contentType = MediaType.APPLICATION_JSON_VALUE;</span>
+<span class="fc bfc" id="L263" title="All 2 branches covered.">      } else if (MediaTypeHelper.canContentTypeBeXml(acceptHeader)) {</span>
+<span class="fc" id="L264">        responseFormat = ResponseFormat.XML;</span>
+<span class="fc" id="L265">        contentType = MediaType.APPLICATION_XML_VALUE;</span>
       } else {
-<span class="fc" id="L266">        responseFormat = ResponseFormat.EMPTY;</span>
-<span class="pc bpc" id="L267" title="1 of 2 branches missed.">        if (StringUtils.hasText(acceptHeader)) {</span>
-<span class="fc" id="L268">          final List&lt;MediaType&gt; accepts = MediaType.parseMediaTypes(acceptHeader);</span>
-<span class="fc" id="L269">          contentType = String</span>
-<span class="fc" id="L270">              .valueOf(MediaTypeHelper.findContentType(accepts, MediaType.TEXT_PLAIN));</span>
-<span class="fc" id="L271">        } else {</span>
-<span class="nc" id="L272">          contentType = MediaType.TEXT_PLAIN_VALUE;</span>
+<span class="fc" id="L267">        responseFormat = ResponseFormat.EMPTY;</span>
+<span class="pc bpc" id="L268" title="1 of 2 branches missed.">        if (StringUtils.hasText(acceptHeader)) {</span>
+<span class="fc" id="L269">          List&lt;MediaType&gt; accepts = MediaType.parseMediaTypes(acceptHeader);</span>
+<span class="fc" id="L270">          contentType = String</span>
+<span class="fc" id="L271">              .valueOf(MediaTypeHelper.findContentType(accepts, MediaType.TEXT_PLAIN));</span>
+<span class="fc" id="L272">        } else {</span>
+<span class="nc" id="L273">          contentType = MediaType.TEXT_PLAIN_VALUE;</span>
         }
       }
-<span class="fc" id="L275">    }</span>
+<span class="fc" id="L276">    }</span>
   }
 
   /**
@@ -291,43 +292,43 @@ public class ApiExceptionResolver implements HandlerExceptionResolver {
      * @param payload the payload
      * @param contentType the content type
      */
-<span class="fc" id="L294">    EmptyView(final @NotNull RestApiException payload, final String contentType) {</span>
-<span class="fc" id="L295">      this.restApiException = payload;</span>
-<span class="fc" id="L296">      setContentType(contentType);</span>
-<span class="fc" id="L297">    }</span>
+<span class="fc" id="L295">    EmptyView(@NotNull RestApiException payload, String contentType) {</span>
+<span class="fc" id="L296">      this.restApiException = payload;</span>
+<span class="fc" id="L297">      setContentType(contentType);</span>
+<span class="fc" id="L298">    }</span>
 
     @Override
     protected void renderMergedOutputModel(
-        @Nullable final Map&lt;String, Object&gt; map,
-        final HttpServletRequest httpServletRequest,
-        final HttpServletResponse httpServletResponse) {
+        @Nullable Map&lt;String, Object&gt; map,
+        @NonNull HttpServletRequest httpServletRequest,
+        HttpServletResponse httpServletResponse) {
 
-<span class="fc" id="L305">      httpServletResponse.addHeader(RestApiExceptionUtils.ID_HEADER_NAME,</span>
-<span class="pc bpc" id="L306" title="1 of 2 branches missed.">          StringUtils.hasText(restApiException.getId())</span>
-<span class="nc" id="L307">              ? restApiException.getId()</span>
-<span class="fc" id="L308">              : RestApiExceptionUtils.NO_ID_VALUE);</span>
+<span class="fc" id="L306">      httpServletResponse.addHeader(RestApiExceptionUtils.ID_HEADER_NAME,</span>
+<span class="pc bpc" id="L307" title="1 of 2 branches missed.">          StringUtils.hasText(restApiException.getId())</span>
+<span class="nc" id="L308">              ? restApiException.getId()</span>
+<span class="fc" id="L309">              : RestApiExceptionUtils.NO_ID_VALUE);</span>
 
-<span class="fc" id="L310">      httpServletResponse.addHeader(RestApiExceptionUtils.TIMESTAMP_HEADER_NAME,</span>
-<span class="pc bpc" id="L311" title="1 of 2 branches missed.">          restApiException.getTimestamp() != null</span>
-<span class="nc" id="L312">              ? restApiException.getTimestamp().format(RestApiExceptionUtils.TIMESTAMP_FORMATTER)</span>
-<span class="fc" id="L313">              : OffsetDateTime.now(ZoneId.of(&quot;UTC&quot;)).format(</span>
+<span class="fc" id="L311">      httpServletResponse.addHeader(RestApiExceptionUtils.TIMESTAMP_HEADER_NAME,</span>
+<span class="pc bpc" id="L312" title="1 of 2 branches missed.">          restApiException.getTimestamp() != null</span>
+<span class="nc" id="L313">              ? restApiException.getTimestamp().format(RestApiExceptionUtils.TIMESTAMP_FORMATTER)</span>
+<span class="fc" id="L314">              : OffsetDateTime.now(ZoneId.of(&quot;UTC&quot;)).format(</span>
                   RestApiExceptionUtils.TIMESTAMP_FORMATTER));
 
-<span class="fc" id="L316">      httpServletResponse.addHeader(RestApiExceptionUtils.MESSAGE_HEADER_NAME,</span>
-<span class="pc bpc" id="L317" title="1 of 2 branches missed.">          StringUtils.hasText(restApiException.getMessage())</span>
-<span class="nc" id="L318">              ? restApiException.getMessage()</span>
-<span class="fc" id="L319">              : RestApiExceptionUtils.NO_MESSAGE_VALUE);</span>
+<span class="fc" id="L317">      httpServletResponse.addHeader(RestApiExceptionUtils.MESSAGE_HEADER_NAME,</span>
+<span class="pc bpc" id="L318" title="1 of 2 branches missed.">          StringUtils.hasText(restApiException.getMessage())</span>
+<span class="nc" id="L319">              ? restApiException.getMessage()</span>
+<span class="fc" id="L320">              : RestApiExceptionUtils.NO_MESSAGE_VALUE);</span>
 
-<span class="fc" id="L321">      httpServletResponse.addHeader(RestApiExceptionUtils.CODE_HEADER_NAME,</span>
-<span class="pc bpc" id="L322" title="1 of 2 branches missed.">          StringUtils.hasText(restApiException.getErrorCode())</span>
-<span class="fc" id="L323">              ? restApiException.getErrorCode()</span>
-<span class="nc" id="L324">              : RestApiExceptionUtils.NO_ERROR_CODE_VALUE);</span>
+<span class="fc" id="L322">      httpServletResponse.addHeader(RestApiExceptionUtils.CODE_HEADER_NAME,</span>
+<span class="pc bpc" id="L323" title="1 of 2 branches missed.">          StringUtils.hasText(restApiException.getErrorCode())</span>
+<span class="fc" id="L324">              ? restApiException.getErrorCode()</span>
+<span class="nc" id="L325">              : RestApiExceptionUtils.NO_ERROR_CODE_VALUE);</span>
 
-<span class="fc" id="L326">      httpServletResponse.addHeader(RestApiExceptionUtils.CLASS_HEADER_NAME,</span>
-<span class="pc bpc" id="L327" title="1 of 2 branches missed.">          StringUtils.hasText(restApiException.getClassName())</span>
-<span class="nc" id="L328">              ? restApiException.getClassName()</span>
-<span class="fc" id="L329">              : RestApiExceptionUtils.NO_CLASS_VALUE);</span>
-<span class="fc" id="L330">    }</span>
+<span class="fc" id="L327">      httpServletResponse.addHeader(RestApiExceptionUtils.CLASS_HEADER_NAME,</span>
+<span class="pc bpc" id="L328" title="1 of 2 branches missed.">          StringUtils.hasText(restApiException.getClassName())</span>
+<span class="nc" id="L329">              ? restApiException.getClassName()</span>
+<span class="fc" id="L330">              : RestApiExceptionUtils.NO_CLASS_VALUE);</span>
+<span class="fc" id="L331">    }</span>
 
   }
 

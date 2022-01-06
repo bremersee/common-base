@@ -23,11 +23,11 @@ under the License.
     <link>https://github.com/bremersee/common-base/common-base-actuator-autoconfigure</link>
     <description>common-base-actuator-autoconfigure - Checkstyle report</description>
     <language>en-us</language>
-    <copyright>&#169;2021 bremersee.org</copyright>
+    <copyright>&#169;2022 bremersee.org</copyright>
     <item>
       <title>File: 17,
              Errors: 0,
-             Warnings: 5,
+             Warnings: 3,
              Infos: 0
       </title>
             <link>https://github.com/bremersee/common-base/common-base-actuator-autoconfigure/checkstyle.html</link>
@@ -200,7 +200,7 @@ under the License.
               </tr>
                           <tr>
                 <td>
-                  <a href="https://github.com/bremersee/common-base/common-base-actuator-autoconfigure/checkstyle.html#org.bremersee.actuator.security.authentication.resourceserver.reactive.ReactiveJwtAndInMemoryTest.java">org/bremersee/actuator/security/authentication/resourceserver/reactive/ReactiveJwtAndInMemoryTest.java</a>
+                  <a href="https://github.com/bremersee/common-base/common-base-actuator-autoconfigure/checkstyle.html#org.bremersee.actuator.security.authentication.resourceserver.reactive.ReactiveInMemoryTest.java">org/bremersee/actuator/security/authentication/resourceserver/reactive/ReactiveInMemoryTest.java</a>
                 </td>
                 <td>
                   0
@@ -214,7 +214,7 @@ under the License.
               </tr>
                           <tr>
                 <td>
-                  <a href="https://github.com/bremersee/common-base/common-base-actuator-autoconfigure/checkstyle.html#org.bremersee.actuator.security.authentication.resourceserver.reactive.ReactiveInMemoryTest.java">org/bremersee/actuator/security/authentication/resourceserver/reactive/ReactiveInMemoryTest.java</a>
+                  <a href="https://github.com/bremersee/common-base/common-base-actuator-autoconfigure/checkstyle.html#org.bremersee.actuator.security.authentication.resourceserver.reactive.ReactiveJwtAndInMemoryTest.java">org/bremersee/actuator/security/authentication/resourceserver/reactive/ReactiveJwtAndInMemoryTest.java</a>
                 </td>
                 <td>
                   0
@@ -234,7 +234,7 @@ under the License.
                   0
                 </td>
                 <td>
-                  4
+                  0
                 </td>
                 <td>
                   0
@@ -248,7 +248,7 @@ under the License.
                   0
                 </td>
                 <td>
-                  1
+                  3
                 </td>
                 <td>
                   0

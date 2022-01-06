@@ -34,10 +34,10 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
  *
  * @author Christian Bremer
  */
-<span class="fc" id="L37">@ToString(callSuper = true, exclude = {&quot;ldaptiveOperations&quot;})</span>
+@ToString(callSuper = true, exclude = {&quot;ldaptiveOperations&quot;})
 public class LdaptiveUserDetailsService extends AbstractUserDetailsService implements UserDetailsService {
 
-<span class="fc" id="L40">  @Getter(value = AccessLevel.PROTECTED)</span>
+  @Getter(value = AccessLevel.PROTECTED)
   private final LdaptiveOperations ldaptiveOperations;
 
   /**

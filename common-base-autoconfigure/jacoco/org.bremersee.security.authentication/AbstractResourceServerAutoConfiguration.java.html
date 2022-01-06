@@ -42,22 +42,22 @@ import org.springframework.util.StringUtils;
 public abstract class AbstractResourceServerAutoConfiguration extends WebSecurityConfigurerAdapter
     implements Ordered {
 
-<span class="nc" id="L45">  @Getter(AccessLevel.PROTECTED)</span>
+  @Getter(AccessLevel.PROTECTED)
   private final Environment environment;
 
-<span class="fc" id="L48">  @Getter(AccessLevel.PROTECTED)</span>
+  @Getter(AccessLevel.PROTECTED)
   private final SecurityProperties securityProperties;
 
-<span class="fc" id="L51">  @Getter(AccessLevel.PROTECTED)</span>
+  @Getter(AccessLevel.PROTECTED)
   private final AuthProperties authProperties;
 
-<span class="nc" id="L54">  @Getter(AccessLevel.PROTECTED)</span>
+  @Getter(AccessLevel.PROTECTED)
   private final CorsProperties corsProperties;
 
-<span class="nc" id="L57">  @Getter(AccessLevel.PROTECTED)</span>
+  @Getter(AccessLevel.PROTECTED)
   private final ObjectProvider&lt;JsonPathJwtConverter&gt; jwtConverterProvider;
 
-<span class="fc" id="L60">  @Getter(AccessLevel.PROTECTED)</span>
+  @Getter(AccessLevel.PROTECTED)
   private final ObjectProvider&lt;PasswordEncoder&gt; passwordEncoderProvider;
 
   /**

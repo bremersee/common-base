@@ -29,8 +29,8 @@ import lombok.ToString;
  *
  * @author Christian Bremer
  */
-<span class="fc" id="L32">@ToString(callSuper = true)</span>
-<span class="nc" id="L33">@NoArgsConstructor(access = AccessLevel.PACKAGE)</span>
+@ToString(callSuper = true)
+@NoArgsConstructor(access = AccessLevel.PACKAGE)
 class AclImpl extends TreeMap&lt;String, Ace&gt; implements Acl&lt;Ace&gt; {
 
   private String owner;

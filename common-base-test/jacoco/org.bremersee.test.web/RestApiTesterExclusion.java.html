@@ -51,11 +51,11 @@ public class RestApiTesterExclusion {
 <span class="fc" id="L51">    return isExcluded(path, type.getParent(), exclusions);</span>
   }
 
-<span class="fc" id="L54">  @Getter</span>
-  private RestApiTesterPath path;
+  @Getter
+  private final RestApiTesterPath path;
 
-<span class="fc" id="L57">  @Getter</span>
-  private RestApiAssertionType type;
+  @Getter
+  private final RestApiAssertionType type;
 
   /**
    * Instantiates a new rest api tester exclusion.
@@ -63,7 +63,7 @@ public class RestApiTesterExclusion {
    * @param path the path
    * @param type the type
    */
-<span class="pc" id="L66">  @Builder(builderMethodName = &quot;exclusionBuilder&quot;)</span>
+  @Builder(builderMethodName = &quot;exclusionBuilder&quot;)
 <span class="fc" id="L67">  public RestApiTesterExclusion(RestApiTesterPath path, RestApiAssertionType type) {</span>
 <span class="fc" id="L68">    this.path = path;</span>
 <span class="pc bpc" id="L69" title="1 of 2 branches missed.">    this.type = type != null ? type : RestApiAssertionType.ANY;</span>

@@ -33,34 +33,34 @@ import org.springframework.util.StringUtils;
  *
  * @author Christian Bremer
  */
-<span class="fc" id="L36">@ToString</span>
+@ToString
 public abstract class AbstractUserDetailsService {
 
-<span class="fc" id="L39">  @Getter(value = AccessLevel.PROTECTED)</span>
+  @Getter(value = AccessLevel.PROTECTED)
   private final String userBaseDn;
 
-<span class="fc" id="L42">  @Getter(value = AccessLevel.PROTECTED)</span>
+  @Getter(value = AccessLevel.PROTECTED)
   private final String userFindOneFilter;
 
-<span class="fc" id="L45">  @Getter(value = AccessLevel.PROTECTED)</span>
+  @Getter(value = AccessLevel.PROTECTED)
   private final SearchScope userFindOneSearchScope;
 
-<span class="fc" id="L48">  @Getter(value = AccessLevel.PROTECTED)</span>
+  @Getter(value = AccessLevel.PROTECTED)
   private final String userAccountControlAttributeName;
 
-<span class="fc" id="L51">  @Getter(value = AccessLevel.PROTECTED)</span>
+  @Getter(value = AccessLevel.PROTECTED)
   private final List&lt;String&gt; authorities;
 
-<span class="fc" id="L54">  @Getter(value = AccessLevel.PROTECTED)</span>
+  @Getter(value = AccessLevel.PROTECTED)
   private final String authorityAttributeName;
 
-<span class="fc" id="L57">  @Getter(value = AccessLevel.PROTECTED)</span>
+  @Getter(value = AccessLevel.PROTECTED)
   private final boolean authorityDn;
 
-<span class="fc" id="L60">  @Getter(value = AccessLevel.PROTECTED)</span>
+  @Getter(value = AccessLevel.PROTECTED)
   private final Map&lt;String, String&gt; authorityMap;
 
-<span class="fc" id="L63">  @Getter(value = AccessLevel.PROTECTED)</span>
+  @Getter(value = AccessLevel.PROTECTED)
   private final String authorityPrefix;
 
   /**

@@ -40,8 +40,8 @@ import org.springframework.web.multipart.MultipartFile;
  *
  * @author Christian Bremer
  */
-<span class="pc bpc" id="L43" title="21 of 38 branches missed.">@EqualsAndHashCode(doNotUseGetters = true)</span>
-<span class="fc" id="L44">@ToString(doNotUseGetters = true)</span>
+@EqualsAndHashCode(doNotUseGetters = true)
+@ToString(doNotUseGetters = true)
 public class FileAwareMultipartFile implements MultipartFile {
 
   private final File file;
@@ -315,7 +315,7 @@ public class FileAwareMultipartFile implements MultipartFile {
   }
 
   @SuppressWarnings(&quot;Lombok&quot;)
-<span class="pc bpc" id="L318" title="1 of 6 branches missed.">  @EqualsAndHashCode</span>
+  @EqualsAndHashCode
   private static class EmptyResource extends AbstractResource {
 
     private EmptyResource() {

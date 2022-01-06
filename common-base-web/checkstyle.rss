@@ -23,11 +23,11 @@ under the License.
     <link>https://github.com/bremersee/common-base/common-base-web</link>
     <description>common-base-web - Checkstyle report</description>
     <language>en-us</language>
-    <copyright>&#169;2021 bremersee.org</copyright>
+    <copyright>&#169;2022 bremersee.org</copyright>
     <item>
       <title>File: 16,
              Errors: 0,
-             Warnings: 0,
+             Warnings: 1,
              Infos: 0
       </title>
             <link>https://github.com/bremersee/common-base/common-base-web/checkstyle.html</link>
@@ -158,6 +158,20 @@ under the License.
               </tr>
                           <tr>
                 <td>
+                  <a href="https://github.com/bremersee/common-base/common-base-web/checkstyle.html#org.bremersee.exception.RestApiExceptionMapper.java">org/bremersee/exception/RestApiExceptionMapper.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  1
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
                   <a href="https://github.com/bremersee/common-base/common-base-web/checkstyle.html#org.bremersee.exception.RestApiExceptionParser.java">org/bremersee/exception/RestApiExceptionParser.java</a>
                 </td>
                 <td>
@@ -172,7 +186,7 @@ under the License.
               </tr>
                           <tr>
                 <td>
-                  <a href="https://github.com/bremersee/common-base/common-base-web/checkstyle.html#org.bremersee.exception.RestApiExceptionMapper.java">org/bremersee/exception/RestApiExceptionMapper.java</a>
+                  <a href="https://github.com/bremersee/common-base/common-base-web/checkstyle.html#org.bremersee.exception.RestApiExceptionParserImplTest.java">org/bremersee/exception/RestApiExceptionParserImplTest.java</a>
                 </td>
                 <td>
                   0
@@ -187,20 +201,6 @@ under the License.
                           <tr>
                 <td>
                   <a href="https://github.com/bremersee/common-base/common-base-web/checkstyle.html#org.bremersee.web.multipart.FileAwareMultipartFileTest.java">org/bremersee/web/multipart/FileAwareMultipartFileTest.java</a>
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-              </tr>
-                          <tr>
-                <td>
-                  <a href="https://github.com/bremersee/common-base/common-base-web/checkstyle.html#org.bremersee.exception.RestApiExceptionParserImplTest.java">org/bremersee/exception/RestApiExceptionParserImplTest.java</a>
                 </td>
                 <td>
                   0

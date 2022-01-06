@@ -42,9 +42,9 @@ import org.springframework.validation.annotation.Validated;
  */
 @ConfigurationProperties(prefix = &quot;bremersee.actuator.auth&quot;)
 @Getter
-<span class="fc" id="L45">@Setter</span>
-<span class="fc" id="L46">@ToString</span>
-<span class="pc bpc" id="L47" title="68 of 120 branches missed.">@EqualsAndHashCode</span>
+@Setter
+@ToString
+@EqualsAndHashCode
 @Validated
 <span class="fc" id="L49">public class ActuatorAuthProperties {</span>
 
@@ -52,7 +52,7 @@ import org.springframework.validation.annotation.Validated;
    * Specifies the behaviour of the actuator security auto configuration.
    */
 <span class="fc" id="L54">  @NotNull</span>
-<span class="fc" id="L55">  private AutoSecurityMode enable = AutoSecurityMode.OTHER;</span>
+  private AutoSecurityMode enable = AutoSecurityMode.OTHER;
 
   /**
    * The order of the actuator security auto configuration.
@@ -68,78 +68,76 @@ import org.springframework.validation.annotation.Validated;
    * A list with unauthenticated actuator endpoints.
    */
 <span class="fc" id="L70">  @NotNull</span>
-<span class="fc" id="L71">  private List&lt;Class&lt;?&gt;&gt; unauthenticatedEndpoints = new ArrayList&lt;&gt;();</span>
+  private List&lt;Class&lt;?&gt;&gt; unauthenticatedEndpoints = new ArrayList&lt;&gt;();
 
   /**
-   * The roles which can write to protected actuator endpoints. The role names normally start with
-   * {@code ROLE_}.
+   * The roles which can write to protected actuator endpoints. The role names normally start with {@code ROLE_}.
    */
-<span class="fc" id="L77">  @NotNull</span>
-<span class="fc" id="L78">  private List&lt;String&gt; adminRoles = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L76">  @NotNull</span>
+  private List&lt;String&gt; adminRoles = new ArrayList&lt;&gt;();
 
   /**
-   * The roles which can read protected actuator endpoints. The role names normally start with
-   * {@code ROLE_}.
+   * The roles which can read protected actuator endpoints. The role names normally start with {@code ROLE_}.
    */
-<span class="fc" id="L84">  @NotNull</span>
-<span class="fc" id="L85">  private List&lt;String&gt; roles = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L82">  @NotNull</span>
+  private List&lt;String&gt; roles = new ArrayList&lt;&gt;();
 
   /**
    * The IP addresses which can access protected actuator endpoints without authentication.
    */
-<span class="fc" id="L90">  @NotNull</span>
-<span class="fc" id="L91">  private List&lt;String&gt; ipAddresses = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L88">  @NotNull</span>
+  private List&lt;String&gt; ipAddresses = new ArrayList&lt;&gt;();
 
   /**
    * The JWK uri.
    */
-<span class="fc" id="L96">  private String jwkSetUri;</span>
+  private String jwkSetUri;
 
   /**
    * The JWS algorithm
    */
-<span class="fc" id="L101">  @NotEmpty</span>
-<span class="fc" id="L102">  private String jwsAlgorithm = &quot;RS256&quot;;</span>
+<span class="fc" id="L99">  @NotEmpty</span>
+  private String jwsAlgorithm = &quot;RS256&quot;;
 
   /**
    * The issuer uri.
    */
-<span class="fc" id="L107">  private String issuerUri;</span>
+  private String issuerUri;
 
   /**
    * The json path in the JWT to the roles.
    */
-<span class="fc" id="L112">  @NotEmpty</span>
-<span class="fc" id="L113">  private String rolesJsonPath = &quot;$.realm_access.roles&quot;;</span>
+<span class="fc" id="L110">  @NotEmpty</span>
+  private String rolesJsonPath = &quot;$.realm_access.roles&quot;;
 
   /**
    * Specifies whether the roles value is a list (json array) or a simple string.
    */
-<span class="fc" id="L118">  private boolean rolesValueList = true;</span>
+<span class="fc" id="L116">  private boolean rolesValueList = true;</span>
 
   /**
    * The role value separator to use if the role value is a simple string.
    */
-<span class="fc" id="L123">  @NotNull</span>
-<span class="fc" id="L124">  private String rolesValueSeparator = &quot; &quot;;</span>
+<span class="fc" id="L121">  @NotNull</span>
+  private String rolesValueSeparator = &quot; &quot;;
 
   /**
    * The role prefix to add.
    */
-<span class="fc" id="L129">  @NotNull</span>
-<span class="fc" id="L130">  private String rolePrefix = &quot;ROLE_&quot;;</span>
+<span class="fc" id="L127">  @NotNull</span>
+  private String rolePrefix = &quot;ROLE_&quot;;
 
   /**
    * The json path in the JWT to the user name.
    */
-<span class="fc" id="L135">  @NotEmpty</span>
-<span class="fc" id="L136">  private String nameJsonPath = &quot;$.preferred_username&quot;;</span>
+<span class="fc" id="L133">  @NotEmpty</span>
+  private String nameJsonPath = &quot;$.preferred_username&quot;;
 
   /**
    * The password flow properties for the actuator endpoints.
    */
-<span class="fc" id="L141">  @NotNull</span>
-<span class="fc" id="L142">  private ActuatorPasswordFlow passwordFlow = new ActuatorPasswordFlow();</span>
+<span class="fc" id="L139">  @NotNull</span>
+  private ActuatorPasswordFlow passwordFlow = new ActuatorPasswordFlow();
 
   /**
    * Gets unauthenticated endpoints or defaults (these are the health and info endpoints).
@@ -148,13 +146,13 @@ import org.springframework.validation.annotation.Validated;
    */
   @NotNull
   public List&lt;Class&lt;?&gt;&gt; unauthenticatedEndpointsOrDefaults() {
-<span class="fc bfc" id="L151" title="All 2 branches covered.">    if (unauthenticatedEndpoints.isEmpty()) {</span>
-<span class="fc" id="L152">      unauthenticatedEndpoints.add(</span>
+<span class="fc bfc" id="L149" title="All 2 branches covered.">    if (unauthenticatedEndpoints.isEmpty()) {</span>
+<span class="fc" id="L150">      unauthenticatedEndpoints.add(</span>
           org.springframework.boot.actuate.health.HealthEndpoint.class);
-<span class="fc" id="L154">      unauthenticatedEndpoints.add(</span>
+<span class="fc" id="L152">      unauthenticatedEndpoints.add(</span>
           org.springframework.boot.actuate.info.InfoEndpoint.class);
     }
-<span class="fc" id="L157">    return unauthenticatedEndpoints;</span>
+<span class="fc" id="L155">    return unauthenticatedEndpoints;</span>
   }
 
   /**
@@ -164,15 +162,15 @@ import org.springframework.validation.annotation.Validated;
    */
   @NotNull
   public Set&lt;String&gt; rolesOrDefaults() {
-<span class="fc" id="L167">    final TreeSet&lt;String&gt; roleSet = new TreeSet&lt;&gt;(roles);</span>
-<span class="fc bfc" id="L168" title="All 2 branches covered.">    if (roleSet.isEmpty()) {</span>
-<span class="fc" id="L169">      roleSet.add(AuthorityConstants.ACTUATOR_ROLE_NAME);</span>
-<span class="fc" id="L170">      roleSet.add(AuthorityConstants.ACTUATOR_ADMIN_ROLE_NAME);</span>
-<span class="fc" id="L171">      roleSet.add(AuthorityConstants.ADMIN_ROLE_NAME);</span>
+<span class="fc" id="L165">    final TreeSet&lt;String&gt; roleSet = new TreeSet&lt;&gt;(roles);</span>
+<span class="fc bfc" id="L166" title="All 2 branches covered.">    if (roleSet.isEmpty()) {</span>
+<span class="fc" id="L167">      roleSet.add(AuthorityConstants.ACTUATOR_ROLE_NAME);</span>
+<span class="fc" id="L168">      roleSet.add(AuthorityConstants.ACTUATOR_ADMIN_ROLE_NAME);</span>
+<span class="fc" id="L169">      roleSet.add(AuthorityConstants.ADMIN_ROLE_NAME);</span>
     }
-<span class="fc" id="L173">    return roleSet.stream()</span>
-<span class="fc" id="L174">        .map(this::ensureRolePrefix)</span>
-<span class="fc" id="L175">        .collect(Collectors.toSet());</span>
+<span class="fc" id="L171">    return roleSet.stream()</span>
+<span class="fc" id="L172">        .map(this::ensureRolePrefix)</span>
+<span class="fc" id="L173">        .collect(Collectors.toSet());</span>
   }
 
   /**
@@ -182,14 +180,14 @@ import org.springframework.validation.annotation.Validated;
    */
   @NotNull
   public Set&lt;String&gt; adminRolesOrDefaults() {
-<span class="fc" id="L185">    final TreeSet&lt;String&gt; roleSet = new TreeSet&lt;&gt;(adminRoles);</span>
-<span class="fc bfc" id="L186" title="All 2 branches covered.">    if (roleSet.isEmpty()) {</span>
-<span class="fc" id="L187">      roleSet.add(AuthorityConstants.ACTUATOR_ADMIN_ROLE_NAME);</span>
-<span class="fc" id="L188">      roleSet.add(AuthorityConstants.ADMIN_ROLE_NAME);</span>
+<span class="fc" id="L183">    final TreeSet&lt;String&gt; roleSet = new TreeSet&lt;&gt;(adminRoles);</span>
+<span class="fc bfc" id="L184" title="All 2 branches covered.">    if (roleSet.isEmpty()) {</span>
+<span class="fc" id="L185">      roleSet.add(AuthorityConstants.ACTUATOR_ADMIN_ROLE_NAME);</span>
+<span class="fc" id="L186">      roleSet.add(AuthorityConstants.ADMIN_ROLE_NAME);</span>
     }
-<span class="fc" id="L190">    return roleSet.stream()</span>
-<span class="fc" id="L191">        .map(this::ensureRolePrefix)</span>
-<span class="fc" id="L192">        .collect(Collectors.toSet());</span>
+<span class="fc" id="L188">    return roleSet.stream()</span>
+<span class="fc" id="L189">        .map(this::ensureRolePrefix)</span>
+<span class="fc" id="L190">        .collect(Collectors.toSet());</span>
   }
 
   /**
@@ -199,8 +197,8 @@ import org.springframework.validation.annotation.Validated;
    */
   @NotNull
   public String buildAccessExpression() {
-<span class="fc" id="L202">    return AccessExpressionUtils.hasAuthorityOrIpAddressExpr(</span>
-<span class="fc" id="L203">        rolesOrDefaults(), null, ipAddresses);</span>
+<span class="fc" id="L200">    return AccessExpressionUtils.hasAuthorityOrIpAddressExpr(</span>
+<span class="fc" id="L201">        rolesOrDefaults(), null, ipAddresses);</span>
   }
 
   /**
@@ -210,7 +208,7 @@ import org.springframework.validation.annotation.Validated;
    */
   @NotNull
   public String buildAdminAccessExpression() {
-<span class="fc" id="L213">    return AccessExpressionUtils.hasAuthorityOrIpAddressExpr(adminRolesOrDefaults(), null, null);</span>
+<span class="fc" id="L211">    return AccessExpressionUtils.hasAuthorityOrIpAddressExpr(adminRolesOrDefaults(), null, null);</span>
   }
 
   /**
@@ -221,24 +219,24 @@ import org.springframework.validation.annotation.Validated;
    */
   @NotNull
   public String ensureRolePrefix(@NotNull String role) {
-<span class="fc" id="L224">    final String prefix = rolePrefix.trim();</span>
-<span class="fc bfc" id="L225" title="All 4 branches covered.">    return StringUtils.hasText(prefix) &amp;&amp; role.startsWith(prefix) ? role : prefix + role;</span>
+<span class="fc" id="L222">    final String prefix = rolePrefix.trim();</span>
+<span class="fc bfc" id="L223" title="All 4 branches covered.">    return StringUtils.hasText(prefix) &amp;&amp; role.startsWith(prefix) ? role : prefix + role;</span>
   }
 
   /**
    * OAuth2 password flow configuration properties.
    */
   @Getter
-<span class="fc" id="L232">  @Setter</span>
-<span class="fc" id="L233">  @ToString(exclude = {&quot;clientSecret&quot;})</span>
-<span class="pc bpc" id="L234" title="8 of 22 branches missed.">  @EqualsAndHashCode(exclude = {&quot;clientSecret&quot;})</span>
-<span class="fc" id="L235">  public static class ActuatorPasswordFlow implements ClientCredentialsFlowProperties {</span>
+  @Setter
+  @ToString(exclude = {&quot;clientSecret&quot;})
+  @EqualsAndHashCode(exclude = {&quot;clientSecret&quot;})
+<span class="fc" id="L233">  public static class ActuatorPasswordFlow implements ClientCredentialsFlowProperties {</span>
 
-<span class="fc" id="L237">    private String tokenEndpoint;</span>
+    private String tokenEndpoint;
 
-<span class="fc" id="L239">    private String clientId;</span>
+    private String clientId;
 
-<span class="fc" id="L241">    private String clientSecret;</span>
+    private String clientSecret;
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.6.202009150832</span></div></body></html>

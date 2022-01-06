@@ -113,7 +113,7 @@ public abstract class MediaTypeHelper {
   /**
    * Determine the content type from the given accepts header.
    *
-   * @param accepts  the accepts header
+   * @param accepts the accepts header
    * @param fallback the content type when no one could be found
    * @return the content type
    */

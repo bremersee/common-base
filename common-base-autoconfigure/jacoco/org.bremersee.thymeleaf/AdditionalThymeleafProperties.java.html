@@ -38,9 +38,9 @@ import org.thymeleaf.templatemode.TemplateMode;
  */
 @ConfigurationProperties(&quot;bremersee.thymeleaf&quot;)
 @Getter
-<span class="nc" id="L41">@Setter</span>
-<span class="fc" id="L42">@ToString</span>
-<span class="pc bpc" id="L43" title="7 of 14 branches missed.">@EqualsAndHashCode</span>
+@Setter
+@ToString
+@EqualsAndHashCode
 <span class="fc" id="L44">public class AdditionalThymeleafProperties {</span>
 
 <span class="fc" id="L46">  private List&lt;ResolverProperties&gt; resolvers = new ArrayList&lt;&gt;();</span>
@@ -49,16 +49,16 @@ import org.thymeleaf.templatemode.TemplateMode;
    * The additional thymeleaf resolver properties.
    */
   @Getter
-<span class="fc" id="L52">  @Setter</span>
-<span class="fc" id="L53">  @ToString</span>
-<span class="pc bpc" id="L54" title="106 of 154 branches missed.">  @EqualsAndHashCode</span>
+  @Setter
+  @ToString
+  @EqualsAndHashCode
 <span class="fc" id="L55">  public static class ResolverProperties {</span>
 
 <span class="fc" id="L57">    private boolean cacheable = false;</span>
 
 <span class="fc" id="L59">    private Set&lt;String&gt; cacheablePatterns = new LinkedHashSet&lt;&gt;();</span>
 
-<span class="fc" id="L61">    private Long cacheTtlms;</span>
+    private Long cacheTtlms;
 
 <span class="fc" id="L63">    private String characterEncoding = StandardCharsets.UTF_8.name();</span>
 
@@ -74,7 +74,7 @@ import org.thymeleaf.templatemode.TemplateMode;
 
 <span class="fc" id="L75">    private Set&lt;String&gt; javaScriptTemplateModePatterns = new LinkedHashSet&lt;&gt;();</span>
 
-<span class="fc" id="L77">    private String name;</span>
+    private String name;
 
 <span class="fc" id="L79">    private Set&lt;String&gt; nonCacheablePatterns = new LinkedHashSet&lt;&gt;();</span>
 
@@ -88,7 +88,7 @@ import org.thymeleaf.templatemode.TemplateMode;
 
 <span class="fc" id="L89">    private Map&lt;String, String&gt; templateAliases = new LinkedHashMap&lt;&gt;();</span>
 
-<span class="fc" id="L91">    private TemplateMode templateMode;</span>
+    private TemplateMode templateMode;
 
 <span class="fc" id="L93">    private Set&lt;String&gt; textTemplateModePatterns = new LinkedHashSet&lt;&gt;();</span>
 

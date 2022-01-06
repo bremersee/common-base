@@ -32,14 +32,13 @@ import reactor.core.publisher.Mono;
 public class ReactiveIpAddressMatcher extends IpAddressMatcher implements ServerWebExchangeMatcher {
 
   /**
-   * Takes a specific IP address or a range specified using the IP/Netmask (e.g. 192.168.1.0/24 or
-   * 202.24.0.0/14).
+   * Takes a specific IP address or a range specified using the IP/Netmask (e.g. 192.168.1.0/24 or 202.24.0.0/14).
    *
    * @param ipAddress the address or range of addresses from which the request must come.
    */
   public ReactiveIpAddressMatcher(String ipAddress) {
-<span class="fc" id="L41">    super(ipAddress);</span>
-<span class="fc" id="L42">  }</span>
+<span class="fc" id="L40">    super(ipAddress);</span>
+<span class="fc" id="L41">  }</span>
 
   /**
    * Checks whether the remote address of the request matches the ip of this matcher.
@@ -48,18 +47,18 @@ public class ReactiveIpAddressMatcher extends IpAddressMatcher implements Server
    * @return {@code true} if the remote adaress matches, otherwise {@code false}
    */
   public boolean matchesRemoteAddress(ServerWebExchange exchange) {
-<span class="fc" id="L51">    return Optional.ofNullable(exchange)</span>
-<span class="fc" id="L52">        .map(ServerWebExchange::getRequest)</span>
-<span class="fc" id="L53">        .map(ServerHttpRequest::getRemoteAddress)</span>
-<span class="fc" id="L54">        .map(InetSocketAddress::getAddress)</span>
-<span class="fc" id="L55">        .map(InetAddress::getHostAddress)</span>
-<span class="fc" id="L56">        .map(this::matches)</span>
-<span class="fc" id="L57">        .orElse(false);</span>
+<span class="fc" id="L50">    return Optional.ofNullable(exchange)</span>
+<span class="fc" id="L51">        .map(ServerWebExchange::getRequest)</span>
+<span class="fc" id="L52">        .map(ServerHttpRequest::getRemoteAddress)</span>
+<span class="fc" id="L53">        .map(InetSocketAddress::getAddress)</span>
+<span class="fc" id="L54">        .map(InetAddress::getHostAddress)</span>
+<span class="fc" id="L55">        .map(this::matches)</span>
+<span class="fc" id="L56">        .orElse(false);</span>
   }
 
   @Override
   public Mono&lt;MatchResult&gt; matches(ServerWebExchange exchange) {
-<span class="pc bpc" id="L62" title="1 of 2 branches missed.">    return matchesRemoteAddress(exchange) ? MatchResult.match() : MatchResult.notMatch();</span>
+<span class="pc bpc" id="L61" title="1 of 2 branches missed.">    return matchesRemoteAddress(exchange) ? MatchResult.match() : MatchResult.notMatch();</span>
   }
 
 }

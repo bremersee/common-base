@@ -34,33 +34,31 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.StringUtils;
 
 /**
- * Feign exception that stores the error payload as a {@link RestApiException}. If the error payload
- * cannot be parsed as {@link RestApiException}, the whole body of the error payload will be stored
- * in the message field of the {@link RestApiException}.
+ * Feign exception that stores the error payload as a {@link RestApiException}. If the error payload cannot be parsed as
+ * {@link RestApiException}, the whole body of the error payload will be stored in the message field of the {@link
+ * RestApiException}.
  *
  * @author Christian Bremer
  */
 public class FeignClientException extends FeignException implements HttpStatusAware,
     HttpResponseHeadersAware, RestApiExceptionAware, ErrorCodeAware {
 
-<span class="fc" id="L46">  @Getter</span>
-  @Nullable
+  @Getter
   private final Request request;
 
   @NotNull
   private final Map&lt;String, ? extends Collection&lt;String&gt;&gt; headers;
 
-<span class="fc" id="L53">  @Getter</span>
-  @Nullable
+  @Getter
   private final RestApiException restApiException;
 
   /**
    * Default constructor.
    *
-   * @param request          the original request
-   * @param headers          the response headers
-   * @param status           the response status code
-   * @param message          the message of this {@link FeignClientException}
+   * @param request the original request
+   * @param headers the response headers
+   * @param status the response status code
+   * @param message the message of this {@link FeignClientException}
    * @param restApiException the rest api exception
    */
   @SuppressWarnings(&quot;WeakerAccess&quot;)
@@ -71,37 +69,32 @@ public class FeignClientException extends FeignException implements HttpStatusAw
       @Nullable final String message,
       @Nullable final RestApiException restApiException) {
 
-<span class="fc" id="L74">    super(</span>
-<span class="fc" id="L75">        resolveHttpStatusCode(status),</span>
-<span class="fc bfc" id="L76" title="All 2 branches covered.">        StringUtils.hasText(message)</span>
-<span class="fc" id="L77">            ? message</span>
-<span class="fc" id="L78">            : RestApiExceptionUtils.NO_MESSAGE_VALUE,</span>
-<span class="fc bfc" id="L79" title="All 2 branches covered.">        request != null</span>
-<span class="fc" id="L80">            ? request.body()</span>
-<span class="fc" id="L81">            : null);</span>
-<span class="fc" id="L82">    this.request = request;</span>
-<span class="fc bfc" id="L83" title="All 2 branches covered.">    this.headers = headers != null ? headers : Collections.emptyMap();</span>
-<span class="fc" id="L84">    this.restApiException = restApiException;</span>
-<span class="fc" id="L85">  }</span>
-
-  @Override
-  public Map&lt;String, String&gt; getHeaders() {
-<span class="fc" id="L89">    return HttpResponseHeadersAware.createHeaders(getMultiValueHeaders());</span>
-  }
+<span class="fc" id="L72">    super(</span>
+<span class="fc" id="L73">        resolveHttpStatusCode(status),</span>
+<span class="fc bfc" id="L74" title="All 2 branches covered.">        StringUtils.hasText(message)</span>
+<span class="fc" id="L75">            ? message</span>
+<span class="fc" id="L76">            : RestApiExceptionUtils.NO_MESSAGE_VALUE,</span>
+<span class="fc bfc" id="L77" title="All 2 branches covered.">        request != null</span>
+<span class="fc" id="L78">            ? request.body()</span>
+<span class="fc" id="L79">            : null);</span>
+<span class="fc" id="L80">    this.request = request;</span>
+<span class="fc bfc" id="L81" title="All 2 branches covered.">    this.headers = headers != null ? headers : Collections.emptyMap();</span>
+<span class="fc" id="L82">    this.restApiException = restApiException;</span>
+<span class="fc" id="L83">  }</span>
 
   @Override
   public Map&lt;String, ? extends Collection&lt;String&gt;&gt; getMultiValueHeaders() {
-<span class="fc" id="L94">    return headers;</span>
+<span class="fc" id="L87">    return headers;</span>
   }
 
   @Override
   public String getErrorCode() {
-<span class="fc bfc" id="L99" title="All 2 branches covered.">    return restApiException != null ? restApiException.getErrorCode() : null;</span>
+<span class="fc bfc" id="L92" title="All 2 branches covered.">    return restApiException != null ? restApiException.getErrorCode() : null;</span>
   }
 
   private static int resolveHttpStatusCode(final int httpStatusCode) {
-<span class="fc" id="L103">    final HttpStatus httpStatus = HttpStatus.resolve(httpStatusCode);</span>
-<span class="fc bfc" id="L104" title="All 2 branches covered.">    return httpStatus != null ? httpStatus.value() : HttpStatus.INTERNAL_SERVER_ERROR.value();</span>
+<span class="fc" id="L96">    final HttpStatus httpStatus = HttpStatus.resolve(httpStatusCode);</span>
+<span class="fc bfc" id="L97" title="All 2 branches covered.">    return httpStatus != null ? httpStatus.value() : HttpStatus.INTERNAL_SERVER_ERROR.value();</span>
   }
 
 }

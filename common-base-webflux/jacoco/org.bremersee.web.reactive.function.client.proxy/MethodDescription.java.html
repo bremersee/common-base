@@ -28,15 +28,15 @@ import org.springframework.util.Assert;
  * @author Christian Bremer
  */
 @Getter
-<span class="nc" id="L31">@ToString</span>
-<span class="pc bpc" id="L32" title="22 of 24 branches missed.">@EqualsAndHashCode</span>
+@ToString
+@EqualsAndHashCode
 class MethodDescription {
 
-<span class="fc" id="L35">  private final String methodName;</span>
+  private final String methodName;
 
-<span class="fc" id="L37">  private final Class&lt;?&gt;[] parameterTypes;</span>
+  private final Class&lt;?&gt;[] parameterTypes;
 
-<span class="fc" id="L39">  private final Class&lt;?&gt; responseType;</span>
+  private final Class&lt;?&gt; responseType;
 
   /**
    * Instantiates a new method description.

@@ -20,20 +20,19 @@ import org.springframework.web.reactive.function.client.ClientResponse;
 import reactor.core.publisher.Mono;
 
 /**
- * An abstract implementation of the error decoder for the
- * {@link org.springframework.web.reactive.function.client.WebClient}.
+ * An abstract implementation of the error decoder for the {@link org.springframework.web.reactive.function.client.WebClient}.
  *
  * @author Christian Bremer
  */
-<span class="fc" id="L28">public abstract class AbstractWebClientErrorDecoder&lt;E extends Throwable&gt;</span>
+<span class="fc" id="L27">public abstract class AbstractWebClientErrorDecoder&lt;E extends Throwable&gt;</span>
     implements WebClientErrorDecoder&lt;E&gt; {
 
   @Override
   public Mono&lt;E&gt; apply(ClientResponse clientResponse) {
-<span class="fc" id="L33">    return clientResponse</span>
-<span class="fc" id="L34">        .bodyToMono(String.class)</span>
-<span class="fc" id="L35">        .switchIfEmpty(Mono.just(&quot;&quot;))</span>
-<span class="fc" id="L36">        .map(response -&gt; buildException(clientResponse, response));</span>
+<span class="fc" id="L32">    return clientResponse</span>
+<span class="fc" id="L33">        .bodyToMono(String.class)</span>
+<span class="fc" id="L34">        .switchIfEmpty(Mono.just(&quot;&quot;))</span>
+<span class="fc" id="L35">        .map(response -&gt; buildException(clientResponse, response));</span>
   }
 
 }

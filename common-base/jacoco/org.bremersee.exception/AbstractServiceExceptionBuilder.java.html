@@ -91,7 +91,7 @@ import org.springframework.util.StringUtils;
    * Build the service exception with the given values.
    *
    * @param httpStatus the http status
-   * @param errorCode  the error code
+   * @param errorCode the error code
    * @return the service exception
    */
   protected abstract T buildWith(int httpStatus, String errorCode);
@@ -100,8 +100,8 @@ import org.springframework.util.StringUtils;
    * Build the service exception with the given values.
    *
    * @param httpStatus the http status
-   * @param errorCode  the error code
-   * @param reason     the reason
+   * @param errorCode the error code
+   * @param reason the reason
    * @return the service exception
    */
   protected abstract T buildWith(int httpStatus, String errorCode, String reason);
@@ -110,8 +110,8 @@ import org.springframework.util.StringUtils;
    * Build the service exception with the given values.
    *
    * @param httpStatus the http status
-   * @param errorCode  the error code
-   * @param cause      the cause
+   * @param errorCode the error code
+   * @param cause the cause
    * @return the t
    */
   protected abstract T buildWith(int httpStatus, String errorCode, Throwable cause);
@@ -120,9 +120,9 @@ import org.springframework.util.StringUtils;
    * Build the service exception with the given values.
    *
    * @param httpStatus the http status
-   * @param errorCode  the error code
-   * @param reason     the reason
-   * @param cause      the cause
+   * @param errorCode the error code
+   * @param reason the reason
+   * @param cause the cause
    * @return the t
    */
   protected abstract T buildWith(int httpStatus, String errorCode, String reason, Throwable cause);

@@ -190,17 +190,17 @@ public interface UserContext extends Principal {
   /**
    * The default implementation.
    */
-<span class="fc" id="L193">  @ToString</span>
-<span class="pc bpc" id="L194" title="14 of 30 branches missed.">  @EqualsAndHashCode</span>
+  @ToString
+  @EqualsAndHashCode
   class Impl implements UserContext {
 
-<span class="fc" id="L197">    @Getter</span>
+    @Getter
     private final String userId;
 
-<span class="fc" id="L200">    @Getter</span>
+    @Getter
     private final Set&lt;String&gt; roles;
 
-<span class="fc" id="L203">    @Getter</span>
+    @Getter
     private final Set&lt;String&gt; groups;
 
     /**

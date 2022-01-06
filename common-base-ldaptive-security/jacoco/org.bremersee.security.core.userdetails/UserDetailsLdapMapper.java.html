@@ -46,28 +46,28 @@ import org.springframework.util.StringUtils;
  *
  * @author Christian Bremer
  */
-<span class="fc" id="L49">@ToString</span>
+@ToString
 public class UserDetailsLdapMapper implements LdaptiveEntryMapper&lt;UserDetails&gt; {
 
-<span class="fc" id="L52">  @Getter(value = AccessLevel.PROTECTED)</span>
+  @Getter(value = AccessLevel.PROTECTED)
   private final String userName;
 
-<span class="fc" id="L55">  @Getter(value = AccessLevel.PROTECTED)</span>
+  @Getter(value = AccessLevel.PROTECTED)
   private final String userAccountControlAttributeName;
 
-<span class="fc" id="L58">  @Getter(value = AccessLevel.PROTECTED)</span>
+  @Getter(value = AccessLevel.PROTECTED)
   private final List&lt;String&gt; authorities;
 
-<span class="fc" id="L61">  @Getter(value = AccessLevel.PROTECTED)</span>
+  @Getter(value = AccessLevel.PROTECTED)
   private final String authorityAttributeName;
 
-<span class="fc" id="L64">  @Getter(value = AccessLevel.PROTECTED)</span>
+  @Getter(value = AccessLevel.PROTECTED)
   private final String authorityPrefix;
 
-<span class="fc" id="L67">  @Getter(value = AccessLevel.PROTECTED)</span>
+  @Getter(value = AccessLevel.PROTECTED)
   private final ValueTranscoder&lt;GrantedAuthority&gt; authorityTranscoder;
 
-<span class="fc" id="L70">  @Getter(value = AccessLevel.PROTECTED)</span>
+  @Getter(value = AccessLevel.PROTECTED)
   private final UserAccountControlValueTranscoder userAccountControlValueTranscoder;
 
   /**
@@ -210,16 +210,16 @@ public class UserDetailsLdapMapper implements LdaptiveEntryMapper&lt;UserDetails
    *
    * @author Christian Bremer
    */
-<span class="fc" id="L213">  @ToString</span>
+  @ToString
   protected static class GrantedAuthorityValueTranscoder extends AbstractStringValueTranscoder&lt;GrantedAuthority&gt; {
 
-<span class="fc" id="L216">    @Getter(value = AccessLevel.PROTECTED)</span>
+    @Getter(value = AccessLevel.PROTECTED)
     private final boolean authorityDn;
 
-<span class="fc" id="L219">    @Getter(value = AccessLevel.PROTECTED)</span>
+    @Getter(value = AccessLevel.PROTECTED)
     private final Map&lt;String, String&gt; authorityMap;
 
-<span class="fc" id="L222">    @Getter(value = AccessLevel.PROTECTED)</span>
+    @Getter(value = AccessLevel.PROTECTED)
     private final String authorityPrefix;
 
     /**

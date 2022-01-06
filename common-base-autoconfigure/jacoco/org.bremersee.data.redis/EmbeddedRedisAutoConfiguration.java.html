@@ -63,20 +63,21 @@ import redis.embedded.RedisServer;
    *
    * @param redisProperties the redis properties
    * @return the redis server
+   * @throws Exception the exception
    */
   @Bean(initMethod = &quot;start&quot;, destroyMethod = &quot;stop&quot;)
-  public RedisServer redisServer(RedisProperties redisProperties) {
-<span class="fc" id="L69">    log.info(&quot;\n&quot;</span>
+  public RedisServer redisServer(RedisProperties redisProperties) throws Exception {
+<span class="fc" id="L70">    log.info(&quot;\n&quot;</span>
             + &quot;*********************************************************************************\n&quot;
             + &quot;* {}\n&quot;
             + &quot;*********************************************************************************\n&quot;
             + &quot;* host = {}\n&quot;
             + &quot;* port = {}\n&quot;
             + &quot;*********************************************************************************&quot;,
-<span class="fc" id="L76">        ClassUtils.getUserClass(getClass()).getSimpleName(),</span>
-<span class="fc" id="L77">        redisProperties.getHost(),</span>
-<span class="fc" id="L78">        redisProperties.getPort());</span>
-<span class="fc" id="L79">    return new RedisServer(redisProperties.getPort());</span>
+<span class="fc" id="L77">        ClassUtils.getUserClass(getClass()).getSimpleName(),</span>
+<span class="fc" id="L78">        redisProperties.getHost(),</span>
+<span class="fc" id="L79">        redisProperties.getPort());</span>
+<span class="fc" id="L80">    return new RedisServer(redisProperties.getPort());</span>
   }
 
 }

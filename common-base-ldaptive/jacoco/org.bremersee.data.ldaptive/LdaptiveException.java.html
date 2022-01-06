@@ -30,17 +30,10 @@ import org.ldaptive.ResultCode;
  *
  * @author Christian Bremer
  */
-<span class="nc bnc" id="L33" title="All 8 branches missed.">@EqualsAndHashCode(callSuper = true)</span>
+@EqualsAndHashCode(callSuper = true)
 public class LdaptiveException extends ServiceException implements HttpStatusAware, ErrorCodeAware {
 
   private static final long serialVersionUID = 1L;
-
-  /**
-   * Instantiates a new ldaptive exception.
-   */
-  protected LdaptiveException() {
-<span class="nc" id="L42">    super();</span>
-<span class="nc" id="L43">  }</span>
 
   /**
    * Instantiates a new ldaptive exception.
@@ -49,8 +42,8 @@ public class LdaptiveException extends ServiceException implements HttpStatusAwa
    * @param errorCode the error code
    */
   protected LdaptiveException(final int httpStatus, final String errorCode) {
-<span class="fc" id="L52">    super(httpStatus, errorCode);</span>
-<span class="fc" id="L53">  }</span>
+<span class="fc" id="L45">    super(httpStatus, errorCode);</span>
+<span class="fc" id="L46">  }</span>
 
   /**
    * Instantiates a new ldaptive exception.
@@ -60,8 +53,8 @@ public class LdaptiveException extends ServiceException implements HttpStatusAwa
    * @param reason the reason
    */
   protected LdaptiveException(final int httpStatus, final String errorCode, final String reason) {
-<span class="fc" id="L63">    super(httpStatus, errorCode, reason);</span>
-<span class="fc" id="L64">  }</span>
+<span class="fc" id="L56">    super(httpStatus, errorCode, reason);</span>
+<span class="fc" id="L57">  }</span>
 
   /**
    * Instantiates a new ldaptive exception.
@@ -71,8 +64,8 @@ public class LdaptiveException extends ServiceException implements HttpStatusAwa
    * @param cause the cause
    */
   protected LdaptiveException(final int httpStatus, final String errorCode, final Throwable cause) {
-<span class="fc" id="L74">    super(httpStatus, errorCode, cause);</span>
-<span class="fc" id="L75">  }</span>
+<span class="fc" id="L67">    super(httpStatus, errorCode, cause);</span>
+<span class="fc" id="L68">  }</span>
 
   /**
    * Instantiates a new ldaptive exception.
@@ -87,8 +80,8 @@ public class LdaptiveException extends ServiceException implements HttpStatusAwa
       final String errorCode,
       final String reason,
       final Throwable cause) {
-<span class="fc" id="L90">    super(httpStatus, errorCode, reason, cause);</span>
-<span class="fc" id="L91">  }</span>
+<span class="fc" id="L83">    super(httpStatus, errorCode, reason, cause);</span>
+<span class="fc" id="L84">  }</span>
 
 
   /**
@@ -97,7 +90,7 @@ public class LdaptiveException extends ServiceException implements HttpStatusAwa
    * @return the ldap exception
    */
   public LdapException getLdapException() {
-<span class="fc bfc" id="L100" title="All 2 branches covered.">    return getCause() instanceof LdapException ? (LdapException) getCause() : null;</span>
+<span class="fc bfc" id="L93" title="All 2 branches covered.">    return getCause() instanceof LdapException ? (LdapException) getCause() : null;</span>
   }
 
   /**
@@ -107,8 +100,8 @@ public class LdaptiveException extends ServiceException implements HttpStatusAwa
    */
   @SuppressWarnings(&quot;unused&quot;)
   public ResultCode getResultCode() {
-<span class="fc" id="L110">    final LdapException ldapException = getLdapException();</span>
-<span class="fc bfc" id="L111" title="All 2 branches covered.">    return ldapException != null ? ldapException.getResultCode() : null;</span>
+<span class="fc" id="L103">    final LdapException ldapException = getLdapException();</span>
+<span class="fc bfc" id="L104" title="All 2 branches covered.">    return ldapException != null ? ldapException.getResultCode() : null;</span>
   }
 
   /**
@@ -117,29 +110,29 @@ public class LdaptiveException extends ServiceException implements HttpStatusAwa
    * @return the service exception builder
    */
   public static ServiceExceptionBuilder&lt;LdaptiveException&gt; builder() {
-<span class="fc" id="L120">    return new AbstractServiceExceptionBuilder&lt;&gt;() {</span>
+<span class="fc" id="L113">    return new AbstractServiceExceptionBuilder&lt;&gt;() {</span>
 
       private static final long serialVersionUID = 2L;
 
       @Override
       protected LdaptiveException buildWith(int httpStatus, String errorCode) {
-<span class="fc" id="L126">        return new LdaptiveException(httpStatus, errorCode);</span>
+<span class="fc" id="L119">        return new LdaptiveException(httpStatus, errorCode);</span>
       }
 
       @Override
       protected LdaptiveException buildWith(int httpStatus, String errorCode, String reason) {
-<span class="fc" id="L131">        return new LdaptiveException(httpStatus, errorCode, reason);</span>
+<span class="fc" id="L124">        return new LdaptiveException(httpStatus, errorCode, reason);</span>
       }
 
       @Override
       protected LdaptiveException buildWith(int httpStatus, String errorCode, Throwable cause) {
-<span class="fc" id="L136">        return new LdaptiveException(httpStatus, errorCode, cause);</span>
+<span class="fc" id="L129">        return new LdaptiveException(httpStatus, errorCode, cause);</span>
       }
 
       @Override
       protected LdaptiveException buildWith(int httpStatus, String errorCode, String reason,
           Throwable cause) {
-<span class="fc" id="L142">        return new LdaptiveException(httpStatus, errorCode, reason, cause);</span>
+<span class="fc" id="L135">        return new LdaptiveException(httpStatus, errorCode, reason, cause);</span>
       }
     };
   }
