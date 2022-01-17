@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 the original author or authors.
+ * Copyright 2019-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
 package org.bremersee.web.reactive;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -25,14 +26,14 @@ import org.bremersee.exception.RestApiExceptionMapperImpl;
 import org.bremersee.exception.RestApiExceptionMapperProperties;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.ObjectProvider;
-import org.springframework.boot.autoconfigure.web.WebProperties.Resources;
+import org.springframework.boot.autoconfigure.web.WebProperties;
 import org.springframework.boot.web.reactive.error.ErrorAttributes;
 import org.springframework.context.ApplicationContext;
 import org.springframework.http.codec.ServerCodecConfigurer;
 import org.springframework.http.codec.support.DefaultServerCodecConfigurer;
 
 /**
- * The api exception handler auto configuration test.
+ * The api exception handler autoconfiguration test.
  *
  * @author Christian Bremer
  */
@@ -47,7 +48,7 @@ class ApiExceptionHandlerAutoConfigurationTest {
     configuration.init();
     assertNotNull(configuration.apiExceptionHandler(
         errorAttributes(),
-        resources(),
+        webProperties(),
         applicationContext(),
         codecConfigurer(),
         restApiExceptionMapper()));
@@ -61,11 +62,13 @@ class ApiExceptionHandlerAutoConfigurationTest {
     return provider;
   }
 
-  private static ObjectProvider<Resources> resources() {
-    Resources value = mock(Resources.class);
+  private static ObjectProvider<WebProperties> webProperties() {
+    WebProperties value = mock(WebProperties.class);
+    when(value.getResources()).thenReturn(mock(WebProperties.Resources.class));
     //noinspection unchecked
-    ObjectProvider<Resources> provider = mock(ObjectProvider.class);
+    ObjectProvider<WebProperties> provider = mock(ObjectProvider.class);
     when(provider.getIfAvailable()).thenReturn(value);
+    when(provider.getIfAvailable(any())).thenReturn(value);
     return provider;
   }
 

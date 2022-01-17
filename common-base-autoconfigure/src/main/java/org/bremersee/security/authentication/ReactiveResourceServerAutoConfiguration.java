@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 the original author or authors.
+ * Copyright 2020-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,7 +38,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.server.SecurityWebFilterChain;
 
 /**
- * The reactive resource server security auto configuration.
+ * The reactive resource server security autoconfiguration.
  *
  * @author Christian Bremer
  */
@@ -59,7 +59,7 @@ public class ReactiveResourceServerAutoConfiguration
     extends AbstractReactiveResourceServerAutoConfiguration {
 
   /**
-   * Instantiates a new reactive resource server security auto configuration.
+   * Instantiates a new reactive resource server security autoconfiguration.
    *
    * @param environment the environment
    * @param corsProperties the cors properties

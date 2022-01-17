@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 the original author or authors.
+ * Copyright 2020-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,7 +34,7 @@ import org.springframework.util.ClassUtils;
 import org.springframework.util.StringUtils;
 
 /**
- * The abstract resource server security auto configuration.
+ * The abstract resource server security autoconfiguration.
  *
  * @author Christian Bremer
  */
@@ -61,7 +61,7 @@ public abstract class AbstractResourceServerAutoConfiguration extends WebSecurit
   private final ObjectProvider<PasswordEncoder> passwordEncoderProvider;
 
   /**
-   * Instantiates a new abstract resource server security auto configuration.
+   * Instantiates a new abstract resource server security autoconfiguration.
    *
    * @param environment the environment
    * @param securityProperties the spring properties
@@ -127,7 +127,8 @@ public abstract class AbstractResourceServerAutoConfiguration extends WebSecurit
   protected void configure(HttpSecurity httpSecurity) throws Exception {
 
     HttpSecurity http = httpSecurity;
-    ExpressionUrlAuthorizationConfigurer<HttpSecurity>.ExpressionInterceptUrlRegistry reg = init(http);
+    ExpressionUrlAuthorizationConfigurer<HttpSecurity>.ExpressionInterceptUrlRegistry reg = init(
+        http);
     if (authProperties.getResourceServer() == AutoSecurityMode.NONE) {
       http = reg
           .anyRequest().permitAll()

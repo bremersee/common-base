@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 the original author or authors.
+ * Copyright 2020-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,7 +32,7 @@ import org.springframework.context.event.EventListener;
 import org.springframework.util.ClassUtils;
 
 /**
- * The multipart file builder auto configuration.
+ * The multipart file builder autoconfiguration.
  *
  * @author Christian Bremer
  */
@@ -46,7 +46,7 @@ public class MultipartFileBuilderAutoConfiguration {
   private final UploadProperties properties;
 
   /**
-   * Instantiates a new multipart file builder auto configuration.
+   * Instantiates a new multipart file builder autoconfiguration.
    *
    * @param properties the properties
    */

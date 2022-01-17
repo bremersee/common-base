@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 the original author or authors.
+ * Copyright 2019-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,7 +36,7 @@ import org.springframework.web.servlet.HandlerExceptionResolver;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 /**
- * The api exception resolver auto configuration.
+ * The api exception resolver autoconfiguration.
  */
 @ConditionalOnWebApplication(type = Type.SERVLET)
 @ConditionalOnClass({
@@ -56,7 +56,7 @@ public class ApiExceptionResolverAutoConfiguration implements WebMvcConfigurer {
   private final ApiExceptionResolver apiExceptionResolver;
 
   /**
-   * Instantiates a new api exception resolver auto configuration.
+   * Instantiates a new api exception resolver autoconfiguration.
    *
    * @param apiExceptionMapper the api exception mapper
    * @param objectMapperBuilder the object mapper builder

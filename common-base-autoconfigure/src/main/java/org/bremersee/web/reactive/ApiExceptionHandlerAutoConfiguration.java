@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 the original author or authors.
+ * Copyright 2019-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,7 +25,6 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication.Type;
 import org.springframework.boot.autoconfigure.web.WebProperties;
-import org.springframework.boot.autoconfigure.web.WebProperties.Resources;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.boot.web.reactive.error.ErrorAttributes;
 import org.springframework.context.ApplicationContext;
@@ -38,14 +37,14 @@ import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 
 /**
- * The api exception handler auto configuration.
+ * The api exception handler autoconfiguration.
  *
  * @author Christian Bremer
  */
 @ConditionalOnWebApplication(type = Type.REACTIVE)
 @ConditionalOnBean({
     ErrorAttributes.class,
-    Resources.class,
+    WebProperties.class,
     ServerCodecConfigurer.class,
     RestApiExceptionMapper.class
 })
@@ -72,17 +71,17 @@ public class ApiExceptionHandlerAutoConfiguration {
    * Builds api exception handler bean.
    *
    * @param errorAttributes the error attributes
-   * @param resources the resources
+   * @param webProperties the web properties
    * @param applicationContext the application context
    * @param serverCodecConfigurer the server codec configurer
    * @param restApiExceptionMapper the rest api exception mapper
    * @return the api exception handler bean
    */
   @Bean
-  @Order(-2)
+  @Order(-2) // to have a higher priority than DefaultErrorWebExceptionHandler
   public ApiExceptionHandler apiExceptionHandler(
       ObjectProvider<ErrorAttributes> errorAttributes,
-      ObjectProvider<WebProperties.Resources> resources,
+      ObjectProvider<WebProperties> webProperties,
       ApplicationContext applicationContext,
       ObjectProvider<ServerCodecConfigurer> serverCodecConfigurer,
       ObjectProvider<RestApiExceptionMapper> restApiExceptionMapper) {
@@ -91,7 +90,7 @@ public class ApiExceptionHandlerAutoConfiguration {
         errorAttributes.getIfAvailable(),
         "Error attributes must be present.");
     Assert.notNull(
-        resources.getIfAvailable(),
+        webProperties.getIfAvailable(),
         "Resources must be present.");
     Assert.notNull(
         serverCodecConfigurer.getIfAvailable(),
@@ -104,7 +103,7 @@ public class ApiExceptionHandlerAutoConfiguration {
 
     return new ApiExceptionHandler(
         errorAttributes.getIfAvailable(),
-        resources.getIfAvailable(),
+        webProperties.getIfAvailable(WebProperties::new).getResources(),
         applicationContext,
         serverCodecConfigurer.getIfAvailable(),
         restApiExceptionMapper.getIfAvailable());

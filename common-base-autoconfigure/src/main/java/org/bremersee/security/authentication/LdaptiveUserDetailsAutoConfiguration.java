@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 the original author or authors.
+ * Copyright 2021-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -47,7 +47,7 @@ import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 
 /**
- * The ldaptive user details auto configuration.
+ * The ldaptive user details autoconfiguration.
  *
  * @author Christian Bremer
  */
@@ -72,7 +72,7 @@ public class LdaptiveUserDetailsAutoConfiguration {
   private final LdaptiveOperations ldaptiveOperations;
 
   /**
-   * Instantiates a new ldaptive user details auto configuration.
+   * Instantiates a new ldaptive user details autoconfiguration.
    *
    * @param properties the properties
    * @param ldaptiveOperationsProvider the ldaptive operations provider

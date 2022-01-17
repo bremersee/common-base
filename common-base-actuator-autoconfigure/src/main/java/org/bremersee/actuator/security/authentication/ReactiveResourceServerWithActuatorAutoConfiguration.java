@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 the original author or authors.
+ * Copyright 2020-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -47,7 +47,7 @@ import org.springframework.security.web.server.SecurityWebFilterChain;
 import org.springframework.security.web.server.util.matcher.NegatedServerWebExchangeMatcher;
 
 /**
- * The reactive resource server with actuator security auto configuration.
+ * The reactive resource server with actuator security autoconfiguration.
  *
  * @author Christian Bremer
  */
@@ -67,7 +67,7 @@ public class ReactiveResourceServerWithActuatorAutoConfiguration
     extends AbstractReactiveResourceServerAutoConfiguration {
 
   /**
-   * Instantiates a new reactive resource server with actuator security auto configuration.
+   * Instantiates a new reactive resource server with actuator security autoconfiguration.
    *
    * @param environment the environment
    * @param corsProperties the cors properties

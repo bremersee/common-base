@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2020 the original author or authors.
+ * Copyright 2019-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,7 +37,7 @@ import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 
 /**
- * The authentication support auto configuration.
+ * The authentication support autoconfiguration.
  *
  * @author Christian Bremer
  */
@@ -55,7 +55,7 @@ public class JwtSupportAutoConfiguration {
   private final AuthProperties properties;
 
   /**
-   * Instantiates a new authentication support auto configuration.
+   * Instantiates a new authentication support autoconfiguration.
    *
    * @param properties the properties
    */

@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 the original author or authors.
+ * Copyright 2020-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -63,7 +63,7 @@ import org.springframework.validation.annotation.Validated;
 public class AuthProperties {
 
   /**
-   * Specifies the behaviour of the resource server security auto configuration.
+   * Specifies the behaviour of the resource server security autoconfiguration.
    */
   @NotNull
   private AutoSecurityMode resourceServer = AutoSecurityMode.OTHER;
@@ -75,7 +75,7 @@ public class AuthProperties {
   private FrameOptionsMode frameOptionsMode = FrameOptionsMode.DENY;
 
   /**
-   * The order of the resource server security auto configuration.
+   * The order of the resource server security autoconfiguration.
    */
   private int resourceServerOrder = 51;
 

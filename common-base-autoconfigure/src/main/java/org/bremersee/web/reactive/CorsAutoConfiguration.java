@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2020 the original author or authors.
+ * Copyright 2019-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,7 +31,7 @@ import org.springframework.web.reactive.config.CorsRegistry;
 import org.springframework.web.reactive.config.WebFluxConfigurer;
 
 /**
- * The cors auto configuration.
+ * The cors autoconfiguration.
  *
  * @author Christian Bremer
  */
@@ -44,7 +44,7 @@ public class CorsAutoConfiguration implements WebFluxConfigurer {
   private final CorsProperties properties;
 
   /**
-   * Instantiates a new cors auto configuration.
+   * Instantiates a new cors autoconfiguration.
    *
    * @param properties the cors properties
    */

@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 the original author or authors.
+ * Copyright 2020-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,7 +39,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.ObjectProvider;
 
 /**
- * The access control auto configuration test.
+ * The access control autoconfiguration test.
  *
  * @author Christian Bremer
  */

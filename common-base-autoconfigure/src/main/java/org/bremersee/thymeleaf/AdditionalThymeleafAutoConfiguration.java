@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 the original author or authors.
+ * Copyright 2019-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,7 +36,7 @@ import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.templateresolver.ITemplateResolver;
 
 /**
- * The additional thymeleaf auto configuration.
+ * The additional thymeleaf autoconfiguration.
  *
  * @author Christian Bremer
  */
@@ -62,7 +62,7 @@ public class AdditionalThymeleafAutoConfiguration {
   private final TemplateEngine templateEngine;
 
   /**
-   * Instantiates a new additional thymeleaf auto configuration.
+   * Instantiates a new additional thymeleaf autoconfiguration.
    *
    * @param properties the properties
    * @param templateEngine the template engine

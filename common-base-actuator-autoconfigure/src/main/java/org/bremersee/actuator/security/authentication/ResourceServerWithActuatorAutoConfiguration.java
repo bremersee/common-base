@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 the original author or authors.
+ * Copyright 2020-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -49,7 +49,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.util.matcher.NegatedRequestMatcher;
 
 /**
- * The resource server with actuator security auto configuration.
+ * The resource server with actuator security autoconfiguration.
  *
  * @author Christian Bremer
  */
@@ -71,7 +71,7 @@ public class ResourceServerWithActuatorAutoConfiguration
     extends AbstractResourceServerAutoConfiguration {
 
   /**
-   * Instantiates a new resource server with actuator security auto configuration.
+   * Instantiates a new resource server with actuator security autoconfiguration.
    *
    * @param environment the environment
    * @param securityProperties the security properties

@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 the original author or authors.
+ * Copyright 2020-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,7 +25,7 @@ import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 
 /**
- * The rest api exception parser auto configuration test.
+ * The rest api exception parser autoconfiguration test.
  *
  * @author Christian Bremer
  */

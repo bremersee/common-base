@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 the original author or authors.
+ * Copyright 2019-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,73 +16,59 @@
 
 package org.bremersee.exception.feign;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
+import feign.Request;
+import feign.Request.HttpMethod;
+import feign.RequestTemplate;
+import java.nio.charset.StandardCharsets;
 import java.util.Collection;
-import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import org.bremersee.exception.RestApiExceptionUtils;
+import org.assertj.core.api.SoftAssertions;
+import org.assertj.core.api.junit.jupiter.SoftAssertionsExtension;
 import org.bremersee.exception.model.RestApiException;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
 
 /**
  * The feign client exception test.
  *
  * @author Christian Bremer
  */
+@ExtendWith(SoftAssertionsExtension.class)
 class FeignClientExceptionTest {
 
   /**
-   * Test with no useful values.
+   * Test feign client exception.
    */
   @Test
-  void testWithNoUsefulValues() {
-    final FeignClientException exception = new FeignClientException(null, null, 0, null, null);
-    assertNull(exception.getRequest());
-    assertNotNull(exception.getMultiValueHeaders());
-    assertEquals(exception.status(), HttpStatus.INTERNAL_SERVER_ERROR.value());
-    assertEquals(exception.getMessage(), RestApiExceptionUtils.NO_MESSAGE_VALUE);
-    assertNull(exception.getRestApiException());
-    assertNull(exception.getErrorCode());
-  }
-
-  /**
-   * Test with some useful values.
-   */
-  @Test
-  void testWithSomeUsefulValues() {
-    final RestApiException restApiException = new RestApiException();
+  void testFeignClientException(SoftAssertions softly) {
+    RestApiException restApiException = new RestApiException();
     restApiException.setErrorCode("TEST:0001");
-    final MultiValueMap<String, String> headers = new LinkedMultiValueMap<>();
-    headers.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
-    final FeignClientException exception = new FeignClientException(
-        null,
-        Collections.unmodifiableMap(headers),
-        404,
-        "Fatal",
-        restApiException);
-    assertNull(exception.getRequest());
-    assertNotNull(exception.getMultiValueHeaders());
-    assertTrue(exception.getMultiValueHeaders().containsKey(HttpHeaders.CONTENT_TYPE));
-    assertTrue(exception.getMultiValueHeaders().get(HttpHeaders.CONTENT_TYPE)
-        .contains(MediaType.APPLICATION_JSON_VALUE));
-    assertEquals(exception.status(), HttpStatus.NOT_FOUND.value());
-    assertEquals("Fatal", exception.getMessage());
-    assertEquals(restApiException, exception.getRestApiException());
-    assertEquals("TEST:0001", exception.getErrorCode());
-
-    final Map<String, ? extends Collection<String>> actualHeaders = exception.getMultiValueHeaders();
-    assertNotNull(actualHeaders);
-    assertEquals(List.of(MediaType.APPLICATION_JSON_VALUE), actualHeaders.get(HttpHeaders.CONTENT_TYPE));
+    Map<String, Collection<String>> headers = new LinkedHashMap<>();
+    headers.put(HttpHeaders.CONTENT_TYPE, List.of(MediaType.APPLICATION_JSON_VALUE));
+    Request request = Request.create(
+        HttpMethod.GET,
+        "http://localhost",
+        Map.of(), // headers
+        new byte[0],  // body
+        StandardCharsets.UTF_8,
+        new RequestTemplate());
+    FeignClientException actual = new FeignClientException(404, "Fatal", request, headers,
+        new byte[0], restApiException);
+    softly.assertThat(actual.getErrorCode())
+        .isEqualTo("TEST:0001");
+    softly.assertThat(actual.getMultiValueHeaders())
+        .containsKey(HttpHeaders.CONTENT_TYPE);
+    softly.assertThat(actual.status())
+        .isEqualTo(HttpStatus.NOT_FOUND.value());
+    softly.assertThat(actual.getMessage())
+        .isEqualTo("Fatal");
+    softly.assertThat(actual.getRestApiException())
+        .isEqualTo(restApiException);
   }
 
 }

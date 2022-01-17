@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 the original author or authors.
+ * Copyright 2020-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -60,7 +60,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestTemplate;
 
 /**
- * The actuator security auto configuration.
+ * The actuator security autoconfiguration.
  *
  * @author Christian Bremer
  */
@@ -93,7 +93,7 @@ public class ActuatorSecurityAutoConfiguration extends WebSecurityConfigurerAdap
   private final ObjectProvider<PasswordEncoder> passwordEncoderProvider;
 
   /**
-   * Instantiates a new actuator security auto configuration.
+   * Instantiates a new actuator security autoconfiguration.
    *
    * @param securityProperties the security properties
    * @param authProperties the security properties

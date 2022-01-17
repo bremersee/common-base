@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 the original author or authors.
+ * Copyright 2020-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,7 +41,7 @@ import org.springframework.util.ClassUtils;
 import org.springframework.util.StringUtils;
 
 /**
- * The abstract reactive resource server security auto configuration.
+ * The abstract reactive resource server security autoconfiguration.
  *
  * @author Christian Bremer
  */
@@ -61,7 +61,7 @@ public abstract class AbstractReactiveResourceServerAutoConfiguration {
   private final ObjectProvider<PasswordEncoder> passwordEncoderProvider;
 
   /**
-   * Instantiates a new abstract reactive resource server security auto configuration.
+   * Instantiates a new abstract reactive resource server security autoconfiguration.
    *
    * @param environment the environment
    * @param corsProperties the cors properties
@@ -204,14 +204,16 @@ public abstract class AbstractReactiveResourceServerAutoConfiguration {
     UserDetailsRepositoryReactiveAuthenticationManager manager
         = new UserDetailsRepositoryReactiveAuthenticationManager(userDetailsService);
     passwordEncoderProvider.ifAvailable(passwordEncoder -> {
-      log.info("Setting {} to ReactiveAuthenticationManager", ClassUtils.getUserClass(passwordEncoder).getSimpleName());
+      log.info("Setting {} to ReactiveAuthenticationManager",
+          ClassUtils.getUserClass(passwordEncoder).getSimpleName());
       manager.setPasswordEncoder(passwordEncoder);
     });
     return manager;
   }
 
   private ReactiveUserDetailsService defaultReactiveUserDetailsService() {
-    UserDetails[] userDetails = authProperties.buildBasicAuthUserDetails(passwordEncoderProvider.getIfAvailable());
+    UserDetails[] userDetails = authProperties.buildBasicAuthUserDetails(
+        passwordEncoderProvider.getIfAvailable());
     return new MapReactiveUserDetailsService(userDetails);
   }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 the original author or authors.
+ * Copyright 2020-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -49,13 +49,13 @@ import org.springframework.validation.annotation.Validated;
 public class ActuatorAuthProperties {
 
   /**
-   * Specifies the behaviour of the actuator security auto configuration.
+   * Specifies the behaviour of the actuator security autoconfiguration.
    */
   @NotNull
   private AutoSecurityMode enable = AutoSecurityMode.OTHER;
 
   /**
-   * The order of the actuator security auto configuration.
+   * The order of the actuator security autoconfiguration.
    */
   private int order = 61;
 
@@ -71,13 +71,15 @@ public class ActuatorAuthProperties {
   private List<Class<?>> unauthenticatedEndpoints = new ArrayList<>();
 
   /**
-   * The roles which can write to protected actuator endpoints. The role names normally start with {@code ROLE_}.
+   * The roles which can write to protected actuator endpoints. The role names normally start with
+   * {@code ROLE_}.
    */
   @NotNull
   private List<String> adminRoles = new ArrayList<>();
 
   /**
-   * The roles which can read protected actuator endpoints. The role names normally start with {@code ROLE_}.
+   * The roles which can read protected actuator endpoints. The role names normally start with
+   * {@code ROLE_}.
    */
   @NotNull
   private List<String> roles = new ArrayList<>();
