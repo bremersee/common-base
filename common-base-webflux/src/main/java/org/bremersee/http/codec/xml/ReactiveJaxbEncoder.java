@@ -33,6 +33,7 @@ import org.springframework.core.io.buffer.DataBufferUtils;
 import org.springframework.core.log.LogFormatUtils;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
+import org.springframework.util.Assert;
 import org.springframework.util.MimeType;
 import org.springframework.util.MimeTypeUtils;
 import org.springframework.validation.annotation.Validated;
@@ -43,8 +44,8 @@ import reactor.core.publisher.Mono;
  * Encode from single value to a byte stream containing XML elements.
  *
  * <p>{@link javax.xml.bind.annotation.XmlElements @XmlElements} and
- * {@link javax.xml.bind.annotation.XmlElement @XmlElement} can be used to specify how collections should be
- * marshalled.
+ * {@link javax.xml.bind.annotation.XmlElement @XmlElement} can be used to specify how collections
+ * should be marshalled.
  *
  * <p>The encoding parts are taken from {@link org.springframework.http.codec.xml.Jaxb2XmlEncoder}.
  *
@@ -62,16 +63,17 @@ public class ReactiveJaxbEncoder extends AbstractSingleValueEncoder<Object> {
    *
    * @param jaxbContextBuilder the jaxb context builder
    */
-  public ReactiveJaxbEncoder(final JaxbContextBuilder jaxbContextBuilder) {
+  public ReactiveJaxbEncoder(JaxbContextBuilder jaxbContextBuilder) {
     super(MimeTypeUtils.APPLICATION_XML, MimeTypeUtils.TEXT_XML);
-    this.jaxbContextBuilder = jaxbContextBuilder != null
-        ? jaxbContextBuilder
-        : JaxbContextBuilder.builder()
-            .withCanUnmarshal(JaxbContextBuilder.CAN_UNMARSHAL_ALL);
+    Assert.notNull(jaxbContextBuilder, "JaxbContextBuilder must be present.");
+    this.jaxbContextBuilder = jaxbContextBuilder;
   }
 
   @Override
-  public boolean canEncode(@NonNull ResolvableType elementType, @Nullable final MimeType mimeType) {
+  public boolean canEncode(
+      @NonNull ResolvableType elementType,
+      @Nullable final MimeType mimeType) {
+
     if (super.canEncode(elementType, mimeType)) {
       final Class<?> outputClass = elementType.toClass();
       return jaxbContextBuilder.canMarshal(outputClass);
@@ -82,8 +84,12 @@ public class ReactiveJaxbEncoder extends AbstractSingleValueEncoder<Object> {
 
   @NonNull
   @Override
-  protected Flux<DataBuffer> encode(@NonNull Object value, @NonNull DataBufferFactory bufferFactory,
-      @NonNull ResolvableType valueType, @Nullable MimeType mimeType, @Nullable Map<String, Object> hints) {
+  protected Flux<DataBuffer> encode(
+      @NonNull Object value,
+      @NonNull DataBufferFactory bufferFactory,
+      @NonNull ResolvableType valueType,
+      @Nullable MimeType mimeType,
+      @Nullable Map<String, Object> hints) {
 
     // we're relying on doOnDiscard in base class
     return Mono.fromCallable(() -> encodeValue(value, bufferFactory, valueType, mimeType, hints))
@@ -92,8 +98,12 @@ public class ReactiveJaxbEncoder extends AbstractSingleValueEncoder<Object> {
 
   @NonNull
   @Override
-  public DataBuffer encodeValue(@NonNull Object value, @NonNull DataBufferFactory bufferFactory,
-      @NonNull ResolvableType valueType, @Nullable MimeType mimeType, @Nullable Map<String, Object> hints) {
+  public DataBuffer encodeValue(
+      @NonNull Object value,
+      @NonNull DataBufferFactory bufferFactory,
+      @NonNull ResolvableType valueType,
+      @Nullable MimeType mimeType,
+      @Nullable Map<String, Object> hints) {
 
     if (!Hints.isLoggingSuppressed(hints)) {
       LogFormatUtils.traceDebug(logger, traceOn -> {

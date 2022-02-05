@@ -48,7 +48,7 @@ public class WebConfiguration implements WebFluxConfigurer {
    */
   public WebConfiguration() {
     jaxbContextBuilder = JaxbContextBuilder
-        .builder()
+        .newInstance()
         .processAll(ServiceLoader.load(JaxbContextDataProvider.class));
   }
 

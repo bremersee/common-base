@@ -22,7 +22,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ServiceLoader;
 import org.bremersee.http.codec.xml.model.XmlTestJaxbContextDataProvider;
-import org.bremersee.http.codec.xml.model.xml1.Person;
 import org.bremersee.http.codec.xml.model.xml2.Vehicle;
 import org.bremersee.http.codec.xml.model.xml3.Company;
 import org.bremersee.http.codec.xml.model.xml4.Address;
@@ -41,7 +40,7 @@ class ReactiveJaxbDecoderTest {
 
   @Test
   void maxInMemorySize() {
-    ReactiveJaxbDecoder decoder = new ReactiveJaxbDecoder(null);
+    ReactiveJaxbDecoder decoder = new ReactiveJaxbDecoder(JaxbContextBuilder.newInstance());
     decoder.setMaxInMemorySize(512 * 1024);
     assertEquals(512 * 1024, decoder.getMaxInMemorySize());
   }
@@ -52,9 +51,7 @@ class ReactiveJaxbDecoderTest {
   @Test
   void testCanDecode() {
     JaxbContextBuilder jaxbContextBuilder = JaxbContextBuilder
-        .builder()
-        .withCanMarshal(JaxbContextBuilder.CAN_MARSHAL_ONLY_PREDEFINED_DATA)
-        .withCanUnmarshal(JaxbContextBuilder.CAN_UNMARSHAL_ONLY_PREDEFINED_DATA)
+        .newInstance()
         .processAll(ServiceLoader.load(JaxbContextDataProvider.class));
 
     ReactiveJaxbDecoder decoder = new ReactiveJaxbDecoder(jaxbContextBuilder);
@@ -82,10 +79,6 @@ class ReactiveJaxbDecoderTest {
                 MimeTypeUtils.APPLICATION_XML));
 
     decoder = new ReactiveJaxbDecoder(jaxbContextBuilder);
-
-    assertFalse(
-        decoder
-            .canDecode(ResolvableType.forRawClass(Person.class), MimeTypeUtils.APPLICATION_XML));
 
     assertTrue(
         decoder

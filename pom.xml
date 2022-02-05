@@ -56,6 +56,8 @@
     <argLine>-Dorg.bremersee.test.executor=NOT_SPECIFIED</argLine>
 
     <common-model.version>2.4.0-SNAPSHOT</common-model.version>
+    <comparator.version>3.1.0-SNAPSHOT</comparator.version>
+    <pagebuilder.version>2.1.0-SNAPSHOT</pagebuilder.version>
   </properties>
 
   <developers>
@@ -114,6 +116,16 @@
         <groupId>org.bremersee</groupId>
         <artifactId>common-model</artifactId>
         <version>${common-model.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.bremersee</groupId>
+        <artifactId>comparator</artifactId>
+        <version>${comparator.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.bremersee</groupId>
+        <artifactId>pagebuilder</artifactId>
+        <version>${pagebuilder.version}</version>
       </dependency>
     </dependencies>
   </dependencyManagement>

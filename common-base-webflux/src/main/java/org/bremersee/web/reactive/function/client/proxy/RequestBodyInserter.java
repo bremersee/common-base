@@ -83,8 +83,9 @@ public interface RequestBodyInserter {
         @SuppressWarnings("SameParameterValue") final Class<?> valueClass,
         final Method method,
         final MediaType mediaType) {
-      return value != null && valueClass.isAssignableFrom(value.getClass()) && matches(method,
-          mediaType);
+      return value != null
+          && valueClass.isAssignableFrom(value.getClass())
+          && matches(method, mediaType);
     }
 
     private boolean matches(final Method method, final MediaType mediaType) {

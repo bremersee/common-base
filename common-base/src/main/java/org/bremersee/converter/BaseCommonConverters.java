@@ -18,7 +18,7 @@ package org.bremersee.converter;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.convert.converter.Converter;
-import org.springframework.format.FormatterRegistry;
+import org.springframework.core.convert.converter.ConverterRegistry;
 
 /**
  * The base common converters.
@@ -49,7 +49,7 @@ public class BaseCommonConverters {
    *
    * @param registry the registry
    */
-  public static void registerAll(FormatterRegistry registry) {
+  public static void registerAll(ConverterRegistry registry) {
     for (Converter<?, ?> converter : CONVERTERS) {
       log.info("Adding convert {} to registry.", converter);
       registry.addConverter(converter);

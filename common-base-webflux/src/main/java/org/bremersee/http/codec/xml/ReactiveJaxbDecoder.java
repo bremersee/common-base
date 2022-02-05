@@ -96,19 +96,18 @@ public class ReactiveJaxbDecoder extends AbstractDecoder<Object> {
    *
    * @param jaxbContextBuilder the jaxb context builder
    */
-  public ReactiveJaxbDecoder(final JaxbContextBuilder jaxbContextBuilder) {
+  public ReactiveJaxbDecoder(JaxbContextBuilder jaxbContextBuilder) {
     super(MimeTypeUtils.APPLICATION_XML, MimeTypeUtils.TEXT_XML,
         new MediaType("application", "*+xml"));
-    this.jaxbContextBuilder = jaxbContextBuilder != null
-        ? jaxbContextBuilder
-        : JaxbContextBuilder.builder()
-            .withCanUnmarshal(JaxbContextBuilder.CAN_UNMARSHAL_ALL);
+    Assert.notNull(jaxbContextBuilder, "JaxbContextBuilder must be present.");
+    this.jaxbContextBuilder = jaxbContextBuilder;
   }
 
   /**
-   * Set the max number of bytes that can be buffered by this decoder. This is either the size of the entire input when
-   * decoding as a whole, or when using async parsing with Aalto XML, it is the size of one top-level XML tree. When the
-   * limit is exceeded, {@link DataBufferLimitException} is raised.
+   * Set the max number of bytes that can be buffered by this decoder. This is either the size of
+   * the entire input when decoding as a whole, or when using async parsing with Aalto XML, it is
+   * the size of one top-level XML tree. When the limit is exceeded, {@link
+   * DataBufferLimitException} is raised.
    *
    * <p>By default this is set to 256K.
    *
@@ -130,7 +129,10 @@ public class ReactiveJaxbDecoder extends AbstractDecoder<Object> {
 
 
   @Override
-  public boolean canDecode(@NonNull ResolvableType elementType, @Nullable MimeType mimeType) {
+  public boolean canDecode(
+      @NonNull ResolvableType elementType,
+      @Nullable MimeType mimeType) {
+
     if (super.canDecode(elementType, mimeType)) {
       final Class<?> outputClass = elementType.getRawClass();
       return jaxbContextBuilder.canUnmarshal(outputClass);
@@ -141,8 +143,11 @@ public class ReactiveJaxbDecoder extends AbstractDecoder<Object> {
 
   @NonNull
   @Override
-  public Flux<Object> decode(@NonNull Publisher<DataBuffer> inputStream, ResolvableType elementType,
-      @Nullable MimeType mimeType, @Nullable Map<String, Object> hints) {
+  public Flux<Object> decode(
+      @NonNull Publisher<DataBuffer> inputStream,
+      ResolvableType elementType,
+      @Nullable MimeType mimeType,
+      @Nullable Map<String, Object> hints) {
 
     Flux<XMLEvent> xmlEventFlux = this.xmlEventDecoder.decode(
         inputStream, ResolvableType.forClass(XMLEvent.class), mimeType, hints);
@@ -165,8 +170,11 @@ public class ReactiveJaxbDecoder extends AbstractDecoder<Object> {
   @Override
   @SuppressWarnings({"rawtypes", "unchecked", "cast"})
   // XMLEventReader is Iterator<Object> on JDK 9
-  public Object decode(DataBuffer dataBuffer, ResolvableType targetType,
-      @Nullable MimeType mimeType, @Nullable Map<String, Object> hints) throws DecodingException {
+  public Object decode(
+      DataBuffer dataBuffer,
+      ResolvableType targetType,
+      @Nullable MimeType mimeType,
+      @Nullable Map<String, Object> hints) throws DecodingException {
 
     try {
       Iterator eventReader = inputFactory.createXMLEventReader(dataBuffer.asInputStream());
@@ -182,8 +190,11 @@ public class ReactiveJaxbDecoder extends AbstractDecoder<Object> {
 
   @NonNull
   @Override
-  public Mono<Object> decodeToMono(@NonNull Publisher<DataBuffer> input, @NonNull ResolvableType elementType,
-      @Nullable MimeType mimeType, @Nullable Map<String, Object> hints) {
+  public Mono<Object> decodeToMono(
+      @NonNull Publisher<DataBuffer> input,
+      @NonNull ResolvableType elementType,
+      @Nullable MimeType mimeType,
+      @Nullable Map<String, Object> hints) {
 
     //noinspection NullableInLambdaInTransform
     return DataBufferUtils.join(input, this.maxInMemorySize)
@@ -208,7 +219,8 @@ public class ReactiveJaxbDecoder extends AbstractDecoder<Object> {
   }
 
   /**
-   * Returns the qualified name for the given class, according to the mapping rules in the JAXB specification.
+   * Returns the qualified name for the given class, according to the mapping rules in the JAXB
+   * specification.
    *
    * @param outputClass the output class
    * @return the q name
@@ -246,10 +258,11 @@ public class ReactiveJaxbDecoder extends AbstractDecoder<Object> {
   }
 
   /**
-   * Split a flux of {@link XMLEvent XMLEvents} into a flux of XMLEvent lists, one list for each branch of the tree that
-   * starts with the given qualified name. That is, given the XMLEvents shown {@linkplain XmlEventDecoder here}, and the
-   * {@code desiredName} "{@code child}", this method returns a flux of two lists, each of which containing the events
-   * of a particular branch of the tree that starts with "{@code child}".
+   * Split a flux of {@link XMLEvent XMLEvents} into a flux of XMLEvent lists, one list for each
+   * branch of the tree that starts with the given qualified name. That is, given the XMLEvents
+   * shown {@linkplain XmlEventDecoder here}, and the {@code desiredName} "{@code child}", this
+   * method returns a flux of two lists, each of which containing the events of a particular branch
+   * of the tree that starts with "{@code child}".
    * <ol>
    * <li>The first list, dealing with the first branch of the tree:
    * <ol>
@@ -273,7 +286,6 @@ public class ReactiveJaxbDecoder extends AbstractDecoder<Object> {
   Flux<List<XMLEvent>> split(Flux<XMLEvent> xmlEventFlux, QName desiredName) {
     return xmlEventFlux.handle(new SplitHandler(desiredName));
   }
-
 
   private static class SplitHandler implements
       BiConsumer<XMLEvent, SynchronousSink<List<XMLEvent>>> {
