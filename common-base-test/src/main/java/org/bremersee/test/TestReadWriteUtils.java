@@ -16,12 +16,18 @@
 
 package org.bremersee.test;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import javax.xml.bind.JAXBException;
 import org.bremersee.test.exception.TestFrameworkException;
+import org.bremersee.xml.JaxbContextBuilder;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.FileCopyUtils;
@@ -78,6 +84,25 @@ public class TestReadWriteUtils {
         fileName);
   }
 
+  public static void writeJsonToTargetFolder(
+      String fileName,
+      ObjectMapper objectMapper,
+      Object model) throws IOException {
+
+    byte[] content = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsBytes(model);
+    writeToTargetFolder(content, fileName);
+  }
+
+  public static void writeXmlToTargetFolder(
+      String fileName,
+      JaxbContextBuilder jaxbContextBuilder,
+      Object model) throws IOException, JAXBException {
+
+    StringWriter sw = new StringWriter();
+    jaxbContextBuilder.buildMarshaller(model).marshal(model, sw);
+    writeToTargetFolder(sw.toString(), fileName);
+  }
+
   /**
    * Read bytes from target folder byte array.
    *
@@ -100,6 +125,33 @@ public class TestReadWriteUtils {
   public static String readStringFromTargetFolder(String fileName) throws IOException {
     Path filePath = Path.of(getTargetFolder().toString(), fileName);
     return Files.readString(filePath, StandardCharsets.UTF_8);
+  }
+
+  public static <T> T readJsonFromTargetFolder(
+      String fileName,
+      ObjectMapper objectMapper,
+      Class<? extends T> clazz) throws IOException {
+
+    byte[] content = readBytesFromTargetFolder(fileName);
+    return objectMapper.readValue(content, clazz);
+  }
+
+  public static <T> T readJsonFromTargetFolder(
+      String fileName,
+      ObjectMapper objectMapper,
+      TypeReference<? extends T> typeReference) throws IOException {
+
+    byte[] content = readBytesFromTargetFolder(fileName);
+    return objectMapper.readValue(content, typeReference);
+  }
+
+  public static <T> T readXmlFromTargetFolder(
+      String fileName,
+      JaxbContextBuilder jaxbContextBuilder) throws IOException, JAXBException {
+
+    byte[] content = readBytesFromTargetFolder(fileName);
+    //noinspection unchecked
+    return (T) jaxbContextBuilder.buildUnmarshaller().unmarshal(new ByteArrayInputStream(content));
   }
 
   /**
@@ -152,6 +204,32 @@ public class TestReadWriteUtils {
    */
   public static String readStringFromClassPath(String location) throws IOException {
     return new String(readFromClassPath(location), StandardCharsets.UTF_8);
+  }
+
+  public static <T> T readJsonFromClassPath(
+      String location,
+      ObjectMapper objectMapper,
+      Class<? extends T> clazz) throws IOException {
+
+    byte[] content = readFromClassPath(location);
+    return objectMapper.readValue(content, clazz);
+  }
+
+  public static <T> T readJsonFromClassPath(
+      String location,
+      ObjectMapper objectMapper,
+      TypeReference<? extends T> typeReference) throws IOException {
+
+    byte[] content = readFromClassPath(location);
+    return objectMapper.readValue(content, typeReference);
+  }
+
+  public static <T> T readXmlFromClassPath(String location, JaxbContextBuilder jaxbContextBuilder)
+      throws IOException, JAXBException {
+
+    byte[] content = readFromClassPath(location);
+    //noinspection unchecked
+    return (T) jaxbContextBuilder.buildUnmarshaller().unmarshal(new ByteArrayInputStream(content));
   }
 
 }

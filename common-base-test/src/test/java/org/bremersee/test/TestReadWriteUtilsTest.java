@@ -18,10 +18,16 @@ package org.bremersee.test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
+import org.bremersee.exception.model.RestApiException;
+import org.bremersee.xml.JaxbContextBuilder;
+import org.bremersee.xml.JaxbContextData;
 import org.junit.jupiter.api.Test;
+import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 
 /**
  * The test read write utils test.
@@ -64,6 +70,73 @@ class TestReadWriteUtilsTest {
     String expected = "Hello world";
     TestReadWriteUtils.writeToTargetFolder(expected, "test_string.txt");
     String actual = TestReadWriteUtils.readStringFromTargetFolder("test_string.txt");
+    assertThat(actual).isEqualTo(expected);
+  }
+
+  /**
+   * Write and read json to target folder with class.
+   *
+   * @throws IOException the io exception
+   */
+  @Test
+  void writeAndReadJsonToTargetFolderWithClass() throws IOException {
+    ObjectMapper objectMapper = new Jackson2ObjectMapperBuilder().build();
+    RestApiException expected = RestApiException.builder()
+        .message("Something failed")
+        .build();
+    TestReadWriteUtils.writeJsonToTargetFolder(
+        "read_write_test.json",
+        objectMapper,
+        expected);
+    RestApiException actual = TestReadWriteUtils.readJsonFromTargetFolder(
+        "read_write_test.json",
+        objectMapper,
+        RestApiException.class);
+    assertThat(actual).isEqualTo(expected);
+  }
+
+  /**
+   * Write and read json to target folder with type reference.
+   *
+   * @throws IOException the io exception
+   */
+  @Test
+  void writeAndReadJsonToTargetFolderWithTypeReference() throws IOException {
+    ObjectMapper objectMapper = new Jackson2ObjectMapperBuilder().build();
+    RestApiException expected = RestApiException.builder()
+        .message("Something failed")
+        .build();
+    TestReadWriteUtils.writeJsonToTargetFolder(
+        "read_write_test.json",
+        objectMapper,
+        expected);
+    RestApiException actual = TestReadWriteUtils.readJsonFromTargetFolder(
+        "read_write_test.json",
+        objectMapper,
+        new TypeReference<>() {
+        });
+    assertThat(actual).isEqualTo(expected);
+  }
+
+  /**
+   * Write and read xml to target folder.
+   *
+   * @throws Exception the exception
+   */
+  @Test
+  void writeAndReadXmlToTargetFolder() throws Exception {
+    JaxbContextBuilder jaxbContextBuilder = JaxbContextBuilder.newInstance()
+        .add(new JaxbContextData(RestApiException.class));
+    RestApiException expected = RestApiException.builder()
+        .message("Something failed")
+        .build();
+    TestReadWriteUtils.writeXmlToTargetFolder(
+        "read_write_test.xml",
+        jaxbContextBuilder,
+        expected);
+    RestApiException actual = TestReadWriteUtils.readXmlFromTargetFolder(
+        "read_write_test.xml",
+        jaxbContextBuilder);
     assertThat(actual).isEqualTo(expected);
   }
 
@@ -115,4 +188,60 @@ class TestReadWriteUtilsTest {
         .readStringFromClassPath("org/bremersee/test/read_write_test.txt");
     assertThat(actual).isEqualTo(expected);
   }
+
+  /**
+   * Read json from class path with class.
+   *
+   * @throws IOException the io exception
+   */
+  @Test
+  void readJsonFromClassPathWithClass() throws IOException {
+    ObjectMapper objectMapper = new Jackson2ObjectMapperBuilder().build();
+    RestApiException expected = RestApiException.builder()
+        .message("Something failed")
+        .build();
+    RestApiException actual = TestReadWriteUtils.readJsonFromClassPath(
+        "org/bremersee/test/read_write_test.json",
+        objectMapper,
+        RestApiException.class);
+    assertThat(actual).isEqualTo(expected);
+  }
+
+  /**
+   * Read json from class path with type reference.
+   *
+   * @throws IOException the io exception
+   */
+  @Test
+  void readJsonFromClassPathWithTypeReference() throws IOException {
+    ObjectMapper objectMapper = new Jackson2ObjectMapperBuilder().build();
+    RestApiException expected = RestApiException.builder()
+        .message("Something failed")
+        .build();
+    RestApiException actual = TestReadWriteUtils.readJsonFromClassPath(
+        "org/bremersee/test/read_write_test.json",
+        objectMapper,
+        new TypeReference<>() {
+        });
+    assertThat(actual).isEqualTo(expected);
+  }
+
+  /**
+   * Read xml from class path.
+   *
+   * @throws Exception the exception
+   */
+  @Test
+  void readXmlFromClassPath() throws Exception {
+    JaxbContextBuilder jaxbContextBuilder = JaxbContextBuilder.newInstance()
+        .add(new JaxbContextData(RestApiException.class));
+    RestApiException expected = RestApiException.builder()
+        .message("Something failed")
+        .build();
+    RestApiException actual = TestReadWriteUtils.readXmlFromClassPath(
+        "org/bremersee/test/read_write_test.xml",
+        jaxbContextBuilder);
+    assertThat(actual).isEqualTo(expected);
+  }
+
 }

@@ -1,0 +1,5 @@
+{
+  "_type" : "org.bremersee.exception.model.RestApiException",
+  "message" : "Something failed",
+  "errorCodeInherited" : false
+}

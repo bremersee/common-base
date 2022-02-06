@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<RestApiException _type="org.bremersee.exception.model.RestApiException">
+    <message>Something failed</message>
+    <errorCodeInherited>false</errorCodeInherited>
+</RestApiException>
