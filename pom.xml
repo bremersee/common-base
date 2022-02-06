@@ -53,7 +53,8 @@
     <gh-pages-staging-dir>${maven.multiModuleProjectDirectory}/target/staging</gh-pages-staging-dir>
 
     <!-- see https://www.eclemma.org/jacoco/trunk/doc/prepare-agent-mojo.html -->
-    <argLine>-Dorg.bremersee.test.executor=NOT_SPECIFIED</argLine>
+    <!-- <argLine>-Dorg.bremersee.test.executor=NOT_SPECIFIED</argLine> -->
+    <argLine>-Dorg.bremersee.test.executor=BUILD_SYSTEM</argLine>
 
     <common-model.version>2.4.0-SNAPSHOT</common-model.version>
     <comparator.version>3.1.0-SNAPSHOT</comparator.version>
