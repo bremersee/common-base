@@ -16,11 +16,12 @@
 
 package org.bremersee.test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
+import org.assertj.core.api.SoftAssertions;
+import org.assertj.core.api.junit.jupiter.SoftAssertionsExtension;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 /**
  * The test environment utils test.
@@ -28,28 +29,35 @@ import org.junit.jupiter.api.Test;
  * @author Christian Bremer
  */
 @Slf4j
+@ExtendWith(SoftAssertionsExtension.class)
 class TestEnvironmentUtilsTest {
 
   /**
    * Gets executor.
    */
   @Test
-  void getExecutor() {
+  void getExecutor(SoftAssertions softly) {
     String rawValue = System.getProperty(TestEnvironmentUtils.EXECUTOR_SYSTEM_PROPERTY);
     log.info("System property {} = {}", TestEnvironmentUtils.EXECUTOR_SYSTEM_PROPERTY, rawValue);
     if (rawValue == null) {
-      assertEquals(TestEnvironmentUtils.EXECUTOR_NOT_SPECIFIED, TestEnvironmentUtils.getExecutor());
+      softly.assertThat(TestEnvironmentUtils.getExecutor())
+          .as("No system property is present.")
+          .isEqualTo(TestEnvironmentUtils.EXECUTOR_NOT_SPECIFIED);
     } else if (!TestEnvironmentUtils.EXECUTOR_BUILD_SYSTEM.equals(rawValue)) {
       try {
         String newValue = UUID.randomUUID().toString().replace("-", "");
         System.setProperty(TestEnvironmentUtils.EXECUTOR_SYSTEM_PROPERTY, newValue);
-        assertEquals(newValue, TestEnvironmentUtils.getExecutor());
+        softly.assertThat(TestEnvironmentUtils.getExecutor())
+            .as("New random test executor value.")
+            .isEqualTo(newValue);
 
       } finally {
         System.setProperty(TestEnvironmentUtils.EXECUTOR_SYSTEM_PROPERTY, rawValue);
       }
     } else {
-      assertEquals(rawValue, TestEnvironmentUtils.getExecutor());
+      softly.assertThat(TestEnvironmentUtils.getExecutor())
+          .as("Existing executor value.")
+          .isEqualTo(rawValue);
     }
   }
 

@@ -16,12 +16,13 @@
 
 package org.bremersee.test.web;
 
-import static org.bremersee.test.web.RestApiTester.assertSameApi;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.bremersee.test.web.RestApiAssertionType.ANNOTATION_MUST_NOT_BE_NULL;
 import static org.bremersee.test.web.RestApiAssertionType.METHOD_MUST_NOT_BE_NULL;
 import static org.bremersee.test.web.RestApiAssertionType.SAME_ANNOTATION_ATTRIBUTE_VALUE;
 import static org.bremersee.test.web.RestApiAssertionType.SAME_ANNOTATION_SIZE;
 import static org.bremersee.test.web.RestApiAssertionType.SAME_METHOD_SIZE;
+import static org.bremersee.test.web.RestApiTester.assertSameApi;
 import static org.bremersee.test.web.RestApiTesterExclusion.exclusionBuilder;
 import static org.bremersee.test.web.RestApiTesterPath.PathType.ANNOTATION;
 import static org.bremersee.test.web.RestApiTesterPath.PathType.ATTRIBUTE;
@@ -29,7 +30,7 @@ import static org.bremersee.test.web.RestApiTesterPath.PathType.CLASS;
 import static org.bremersee.test.web.RestApiTesterPath.PathType.METHOD;
 import static org.bremersee.test.web.RestApiTesterPath.pathBuilder;
 
-import org.junit.jupiter.api.Assertions;
+import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -52,9 +53,8 @@ class RestApiTesterTest {
    */
   @Test
   void compareBadApisAndExpectWrongClassAnnotations() {
-    Assertions.assertThrows(
-        AssertionError.class,
-        () -> assertSameApi(BadApis.One.class, BadApis.Two.class));
+    assertThatExceptionOfType(AssertionError.class)
+        .isThrownBy(() -> assertSameApi(BadApis.One.class, BadApis.Two.class));
   }
 
   /**
@@ -62,9 +62,8 @@ class RestApiTesterTest {
    */
   @Test
   void compareBadApisAndExpectWrongSizeOfMethods() {
-    Assertions.assertThrows(
-        AssertionError.class,
-        () -> assertSameApi(BadApis.Three.class, BadApis.Four.class));
+    assertThatExceptionOfType(AssertionError.class)
+        .isThrownBy(() -> assertSameApi(BadApis.Three.class, BadApis.Four.class));
   }
 
   /**
@@ -72,9 +71,8 @@ class RestApiTesterTest {
    */
   @Test
   void compareBadApisAndExpectWrongMethods() {
-    Assertions.assertThrows(
-        AssertionError.class,
-        () -> assertSameApi(BadApis.Five.class, BadApis.Six.class));
+    assertThatExceptionOfType(AssertionError.class)
+        .isThrownBy(() -> assertSameApi(BadApis.Five.class, BadApis.Six.class));
   }
 
   /**
@@ -82,9 +80,12 @@ class RestApiTesterTest {
    */
   @Test
   void compareBadApisAndExpectWrongMethodParameters() {
-    Assertions.assertThrows(
-        AssertionError.class,
-        () -> assertSameApi(BadApis.Seven.class, BadApis.Eight.class));
+    assertThatExceptionOfType(AssertionError.class)
+        .isThrownBy(() -> assertSameApi(
+            new SoftAssertions(),
+            true,
+            BadApis.Seven.class,
+            BadApis.Eight.class));
   }
 
   /**
@@ -92,7 +93,10 @@ class RestApiTesterTest {
    */
   @Test
   void compareBadApisButExcludeDifferentValues() {
+    SoftAssertions softAssertions = new SoftAssertions();
     assertSameApi(
+        softAssertions,
+        false,
         BadApis.Three.class,
         BadApis.Four.class,
         exclusionBuilder()
@@ -146,5 +150,6 @@ class RestApiTesterTest {
             .type(SAME_ANNOTATION_ATTRIBUTE_VALUE)
             .build()
     );
+    softAssertions.assertAll();
   }
 }

@@ -24,7 +24,7 @@ import java.util.List;
 import org.bremersee.exception.RestApiExceptionMapper;
 import org.bremersee.exception.RestApiExceptionMapperImpl;
 import org.bremersee.exception.RestApiExceptionMapperProperties;
-import org.bremersee.test.beans.SimpleObjectProvider;
+import org.bremersee.test.beans.MockObjectProvider;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
@@ -44,7 +44,7 @@ class ApiExceptionResolverAutoConfigurationTest {
   void extendHandlerExceptionResolvers() {
     ApiExceptionResolverAutoConfiguration configuration = new ApiExceptionResolverAutoConfiguration(
         restApiExceptionMapper(),
-        new SimpleObjectProvider<>(new Jackson2ObjectMapperBuilder()));
+        new MockObjectProvider<>(new Jackson2ObjectMapperBuilder()));
     configuration.init();
     List<HandlerExceptionResolver> exceptionResolvers = new ArrayList<>();
     configuration.extendHandlerExceptionResolvers(exceptionResolvers);

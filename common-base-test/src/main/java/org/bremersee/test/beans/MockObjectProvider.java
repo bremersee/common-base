@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 the original author or authors.
+ * Copyright 2020-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,35 +24,36 @@ import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 
 /**
- * The simple object provider.
+ * The mock object provider.
  *
  * @param <T> the type parameter
  */
-public class SimpleObjectProvider<T> implements ObjectProvider<T> {
+public class MockObjectProvider<T> implements ObjectProvider<T> {
 
   private final T provides;
 
   private final Consumer<T> dependencyConsumer;
 
   /**
-   * Instantiates a new simple object provider.
+   * Instantiates a new mock object provider.
    *
    * @param provides the provides
    */
-  public SimpleObjectProvider(@Nullable T provides) {
+  public MockObjectProvider(@Nullable T provides) {
     this(provides, null);
   }
 
   /**
-   * Instantiates a new simple object provider.
+   * Instantiates a new mock object provider.
    *
    * <p>If a dependency consumer is set, the given consumer will be invoked when
-   * {@link ObjectProvider#ifAvailable(Consumer)} or {@link ObjectProvider#ifUnique(Consumer)} is called.
+   * {@link ObjectProvider#ifAvailable(Consumer)} or {@link ObjectProvider#ifUnique(Consumer)} is
+   * called.
    *
    * @param provides the provides
    * @param dependencyConsumer the dependency consumer
    */
-  public SimpleObjectProvider(@Nullable T provides, @Nullable Consumer<T> dependencyConsumer) {
+  public MockObjectProvider(@Nullable T provides, @Nullable Consumer<T> dependencyConsumer) {
     this.provides = provides;
     this.dependencyConsumer = dependencyConsumer;
   }

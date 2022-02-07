@@ -16,7 +16,8 @@
 
 package org.bremersee.test.web;
 
-import static java.lang.String.format;
+import static java.util.Objects.isNull;
+import static java.util.Objects.nonNull;
 import static org.bremersee.test.web.RestApiAssertionType.ANNOTATION_MUST_NOT_BE_NULL;
 import static org.bremersee.test.web.RestApiAssertionType.CLASS_MUST_BE_INTERFACE;
 import static org.bremersee.test.web.RestApiAssertionType.METHOD_MUST_NOT_BE_NULL;
@@ -31,11 +32,7 @@ import static org.bremersee.test.web.RestApiTesterPath.PathType.CLASS;
 import static org.bremersee.test.web.RestApiTesterPath.PathType.METHOD;
 import static org.bremersee.test.web.RestApiTesterPath.PathType.METHOD_PARAMETER;
 import static org.bremersee.test.web.RestApiTesterPath.pathBuilder;
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.springframework.util.ObjectUtils.isEmpty;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedElement;
@@ -43,10 +40,13 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.Arrays;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
+import org.assertj.core.api.SoftAssertions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.annotation.AnnotationUtils;
+import org.springframework.util.Assert;
 import org.springframework.util.ReflectionUtils;
 import org.springframework.util.StringUtils;
 
@@ -74,10 +74,39 @@ public class RestApiTester {
       final Class<?> actual,
       final RestApiTesterExclusion... exclusions) {
 
+    assertSameApi(null, true, expected, actual, exclusions);
+  }
+
+  /**
+   * Assert same api.
+   *
+   * @param softAssertions the soft assertions
+   * @param assertAll the assert all
+   * @param expected the expected
+   * @param actual the actual
+   * @param exclusions the exclusions
+   */
+  public static void assertSameApi(
+      final SoftAssertions softAssertions,
+      final boolean assertAll,
+      final Class<?> expected,
+      final Class<?> actual,
+      final RestApiTesterExclusion... exclusions) {
+
     log.info("Assert same api: expected = {}, actual = {}", name(expected),
         name(actual));
-    assertNotNull(expected, "Expected api class must not be null.");
-    assertNotNull(actual, "Actual api class must not be null.");
+    Assert.notNull(expected, "Expected api class must not be null.");
+    Assert.notNull(actual, "Actual api class must not be null.");
+
+    SoftAssertions softly;
+    boolean internalAssertAll;
+    if (Objects.nonNull(softAssertions)) {
+      softly = softAssertions;
+      internalAssertAll = assertAll;
+    } else {
+      softly = new SoftAssertions();
+      internalAssertAll = true;
+    }
 
     RestApiTesterPath path = pathBuilder().add(CLASS, expected.getSimpleName()).build();
     if (!isExcluded(path, CLASS_MUST_BE_INTERFACE, exclusions)) {
@@ -85,7 +114,9 @@ public class RestApiTester {
               + "\n  - path = {}"
               + "\n  - type = {}",
           path, CLASS_MUST_BE_INTERFACE);
-      assertTrue(expected.isInterface(), "Expected api class must be an interface.");
+      softly.assertThat(expected.isInterface())
+          .as("Expected api class must be an interface.")
+          .isTrue();
     }
 
     path = pathBuilder().add(CLASS, actual.getSimpleName()).build();
@@ -94,14 +125,21 @@ public class RestApiTester {
               + "\n  - path = {}"
               + "\n  - type = {}",
           path, CLASS_MUST_BE_INTERFACE);
-      assertTrue(actual.isInterface(), "Actual api class must be an interface.");
+      softly.assertThat(actual.isInterface())
+          .as("Actual api class must be an interface.")
+          .isTrue();
     }
 
-    assertSameClassAnnotations(expected, actual, exclusions);
-    assertSameMethodAnnotations(expected, actual, exclusions);
+    assertSameClassAnnotations(softly, expected, actual, exclusions);
+    assertSameMethodAnnotations(softly, expected, actual, exclusions);
+
+    if (internalAssertAll) {
+      softly.assertAll();
+    }
   }
 
   private static void assertSameClassAnnotations(
+      SoftAssertions softly,
       final Class<?> expected,
       final Class<?> actual,
       final RestApiTesterExclusion... exclusions) {
@@ -109,6 +147,7 @@ public class RestApiTester {
     final Annotation[] expectedAnnotations = expected.getAnnotations();
     final Annotation[] actualAnnotations = actual.getAnnotations();
     assertSameAnnotations(
+        softly,
         pathBuilder().add(CLASS, actual.getSimpleName()).build(),
         expectedAnnotations,
         actualAnnotations,
@@ -117,6 +156,7 @@ public class RestApiTester {
   }
 
   private static void assertSameMethodAnnotations(
+      SoftAssertions softly,
       final Class<?> expected,
       final Class<?> actual,
       final RestApiTesterExclusion... exclusions) {
@@ -130,11 +170,10 @@ public class RestApiTester {
               + "\n  - path = {}"
               + "\n  - type = {}",
           classPath, SAME_METHOD_SIZE);
-      assertEquals(
-          expectedMethods.length,
-          actualMethods.length,
-          format("Methods must have the same size on %s and %s.",
-              expected.getSimpleName(), actual.getSimpleName()));
+      softly.assertThat(actualMethods.length)
+          .as("Methods must have the same size on %s and %s.",
+              expected.getSimpleName(), actual.getSimpleName())
+          .isEqualTo(expectedMethods.length);
     }
 
     for (final Method expectedMethod : expectedMethods) {
@@ -148,17 +187,19 @@ public class RestApiTester {
                 + "\n  - path = {}"
                 + "\n  - type = {}",
             methodPath, METHOD_MUST_NOT_BE_NULL);
-        assertNotNull(
-            actualMethod,
-            format("Method %s (%s) is missing on %s", expectedMethod.getName(),
-                parameters(expectedMethod.getParameterTypes()), name(actual)));
-      } else if (actualMethod == null) {
+        softly.assertThat(actualMethod)
+            .as("Method %s (%s) must be present on %s", expectedMethod.getName(),
+                parameters(expectedMethod.getParameterTypes()), name(actual))
+            .isNotNull();
+      }
+      if (isNull(actualMethod)) {
         continue;
       }
 
       final Annotation[] expectedAnnotations = expectedMethod.getAnnotations();
       final Annotation[] actualAnnotations = actualMethod.getAnnotations();
       assertSameAnnotations(
+          softly,
           methodPath,
           expectedAnnotations,
           actualAnnotations,
@@ -175,6 +216,7 @@ public class RestApiTester {
               .add(METHOD_PARAMETER, String.valueOf(i))
               .build();
           assertSameAnnotations(
+              softly,
               methodParameterPath,
               expectedParameter.getAnnotations(),
               actualParameter.getAnnotations(),
@@ -186,6 +228,7 @@ public class RestApiTester {
   }
 
   private static void assertSameAnnotations(
+      final SoftAssertions softly,
       final RestApiTesterPath path,
       final Annotation[] expectedAnnotations,
       final Annotation[] actualAnnotations,
@@ -197,15 +240,15 @@ public class RestApiTester {
               + "\n  - path = {}"
               + "\n  - type = {}",
           path, SAME_ANNOTATION_SIZE);
-      assertEquals(
-          expectedAnnotations.length,
-          actualAnnotations.length,
-          format("Annotations must have the same size on %s.", path));
+      softly.assertThat(actualAnnotations.length)
+          .as("Annotations must have the same size on %s.", path)
+          .isEqualTo(expectedAnnotations.length);
     }
     for (final Annotation expectedAnnotation : expectedAnnotations) {
       final Annotation actualAnnotation = AnnotationUtils.getAnnotation(
           actualAnnotatedElement, expectedAnnotation.annotationType());
       assertSameAnnotation(
+          softly,
           path,
           expectedAnnotation,
           actualAnnotation,
@@ -214,6 +257,7 @@ public class RestApiTester {
   }
 
   private static void assertSameAnnotation(
+      final SoftAssertions softly,
       final RestApiTesterPath path,
       final Annotation expected,
       final Annotation actual,
@@ -227,11 +271,11 @@ public class RestApiTester {
               + "\n  - path = {}"
               + "\n  - type = {}",
           annotationPath, ANNOTATION_MUST_NOT_BE_NULL);
-      assertNotNull(
-          actual,
-          format("Annotation %s is missing on %s.", name(expected), path));
+      softly.assertThat(actual)
+          .as("Annotation %s is missing on %s.", name(expected), path)
+          .isNotNull();
     }
-    if (actual == null) {
+    if (isNull(actual)) {
       return;
     }
     final Map<String, Object> expectedAttributes = AnnotationUtils.getAnnotationAttributes(
@@ -239,6 +283,7 @@ public class RestApiTester {
     final Map<String, Object> actualAttributes = AnnotationUtils.getAnnotationAttributes(
         actual, true, false);
     assertSameAttributes(
+        softly,
         annotationPath,
         expectedAttributes,
         actualAttributes,
@@ -246,6 +291,7 @@ public class RestApiTester {
   }
 
   private static void assertSameAttributes(
+      final SoftAssertions softly,
       final RestApiTesterPath annotationPath,
       final Map<String, Object> expected,
       final Map<String, Object> actual,
@@ -256,15 +302,15 @@ public class RestApiTester {
               + "\n  - path = {}"
               + "\n  - type = {}",
           annotationPath, SAME_ANNOTATION_ATTRIBUTES_SIZE);
-      assertEquals(
-          expected.size(),
-          actual.size(),
-          format("Attributes of annotation (%s) must have the same size.", annotationPath));
+      softly.assertThat(actual.size())
+          .as("Attributes of annotation (%s) must have the same size.", annotationPath)
+          .isEqualTo(expected.size());
     }
     for (final Map.Entry<String, Object> expectedAttribute : expected.entrySet()) {
       final Object expectedAttributeValue = expectedAttribute.getValue();
       final Object actualAttributeValue = actual.get(expectedAttribute.getKey());
       assertSameAttributeValues(
+          softly,
           annotationPath.toPathBuilder().add(ATTRIBUTE, expectedAttribute.getKey()).build(),
           expectedAttributeValue,
           actualAttributeValue,
@@ -273,6 +319,7 @@ public class RestApiTester {
   }
 
   private static void assertSameAttributeValues(
+      final SoftAssertions softly,
       final RestApiTesterPath attributePath,
       final Object expected,
       final Object actual,
@@ -286,19 +333,24 @@ public class RestApiTester {
               + "\n  - type     = {}",
           attributePath, expected, actual, SAME_ANNOTATION_ATTRIBUTE_VALUE);
 
-      if (expected == null) {
-        assertNull(
-            actual,
-            format("Attribute (%s) must be null.", attributePath));
+      if (isNull(exclusions)) {
+        softly.assertThat(actual)
+            .as("Attribute (%s) must be null.", attributePath)
+            .isNull();
       } else if (expected instanceof Annotation[]) {
-        assertTrue(actual instanceof Annotation[]);
+        softly.assertThat(actual)
+            .as("Attributes must be instance of 'Annotation[]' on %s", attributePath)
+            .isInstanceOf(Annotation[].class);
         final Annotation[] expectedAnnotations = (Annotation[]) expected;
         final Annotation[] actualAnnotations = (Annotation[]) actual;
-        assertEquals(expectedAnnotations.length, actualAnnotations.length);
+        softly.assertThat(actualAnnotations.length)
+            .as("Annotations must have same size on %s", attributePath)
+            .isEqualTo(expectedAnnotations.length);
         for (int i = 0; i < actualAnnotations.length; i++) {
           final Annotation expectedAnnotation = expectedAnnotations[i];
           final Annotation actualAnnotation = actualAnnotations[i];
           assertSameAnnotation(
+              softly,
               attributePath,
               expectedAnnotation,
               actualAnnotation,
@@ -308,6 +360,7 @@ public class RestApiTester {
         final Annotation expectedAnnotation = (Annotation) expected;
         final Annotation actualAnnotation = (Annotation) actual;
         assertSameAnnotation(
+            softly,
             attributePath,
             expectedAnnotation,
             actualAnnotation,
@@ -316,25 +369,28 @@ public class RestApiTester {
         if (expected.getClass().isArray()) {
           final Object[] expectedArray = (Object[]) expected;
           final Object[] actualArray = (Object[]) actual;
-          assertArrayEquals(expectedArray, actualArray);
+          softly.assertThat(actualArray)
+              .as("Arrays must be equal on %s", attributePath)
+              .isEqualTo(expectedArray);
         } else {
-          assertEquals(
-              expected, actual);
+          softly.assertThat(actual)
+              .as("Objects must be equal on %s", attributePath)
+              .isEqualTo(expected);
         }
       }
     }
   }
 
   private static String name(final Annotation annotation) {
-    return annotation != null ? name(annotation.annotationType()) : "null";
+    return nonNull(annotation) ? name(annotation.annotationType()) : "null";
   }
 
   private static String name(final Class<?> clazz) {
-    return clazz != null ? clazz.getName() : "null";
+    return nonNull(clazz) ? clazz.getName() : "null";
   }
 
   private static String parameters(final Class<?>[] parameters) {
-    if (parameters == null || parameters.length == 0) {
+    if (isEmpty(parameters)) {
       return "";
     }
     return StringUtils.collectionToCommaDelimitedString(Arrays.stream(parameters)

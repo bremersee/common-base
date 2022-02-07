@@ -66,7 +66,7 @@ public enum RestApiAssertionType {
   SAME_ANNOTATION_ATTRIBUTE_VALUE(ANY);
 
   @Getter
-  private RestApiAssertionType parent;
+  private final RestApiAssertionType parent;
 
   RestApiAssertionType(RestApiAssertionType parent) {
     this.parent = parent;
